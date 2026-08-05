@@ -153,6 +153,18 @@ export async function addGalleryItem(formData: FormData) {
   await logActivity(user.id, "added", tripId > 0 ? "trip_gallery" : "gallery", String(mediaId)); refreshPublic()
 }
 
+export async function setTripCover(formData: FormData) {
+  const user = await requireAdmin()
+  const tripId = Number(formData.get("tripId"))
+  const mediaId = Number(formData.get("mediaId"))
+  if (!Number.isInteger(tripId) || !Number.isInteger(mediaId)) throw new Error("Wybierz wyjazd i zdjęcie")
+  const [asset] = await db.select({ id: mediaAssets.id }).from(mediaAssets).where(eq(mediaAssets.id, mediaId)).limit(1)
+  if (!asset) throw new Error("Nie znaleziono zdjęcia")
+  await db.update(trips).set({ image: `/api/media/${mediaId}`, updatedAt: new Date() }).where(eq(trips.id, tripId))
+  await logActivity(user.id, "updated_cover", "trip", String(tripId), `Media #${mediaId}`)
+  refreshPublic()
+}
+
 export async function removeGalleryItem(formData: FormData) {
   const user = await requireAdmin(); const id = Number(formData.get("id")); const scope = clean(formData.get("scope"))
   if (scope === "trip") await db.delete(tripGalleryItems).where(eq(tripGalleryItems.id, id)); else await db.delete(galleryItems).where(eq(galleryItems.id, id))

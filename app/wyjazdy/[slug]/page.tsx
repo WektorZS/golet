@@ -6,7 +6,7 @@ import { ArrowLeft, CalendarDays, Check, Headphones, MapPin, Plane, ShieldCheck,
 import { InquiryForm } from "@/components/inquiry-form"
 import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
-import { getTripBySlug } from "@/lib/trips"
+import { getTripBySlug, getTripGallery } from "@/lib/trips"
 
 export const dynamic = "force-dynamic"
 
@@ -14,13 +14,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const trip = await getTripBySlug(slug)
   if (!trip) return { title: "Wyjazd niedostępny" }
-  return { title: trip.title, description: `${trip.description} Pakiet od ${trip.price} zł.` }
+  return { title: trip.seoTitle || trip.title, description: trip.seoDescription || `${trip.description} Pakiet od ${trip.price} zł.` }
 }
 
 export default async function TripDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const trip = await getTripBySlug(slug)
   if (!trip) notFound()
+  const gallery = await getTripGallery(trip.id)
   const date = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${trip.startDate}T12:00:00`))
   const jsonLd = { "@context": "https://schema.org", "@type": "TouristTrip", name: trip.title, description: trip.description, touristType: "Kibice piłkarscy", offers: { "@type": "Offer", price: trip.price, priceCurrency: "PLN", availability: "https://schema.org/InStock" } }
 
@@ -48,6 +49,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
         </div>
         <aside id="rezerwacja" className="rounded-xl bg-foreground p-6 text-background md:p-8"><h2 className="font-sans text-3xl font-black uppercase">Zapytaj o ten wyjazd</h2><p className="mt-3 mb-7 text-sm leading-relaxed text-background/65">W formularzu wpisz „{trip.title}”. Oddzwonimy z dostępnością i wariantami wylotu.</p><InquiryForm /></aside>
       </div></section>
+      {gallery.length > 0 && <section className="bg-secondary px-4 py-20 md:px-6"><div className="mx-auto max-w-7xl"><p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Zobacz atmosferę</p><h2 className="mt-3 font-sans text-4xl font-black uppercase">Galeria wyjazdu</h2><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{gallery.map((item, index) => <figure key={item.id} className={`overflow-hidden rounded-xl bg-card ${index === 0 ? "sm:col-span-2" : ""}`}><div className={`relative ${index === 0 ? "aspect-[2/1]" : "aspect-[4/3]"}`}><Image src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || `Zdjęcie z wyjazdu ${trip.title}`} fill className="object-cover" sizes={index === 0 ? "(max-width: 1024px) 100vw, 66vw" : "(max-width: 1024px) 50vw, 33vw"} /></div>{item.caption && <figcaption className="p-4 text-sm text-muted-foreground">{item.caption}</figcaption>}</figure>)}</div></div></section>}
       <SiteFooter />
     </main>
   )

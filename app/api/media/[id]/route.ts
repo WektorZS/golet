@@ -17,11 +17,12 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   const { data } = await getAuth().getSession()
   const isAdmin = Boolean(data?.user && isAdminEmail(data.user.email))
   if (!isAdmin) {
-    const [globalReference, tripReference] = await Promise.all([
+    const [globalReference, tripReference, coverReference] = await Promise.all([
       db.select({ id: galleryItems.id }).from(galleryItems).where(and(eq(galleryItems.mediaId, id), eq(galleryItems.status, "published"))).limit(1),
       db.select({ id: tripGalleryItems.id }).from(tripGalleryItems).innerJoin(trips, eq(tripGalleryItems.tripId, trips.id)).where(and(eq(tripGalleryItems.mediaId, id), eq(tripGalleryItems.status, "published"), eq(trips.status, "published"))).limit(1),
+      db.select({ id: trips.id }).from(trips).where(and(eq(trips.image, `/api/media/${id}`), eq(trips.status, "published"))).limit(1),
     ])
-    if (!globalReference.length && !tripReference.length) return new NextResponse("Not found", { status: 404 })
+    if (!globalReference.length && !tripReference.length && !coverReference.length) return new NextResponse("Not found", { status: 404 })
   }
 
   const result = await get(asset.pathname, { access: "private", ifNoneMatch: request.headers.get("if-none-match") ?? undefined })
