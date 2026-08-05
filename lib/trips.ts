@@ -11,3 +11,13 @@ export async function getPublishedTrips() {
     .where(eq(trips.status, "published"))
     .orderBy(asc(trips.startDate))
 }
+
+export async function getTripBySlug(slug: string) {
+  const [trip] = await db
+    .select()
+    .from(trips)
+    .where(eq(trips.slug, slug))
+    .limit(1)
+
+  return trip?.status === "published" ? trip : null
+}
