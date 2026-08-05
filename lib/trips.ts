@@ -9,7 +9,7 @@ export async function getPublishedTrips() {
     .select()
     .from(trips)
     .where(eq(trips.status, "published"))
-    .orderBy(asc(trips.startDate))
+    .orderBy(asc(trips.sortOrder), asc(trips.startDate))
 }
 
 export async function getTripBySlug(slug: string) {

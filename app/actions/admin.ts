@@ -138,8 +138,12 @@ export async function deleteMedia(formData: FormData) {
   const user = await requireAdmin(); const id = Number(formData.get("id"))
   const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, id)).limit(1)
   if (!asset) return
-  const [globalUse, tripUse] = await Promise.all([db.select({ id: galleryItems.id }).from(galleryItems).where(eq(galleryItems.mediaId, id)).limit(1), db.select({ id: tripGalleryItems.id }).from(tripGalleryItems).where(eq(tripGalleryItems.mediaId, id)).limit(1)])
-  if (globalUse.length || tripUse.length) throw new Error("To zdjęcie jest używane w galerii")
+  const [globalUse, tripUse, coverUse] = await Promise.all([
+    db.select({ id: galleryItems.id }).from(galleryItems).where(eq(galleryItems.mediaId, id)).limit(1),
+    db.select({ id: tripGalleryItems.id }).from(tripGalleryItems).where(eq(tripGalleryItems.mediaId, id)).limit(1),
+    db.select({ id: trips.id }).from(trips).where(eq(trips.image, `/api/media/${id}`)).limit(1),
+  ])
+  if (globalUse.length || tripUse.length || coverUse.length) throw new Error("To zdjęcie jest używane w galerii lub jako okładka wyjazdu")
   await del(asset.pathname); await db.delete(mediaAssets).where(eq(mediaAssets.id, id))
   await logActivity(user.id, "deleted", "media", String(id), asset.originalName); revalidatePath("/admin")
 }
