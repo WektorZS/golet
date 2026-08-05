@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { db } from "@/lib/db"
 import { inquiries, trips } from "@/lib/db/schema"
+import { isAdminEmail } from "@/lib/auth/admin"
 import { getAuth, isAuthConfigured } from "@/lib/auth/server"
 
 export const dynamic = "force-dynamic"
@@ -19,6 +20,7 @@ export default async function AdminPage() {
   if (!isAuthConfigured()) return <SetupRequired />
   const { data } = await getAuth().getSession()
   if (!data?.user) redirect("/auth/sign-in")
+  if (!isAdminEmail(data.user.email)) redirect("/auth/sign-in?error=unauthorized")
 
   const [allTrips, allInquiries] = await Promise.all([
     db.select().from(trips).orderBy(desc(trips.startDate)),

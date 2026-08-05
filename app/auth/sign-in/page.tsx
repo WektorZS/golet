@@ -4,6 +4,7 @@ import { ArrowLeft, KeyRound } from "lucide-react"
 import { AdminLoginForm } from "@/components/admin-login-form"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { isAdminEmail } from "@/lib/auth/admin"
 import { getAuth, isAuthConfigured } from "@/lib/auth/server"
 
 export const dynamic = "force-dynamic"
@@ -21,7 +22,7 @@ export default async function SignInPage() {
       <KeyRound className="text-primary" aria-hidden="true" />
       <h1 className="mt-4 font-sans text-3xl font-black uppercase">Panel administratora</h1>
       <p className="mt-2 mb-7 text-sm leading-relaxed text-muted-foreground">Zaloguj się, aby zarządzać wyjazdami i zapytaniami klientów.</p>
-      {configured ? <AdminLoginForm /> : <Alert><AlertTitle>Ostatni krok konfiguracji</AlertTitle><AlertDescription>Panel jest gotowy, ale logowanie pozostaje wyłączone, ponieważ pominięto ustawienie zmiennej NEON_AUTH_COOKIE_SECRET. Dodaj losowy sekret o długości co najmniej 32 znaków w Vars, aby aktywować bezpieczne sesje.</AlertDescription></Alert>}
+      {configured ? <><AdminLoginForm /><p className="mt-5 text-center text-sm text-muted-foreground">Pierwsze logowanie? <Link href="/auth/setup" className="font-semibold text-foreground underline underline-offset-4">Ustaw hasło administratora</Link></p></> : <Alert><AlertTitle>Ostatni krok konfiguracji</AlertTitle><AlertDescription>Panel jest gotowy, ale logowanie pozostaje wyłączone, ponieważ pominięto ustawienie zmiennej NEON_AUTH_COOKIE_SECRET. Dodaj losowy sekret o długości co najmniej 32 znaków w Vars, aby aktywować bezpieczne sesje.</AlertDescription></Alert>}
     </div>
   </main>
 }

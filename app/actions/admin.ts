@@ -4,11 +4,12 @@ import { revalidatePath } from "next/cache"
 import { and, eq } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { inquiries, trips } from "@/lib/db/schema"
+import { isAdminEmail } from "@/lib/auth/admin"
 import { getAuth } from "@/lib/auth/server"
 
 async function requireAdmin() {
   const { data } = await getAuth().getSession()
-  if (!data?.user) throw new Error("Unauthorized")
+  if (!data?.user || !isAdminEmail(data.user.email)) throw new Error("Unauthorized")
   return data.user.id
 }
 
