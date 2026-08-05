@@ -1,49 +1,21 @@
-import { Analytics } from '@vercel/analytics/next'
-import type { Metadata, Viewport } from 'next'
-import './globals.css'
+import { Analytics } from "@vercel/analytics/next"
+import type { Metadata, Viewport } from "next"
+import { Geist, Oswald } from "next/font/google"
+import "./globals.css"
+
+const geist = Geist({ subsets: ["latin", "latin-ext"], variable: "--font-geist" })
+const oswald = Oswald({ subsets: ["latin", "latin-ext"], variable: "--font-oswald" })
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
-  },
+  metadataBase: new URL("https://letsgol.pl"),
+  title: { default: "Let’s Gol — wyjazdy na mecze w Europie", template: "%s | Let’s Gol" },
+  description: "Kompleksowe wyjazdy na największe mecze w Europie. Bilety, lot, hotel i opieka koordynatora w jednym pakiecie.",
+  openGraph: { title: "Let’s Gol — wyjazdy na mecze", description: "Ty wybierasz mecz. My organizujemy całą podróż.", locale: "pl_PL", type: "website", images: ["/images/hero-stadium.png"] },
+  robots: { index: true, follow: true },
 }
 
-export const viewport: Viewport = {
-  colorScheme: 'light dark',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
-  ],
-}
+export const viewport: Viewport = { colorScheme: "light", themeColor: "#080A0D", userScalable: true }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
-  return (
-    <html lang="en">
-      <body className="antialiased">
-        {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
-      </body>
-    </html>
-  )
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <html lang="pl" className={`light bg-background ${geist.variable} ${oswald.variable}`}><body>{children}{process.env.NODE_ENV === "production" && <Analytics />}</body></html>
 }
