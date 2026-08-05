@@ -19,7 +19,10 @@ export async function signInAdmin(_: AuthState, formData: FormData): Promise<Aut
 export async function requestAdminSetupCode(_: AuthState, formData: FormData): Promise<AuthState> {
   const email = String(formData.get("email") ?? "").trim().toLowerCase()
   if (email !== getAdminEmail()) return { error: "Nieprawidłowe konto administratora." }
-  const { error } = await getAuth().forgetPassword.emailOtp({ email })
+  const { error } = await getAuth().emailOtp.sendVerificationOtp({
+    email,
+    type: "forget-password",
+  })
   if (error) return { error: error.message || "Nie udało się wysłać kodu." }
   return { sent: true }
 }
