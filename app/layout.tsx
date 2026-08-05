@@ -1,6 +1,8 @@
 import { Analytics } from "@vercel/analytics/next"
 import type { Metadata, Viewport } from "next"
 import { Geist, Oswald } from "next/font/google"
+import { Toaster } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import "./globals.css"
 
 const geist = Geist({ subsets: ["latin", "latin-ext"], variable: "--font-geist" })
@@ -17,5 +19,5 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { colorScheme: "light", themeColor: "#080A0D", userScalable: true }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="pl" className={`light bg-background ${geist.variable} ${oswald.variable}`}><body>{children}{process.env.NODE_ENV === "production" && <Analytics />}</body></html>
+  return <html lang="pl" className={`light bg-background ${geist.variable} ${oswald.variable}`}><body><TooltipProvider>{children}</TooltipProvider><Toaster richColors />{process.env.NODE_ENV === "production" && <Analytics />}</body></html>
 }

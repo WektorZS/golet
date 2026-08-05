@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { getAdminEmail, isAdminEmail } from "@/lib/auth/admin"
+import { requireAdmin } from "@/lib/auth/require-admin"
 import { getAuth, resetPasswordWithOtp } from "@/lib/auth/server"
 
 export type AuthState = { error?: string; sent?: boolean } | null
@@ -44,6 +45,21 @@ export async function finishAdminSetup(_: AuthState, formData: FormData): Promis
   const signInResult = await getAuth().signIn.email({ email, password })
   if (signInResult.error) redirect("/auth/sign-in?setup=success")
   redirect("/admin")
+}
+
+export async function changeAdminPassword(formData: FormData) {
+  await requireAdmin()
+  const currentPassword = String(formData.get("currentPassword") ?? "")
+  const newPassword = String(formData.get("newPassword") ?? "")
+  const confirmPassword = String(formData.get("confirmPassword") ?? "")
+  if (newPassword.length < 12) throw new Error("Nowe hasło musi mieć co najmniej 12 znaków")
+  if (newPassword !== confirmPassword) throw new Error("Nowe hasła nie są takie same")
+  const result = await getAuth().changePassword({
+    currentPassword,
+    newPassword,
+    revokeOtherSessions: formData.get("revokeOtherSessions") === "on",
+  })
+  if (result.error) throw new Error(result.error.message || "Nie udało się zmienić hasła")
 }
 
 export async function signOutAdmin() {

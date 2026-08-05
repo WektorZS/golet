@@ -1,6 +1,6 @@
-import { asc, eq } from "drizzle-orm"
+import { and, asc, eq } from "drizzle-orm"
 import { db } from "@/lib/db"
-import { trips } from "@/lib/db/schema"
+import { tripGalleryItems, trips } from "@/lib/db/schema"
 
 export type Trip = typeof trips.$inferSelect
 
@@ -20,4 +20,8 @@ export async function getTripBySlug(slug: string) {
     .limit(1)
 
   return trip?.status === "published" ? trip : null
+}
+
+export async function getTripGallery(tripId: number) {
+  return db.select().from(tripGalleryItems).where(and(eq(tripGalleryItems.tripId, tripId), eq(tripGalleryItems.status, "published"))).orderBy(asc(tripGalleryItems.sortOrder))
 }

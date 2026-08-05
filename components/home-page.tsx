@@ -8,6 +8,7 @@ import { SectionHeading } from "@/components/section-heading"
 import { InquiryForm } from "@/components/inquiry-form"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import type { SiteContent, YouTubeVideo } from "@/lib/content"
 import type { Trip } from "@/lib/trips"
 
 const trust = [
@@ -41,7 +42,10 @@ const faqs = [
   ["Co jeśli termin meczu zostanie zmieniony?", "Monitorujemy oficjalne komunikaty ligowe i dobieramy elastyczną logistykę. O każdej zmianie informujemy od razu i proponujemy najlepsze rozwiązanie."],
 ] as const
 
-export function HomePage({ trips }: { trips: Trip[] }) {
+type GalleryItem = { id: number; title: string; city: string; image: string; mediaId: number | null; alt: string }
+type Testimonial = { id: number; author: string; tripName: string; content: string; rating: number }
+
+export function HomePage({ trips, content, gallery, testimonials, videos }: { trips: Trip[]; content: SiteContent; gallery: GalleryItem[]; testimonials: Testimonial[]; videos: YouTubeVideo[] }) {
   return (
     <main>
       <section className="relative isolate min-h-[780px] overflow-hidden bg-foreground text-background">
@@ -51,11 +55,11 @@ export function HomePage({ trips }: { trips: Trip[] }) {
         <SiteHeader />
         <div className="relative mx-auto flex min-h-[650px] max-w-7xl items-center px-4 pb-14 pt-28 md:px-6">
           <div className="flex max-w-3xl flex-col items-start gap-6">
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-primary">Mecz zaczyna się dużo wcześniej niż pierwszy gwizdek</p>
-            <h1 className="text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">Leć z nami<br /><span className="text-primary">na największe</span><br />mecze w Europie</h1>
-            <p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">Bilet, lot, hotel i opieka koordynatora. Ty wybierasz mecz, my dopinamy całą resztę.</p>
+            <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-primary">{content.heroEyebrow || "Mecz zaczyna się dużo wcześniej niż pierwszy gwizdek"}</p>
+            <h1 className="text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">{content.heroTitle || "Leć z nami na największe mecze w Europie"}</h1>
+            <p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">{content.heroDescription || "Bilet, lot, hotel i opieka koordynatora. Ty wybierasz mecz, my dopinamy całą resztę."}</p>
             <div className="flex flex-wrap gap-3">
-              <Button size="lg" className="h-13 rounded-md px-6 font-bold uppercase" nativeButton={false} render={<Link href="#wyjazdy" />}>Zobacz wyjazdy <ArrowRight data-icon="inline-end" /></Button>
+              <Button size="lg" className="h-13 rounded-md px-6 font-bold uppercase" nativeButton={false} render={<Link href="#wyjazdy" />}>{content.heroCta || "Zobacz wyjazdy"} <ArrowRight data-icon="inline-end" /></Button>
               <Button size="lg" variant="outline" className="h-13 rounded-md border-background/35 bg-foreground/20 px-6 font-bold uppercase text-background hover:bg-background hover:text-foreground" nativeButton={false} render={<Link href="#kontakt" />}>Wyceń mój wyjazd</Button>
             </div>
           </div>
@@ -99,8 +103,8 @@ export function HomePage({ trips }: { trips: Trip[] }) {
 
       <section className="bg-secondary px-4 py-20 md:px-6">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.25fr_0.75fr]">
-          <div><SectionHeading eyebrow="Z pierwszego rzędu" title="Galeria z wyjazdów" align="left" /><div className="mt-7 grid grid-cols-2 gap-3"><div className="relative col-span-2 aspect-[2/1] overflow-hidden rounded-xl"><Image src="/images/barcelona-trip.png" alt="Stadion w Barcelonie" fill className="object-cover" sizes="66vw" /></div><div className="relative aspect-square overflow-hidden rounded-xl"><Image src="/images/milan-trip.png" alt="Wieczór meczowy w Mediolanie" fill className="object-cover" sizes="33vw" /></div><div className="relative aspect-square overflow-hidden rounded-xl"><Image src="/images/madrid-trip.png" alt="Stadion w Madrycie" fill className="object-cover" sizes="33vw" /></div></div></div>
-          <div className="flex flex-col justify-center"><SectionHeading eyebrow="Opinie klientów" title="Emocje potwierdzone na trybunach" align="left" /><blockquote className="mt-7 rounded-xl bg-card p-7 shadow-sm"><div className="flex gap-1 text-primary" aria-label="Ocena 5 na 5">{Array.from({length:5}).map((_,i)=><Star key={i} fill="currentColor" aria-hidden="true" />)}</div><p className="mt-5 text-lg leading-relaxed">„Pierwszy wyjazd z Let&apos;s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!”</p><footer className="mt-5 font-semibold">Kamil · Barcelona</footer></blockquote></div>
+          <div><SectionHeading eyebrow="Z pierwszego rzędu" title="Galeria z wyjazdów" align="left" /><div className="mt-7 grid grid-cols-2 gap-3">{(gallery.length ? gallery.slice(0, 3) : [{ id: -1, image: "/images/barcelona-trip.png", mediaId: null, alt: "Stadion w Barcelonie", title: "Barcelona", city: "Barcelona" }, { id: -2, image: "/images/milan-trip.png", mediaId: null, alt: "Wieczór meczowy w Mediolanie", title: "Mediolan", city: "Mediolan" }, { id: -3, image: "/images/madrid-trip.png", mediaId: null, alt: "Stadion w Madrycie", title: "Madryt", city: "Madryt" }]).map((item, index) => <div key={item.id} className={`relative overflow-hidden rounded-xl ${index === 0 ? "col-span-2 aspect-[2/1]" : "aspect-square"}`}><Image src={item.mediaId ? `/api/media/${item.mediaId}` : item.image} alt={item.alt || item.title} fill className="object-cover" sizes={index === 0 ? "66vw" : "33vw"} /></div>)}</div></div>
+          <div className="flex flex-col justify-center"><SectionHeading eyebrow="Opinie klientów" title="Emocje potwierdzone na trybunach" align="left" />{(testimonials.length ? testimonials.slice(0, 2) : [{ id: -1, author: "Kamil", tripName: "Barcelona", content: "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!", rating: 5 }]).map((item) => <blockquote key={item.id} className="mt-4 rounded-xl bg-card p-7 shadow-sm"><div className="flex gap-1 text-primary" aria-label={`Ocena ${item.rating} na 5`}>{Array.from({length:item.rating}).map((_,i)=><Star key={i} fill="currentColor" aria-hidden="true" />)}</div><p className="mt-5 text-lg leading-relaxed">„{item.content}”</p><footer className="mt-5 font-semibold">{item.author}{item.tripName ? ` · ${item.tripName}` : ""}</footer></blockquote>)}</div>
         </div>
       </section>
 
@@ -109,6 +113,8 @@ export function HomePage({ trips }: { trips: Trip[] }) {
       <section id="o-nas" className="bg-secondary px-4 py-20 md:px-6"><div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2"><div><SectionHeading eyebrow="O nas" title="Kibice, którzy zawodowo ogarniają podróże" intro="Let’s Gol powstało z prostego przekonania: droga na stadion powinna budować emocje, a nie stres. Łączymy znajomość futbolu z doświadczeniem w turystyce i bierzemy odpowiedzialność za każdy etap wyjazdu." align="left" /><div className="mt-7 flex flex-wrap gap-6"><div><strong className="text-3xl font-black">42</strong><p className="text-sm text-muted-foreground">stadiony w ofercie</p></div><div><strong className="text-3xl font-black">4.9/5</strong><p className="text-sm text-muted-foreground">średnia ocen</p></div><div><strong className="text-3xl font-black">24/7</strong><p className="text-sm text-muted-foreground">pomoc w podróży</p></div></div></div><div className="relative aspect-[4/3] overflow-hidden rounded-xl"><Image src="/images/hero-stadium.png" alt="Kibice Let’s Gol na stadionie" fill className="object-cover" sizes="50vw" /></div></div></section>
 
       <section id="faq" className="bg-background px-4 py-20 md:px-6"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.65fr_1fr]"><SectionHeading eyebrow="FAQ" title="Najczęstsze pytania" intro="Jeśli nie ma tu odpowiedzi, napisz lub zadzwoń. Odpowiadamy konkretnie." align="left" /><Accordion className="rounded-xl border px-5">{faqs.map(([q,a]) => <AccordionItem key={q}><AccordionTrigger className="py-5 text-base">{q}</AccordionTrigger><AccordionContent className="pb-5 leading-relaxed text-muted-foreground">{a}</AccordionContent></AccordionItem>)}</Accordion></div></section>
+
+      {videos.length > 0 && <section className="bg-secondary px-4 py-20 md:px-6"><div className="mx-auto max-w-7xl"><SectionHeading eyebrow="Zobacz atmosferę" title="Najnowsze na YouTube" intro="Relacje, stadiony i emocje z naszych piłkarskich podróży." /><div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{videos.map((video) => <a key={video.id} href={video.url} target="_blank" rel="noreferrer" className="group overflow-hidden rounded-xl border bg-card"><div className="relative aspect-video overflow-hidden"><Image src={video.thumbnail} alt={`Miniatura filmu: ${video.title}`} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 768px) 100vw, 33vw" /></div><div className="flex items-start justify-between gap-4 p-4"><h3 className="font-bold leading-snug">{video.title}</h3><ArrowRight className="shrink-0 text-primary" /></div></a>)}</div></div></section>}
 
       <section id="kontakt" className="bg-foreground px-4 py-20 text-background md:px-6 md:py-24"><div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.75fr_1.25fr]"><div className="flex flex-col gap-6"><p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Twój następny mecz</p><h2 className="text-balance font-sans text-4xl font-black uppercase leading-tight md:text-6xl">Zapytaj o swój wyjazd</h2><p className="max-w-md leading-relaxed text-background/65">Wypełnij formularz, a przygotujemy propozycję dopasowaną do meczu, budżetu i lotniska wylotu.</p><div className="flex items-center gap-3"><Trophy className="text-primary" aria-hidden="true" /><span>Odpowiedź zwykle w ciągu 24 godzin</span></div></div><InquiryForm /></div></section>
       <SiteFooter />
