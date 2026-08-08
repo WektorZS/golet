@@ -3,8 +3,7 @@ import { NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import { db } from "@/lib/db"
 import { inquiries } from "@/lib/db/schema"
-
-const csv = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`
+import { csvCell } from "@/lib/security"
 
 export async function GET() {
   try {
@@ -15,8 +14,8 @@ export async function GET() {
 
   const rows = await db.select().from(inquiries).orderBy(desc(inquiries.createdAt))
   const header = ["ID", "Data", "Imię", "E-mail", "Telefon", "Mecz", "Miasto wylotu", "Liczba osób", "Wiadomość", "Status", "Notatka"]
-  const body = rows.map((row) => [row.id, row.createdAt.toISOString(), row.name, row.email, row.phone, row.matchName, row.departureCity, row.travelers, row.message, row.status, row.adminNote].map(csv).join(";"))
-  const content = `\uFEFF${header.map(csv).join(";")}\n${body.join("\n")}`
+  const body = rows.map((row) => [row.id, row.createdAt.toISOString(), row.name, row.email, row.phone, row.matchName, row.departureCity, row.travelers, row.message, row.status, row.adminNote].map(csvCell).join(";"))
+  const content = `\uFEFF${header.map(csvCell).join(";")}\n${body.join("\n")}`
 
   return new NextResponse(content, {
     headers: {

@@ -105,23 +105,46 @@ export async function archiveTestimonial(formData: FormData) {
   await logActivity(user.id, "archived", "testimonial", String(id)); refreshPublic()
 }
 
+const ALLOWED_SETTING_KEYS = new Set([
+  "heroEyebrow", "heroTitle", "heroDescription", "heroCta", "tripsTitle", "tripsDescription",
+  "customTripTitle", "packageTitle", "benefitsTitle", "galleryTitle", "galleryHomeLimit",
+  "testimonialsTitle", "processTitle", "aboutTitle", "aboutText", "faqTitle", "contactTitle",
+  "youtubeTitle", "youtubeUrl", "youtubeLimit", "youtubeEnabled",
+])
+
 export async function saveSettings(formData: FormData) {
   const user = await requireAdmin()
   for (const [key, value] of formData.entries()) {
     if (!key.startsWith("setting.")) continue
     const settingKey = key.slice(8)
-    await db.insert(siteSettings).values({ key: settingKey, value: String(value), updatedAt: new Date() }).onConflictDoUpdate({ target: siteSettings.key, set: { value: String(value), updatedAt: new Date() } })
+    if (!ALLOWED_SETTING_KEYS.has(settingKey)) continue
+    const settingValue = String(value).slice(0, 4000)
+    await db.insert(siteSettings).values({ key: settingKey, value: settingValue, updatedAt: new Date() }).onConflictDoUpdate({ target: siteSettings.key, set: { value: settingValue, updatedAt: new Date() } })
   }
   await logActivity(user.id, "updated", "settings", undefined, "Treści strony")
   refreshPublic()
+}
+
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"] as const
+
+/** Confirms the file's magic bytes match a claimed image type; rejects mislabeled or disguised uploads. */
+function detectImageType(bytes: Uint8Array): (typeof ALLOWED_IMAGE_TYPES)[number] | null {
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg"
+  if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return "image/png"
+  if (bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) return "image/webp"
+  if (bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70) return "image/avif"
+  return null
 }
 
 export async function uploadMedia(formData: FormData) {
   const user = await requireAdmin(); const file = formData.get("file")
   if (!(file instanceof File) || file.size === 0) throw new Error("Wybierz plik")
   if (file.size > 8 * 1024 * 1024) throw new Error("Plik może mieć maksymalnie 8 MB")
-  if (!["image/jpeg", "image/png", "image/webp", "image/avif"].includes(file.type)) throw new Error("Dozwolone formaty: JPEG, PNG, WebP i AVIF")
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-")
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number])) throw new Error("Dozwolone formaty: JPEG, PNG, WebP i AVIF")
+  const header = new Uint8Array(await file.slice(0, 16).arrayBuffer())
+  const detectedType = detectImageType(header)
+  if (!detectedType || detectedType !== file.type) throw new Error("Zawartość pliku nie zgadza się z jego typem")
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-").slice(0, 80)
   const blob = await put(`admin/${crypto.randomUUID()}-${safeName}`, file, { access: "private", addRandomSuffix: false })
   const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: file.type, size: file.size, alt: clean(formData.get("alt")), originalName: file.name, createdBy: user.id }).returning({ id: mediaAssets.id })
   await logActivity(user.id, "uploaded", "media", String(asset.id), file.name)
