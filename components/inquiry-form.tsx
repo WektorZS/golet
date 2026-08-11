@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
 import { createInquiry, type InquiryState } from "@/app/actions/inquiries"
 import { Button } from "@/components/ui/button"
@@ -12,9 +12,13 @@ const initialState: InquiryState = { status: "idle", message: "" }
 
 export function InquiryForm() {
   const [state, action, pending] = useActionState(createInquiry, initialState)
+  const [formLoadedAt] = useState(() => Date.now())
 
   return (
     <form action={action} className="flex flex-col gap-5">
+      {/* Honeypot: hidden from real users via CSS + tabIndex, but bots that fill every field will trip it. */}
+      <input type="text" name="website" tabIndex={-1} autoComplete="off" className="absolute left-[-9999px] top-auto h-0 w-0 overflow-hidden opacity-0" aria-hidden="true" />
+      <input type="hidden" name="formLoadedAt" value={formLoadedAt} />
       <FieldGroup className="grid gap-4 md:grid-cols-2">
         <Field><FieldLabel htmlFor="name">Imię i nazwisko</FieldLabel><Input id="name" name="name" required autoComplete="name" placeholder="Jan Kowalski" /></Field>
         <Field><FieldLabel htmlFor="phone">Telefon</FieldLabel><Input id="phone" name="phone" required autoComplete="tel" placeholder="+48 500 000 000" /></Field>

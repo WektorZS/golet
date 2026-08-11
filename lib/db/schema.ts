@@ -104,3 +104,24 @@ export const adminActivity = pgTable("admin_activity", {
   details: text("details").notNull().default(""),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 })
+
+/** Hashed (never raw) fingerprints of inquiry-form submission attempts, used for cooldown/rate-limit and duplicate detection. */
+export const inquiryAttempts = pgTable("inquiry_attempts", {
+  id: serial("id").primaryKey(),
+  ipHash: text("ip_hash").notNull(),
+  emailHash: text("email_hash").notNull(),
+  contentHash: text("content_hash").notNull(),
+  accepted: boolean("accepted").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+})
+
+/** Local cache of the channel's YouTube videos, refreshed once a day by a Vercel Cron job. */
+export const youtubeVideos = pgTable("youtube_videos", {
+  id: serial("id").primaryKey(),
+  videoId: text("video_id").notNull().unique(),
+  title: text("title").notNull(),
+  thumbnailUrl: text("thumbnail_url").notNull(),
+  publishedAt: timestamp("published_at").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+})

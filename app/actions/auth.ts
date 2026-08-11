@@ -47,19 +47,27 @@ export async function finishAdminSetup(_: AuthState, formData: FormData): Promis
   redirect("/admin")
 }
 
-export async function changeAdminPassword(formData: FormData) {
+export type ChangePasswordState = { error?: string; success?: boolean }
+
+export async function changeAdminPassword(_: ChangePasswordState, formData: FormData): Promise<ChangePasswordState> {
   await requireAdmin()
   const currentPassword = String(formData.get("currentPassword") ?? "")
   const newPassword = String(formData.get("newPassword") ?? "")
   const confirmPassword = String(formData.get("confirmPassword") ?? "")
-  if (newPassword.length < 12) throw new Error("Nowe hasło musi mieć co najmniej 12 znaków")
-  if (newPassword !== confirmPassword) throw new Error("Nowe hasła nie są takie same")
-  const result = await getAuth().changePassword({
-    currentPassword,
-    newPassword,
-    revokeOtherSessions: formData.get("revokeOtherSessions") === "on",
-  })
-  if (result.error) throw new Error(result.error.message || "Nie udało się zmienić hasła")
+  if (newPassword.length < 12) return { error: "Nowe hasło musi mieć co najmniej 12 znaków." }
+  if (newPassword !== confirmPassword) return { error: "Nowe hasła nie są takie same." }
+
+  try {
+    const result = await getAuth().changePassword({
+      currentPassword,
+      newPassword,
+      revokeOtherSessions: formData.get("revokeOtherSessions") === "on",
+    })
+    if (result.error) return { error: result.error.message || "Nie udało się zmienić hasła. Sprawdź aktualne hasło." }
+    return { success: true }
+  } catch {
+    return { error: "Nie udało się zmienić hasła. Sprawdź aktualne hasło." }
+  }
 }
 
 export async function signOutAdmin() {
