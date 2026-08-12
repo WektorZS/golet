@@ -45,6 +45,36 @@ const faqs = [
 type GalleryItem = { id: number; title: string; city: string; image: string; mediaId: number | null; alt: string }
 type Testimonial = { id: number; author: string; tripName: string; content: string; rating: number }
 
+const FALLBACK_GALLERY: GalleryItem[] = [
+  { id: -1, image: "/images/barcelona-trip.png", mediaId: null, alt: "Stadion w Barcelonie", title: "Barcelona", city: "Barcelona" },
+  { id: -2, image: "/images/milan-trip.png", mediaId: null, alt: "Wieczór meczowy w Mediolanie", title: "Mediolan", city: "Mediolan" },
+  { id: -3, image: "/images/madrid-trip.png", mediaId: null, alt: "Stadion w Madrycie", title: "Madryt", city: "Madryt" },
+]
+
+/**
+ * Renders a fixed number of gallery photos (set by the admin via `galleryHomeLimit`,
+ * clamped to a sane 1-8 range) in a compact, evenly sized grid so the section never
+ * grows taller than the rest of the homepage regardless of how many photos are shown.
+ */
+function HomeGallery({ gallery, limit }: { gallery: GalleryItem[]; limit: number }) {
+  const count = Math.min(8, Math.max(1, Math.round(limit) || 3))
+  const items = (gallery.length ? gallery : FALLBACK_GALLERY).slice(0, count)
+  const featureFirst = items.length >= 3
+
+  return (
+    <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3">
+      {items.map((item, index) => {
+        const isFeatured = featureFirst && index === 0
+        return (
+          <div key={item.id} className={`relative aspect-square overflow-hidden rounded-xl ${isFeatured ? "col-span-2 sm:col-span-2 sm:aspect-[2/1]" : ""}`}>
+            <Image src={item.mediaId ? `/api/media/${item.mediaId}` : item.image} alt={item.alt || item.title} fill className="object-cover" sizes={isFeatured ? "66vw" : "33vw"} />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export function HomePage({ trips, content, gallery, testimonials, videos }: { trips: Trip[]; content: SiteContent; gallery: GalleryItem[]; testimonials: Testimonial[]; videos: YouTubeVideo[] }) {
   return (
     <main>
@@ -103,7 +133,10 @@ export function HomePage({ trips, content, gallery, testimonials, videos }: { tr
 
       <section className="bg-secondary px-4 py-20 md:px-6">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.25fr_0.75fr]">
-          <div><SectionHeading eyebrow="Z pierwszego rzędu" title={content.galleryTitle || "Galeria z wyjazdów"} align="left" /><div className="mt-7 grid grid-cols-2 gap-3">{(gallery.length ? gallery.slice(0, 3) : [{ id: -1, image: "/images/barcelona-trip.png", mediaId: null, alt: "Stadion w Barcelonie", title: "Barcelona", city: "Barcelona" }, { id: -2, image: "/images/milan-trip.png", mediaId: null, alt: "Wieczór meczowy w Mediolanie", title: "Mediolan", city: "Mediolan" }, { id: -3, image: "/images/madrid-trip.png", mediaId: null, alt: "Stadion w Madrycie", title: "Madryt", city: "Madryt" }]).map((item, index) => <div key={item.id} className={`relative overflow-hidden rounded-xl ${index === 0 ? "col-span-2 aspect-[2/1]" : "aspect-square"}`}><Image src={item.mediaId ? `/api/media/${item.mediaId}` : item.image} alt={item.alt || item.title} fill className="object-cover" sizes={index === 0 ? "66vw" : "33vw"} /></div>)}</div></div>
+          <div>
+            <SectionHeading eyebrow="Z pierwszego rzędu" title={content.galleryTitle || "Galeria z wyjazdów"} align="left" />
+            <HomeGallery gallery={gallery} limit={Number(content.galleryHomeLimit) || 3} />
+          </div>
           <div className="flex flex-col justify-center"><SectionHeading eyebrow="Opinie klientów" title={content.testimonialsTitle || "Emocje potwierdzone na trybunach"} align="left" />{(testimonials.length ? testimonials.slice(0, 2) : [{ id: -1, author: "Kamil", tripName: "Barcelona", content: "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!", rating: 5 }]).map((item) => <blockquote key={item.id} className="mt-4 rounded-xl bg-card p-7 shadow-sm"><div className="flex gap-1 text-primary" aria-label={`Ocena ${item.rating} na 5`}>{Array.from({length:item.rating}).map((_,i)=><Star key={i} fill="currentColor" aria-hidden="true" />)}</div><p className="mt-5 text-lg leading-relaxed">„{item.content}”</p><footer className="mt-5 font-semibold">{item.author}{item.tripName ? ` · ${item.tripName}` : ""}</footer></blockquote>)}</div>
         </div>
       </section>
