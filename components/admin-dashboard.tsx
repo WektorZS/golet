@@ -2,12 +2,12 @@
 
 import Link from "next/link"
 import { useActionState, useMemo, useState } from "react"
-import { Archive, BookOpen, Clapperboard, Copy, ExternalLink, FileImage, Home, Inbox, KeyRound, LayoutDashboard, LogOut, Pencil, Plane, Plus, Search, Settings, Star, Upload, Users } from "lucide-react"
-import { archiveTestimonial, addGalleryItem, deleteMedia, duplicateTrip, removeGalleryItem, saveSettings, saveTestimonial, saveTrip, setTripCover, setTripStatus, updateInquiry, updateMedia, uploadMedia } from "@/app/actions/admin"
+import { Archive, BookOpen, Clapperboard, Copy, ExternalLink, FileImage, Home, Inbox, KeyRound, LayoutDashboard, LogOut, Pencil, Plane, Plus, RefreshCw, Search, Settings, Star, Upload, Users } from "lucide-react"
+import { archiveTestimonial, addGalleryItem, deleteMedia, duplicateTrip, removeGalleryItem, saveSettings, saveTestimonial, saveTrip, setTripCover, setTripStatus, type SyncYouTubeState, syncYouTubeNow, updateInquiry, updateMedia, uploadMedia } from "@/app/actions/admin"
 import { changeAdminPassword, type ChangePasswordState, signOutAdmin } from "@/app/actions/auth"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -60,7 +60,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
 
       <TabsContent value="content"><SectionHeader eyebrow="Mini-CMS" title="Treści strony" description="Zmień kluczowe komunikaty bez edycji kodu." /><SettingsForm settings={data.settings} /></TabsContent>
       <TabsContent value="testimonials"><SectionHeader eyebrow="Wiarygodność" title="Opinie klientów" description="Publikuj i porządkuj rekomendacje." action={<TestimonialDialog trigger={<Button><Plus />Dodaj opinię</Button>} />} /><div className="grid gap-4 lg:grid-cols-2">{data.testimonials.map((item) => <Card key={item.id}><CardHeader><div className="flex items-start justify-between gap-4"><div><CardTitle>{item.author}</CardTitle><CardDescription>{item.tripName} · {"★".repeat(item.rating)}</CardDescription></div><StatusBadge status={item.status} /></div></CardHeader><CardContent><p className="mb-4 text-muted-foreground">{item.content}</p><div className="flex gap-2"><TestimonialDialog item={item} trigger={<Button variant="outline" size="sm"><Pencil />Edytuj</Button>} /><form action={archiveTestimonial}><input type="hidden" name="id" value={item.id} /><Button type="submit" variant="ghost" size="sm"><Archive />Archiwizuj</Button></form></div></CardContent></Card>)}</div></TabsContent>
-      <TabsContent value="youtube"><SectionHeader eyebrow="Kanał wideo" title="YouTube" description="Podaj adres kanału, a najnowsze filmy pojawią się na stronie głównej." /><div className="grid gap-6 xl:grid-cols-[.8fr_1.2fr]"><Card><CardHeader><CardTitle>Konfiguracja kanału</CardTitle><CardDescription>Obsługiwane są adresy /channel/UC…, /@nazwa oraz /user/nazwa.</CardDescription></CardHeader><CardContent><form action={saveSettings} className="flex flex-col gap-5"><Field label="Link do kanału"><Input name="setting.youtubeUrl" type="url" defaultValue={data.settings.youtubeUrl} placeholder="https://www.youtube.com/@twojkanal" /></Field><div className="grid gap-4 sm:grid-cols-2"><Field label="Liczba filmów"><Input name="setting.youtubeLimit" type="number" min="1" max="12" defaultValue={data.settings.youtubeLimit || "6"} /></Field><Field label="Widoczność"><select name="setting.youtubeEnabled" defaultValue={data.settings.youtubeEnabled || "true"} className="h-9 rounded-lg border bg-background px-3"><option value="true">Sekcja włączona</option><option value="false">Sekcja wyłączona</option></select></Field></div><Button type="submit" className="self-start"><Clapperboard />Zapisz konfigurację</Button></form></CardContent></Card><Card><CardHeader><CardTitle>Podgląd najnowszych filmów</CardTitle><CardDescription>{data.videos.length ? `Pobrano ${data.videos.length} filmów z kanału.` : "Po zapisaniu poprawnego kanału zobaczysz tutaj podgląd."}</CardDescription></CardHeader><CardContent className="grid gap-4 sm:grid-cols-2">{data.videos.map((video) => <a key={video.id} href={video.url} target="_blank" rel="noreferrer" className="group overflow-hidden rounded-xl border"><img src={video.thumbnail} alt={video.title} className="aspect-video w-full object-cover" /><div className="flex gap-3 p-3"><p className="line-clamp-2 flex-1 text-sm font-medium">{video.title}</p><ExternalLink className="shrink-0 text-primary" /></div></a>)}</CardContent></Card></div></TabsContent>
+      <TabsContent value="youtube"><SectionHeader eyebrow="Kanał wideo" title="YouTube" description="Podaj adres kanału, a najnowsze filmy pojawią się na stronie głównej." /><div className="grid gap-6 xl:grid-cols-[.8fr_1.2fr]"><Card><CardHeader><CardTitle>Konfiguracja kanału</CardTitle><CardDescription>Obsługiwane są adresy /channel/UC…, /@nazwa oraz /user/nazwa.</CardDescription></CardHeader><CardContent><form action={saveSettings} className="flex flex-col gap-5"><Field label="Link do kanału"><Input name="setting.youtubeUrl" type="url" defaultValue={data.settings.youtubeUrl} placeholder="https://www.youtube.com/@twojkanal" /></Field><div className="grid gap-4 sm:grid-cols-2"><Field label="Liczba filmów"><Input name="setting.youtubeLimit" type="number" min="1" max="12" defaultValue={data.settings.youtubeLimit || "6"} /></Field><Field label="Widoczność"><select name="setting.youtubeEnabled" defaultValue={data.settings.youtubeEnabled || "true"} className="h-9 rounded-lg border bg-background px-3"><option value="true">Sekcja włączona</option><option value="false">Sekcja wyłączona</option></select></Field></div><Button type="submit" className="self-start"><Clapperboard />Zapisz konfigurację</Button></form></CardContent><CardFooter className="flex flex-col items-start gap-3 border-t pt-5"><YouTubeSyncStatus lastSyncedAt={data.settings.youtubeLastSyncedAt} lastSyncStatus={data.settings.youtubeLastSyncStatus} /></CardFooter></Card><Card><CardHeader><CardTitle>Podgląd najnowszych filmów</CardTitle><CardDescription>{data.videos.length ? `Pobrano ${data.videos.length} filmów z kanału.` : "Po zapisaniu poprawnego kanału zobaczysz tutaj podgląd."}</CardDescription></CardHeader><CardContent className="grid gap-4 sm:grid-cols-2">{data.videos.map((video) => <a key={video.id} href={video.url} target="_blank" rel="noreferrer" className="group overflow-hidden rounded-xl border"><img src={video.thumbnail} alt={video.title} className="aspect-video w-full object-cover" /><div className="flex gap-3 p-3"><p className="line-clamp-2 flex-1 text-sm font-medium">{video.title}</p><ExternalLink className="shrink-0 text-primary" /></div></a>)}</CardContent></Card></div></TabsContent>
 
       <TabsContent value="inquiries"><SectionHeader eyebrow="Sprzedaż" title="Zapytania klientów" description="Obsługuj zgłoszenia, notatki i status kontaktu." action={<Button variant="outline" nativeButton={false} render={<a href="/api/admin/inquiries.csv" />}><ExternalLink />Eksportuj CSV</Button>} /><div className="flex flex-col gap-4">{data.inquiries.map((lead) => <Card key={lead.id}><CardContent className="grid gap-5 pt-6 lg:grid-cols-[1fr_1.4fr_auto]"><div><div className="flex items-center gap-2"><strong>{lead.name}</strong><StatusBadge status={lead.status} /></div><a className="block text-sm text-primary underline-offset-4 hover:underline" href={`mailto:${lead.email}`}>{lead.email}</a><a className="text-sm text-primary underline-offset-4 hover:underline" href={`tel:${lead.phone}`}>{lead.phone}</a></div><div><p className="font-medium">{lead.matchName}</p><p className="text-sm text-muted-foreground">{lead.departureCity} · {lead.travelers} os.</p><p className="mt-2 text-sm">{lead.message || "Brak dodatkowej wiadomości."}</p></div><form action={updateInquiry} className="flex min-w-72 flex-col gap-2"><input type="hidden" name="id" value={lead.id} /><select name="status" defaultValue={lead.status} className="h-9 rounded-lg border bg-background px-3"><option value="new">Nowe</option><option value="contacted">Skontaktowano</option><option value="closed">Zamknięte</option></select><Textarea name="adminNote" defaultValue={lead.adminNote} placeholder="Notatka wewnętrzna" rows={2} /><Button type="submit" size="sm">Zapisz obsługę</Button></form></CardContent></Card>)}</div></TabsContent>
 
@@ -73,6 +73,35 @@ function SectionHeader({ eyebrow, title, description, action }: { eyebrow: strin
 function Metric({ icon: Icon, label, value }: { icon: typeof Plane; label: string; value: number }) { return <Card><CardContent className="flex items-center gap-4 pt-6"><span className="flex size-11 items-center justify-center rounded-lg bg-primary text-primary-foreground"><Icon /></span><div><p className="text-3xl font-black">{value}</p><p className="text-sm text-muted-foreground">{label}</p></div></CardContent></Card> }
 function StatusBadge({ status }: { status: string }) { const labels: Record<string, string> = { published: "Opublikowane", draft: "Szkic", archived: "Archiwum", new: "Nowe", contacted: "Kontakt", closed: "Zamknięte" }; return <Badge variant={status === "published" || status === "new" ? "default" : "secondary"}>{labels[status] || status}</Badge> }
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <div className="flex flex-col gap-2"><Label>{label}</Label>{children}</div> }
+
+const initialSyncState: SyncYouTubeState = {}
+
+function YouTubeSyncStatus({ lastSyncedAt, lastSyncStatus }: { lastSyncedAt?: string; lastSyncStatus?: string }) {
+  const [state, action, pending] = useActionState(syncYouTubeNow, initialSyncState)
+  const formatted = lastSyncedAt
+    ? new Date(lastSyncedAt).toLocaleString("pl-PL", { dateStyle: "medium", timeStyle: "short" })
+    : null
+
+  return (
+    <div className="flex w-full flex-col gap-2">
+      <p className="text-sm text-muted-foreground">
+        Lista filmów odświeża się automatycznie raz dziennie (4:00 UTC / ok. 6:00 w Polsce).
+      </p>
+      <p className="text-sm">
+        Ostatnie odświeżenie: <span className="font-medium text-foreground">{formatted ?? "jeszcze nie wykonano"}</span>
+      </p>
+      {lastSyncStatus && <p className="text-sm text-muted-foreground">Status: {lastSyncStatus}</p>}
+      {state.error && <p className="text-sm text-destructive">{state.error}</p>}
+      {state.success && <p className="text-sm text-primary">Lista filmów została odświeżona.</p>}
+      <form action={action}>
+        <Button type="submit" variant="outline" size="sm" disabled={pending}>
+          <RefreshCw className={pending ? "animate-spin" : ""} />
+          {pending ? "Odświeżam…" : "Odśwież teraz"}
+        </Button>
+      </form>
+    </div>
+  )
+}
 
 const initialPasswordState: ChangePasswordState = {}
 

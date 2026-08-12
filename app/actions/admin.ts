@@ -16,6 +16,7 @@ import {
   tripGalleryItems,
   trips,
 } from "@/lib/db/schema"
+import { syncYouTubeVideos } from "@/lib/youtube-sync"
 
 const statuses = ["draft", "published", "archived"] as const
 const clean = (value: FormDataEntryValue | null) => String(value ?? "").trim()
@@ -196,4 +197,19 @@ export async function removeGalleryItem(formData: FormData) {
   const user = await requireAdmin(); const id = Number(formData.get("id")); const scope = clean(formData.get("scope"))
   if (scope === "trip") await db.delete(tripGalleryItems).where(eq(tripGalleryItems.id, id)); else await db.delete(galleryItems).where(eq(galleryItems.id, id))
   await logActivity(user.id, "removed", `${scope}_gallery`, String(id)); refreshPublic()
+}
+
+export type SyncYouTubeState = { error?: string; success?: boolean }
+
+/** Lets an admin trigger the daily YouTube cache refresh on demand instead of waiting for the nightly cron job. */
+export async function syncYouTubeNow(_: SyncYouTubeState, _formData: FormData): Promise<SyncYouTubeState> {
+  const user = await requireAdmin()
+  try {
+    await syncYouTubeVideos()
+    await logActivity(user.id, "synced", "youtube", undefined, "Ręczne odświeżenie listy filmów")
+    refreshPublic()
+    return { success: true }
+  } catch {
+    return { error: "Nie udało się odświeżyć listy filmów. Sprawdź adres kanału YouTube w ustawieniach." }
+  }
 }
