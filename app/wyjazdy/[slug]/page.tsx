@@ -3,9 +3,11 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, CalendarDays, Check, Headphones, MapPin, Plane, ShieldCheck, TicketCheck } from "lucide-react"
+import { DescriptionHtml } from "@/components/description-html"
 import { InquiryForm } from "@/components/inquiry-form"
 import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
+import { stripHtml } from "@/lib/sanitize-html"
 import { getTripBySlug, getTripGallery } from "@/lib/trips"
 
 export const dynamic = "force-dynamic"
@@ -14,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const trip = await getTripBySlug(slug)
   if (!trip) return { title: "Wyjazd niedostępny" }
-  return { title: trip.seoTitle || trip.title, description: trip.seoDescription || `${trip.description} Pakiet od ${trip.price} zł.` }
+  return { title: trip.seoTitle || trip.title, description: trip.seoDescription || `${stripHtml(trip.description)} Pakiet od ${trip.price} zł.` }
 }
 
 export default async function TripDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -23,7 +25,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   if (!trip) notFound()
   const gallery = await getTripGallery(trip.id)
   const date = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${trip.startDate}T12:00:00`))
-  const jsonLd = { "@context": "https://schema.org", "@type": "TouristTrip", name: trip.title, description: trip.description, touristType: "Kibice piłkarscy", offers: { "@type": "Offer", price: trip.price, priceCurrency: "PLN", availability: "https://schema.org/InStock" } }
+  const jsonLd = { "@context": "https://schema.org", "@type": "TouristTrip", name: trip.title, description: stripHtml(trip.description), touristType: "Kibice piłkarscy", offers: { "@type": "Offer", price: trip.price, priceCurrency: "PLN", availability: "https://schema.org/InStock" } }
 
   return (
     <main className="bg-background">
@@ -42,7 +44,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
         </div>
       </section>
       <section className="px-4 py-20 md:px-6"><div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1fr_0.8fr]">
-        <div className="flex flex-col gap-8"><div><p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Pełny pakiet</p><h2 className="mt-3 font-sans text-4xl font-black uppercase">Wszystko przygotowane</h2><p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{trip.description}</p></div>
+        <div className="flex flex-col gap-8"><div><p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Pełny pakiet</p><h2 className="mt-3 font-sans text-4xl font-black uppercase">Wszystko przygotowane</h2><DescriptionHtml html={trip.description} className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground [&_p]:mb-4 [&_a]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5" /></div>
           <div className="grid gap-3 sm:grid-cols-2">{trip.includes.map((item) => <div key={item} className="flex items-center gap-3 rounded-lg border p-4 font-semibold"><Check className="text-primary" />{item}</div>)}</div>
           <div className="grid gap-4 sm:grid-cols-2">{[[TicketCheck,"Pewne bilety"],[Plane,"Dopasowany lot"],[Headphones,"Koordynator"],[ShieldCheck,"Ubezpieczenie"]].map(([Icon,label]) => { const I=Icon as typeof Plane; return <div key={label as string} className="flex items-center gap-3"><I className="text-primary" /><span>{label as string}</span></div>})}</div>
           <div className="rounded-xl bg-secondary p-6"><h3 className="font-bold uppercase">Ważna informacja</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">Dokładna godzina meczu może zostać potwierdzona przez ligę bliżej terminu. Program podróży dopasujemy do oficjalnego terminarza.</p></div>

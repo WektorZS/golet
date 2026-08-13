@@ -16,6 +16,7 @@ import {
   tripGalleryItems,
   trips,
 } from "@/lib/db/schema"
+import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
 import { syncYouTubeVideos } from "@/lib/youtube-sync"
 
 const statuses = ["draft", "published", "archived"] as const
@@ -35,16 +36,21 @@ function refreshPublic() {
 const tripSchema = z.object({
   title: z.string().min(3).max(120), opponent: z.string().min(2).max(100), city: z.string().min(2).max(100),
   country: z.string().min(2).max(100), startDate: z.string().date(), endDate: z.string().optional(),
-  price: z.coerce.number().int().nonnegative().max(1_000_000), status: z.enum(statuses), description: z.string().max(8000),
+  price: z.coerce.number().int().nonnegative().max(1_000_000), status: z.enum(statuses),
+  description: z.string().max(12000).refine((value) => stripHtml(value).length <= 8000, "Opis jest za długi"),
 })
 
 export async function saveTrip(formData: FormData) {
   const user = await requireAdmin()
   const id = Number(formData.get("id"))
+  // The description field carries HTML produced by the restricted rich-text editor
+  // (bold/italic/lists/links only); sanitize before validation so stored content is
+  // always the safe, allowlisted subset regardless of what the client actually sent.
+  const description = sanitizeDescriptionHtml(clean(formData.get("description")))
   const parsed = tripSchema.safeParse({
     title: clean(formData.get("title")), opponent: clean(formData.get("opponent")), city: clean(formData.get("city")),
     country: clean(formData.get("country")), startDate: clean(formData.get("startDate")), endDate: clean(formData.get("endDate")) || undefined,
-    price: clean(formData.get("price")), status: clean(formData.get("status")), description: clean(formData.get("description")),
+    price: clean(formData.get("price")), status: clean(formData.get("status")), description,
   })
   if (!parsed.success) throw new Error("Sprawdź wymagane pola wyjazdu")
   const slug = slugify(clean(formData.get("slug")) || parsed.data.title)

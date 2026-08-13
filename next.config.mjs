@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
+// React's development-mode debugging (e.g. reconstructing stack traces for Fast Refresh)
+// relies on eval() and is never used in production builds, so 'unsafe-eval' is scoped to dev only.
+const scriptSrc = process.env.NODE_ENV === "development" ? "'self' 'unsafe-inline' 'unsafe-eval'" : "'self' 'unsafe-inline'"
+
 const nextConfig = {
   reactCompiler: true,
   images: { unoptimized: true },
@@ -14,7 +18,7 @@ const nextConfig = {
         {
           key: "Content-Security-Policy",
           value:
-            "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data: https://i.ytimg.com blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://*.neon.tech; font-src 'self' data:; object-src 'none'",
+            `default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data: https://i.ytimg.com blob:; style-src 'self' 'unsafe-inline'; script-src ${scriptSrc}; connect-src 'self' https://*.neon.tech; font-src 'self' data:; object-src 'none'`,
         },
       ],
     }]
