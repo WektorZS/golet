@@ -1,14 +1,20 @@
 import { createNeonAuth } from "@neondatabase/auth/next/server"
 import { headers } from "next/headers"
 
+function getAuthBaseUrl() {
+  return (process.env.NEON_AUTH_BASE_URL ?? process.env.VITE_NEON_AUTH_URL)?.trim()
+}
+
 export function isAuthConfigured() {
-  return Boolean(process.env.NEON_AUTH_BASE_URL && process.env.NEON_AUTH_COOKIE_SECRET)
+  return Boolean(getAuthBaseUrl() && process.env.NEON_AUTH_COOKIE_SECRET?.trim())
 }
 
 export function getAuth() {
-  const baseUrl = process.env.NEON_AUTH_BASE_URL
-  const secret = process.env.NEON_AUTH_COOKIE_SECRET
-  if (!baseUrl || !secret) throw new Error("Neon Auth is not configured")
+  const baseUrl = getAuthBaseUrl()
+  const secret = process.env.NEON_AUTH_COOKIE_SECRET?.trim()
+  if (!baseUrl && !secret) throw new Error("Neon Auth is not configured: missing NEON_AUTH_BASE_URL and NEON_AUTH_COOKIE_SECRET")
+  if (!baseUrl) throw new Error("Neon Auth is not configured: missing NEON_AUTH_BASE_URL")
+  if (!secret) throw new Error("Neon Auth is not configured: missing NEON_AUTH_COOKIE_SECRET")
   return createNeonAuth({ baseUrl, cookies: { secret }, logLevel: "warn" })
 }
 
@@ -17,8 +23,8 @@ export async function resetPasswordWithOtp(input: {
   otp: string
   password: string
 }) {
-  const baseUrl = process.env.NEON_AUTH_BASE_URL
-  if (!baseUrl) return { error: "Neon Auth is not configured" }
+  const baseUrl = getAuthBaseUrl()
+  if (!baseUrl) return { error: "Neon Auth is not configured: missing Neon Auth base URL" }
 
   const requestHeaders = await headers()
   const referer = requestHeaders.get("referer")
