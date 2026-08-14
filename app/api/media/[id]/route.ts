@@ -14,8 +14,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, id)).limit(1)
   if (!asset) return new NextResponse("Not found", { status: 404 })
 
-  const { data } = await getAuth().getSession()
-  const isAdmin = Boolean(data?.user && isAdminEmail(data.user.email))
+  // Publicly referenced media must remain available even when the auth integration
+  // is temporarily unavailable. Admin-only access is still enforced when auth works.
+  let isAdmin = false
+  try {
+    const { data } = await getAuth().getSession()
+    isAdmin = Boolean(data?.user && isAdminEmail(data.user.email))
+  } catch {
+    isAdmin = false
+  }
   if (!isAdmin) {
     const [globalReference, tripReference, coverReference] = await Promise.all([
       db.select({ id: galleryItems.id }).from(galleryItems).where(and(eq(galleryItems.mediaId, id), eq(galleryItems.status, "published"))).limit(1),
