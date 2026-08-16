@@ -1,26 +1,33 @@
-import DOMPurify from "isomorphic-dompurify"
+import sanitizeHtml from "sanitize-html"
 
 /**
  * Allowlist for trip description formatting. Deliberately narrow: safe text formatting
  * only (bold, italic, lists, paragraphs, links) — no images, scripts, styles, or iframes.
- * Used both when saving admin input and when rendering it publicly, so stored HTML is
- * sanitized twice: defense in depth against any future editor change or direct DB edits.
+ * This implementation is server-native and does not instantiate JSDOM in Vercel functions.
  */
 const ALLOWED_TAGS = ["p", "strong", "em", "ul", "ol", "li", "a", "br"]
-const ALLOWED_ATTR = ["href", "target", "rel"]
 
-/** Strips all markup for contexts that need plain text: <meta> descriptions, JSON-LD, previews. */
+/** Strips all markup for contexts that need plain text: meta descriptions, JSON-LD and previews. */
 export function stripHtml(html: string): string {
-  return DOMPurify.sanitize(html, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }).replace(/\s+/g, " ").trim()
+  return sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} }).replace(/\s+/g, " ").trim()
 }
 
 export function sanitizeDescriptionHtml(dirty: string): string {
-  const clean = DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    ALLOW_DATA_ATTR: false,
+  return sanitizeHtml(dirty, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: { a: ["href"] },
+    allowedSchemes: ["http", "https", "mailto", "tel"],
+    allowProtocolRelative: false,
+    disallowedTagsMode: "discard",
+    transformTags: {
+      a: (_tagName, attribs) => ({
+        tagName: "a",
+        attribs: {
+          href: attribs.href ?? "",
+          target: "_blank",
+          rel: "noopener noreferrer",
+        },
+      }),
+    },
   })
-  // Normalize every <a> to only carry a safe href plus a forced-safe target/rel,
-  // regardless of what attributes the editor or a direct DB edit produced.
-  return clean.replace(/<a\s+[^>]*href="([^"]*)"[^>]*>/g, (_match, href) => `<a href="${href}" target="_blank" rel="noopener noreferrer">`)
 }
