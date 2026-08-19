@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState, useMemo, useState } from "react"
+import { useActionState, useEffect, useMemo, useRef, useState } from "react"
 import { Archive, BookOpen, Clapperboard, Copy, ExternalLink, FileImage, Home, Inbox, KeyRound, LayoutDashboard, LogOut, Pencil, Plane, Plus, RefreshCw, Search, Settings, Star, Upload, Users } from "lucide-react"
 import { archiveTestimonial, addGalleryItem, deleteMedia, duplicateTrip, removeGalleryItem, type SaveSettingsState, saveSettings, saveTestimonial, saveTrip, setTripCover, setTripStatus, type SyncYouTubeState, syncYouTubeNow, updateInquiry, updateMedia, uploadMedia } from "@/app/actions/admin"
 import { changeAdminPassword, type ChangePasswordState, signOutAdmin } from "@/app/actions/auth"
@@ -97,14 +97,27 @@ const initialSyncState: SyncYouTubeState = {}
 
 function YouTubeSyncStatus({ lastSyncedAt, lastSyncStatus }: { lastSyncedAt?: string; lastSyncStatus?: string }) {
   const [state, action, pending] = useActionState(syncYouTubeNow, initialSyncState)
+  const formRef = useRef<HTMLFormElement>(null)
+  const automaticSyncStarted = useRef(false)
   const formatted = lastSyncedAt
     ? new Date(lastSyncedAt).toLocaleString("pl-PL", { dateStyle: "medium", timeStyle: "short" })
     : null
 
+  useEffect(() => {
+    if (automaticSyncStarted.current) return
+    const lastSyncTime = lastSyncedAt ? new Date(lastSyncedAt).getTime() : 0
+    const isStale = !lastSyncTime || Date.now() - lastSyncTime >= 24 * 60 * 60 * 1000
+    const lastAttemptFailed = lastSyncStatus?.startsWith("Błąd:") ?? false
+    if (!isStale && !lastAttemptFailed) return
+
+    automaticSyncStarted.current = true
+    formRef.current?.requestSubmit()
+  }, [lastSyncedAt, lastSyncStatus])
+
   return (
     <div className="flex w-full flex-col gap-2">
       <p className="text-sm text-muted-foreground">
-        Lista filmów odświeża się automatycznie raz dziennie (4:00 UTC / ok. 6:00 w Polsce).
+        Lista filmów odświeża się automatycznie raz dziennie. Jeśli nocna próba się nie powiedzie, panel ponowi ją automatycznie po otwarciu.
       </p>
       <p className="text-sm">
         Ostatnie odświeżenie: <span className="font-medium text-foreground">{formatted ?? "jeszcze nie wykonano"}</span>
@@ -112,7 +125,7 @@ function YouTubeSyncStatus({ lastSyncedAt, lastSyncStatus }: { lastSyncedAt?: st
       {lastSyncStatus && <p className="text-sm text-muted-foreground">Status: {lastSyncStatus}</p>}
       {state.error && <p className="text-sm text-destructive">{state.error}</p>}
       {state.success && <p className="text-sm text-primary">Lista filmów została odświeżona.</p>}
-      <form action={action}>
+      <form ref={formRef} action={action}>
         <Button type="submit" variant="outline" size="sm" disabled={pending}>
           <RefreshCw className={pending ? "animate-spin" : ""} />
           {pending ? "Odświeżam…" : "Odśwież teraz"}
