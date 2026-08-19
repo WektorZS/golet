@@ -188,13 +188,20 @@ export async function deleteMedia(formData: FormData) {
   await logActivity(user.id, "deleted", "media", String(id), asset.originalName); revalidatePath("/admin")
 }
 
-export async function addGalleryItem(formData: FormData) {
-  const user = await requireAdmin(); const mediaId = Number(formData.get("mediaId")); const tripId = Number(formData.get("tripId"))
-  const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, mediaId)).limit(1)
-  if (!asset) throw new Error("Nie znaleziono zdjęcia")
-  if (tripId > 0) await db.insert(tripGalleryItems).values({ tripId, mediaId, caption: clean(formData.get("caption")), alt: clean(formData.get("alt")) || asset.alt, sortOrder: Number(formData.get("sortOrder")) || 0 })
-  else await db.insert(galleryItems).values({ title: clean(formData.get("caption")) || asset.originalName, city: clean(formData.get("city")), image: `/api/media/${mediaId}`, mediaId, alt: clean(formData.get("alt")) || asset.alt, sortOrder: Number(formData.get("sortOrder")) || 0 })
-  await logActivity(user.id, "added", tripId > 0 ? "trip_gallery" : "gallery", String(mediaId)); refreshPublic()
+export type AddGalleryItemState = { error?: string; success?: boolean; message?: string }
+
+export async function addGalleryItem(_: AddGalleryItemState, formData: FormData): Promise<AddGalleryItemState> {
+  try {
+    const user = await requireAdmin(); const mediaId = Number(formData.get("mediaId")); const tripId = Number(formData.get("tripId"))
+    const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, mediaId)).limit(1)
+    if (!asset) return { error: "Nie znaleziono zdjęcia" }
+    if (tripId > 0) await db.insert(tripGalleryItems).values({ tripId, mediaId, caption: clean(formData.get("caption")), alt: clean(formData.get("alt")) || asset.alt, sortOrder: Number(formData.get("sortOrder")) || 0 })
+    else await db.insert(galleryItems).values({ title: clean(formData.get("caption")) || asset.originalName, city: clean(formData.get("city")), image: `/api/media/${mediaId}`, mediaId, alt: clean(formData.get("alt")) || asset.alt, sortOrder: Number(formData.get("sortOrder")) || 0 })
+    await logActivity(user.id, "added", tripId > 0 ? "trip_gallery" : "gallery", String(mediaId)); refreshPublic()
+    return { success: true, message: tripId > 0 ? "Zdjęcie dodano do galerii wyjazdu." : "Zdjęcie dodano do galerii głównej." }
+  } catch {
+    return { error: "Nie udało się dodać zdjęcia do galerii." }
+  }
 }
 
 export async function setTripCover(formData: FormData) {

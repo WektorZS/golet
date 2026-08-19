@@ -57,7 +57,7 @@ const FALLBACK_GALLERY: GalleryItem[] = [
  * grows taller than the rest of the homepage regardless of how many photos are shown.
  */
 function HomeGallery({ gallery, limit }: { gallery: GalleryItem[]; limit: number }) {
-  const count = Math.min(8, Math.max(1, Math.round(limit) || 3))
+  const count = Math.min(5, Math.max(1, Math.round(limit) || 5))
   const items = (gallery.length ? gallery : FALLBACK_GALLERY).slice(0, count)
   const featureFirst = items.length >= 3
 
@@ -135,7 +135,10 @@ export function HomePage({ trips, content, gallery, testimonials, videos }: { tr
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.25fr_0.75fr]">
           <div>
             <SectionHeading eyebrow="Z pierwszego rzędu" title={content.galleryTitle || "Galeria z wyjazdów"} align="left" />
-            <HomeGallery gallery={gallery} limit={Number(content.galleryHomeLimit) || 3} />
+            <HomeGallery gallery={gallery} limit={Number(content.galleryHomeLimit) || 5} />
+            <Button className="mt-6" variant="outline" nativeButton={false} render={<Link href="/galeria" />}>
+              Zobacz całą galerię <ArrowRight data-icon="inline-end" />
+            </Button>
           </div>
           <div className="flex flex-col justify-center"><SectionHeading eyebrow="Opinie klientów" title={content.testimonialsTitle || "Emocje potwierdzone na trybunach"} align="left" />{(testimonials.length ? testimonials.slice(0, 2) : [{ id: -1, author: "Kamil", tripName: "Barcelona", content: "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!", rating: 5 }]).map((item) => <blockquote key={item.id} className="mt-4 rounded-xl bg-card p-7 shadow-sm"><div className="flex gap-1 text-primary" aria-label={`Ocena ${item.rating} na 5`}>{Array.from({length:item.rating}).map((_,i)=><Star key={i} fill="currentColor" aria-hidden="true" />)}</div><p className="mt-5 text-lg leading-relaxed">„{item.content}”</p><footer className="mt-5 font-semibold">{item.author}{item.tripName ? ` · ${item.tripName}` : ""}</footer></blockquote>)}</div>
         </div>

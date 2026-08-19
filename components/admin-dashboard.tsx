@@ -166,7 +166,7 @@ function SettingsForm({ settings }: { settings: Record<string, string> }) {
       <CardContent>
         <form action={action} className="grid gap-5 md:grid-cols-2">
           {fields.map(([key, label, fallback]) => <Field key={key} label={label}>{key.endsWith("Text") || key.endsWith("Description") ? <Textarea name={`setting.${key}`} defaultValue={settings[key] || fallback} rows={4} /> : <Input name={`setting.${key}`} defaultValue={settings[key] || fallback} />}</Field>)}
-          <Field label="Liczba zdjęć w galerii na stronie głównej"><Input name="setting.galleryHomeLimit" type="number" min="1" max="8" defaultValue={settings.galleryHomeLimit || "3"} /></Field>
+          <Field label="Liczba zdjęć w galerii na stronie głównej"><Input name="setting.galleryHomeLimit" type="number" min="1" max="5" defaultValue={settings.galleryHomeLimit || "5"} /></Field>
           <div className="flex flex-col gap-2 md:col-span-2">
             {state.error && <p className="text-sm text-destructive">{state.error}</p>}
             {state.success && <p className="text-sm text-primary">Treści strony zostały zapisane.</p>}
