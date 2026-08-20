@@ -131,7 +131,7 @@ export async function saveSettings(_: SaveSettingsState, formData: FormData): Pr
       const settingKey = key.slice(8)
       if (!ALLOWED_SETTING_KEYS.has(settingKey)) continue
       let settingValue = String(value).slice(0, 4000)
-      if (settingKey === "galleryHomeLimit") settingValue = String(Math.min(8, Math.max(1, Number(settingValue) || 3)))
+      if (settingKey === "galleryHomeLimit") settingValue = String(Math.min(5, Math.max(1, Number(settingValue) || 5)))
       await db.insert(siteSettings).values({ key: settingKey, value: settingValue, updatedAt: new Date() }).onConflictDoUpdate({ target: siteSettings.key, set: { value: settingValue, updatedAt: new Date() } })
     }
     await logActivity(user.id, "updated", "settings", undefined, "Treści strony")
