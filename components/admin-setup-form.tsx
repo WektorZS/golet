@@ -7,18 +7,17 @@ import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
-export function AdminSetupForm({ email }: { email: string }) {
+export function AdminSetupForm() {
   const [requestState, requestAction, requesting] = useActionState(requestAdminSetupCode, null)
   const [finishState, finishAction, finishing] = useActionState(finishAdminSetup, null)
 
   if (requestState?.sent) {
     return <form action={finishAction} className="flex flex-col gap-5">
-      <input type="hidden" name="email" value={email} />
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="otp">Kod z wiadomości e-mail</FieldLabel>
           <Input id="otp" name="otp" inputMode="numeric" autoComplete="one-time-code" minLength={6} required />
-          <FieldDescription>Wpisz kod wysłany przez Neon Auth na {email}.</FieldDescription>
+          <FieldDescription>Wpisz kod wysłany na skonfigurowany adres administratora.</FieldDescription>
         </Field>
         <Field>
           <FieldLabel htmlFor="password">Nowe hasło</FieldLabel>
@@ -36,10 +35,9 @@ export function AdminSetupForm({ email }: { email: string }) {
   }
 
   return <form action={requestAction} className="flex flex-col gap-5">
-    <input type="hidden" name="email" value={email} />
     <div className="rounded-lg border bg-secondary p-4">
       <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Konto administratora</p>
-      <p className="mt-1 font-semibold">{email}</p>
+      <p className="mt-1 text-sm text-muted-foreground">Kod zostanie wysłany na bezpiecznie skonfigurowany adres.</p>
     </div>
     {requestState?.error && <p className="text-sm text-destructive" role="alert">{requestState.error}</p>}
     <Button type="submit" size="lg" disabled={requesting}><Mail data-icon="inline-start" />{requesting ? "Wysyłanie kodu…" : "Wyślij kod ustawienia hasła"}</Button>

@@ -30,6 +30,7 @@ async function logActivity(userId: string, action: string, entityType: string, e
 function refreshPublic() {
   revalidatePath("/admin")
   revalidatePath("/")
+  revalidatePath("/galeria")
   revalidatePath("/wyjazdy")
 }
 
@@ -214,6 +215,25 @@ export async function setTripCover(formData: FormData) {
   await db.update(trips).set({ image: `/api/media/${mediaId}`, updatedAt: new Date() }).where(eq(trips.id, tripId))
   await logActivity(user.id, "updated_cover", "trip", String(tripId), `Media #${mediaId}`)
   refreshPublic()
+}
+
+export type UpdateGalleryItemState = { error?: string; success?: boolean }
+
+export async function updateGalleryItem(_: UpdateGalleryItemState, formData: FormData): Promise<UpdateGalleryItemState> {
+  try {
+    const user = await requireAdmin()
+    const id = Number(formData.get("id"))
+    if (!Number.isInteger(id) || id <= 0) return { error: "Nieprawidłowe zdjęcie galerii." }
+    await db.update(galleryItems).set({
+      title: clean(formData.get("title")),
+      city: clean(formData.get("city")),
+    }).where(eq(galleryItems.id, id))
+    await logActivity(user.id, "updated", "gallery", String(id))
+    refreshPublic()
+    return { success: true }
+  } catch {
+    return { error: "Nie udało się zapisać zmian zdjęcia." }
+  }
 }
 
 export async function removeGalleryItem(formData: FormData) {

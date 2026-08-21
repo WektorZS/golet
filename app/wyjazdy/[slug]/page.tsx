@@ -24,7 +24,11 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   const trip = await getTripBySlug(slug)
   if (!trip) notFound()
   const gallery = await getTripGallery(trip.id)
-  const date = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${trip.startDate}T12:00:00`))
+  const dateFormatter = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric" })
+  const startDate = dateFormatter.format(new Date(`${trip.startDate}T12:00:00`))
+  const date = trip.endDate && trip.endDate !== trip.startDate
+    ? `${startDate} – ${dateFormatter.format(new Date(`${trip.endDate}T12:00:00`))}`
+    : startDate
   const jsonLd = { "@context": "https://schema.org", "@type": "TouristTrip", name: trip.title, description: stripHtml(trip.description), touristType: "Kibice piłkarscy", offers: { "@type": "Offer", price: trip.price, priceCurrency: "PLN", availability: "https://schema.org/InStock" } }
 
   return (

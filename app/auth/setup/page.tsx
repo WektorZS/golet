@@ -4,7 +4,7 @@ import { ArrowLeft, ShieldCheck } from "lucide-react"
 import { AdminSetupForm } from "@/components/admin-setup-form"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { getAdminEmail, isAdminEmail } from "@/lib/auth/admin"
+import { isAdminEmail } from "@/lib/auth/admin"
 import { getAuth, isAuthConfigured } from "@/lib/auth/server"
 
 export const dynamic = "force-dynamic"
@@ -22,7 +22,7 @@ export default async function AdminSetupPage() {
       <ShieldCheck className="text-primary" aria-hidden="true" />
       <h1 className="mt-4 font-sans text-3xl font-black uppercase">Ustaw hasło administratora</h1>
       <p className="mt-2 mb-7 text-sm leading-relaxed text-muted-foreground">Wyślemy jednorazowy kod na Twój adres. Po jego wpisaniu ustawisz bezpieczne hasło i od razu wejdziesz do panelu.</p>
-      {configured ? <AdminSetupForm email={getAdminEmail()} /> : <Alert><AlertTitle>Brakuje sekretu sesji</AlertTitle><AlertDescription>Dodaj w Vars zmienną NEON_AUTH_COOKIE_SECRET o długości co najmniej 32 losowych znaków. Następnie odśwież tę stronę.</AlertDescription></Alert>}
+      {configured ? <AdminSetupForm /> : <Alert><AlertTitle>Brakuje sekretu sesji</AlertTitle><AlertDescription>Dodaj w Vars zmienną NEON_AUTH_COOKIE_SECRET o długości co najmniej 32 losowych znaków. Następnie odśwież tę stronę.</AlertDescription></Alert>}
     </div>
   </main>
 }

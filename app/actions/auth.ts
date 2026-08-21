@@ -17,9 +17,8 @@ export async function signInAdmin(_: AuthState, formData: FormData): Promise<Aut
   redirect("/admin")
 }
 
-export async function requestAdminSetupCode(_: AuthState, formData: FormData): Promise<AuthState> {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase()
-  if (email !== getAdminEmail()) return { error: "Nieprawidłowe konto administratora." }
+export async function requestAdminSetupCode(_: AuthState, _formData: FormData): Promise<AuthState> {
+  const email = getAdminEmail()
   const { error } = await getAuth().emailOtp.sendVerificationOtp({
     email,
     type: "forget-password",
@@ -29,12 +28,11 @@ export async function requestAdminSetupCode(_: AuthState, formData: FormData): P
 }
 
 export async function finishAdminSetup(_: AuthState, formData: FormData): Promise<AuthState> {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase()
+  const email = getAdminEmail()
   const otp = String(formData.get("otp") ?? "").trim()
   const password = String(formData.get("password") ?? "")
   const confirmPassword = String(formData.get("confirmPassword") ?? "")
 
-  if (email !== getAdminEmail()) return { error: "Nieprawidłowe konto administratora." }
   if (!otp) return { error: "Wpisz kod z wiadomości e-mail." }
   if (password.length < 12) return { error: "Hasło musi mieć co najmniej 12 znaków." }
   if (password !== confirmPassword) return { error: "Podane hasła nie są takie same." }

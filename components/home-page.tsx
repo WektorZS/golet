@@ -51,14 +51,9 @@ const FALLBACK_GALLERY: GalleryItem[] = [
   { id: -3, image: "/images/madrid-trip.png", mediaId: null, alt: "Stadion w Madrycie", title: "Madryt", city: "Madryt" },
 ]
 
-/**
- * Renders a fixed number of gallery photos (set by the admin via `galleryHomeLimit`,
- * clamped to a sane 1-8 range) in a compact, evenly sized grid so the section never
- * grows taller than the rest of the homepage regardless of how many photos are shown.
- */
-function HomeGallery({ gallery, limit }: { gallery: GalleryItem[]; limit: number }) {
-  const count = Math.min(5, Math.max(1, Math.round(limit) || 5))
-  const items = (gallery.length ? gallery : FALLBACK_GALLERY).slice(0, count)
+/** Renders the first five gallery photos according to their saved order. */
+function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
+  const items = (gallery.length ? gallery : FALLBACK_GALLERY).slice(0, 5)
   const featureFirst = items.length >= 3
 
   return (
@@ -78,12 +73,12 @@ function HomeGallery({ gallery, limit }: { gallery: GalleryItem[]; limit: number
 export function HomePage({ trips, content, gallery, testimonials, videos }: { trips: Trip[]; content: SiteContent; gallery: GalleryItem[]; testimonials: Testimonial[]; videos: YouTubeVideo[] }) {
   return (
     <main>
-      <section className="relative isolate min-h-[780px] overflow-hidden bg-foreground text-background">
+      <section className="relative isolate flex min-h-[780px] flex-col overflow-hidden bg-foreground text-background">
         <Image src="/images/hero-stadium.png" alt="Kibice na trybunach podczas wieczornego meczu w Barcelonie" fill priority className="object-cover object-center" sizes="100vw" />
         <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/75 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-foreground to-transparent" />
         <SiteHeader />
-        <div className="relative mx-auto flex min-h-[650px] max-w-7xl items-center px-4 pb-14 pt-28 md:px-6">
+        <div className="relative mx-auto flex w-full flex-1 items-center px-4 pb-14 pt-28 md:px-6 lg:max-w-7xl">
           <div className="flex max-w-3xl flex-col items-start gap-6">
             <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-primary">{content.heroEyebrow || "Mecz zaczyna się dużo wcześniej niż pierwszy gwizdek"}</p>
             <h1 className="text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">{content.heroTitle || "Leć z nami na największe mecze w Europie"}</h1>
@@ -135,7 +130,7 @@ export function HomePage({ trips, content, gallery, testimonials, videos }: { tr
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.25fr_0.75fr]">
           <div>
             <SectionHeading eyebrow="Z pierwszego rzędu" title={content.galleryTitle || "Galeria z wyjazdów"} align="left" />
-            <HomeGallery gallery={gallery} limit={Number(content.galleryHomeLimit) || 5} />
+            <HomeGallery gallery={gallery} />
             <Button className="mt-6" variant="outline" nativeButton={false} render={<Link href="/galeria" />}>
               Zobacz całą galerię <ArrowRight data-icon="inline-end" />
             </Button>
