@@ -23,7 +23,7 @@ export function InquiryForm() {
         <Field><FieldLabel htmlFor="name">Imię i nazwisko</FieldLabel><Input id="name" name="name" required autoComplete="name" placeholder="Jan Kowalski" /></Field>
         <Field><FieldLabel htmlFor="phone">Telefon</FieldLabel><Input id="phone" name="phone" required autoComplete="tel" placeholder="+48 500 000 000" /></Field>
         <Field><FieldLabel htmlFor="email">E-mail</FieldLabel><Input id="email" name="email" type="email" required autoComplete="email" placeholder="jan@example.com" /></Field>
-        <Field><FieldLabel htmlFor="matchName">Na jaki mecz?</FieldLabel><Input id="matchName" name="matchName" required placeholder="np. Barcelona – Real" /></Field>
+        <Field><FieldLabel htmlFor="matchName">Na jaki mecz?</FieldLabel><Input id="matchName" name="matchName" required placeholder="np. Barcelona - Real" /></Field>
         <Field><FieldLabel htmlFor="departureCity">Skąd wylot?</FieldLabel><Input id="departureCity" name="departureCity" required placeholder="Warszawa" /></Field>
         <Field><FieldLabel htmlFor="travelers">Liczba osób</FieldLabel><Input id="travelers" name="travelers" type="number" min="1" max="20" defaultValue="2" required /></Field>
       </FieldGroup>
