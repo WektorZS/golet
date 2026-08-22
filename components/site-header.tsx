@@ -1,7 +1,8 @@
 'use client'
 
+import Image from "next/image"
 import Link from "next/link"
-import { Menu, Plane, Ticket, X } from "lucide-react"
+import { Menu, Plane, X } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 
@@ -15,13 +16,22 @@ const links = [
 
 export function Brand() {
   return (
-    <Link href="/" className="flex items-center gap-3 text-background" aria-label="Let’s Gol – strona główna">
-      <span className="flex size-11 items-center justify-center rounded-full border border-primary text-primary"><Ticket aria-hidden="true" /></span>
-      <span className="flex flex-col font-sans font-black uppercase leading-none tracking-tight"><span className="text-xl">Let&apos;s Gol</span><span className="font-mono text-[10px] font-semibold tracking-[0.16em] text-primary">Wyjazdy na mecze</span></span>
+    <Link
+      href="/"
+      className="flex items-center"
+      aria-label="Let’s Gol – strona główna"
+    >
+      <Image
+        src="/logo.png"
+        alt="Let’s Gol"
+        width={180}
+        height={60}
+        className="h-12 w-auto object-contain"
+        priority
+      />
     </Link>
   )
 }
-
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
   return (
