@@ -25,8 +25,8 @@ export function Brand() {
         <Image
           src="/logo.png"
           alt="Let’s Gol"
-          width={44}
-          height={44}
+          width={60}
+          height={60}
           className="size-11 object-contain"
           priority
         />
