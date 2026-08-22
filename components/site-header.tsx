@@ -21,13 +21,13 @@ export function Brand() {
       className="flex items-center gap-3 text-background"
       aria-label="Let’s Gol – strona główna"
     >
-      <span className="flex size-11 items-center justify-center">
+      <span className="flex size-16 shrink-0 items-center justify-center">
         <Image
           src="/logo.png"
           alt="Let’s Gol"
-          width={60}
-          height={60}
-          className="size-11 object-contain"
+          width={64}
+          height={64}
+          className="size-16 object-contain"
           priority
         />
       </span>
