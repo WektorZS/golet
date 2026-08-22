@@ -18,20 +18,30 @@ export function Brand() {
   return (
     <Link
       href="/"
-      className="flex items-center"
+      className="flex items-center gap-3 text-background"
       aria-label="Let’s Gol – strona główna"
     >
-      <Image
-        src="/logo.png"
-        alt="Let’s Gol"
-        width={180}
-        height={60}
-        className="h-12 w-auto object-contain"
-        priority
-      />
+      <span className="flex size-11 items-center justify-center">
+        <Image
+          src="/logo.png"
+          alt="Let’s Gol"
+          width={44}
+          height={44}
+          className="size-11 object-contain"
+          priority
+        />
+      </span>
+
+      <span className="flex flex-col font-sans font-black uppercase leading-none tracking-tight">
+        <span className="text-xl">Let&apos;s Gol</span>
+        <span className="font-mono text-[10px] font-semibold tracking-[0.16em] text-primary">
+          Wyjazdy na mecze
+        </span>
+      </span>
     </Link>
   )
 }
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
   return (
