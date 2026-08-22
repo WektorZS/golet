@@ -11,9 +11,9 @@ const oswald = Oswald({ subsets: ["latin", "latin-ext"], variable: "--font-oswal
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://letsgol.pl"),
-  title: { default: "Let’s Gol — wyjazdy na mecze w Europie", template: "%s | Let’s Gol" },
+  title: { default: "Let’s Gol - wyjazdy na mecze w Europie", template: "%s | Let’s Gol" },
   description: "Kompleksowe wyjazdy na największe mecze w Europie. Bilety, lot, hotel i opieka koordynatora w jednym pakiecie.",
-  openGraph: { title: "Let’s Gol — wyjazdy na mecze", description: "Ty wybierasz mecz. My organizujemy całą podróż.", locale: "pl_PL", type: "website", images: ["/images/hero-stadium.png"] },
+  openGraph: { title: "Let’s Gol - wyjazdy na mecze", description: "Ty wybierasz mecz. My organizujemy całą podróż.", locale: "pl_PL", type: "website", images: ["/images/hero-stadium.png"] },
   robots: { index: true, follow: true },
 }
 

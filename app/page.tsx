@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic"
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getSiteContent()
   return {
-    title: content.seoTitle || "Let’s Gol — wyjazdy na mecze piłkarskie",
+    title: content.seoTitle || "Let’s Gol - wyjazdy na mecze piłkarskie",
     description: content.seoDescription || "Kompleksowe wyjazdy na największe mecze w Europie: bilety, lot, hotel i opieka koordynatora.",
   }
 }
