@@ -23,7 +23,7 @@ export function Brand() {
     >
       <span className="flex size-16 shrink-0 items-center justify-center">
         <Image
-          src="/logo.png"
+          src="/logo.webp"
           alt="Let’s Gol"
           width={84}
           height={84}
