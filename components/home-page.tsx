@@ -82,7 +82,7 @@ export function HomePage({ trips, content, gallery, testimonials, videos }: { tr
           <div className="flex max-w-3xl flex-col items-start gap-6">
             <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-primary">{content.heroEyebrow || "Mecz zaczyna się dużo wcześniej niż pierwszy gwizdek"}</p>
             <h1 className="text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">{content.heroTitle || "Leć z nami na największe mecze w Europie"}</h1>
-            <p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">{content.heroDescription || "XBilet, lot, hotel i opieka koordynatora. Ty wybierasz mecz, my dopinamy całą resztę."}</p>
+            <p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">{content.heroDescription || "Bilet, lot, hotel i opieka koordynatora. Ty wybierasz mecz, my dopinamy całą resztę."}</p>
             <div className="flex flex-wrap gap-3">
               <Button size="lg" className="h-13 rounded-md px-6 font-bold uppercase" nativeButton={false} render={<Link href="#wyjazdy" />}>{content.heroCta || "Zobacz wyjazdy"} <ArrowRight data-icon="inline-end" /></Button>
               <Button size="lg" variant="outline" className="h-13 rounded-md border-background/35 bg-foreground/20 px-6 font-bold uppercase text-background hover:bg-background hover:text-foreground" nativeButton={false} render={<Link href="#kontakt" />}>Wyceń mój wyjazd</Button>
