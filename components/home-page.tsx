@@ -91,7 +91,7 @@ export function HomePage({ trips, content, gallery, testimonials, videos }: { tr
         </div>
         <div className="relative border-t border-background/15 bg-foreground/75 backdrop-blur-sm">
           <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:grid-cols-2 md:px-6 lg:grid-cols-4">
-            {trust.map(([Icon, text]) => <div key={text} className="flex items-center gap-3"><Icon className="text-primary" aria-hidden="true" /><span className="text-sm font-semibold leading-tight">{text}</span></div>)}
+            {trust.map(([Icon, text]) => <div key={text} className="flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-3 sm:text-left"><Icon className="text-primary" aria-hidden="true" /><span className="text-sm font-semibold leading-tight">{text}</span></div>)}
           </div>
         </div>
       </section>
