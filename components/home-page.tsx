@@ -73,12 +73,12 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
 export function HomePage({ trips, content, gallery, testimonials, videos }: { trips: Trip[]; content: SiteContent; gallery: GalleryItem[]; testimonials: Testimonial[]; videos: YouTubeVideo[] }) {
   return (
     <main>
-      <section className="relative isolate flex min-h-[780px] flex-col overflow-hidden bg-foreground text-background">
+      <section className="relative isolate flex flex-col overflow-hidden bg-foreground text-background md:h-dvh md:min-h-[700px]">
         <Image src="/images/hero-stadium.png" alt="Kibice na trybunach podczas wieczornego meczu w Barcelonie" fill priority className="object-cover object-center" sizes="100vw" />
         <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/75 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-foreground to-transparent" />
         <SiteHeader />
-        <div className="relative mx-auto flex w-full flex-1 items-center px-4 pb-14 pt-28 md:px-6 lg:max-w-7xl">
+        <div className="relative mx-auto flex min-h-svh w-full flex-1 items-center px-4 pb-14 pt-28 md:min-h-0 md:px-6 md:pb-8 md:pt-24 lg:max-w-7xl">
           <div className="flex max-w-3xl flex-col items-start gap-6">
             <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-primary">{content.heroEyebrow || "Mecz zaczyna się dużo wcześniej niż pierwszy gwizdek"}</p>
             <h1 className="text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">{content.heroTitle || "Leć z nami na największe mecze w Europie"}</h1>
