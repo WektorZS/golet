@@ -22,6 +22,7 @@ export function FloatingContact() {
   const pathname = usePathname()
   const [showMobileButton, setShowMobileButton] = useState(false)
   const [footerVisible, setFooterVisible] = useState(false)
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setShowMobileButton(window.scrollY > 240)
@@ -43,11 +44,11 @@ export function FloatingContact() {
   if (pathname.startsWith("/admin") || pathname.startsWith("/auth")) return null
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
           <Button
-            className={`fixed bottom-5 right-4 shadow-lg transition-all duration-200 md:bottom-8 md:right-8 ${
+            className={`fixed bottom-5 right-4 border-2 border-primary-foreground/70 shadow-xl ring-4 ring-primary/25 transition-all duration-200 hover:scale-105 hover:ring-primary/40 motion-safe:animate-pulse md:bottom-8 md:right-8 ${
               showMobileButton && !footerVisible
                 ? "translate-y-0 opacity-100"
                 : "pointer-events-none translate-y-4 opacity-0 md:pointer-events-auto md:translate-y-0 md:opacity-100"
@@ -69,11 +70,16 @@ export function FloatingContact() {
             <Phone data-icon="inline-start" />
             Zadzwoń: {PHONE_DISPLAY}
           </Button>
-          <Button nativeButton={false} render={<Link href="/#kontakt" />} variant="outline" size="lg">
+          <Button
+            nativeButton={false}
+            render={<Link href="/#kontakt" onClick={() => setOpen(false)} />}
+            variant="outline"
+            size="lg"
+          >
             <MessageCircle data-icon="inline-start" />
             Przejdź do formularza
           </Button>
-          <Button nativeButton={false} render={<a href={`mailto:${EMAIL}`} />} variant="outline" size="lg" className="md:hidden">
+          <Button nativeButton={false} render={<a href={`mailto:${EMAIL}`} />} variant="outline" size="lg">
             <Mail data-icon="inline-start" />
             Napisz e-mail
           </Button>
