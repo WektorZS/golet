@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Menu, Plane, X } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { SocialLinks } from "@/components/social-links"
 
 const links = [
   ["Wyjazdy", "/#wyjazdy"],
@@ -60,6 +61,10 @@ export function SiteHeader() {
         <nav className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 md:hidden" aria-label="Menu mobilne">
           {links.map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)} className="rounded-md px-3 py-3 font-mono text-sm font-semibold uppercase tracking-wider text-background hover:bg-background/10 hover:text-primary">{label}</Link>)}
           <Button className="mt-2 w-full font-bold uppercase" nativeButton={false} render={<Link href="/#kontakt" onClick={() => setOpen(false)} />}>Zapytaj o wyjazd <Plane data-icon="inline-end" /></Button>
+          <div className="mt-auto border-t border-background/15 pt-5">
+            <p className="mb-3 font-mono text-xs font-bold uppercase tracking-widest text-primary">Obserwuj nas</p>
+            <SocialLinks showLabels />
+          </div>
         </nav>
       ) : null}
     </header>
