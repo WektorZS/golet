@@ -7,7 +7,7 @@ export function SectionHeading({ eyebrow, title, intro, inverse = false, align =
   <p
     className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-primary"
     style={{
-    textShadow: "1px 1px 0 rgba(34, 34, 34, 0.5), -1px -1px 0 rgba(34, 34, 34, 0.5), 1px -1px 0 rgba(34, 34, 34, 0.5), -1px 1px 0 rgba(34, 34, 34, 0.5)",
+    textShadow: "0.4px 0.4px 0 rgba(34, 34, 34, 0.4), -0.4px -0.4px 0 rgba(34, 34, 34, 0.4), 0.4px -0.4px 0 rgba(34, 34, 34, 0.4), -0.4px 0.4px 0 rgba(34, 34, 34, 0.4)",
     }}
   >
     {eyebrow}
