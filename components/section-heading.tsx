@@ -22,7 +22,7 @@ export function SectionHeading({
     >
       {eyebrow && (
         <p
-          className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary"
+          className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-primary"
           style={{
             WebkitTextStroke: "0.5px rgba(34, 34, 34, 0.5)",
           }}
