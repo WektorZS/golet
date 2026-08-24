@@ -22,9 +22,9 @@ export function SectionHeading({
     >
 {eyebrow && (
   <p
-    className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-primary"
+    className="font-mono text-base font-black uppercase tracking-[0.25em] text-primary md:text-lg"
     style={{
-      textShadow: "0 1px 1px rgba(0, 0, 0, 0.45)",
+      textShadow: "0 2px 3px rgba(0, 0, 0, 0.45)",
     }}
   >
     {eyebrow}
