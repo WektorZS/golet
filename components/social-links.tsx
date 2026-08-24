@@ -4,7 +4,7 @@ export const socialProfiles = [
   { name: "Facebook", href: "https://facebook.com/profile.php?id=61573517165441", icon: "/icons/social/facebook.svg" },
   { name: "Instagram", href: "https://instagram.com/letsgol_wyjazdynamecze", icon: "/icons/social/instagram.svg" },
   { name: "TikTok", href: "https://tiktok.com/@letsgol.wyjazdynamecze", icon: "/icons/social/tiktok.svg" },
-  { name: "YouTube", href: "https://youtube.com/@LetsGolWyjazdynamecze", icon: "/icons/social/youtube.svg" },
+  { name: "YouTube", href: "https://youtube.com/@LetsGolWyjazdynamecze", icon: "/icons/social/youtube.webp" },
 ] as const
 
 export function SocialLinks({
@@ -39,14 +39,14 @@ export function SocialLinks({
             className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-semibold transition-colors ${linkClassName}`}
             aria-label={`${name} - profil Let’s Gol (otwiera się w nowej karcie)`}
           >
-          <Image
-  src={currentIcon}
-  alt=""
-  width={name === "YouTube" ? 30 : 20}
-  height={name === "YouTube" ? 20 : 20}
-  unoptimized
-  aria-hidden="true"
-/>
+            <Image
+              src={currentIcon}
+              alt=""
+              width={20}
+              height={20}
+              unoptimized
+              aria-hidden="true"
+            />
             {showLabels ? <span>{name}</span> : null}
           </a>
         )
