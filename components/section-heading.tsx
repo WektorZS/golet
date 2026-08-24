@@ -4,13 +4,10 @@ export function SectionHeading({ eyebrow, title, intro, inverse = false, align =
   return (
     <div className={cn("flex max-w-3xl flex-col gap-3", align === "center" && "mx-auto items-center text-center")}>
 {eyebrow && (
-  <p
-    className="font-mono text-[15px] font-bold uppercase tracking-[0.2em] text-primary"
-    style={{
-      textShadow: "0 1px 1px rgba(0, 0, 0, 0.45)",
-    }}
-  >
-    {eyebrow}
+  <p className="font-mono text-[15px] font-bold uppercase tracking-[0.2em] text-primary">
+    <span className="rounded-sm bg-black/10 px-1.5 py-0.5">
+      {eyebrow}
+    </span>
   </p>
 )}
       <h2 className={cn("text-balance font-sans text-3xl font-black uppercase leading-tight tracking-tight md:text-5xl", inverse && "text-background")}>{title}</h2>
