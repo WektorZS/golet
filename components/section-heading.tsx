@@ -5,7 +5,7 @@ export function SectionHeading({ eyebrow, title, intro, inverse = false, align =
     <div className={cn("flex max-w-3xl flex-col gap-3", align === "center" && "mx-auto items-center text-center")}>
       {eyebrow && <p className="font-mono text-[15px] font-bold uppercase tracking-[0.2em] text-primary">{eyebrow}</p>}
       <h2 className={cn("text-balance font-sans text-3xl font-black uppercase leading-tight tracking-tight md:text-5xl", inverse && "text-background")}>{title}</h2>
-      {intro && <p className={cn("text-pretty text-base leading-relaxed text-muted-foreground md:text-lg", inverse && "text-background/65")}>{intro}</p>}
+      {intro && <p className={cn("text-pretty text-[15px] leading-relaxed text-muted-foreground md:text-lg", inverse && "text-background/65")}>{intro}</p>}
       <span className="mt-1 h-1 w-12 bg-primary" aria-hidden="true" />
     </div>
   )
