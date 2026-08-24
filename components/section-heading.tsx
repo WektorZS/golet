@@ -20,20 +20,16 @@ export function SectionHeading({
         align === "center" && "mx-auto items-center text-center"
       )}
     >
-      {eyebrow && (
-        <p
-          className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-primary"
-          style={{
-            WebkitTextStroke: "0.35px rgba(25, 25, 25, 0.85)",
-            textShadow: `
-              0 1px 2px rgba(0, 0, 0, 0.35),
-              0 0 6px rgba(0, 0, 0, 0.18)
-            `,
-          }}
-        >
-          {eyebrow}
-        </p>
-      )}
+{eyebrow && (
+  <p
+    className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-primary"
+    style={{
+      textShadow: "0 1px 1px rgba(0, 0, 0, 0.45)",
+    }}
+  >
+    {eyebrow}
+  </p>
+)}
 
       <h2
         className={cn(
