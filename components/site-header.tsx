@@ -52,9 +52,16 @@ export function SiteHeader() {
         <nav className="hidden items-center gap-7 lg:flex" aria-label="Główna nawigacja">
           {links.map(([label, href]) => <Link key={href} href={href} className="font-mono text-xs font-semibold uppercase tracking-wider text-background/80 transition-colors hover:text-primary">{label}</Link>)}
         </nav>
-        <Button className="hidden h-11 rounded-md px-5 font-bold uppercase md:inline-flex" nativeButton={false} render={<Link href="/#kontakt" />}>
-          Zapytaj o wyjazd <Plane data-icon="inline-end" />
-        </Button>
+       <Button
+  className="hidden h-11 rounded-md px-4 font-bold uppercase md:inline-flex"
+  nativeButton={false}
+  render={<Link href="/#kontakt" />}
+>
+  <span className="inline-flex items-center gap-2">
+    Zapytaj o wyjazd
+    <Plane className="h-4 w-4" />
+  </span>
+</Button>
         <Button variant="outline" size="icon-lg" className="border-background/30 bg-transparent text-background md:hidden" aria-label={open ? "Zamknij menu" : "Otwórz menu"} aria-expanded={open} onClick={() => setOpen((value) => !value)}>{open ? <X /> : <Menu />}</Button>
       </div>
       {open ? (
