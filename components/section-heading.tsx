@@ -21,12 +21,7 @@ export function SectionHeading({
       )}
     >
 {eyebrow && (
-  <p
-    className="font-mono text-base font-black uppercase tracking-[0.25em] text-primary md:text-lg"
-    style={{
-      textShadow: "0 2px 3px rgba(0, 0, 0, 0.45)",
-    }}
-  >
+  <p className="font-mono text-lg font-black uppercase tracking-[0.3em] text-primary md:text-xl">
     {eyebrow}
   </p>
 )}
@@ -52,9 +47,9 @@ export function SectionHeading({
       )}
 
       <span
-        className="mt-1 h-1 w-12 rounded-full bg-primary shadow-[0_2px_6px_rgba(0,0,0,0.25)]"
-        aria-hidden="true"
-      />
+  className="mt-1 h-1 w-12 rounded-full bg-primary"
+  aria-hidden="true"
+/>
     </div>
   )
 }
