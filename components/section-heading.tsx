@@ -24,7 +24,11 @@ export function SectionHeading({
         <p
           className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-primary"
           style={{
-            WebkitTextStroke: "0.5px rgba(34, 34, 34, 1)",
+            WebkitTextStroke: "0.35px rgba(25, 25, 25, 0.85)",
+            textShadow: `
+              0 1px 2px rgba(0, 0, 0, 0.35),
+              0 0 6px rgba(0, 0, 0, 0.18)
+            `,
           }}
         >
           {eyebrow}
@@ -52,7 +56,7 @@ export function SectionHeading({
       )}
 
       <span
-        className="mt-1 h-1 w-12 bg-primary"
+        className="mt-1 h-1 w-12 rounded-full bg-primary shadow-[0_2px_6px_rgba(0,0,0,0.25)]"
         aria-hidden="true"
       />
     </div>
