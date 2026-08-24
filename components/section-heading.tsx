@@ -3,11 +3,11 @@ import { cn } from "@/lib/utils"
 export function SectionHeading({ eyebrow, title, intro, inverse = false, align = "center" }: { eyebrow?: string; title: string; intro?: string; inverse?: boolean; align?: "center" | "left" }) {
   return (
     <div className={cn("flex max-w-3xl flex-col gap-3", align === "center" && "mx-auto items-center text-center")}>
-     {eyebrow && (
+{eyebrow && (
   <p
     className="font-mono text-[15px] font-bold uppercase tracking-[0.2em] text-primary"
     style={{
-      WebkitTextStroke: "0.4px #222",
+      textShadow: "0 1px 1px rgba(0, 0, 0, 0.45)",
     }}
   >
     {eyebrow}
