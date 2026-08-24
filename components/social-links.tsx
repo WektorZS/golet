@@ -42,8 +42,8 @@ export function SocialLinks({
           <Image
   src={currentIcon}
   alt=""
-  width={name === "YouTube" ? 20 : 20}
-  height={name === "YouTube" ? 30 : 20}
+  width={name === "YouTube" ? 30 : 20}
+  height={name === "YouTube" ? 20 : 20}
   unoptimized
   aria-hidden="true"
 />
