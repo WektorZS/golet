@@ -82,7 +82,9 @@ export function HomePage({ trips, content, gallery, testimonials, videos }: { tr
         <div className="relative mx-auto flex min-h-svh w-full flex-1 items-center px-4 pb-14 pt-28 md:min-h-0 md:px-6 md:pb-8 md:pt-24 lg:max-w-7xl">
           <div className="flex max-w-3xl flex-col items-start gap-6">
             <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-primary">{content.heroEyebrow || "Mecz zaczyna się dużo wcześniej niż pierwszy gwizdek"}</p>
-            <h1 className="text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">{content.heroTitle || "Leć z nami na największe mecze w Europie"}</h1>
+        <h1 className="text-balance font-sans text-6xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-8xl lg:text-[100px]">
+  {content.heroTitle || "Leć z nami na największe mecze w Europie"}
+</h1>
             <p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">{content.heroDescription || ""}</p>
             <div className="flex flex-wrap gap-3">
               <Button size="lg" className="h-13 rounded-md px-6 font-bold uppercase" nativeButton={false} render={<Link href="#wyjazdy" />}>{content.heroCta || "Zobacz wyjazdy"} <ArrowRight data-icon="inline-end" /></Button>
