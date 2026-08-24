@@ -7,7 +7,11 @@ export const socialProfiles = [
   { name: "TikTok", href: "https://tiktok.com/@letsgol.wyjazdynamecze", icon: "/icons/social/tiktok.svg" },
 ] as const
 
-export function SocialLinks({ showLabels = false }: { showLabels?: boolean }) {
+export function SocialLinks({ showLabels = false, variant = "dark" }: { showLabels?: boolean; variant?: "dark" | "light" }) {
+  const linkClassName = variant === "light"
+    ? "border-border bg-background text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground"
+    : "border-background/20 bg-background/5 text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
+
   return (
     <div className="flex flex-wrap items-center gap-3" aria-label="Let’s Gol w mediach społecznościowych">
       {socialProfiles.map(({ name, href, icon }) => (
@@ -16,7 +20,7 @@ export function SocialLinks({ showLabels = false }: { showLabels?: boolean }) {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 rounded-md border border-background/20 bg-background/5 px-3 py-2 text-sm font-semibold text-background transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
+          className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-semibold transition-colors ${linkClassName}`}
           aria-label={`${name} — profil Let’s Gol (otwiera się w nowej karcie)`}
         >
           <Image src={icon} alt="" width={20} height={20} unoptimized aria-hidden="true" />

@@ -31,6 +31,11 @@ export const metadata: Metadata = {
   description: "Kompleksowe wyjazdy na największe mecze w Europie. Bilety, lot, hotel i opieka koordynatora w jednym pakiecie.",
   openGraph: { title: "Let’s Gol - wyjazdy na mecze", description: "Ty wybierasz mecz. My organizujemy całą podróż.", locale: "pl_PL", type: "website", images: ["/images/hero-stadium.png"] },
   robots: { index: true, follow: true },
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+    apple: "/apple-icon.png",
+  },
 }
 
 export const viewport: Viewport = { colorScheme: "light", themeColor: "#080A0D", userScalable: true }
