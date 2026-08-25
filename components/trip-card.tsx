@@ -28,7 +28,7 @@ export function TripCard({ trip }: { trip: Trip }) {
       <div className="flex flex-1 flex-col gap-4 p-4">
         <div className="flex flex-col gap-2 text-sm text-muted-foreground">
           <span className="flex items-center gap-2"><CalendarDays aria-hidden="true" />{formatTripDates(trip.startDate, trip.endDate)}</span>
-          <span className="flex items-center gap-2"><MapPin aria-hidden="true" />Wyloty z Polski</span>
+          <span className="flex items-center gap-2"><MapPin aria-hidden="true" />Wyloty z dowolnego lotniska</span>
         </div>
         <div className="mt-auto flex items-end justify-between gap-3 border-t pt-4">
           <div><p className="text-xs uppercase text-muted-foreground">od osoby</p><p className="text-2xl font-black">{trip.price.toLocaleString("pl-PL")} zł</p></div>
