@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/images/hero-stadium.png",
+        url: "/images/og-image.webp",
         width: 1200,
         height: 630,
         alt: "Let’s Gol - wyjazdy na mecze",
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Let’s Gol - wyjazdy na mecze",
     description: "Ty wybierasz mecz. My organizujemy całą podróż.",
-    images: ["/images/hero-stadium.png"],
+    images: ["/images/og-image.webp"],
   },
 
   robots: {
