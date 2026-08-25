@@ -6,15 +6,28 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { FloatingContact } from "@/components/floating-contact"
 import "./globals.css"
 
-const geist = Geist({ subsets: ["latin", "latin-ext"], variable: "--font-geist" })
-const oswald = Oswald({ subsets: ["latin", "latin-ext"], variable: "--font-oswald" })
+const geist = Geist({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-geist",
+})
+
+const oswald = Oswald({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-oswald",
+})
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
+  : undefined
 
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "TravelAgency",
   name: "Let’s Gol",
-  url: "https://letsgol.pl",
-  logo: "https://letsgol.pl/logo.webp",
+  ...(siteUrl && {
+    url: siteUrl.toString(),
+    logo: new URL("/logo.webp", siteUrl).toString(),
+  }),
   email: "kontakt.letsgol@gmail.com",
   telephone: "+48501465318",
   sameAs: [
@@ -26,11 +39,46 @@ const organizationSchema = {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://letsgol.pl"),
-  title: { default: "Let’s Gol - wyjazdy na mecze w Europie", template: "%s | Let’s Gol" },
-  description: "Kompleksowe wyjazdy na największe mecze w Europie. Bilety, lot, hotel i opieka koordynatora w jednym pakiecie.",
-  openGraph: { title: "Let’s Gol - wyjazdy na mecze", description: "Ty wybierasz mecz. My organizujemy całą podróż.", locale: "pl_PL", type: "website", images: ["/images/hero-stadium.png"] },
-  robots: { index: true, follow: true },
+  ...(siteUrl && {
+    metadataBase: siteUrl,
+  }),
+
+  title: {
+    default: "Let’s Gol - wyjazdy na mecze w Europie",
+    template: "%s | Let’s Gol",
+  },
+
+  description:
+    "Kompleksowe wyjazdy na największe mecze w Europie. Bilety, lot, hotel i opieka koordynatora w jednym pakiecie.",
+
+  openGraph: {
+    title: "Let’s Gol - wyjazdy na mecze",
+    description: "Ty wybierasz mecz. My organizujemy całą podróż.",
+    siteName: "Let’s Gol",
+    locale: "pl_PL",
+    type: "website",
+    images: [
+      {
+        url: "/images/hero-stadium.png",
+        width: 1200,
+        height: 630,
+        alt: "Let’s Gol - wyjazdy na mecze",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Let’s Gol - wyjazdy na mecze",
+    description: "Ty wybierasz mecz. My organizujemy całą podróż.",
+    images: ["/images/hero-stadium.png"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     shortcut: "/icon.svg",
@@ -38,8 +86,42 @@ export const metadata: Metadata = {
   },
 }
 
-export const viewport: Viewport = { colorScheme: "light", themeColor: "#080A0D", userScalable: true }
+export const viewport: Viewport = {
+  colorScheme: "light",
+  themeColor: "#080A0D",
+  userScalable: true,
+}
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="pl" className={`light bg-background ${geist.variable} ${oswald.variable}`}><body><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema).replace(/</g, "\\u003c") }} /><TooltipProvider>{children}<FloatingContact /></TooltipProvider><Toaster richColors />{process.env.NODE_ENV === "production" && <Analytics />}</body></html>
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html
+      lang="pl"
+      className={`light bg-background ${geist.variable} ${oswald.variable}`}
+    >
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema).replace(
+              /</g,
+              "\\u003c"
+            ),
+          }}
+        />
+
+        <TooltipProvider>
+          {children}
+          <FloatingContact />
+        </TooltipProvider>
+
+        <Toaster richColors />
+
+        {process.env.NODE_ENV === "production" && <Analytics />}
+      </body>
+    </html>
+  )
 }
