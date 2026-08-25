@@ -34,7 +34,7 @@ export function FloatingContact() {
 
       // Przycisk znika w ostatnich 200 px strony
       const nearBottom =
-        scrollY + viewportHeight >= documentHeight - 200
+        scrollY + viewportHeight >= documentHeight - 500
 
       setShowMobileButton(passedHeader && !nearBottom)
     }
