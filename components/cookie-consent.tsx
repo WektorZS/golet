@@ -60,9 +60,9 @@ export function CookieConsent() {
   onClick={() => setEditing(true)}
   aria-label="Ustawienia cookies"
   title="Ustawienia cookies"
-  cclassName="fixed bottom-3 left-3 z-40 border border-[#f4b91e] bg-white text-black shadow-[0_4px_12px_rgba(244,185,30,0.45)] transition-all duration-200 hover:scale-105 hover:bg-black md:bottom-3 md:left-3"
+  className="fixed bottom-3 left-3 z-40 h-14 w-14 border border-[#f4b91e] bg-white text-black shadow-[0_4px_12px_rgba(244,185,30,0.45)] transition-all duration-200 hover:scale-105 hover:bg-black md:bottom-3 md:left-3"
 >
-  <Cookie className="h-6 w-6 text-[#000000]" />
+  <Cookie className="h-10 w-10 text-[#000000]" />
 </Button>
       )}
     </>
