@@ -43,7 +43,7 @@ export function CookieConsent() {
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="flex max-w-xl flex-col gap-2">
               <h2 className="font-sans text-xl font-black uppercase">Twoja prywatność</h2>
-              <p className="text-sm leading-relaxed text-muted-foreground">Niezbędne cookies zapewniają działanie strony i panelu. Vercel Analytics uruchomimy tylko za Twoją zgodą, aby anonimowo mierzyć korzystanie z serwisu.</p>
+              <p className="text-sm leading-relaxed text-muted-foreground">Niezbędne cookies zapewniają działanie strony. Zezwól na analitykę jeśli zgadzasz się na zbieranie anonimowych informacji o tym, jak użytkownicy korzystają z naszej strony. Pozwala nam to m.in. sprawdzać liczbę odwiedzin, źródła ruchu, popularność poszczególnych podstron oraz poprawiać działanie i funkcjonalność serwisu.</p>
               <Link href="/informacje-prawne#cookies" className="text-sm font-medium text-primary underline underline-offset-4">Dowiedz się więcej</Link>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
@@ -53,7 +53,14 @@ export function CookieConsent() {
           </div>
         </section>
       ) : (
-        <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)} className="fixed bottom-4 left-4 z-40">Ustawienia cookies</Button>
+    <Button
+  type="button"
+  size="lg"
+  onClick={() => setEditing(true)}
+  className="fixed bottom-3 left-3 z-40 border-1 border-foreground shadow-xl transition-all duration-200 hover:scale-105 md:bottom-3 md:left-3"
+>
+  Ustawienia cookies
+</Button>
       )}
     </>
   )
