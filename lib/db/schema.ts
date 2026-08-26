@@ -33,6 +33,7 @@ export const inquiries = pgTable("inquiries", {
   message: text("message").notNull().default(""),
   status: text("status").notNull().default("new"),
   adminNote: text("admin_note").notNull().default(""),
+  consentAcceptedAt: timestamp("consent_accepted_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 })

@@ -19,7 +19,7 @@ export function TripCard({ trip }: { trip: Trip }) {
       <div className="relative aspect-[4/3] overflow-hidden">
         <Image src={trip.image} alt={`Stadion w mieście ${trip.city}`} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 768px) 100vw, 25vw" />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/10 to-transparent" />
-        <Badge className="absolute left-4 top-4 rounded-md bg-primary text-primary-foreground">Pełny pakiet</Badge>
+        <Badge className="absolute left-4 top-4 rounded-md bg-primary text-primary-foreground">{trip.featured ? "Polecany wyjazd" : "Pełny pakiet"}</Badge>
         <div className="absolute inset-x-4 bottom-4 text-background">
           <p className="font-mono text-xs font-semibold uppercase tracking-widest">{trip.city} · {trip.country}</p>
           <h3 className="mt-1 font-sans text-2xl font-black uppercase leading-none tracking-tight">{trip.title}</h3>

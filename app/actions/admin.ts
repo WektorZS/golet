@@ -35,13 +35,15 @@ function refreshPublic() {
 }
 
 const tripSchema = z.object({
-  title: z.string().min(3).max(120), opponent: z.string().min(2).max(100), city: z.string().min(2).max(100),
+  title: z.string().min(3).max(120), city: z.string().min(2).max(100),
   country: z.string().min(2).max(100), startDate: z.string().date(), endDate: z.string().optional(),
   price: z.coerce.number().int().nonnegative().max(1_000_000), status: z.enum(statuses),
   description: z.string().max(12000).refine((value) => stripHtml(value).length <= 8000, "Opis jest za długi"),
 })
 
-export async function saveTrip(formData: FormData) {
+export type SaveTripState = { success?: boolean; error?: string }
+
+export async function saveTrip(_: SaveTripState, formData: FormData): Promise<SaveTripState> {
   const user = await requireAdmin()
   const id = Number(formData.get("id"))
   // The description field carries HTML produced by the restricted rich-text editor
@@ -49,16 +51,30 @@ export async function saveTrip(formData: FormData) {
   // always the safe, allowlisted subset regardless of what the client actually sent.
   const description = sanitizeDescriptionHtml(clean(formData.get("description")))
   const parsed = tripSchema.safeParse({
-    title: clean(formData.get("title")), opponent: clean(formData.get("opponent")), city: clean(formData.get("city")),
+    title: clean(formData.get("title")), city: clean(formData.get("city")),
     country: clean(formData.get("country")), startDate: clean(formData.get("startDate")), endDate: clean(formData.get("endDate")) || undefined,
     price: clean(formData.get("price")), status: clean(formData.get("status")), description,
   })
-  if (!parsed.success) throw new Error("Sprawdź wymagane pola wyjazdu")
+  if (!parsed.success) return { error: "Sprawdź wymagane pola wyjazdu." }
   const slug = slugify(clean(formData.get("slug")) || parsed.data.title)
   const duplicate = await db.select({ id: trips.id }).from(trips).where(id ? and(eq(trips.slug, slug), ne(trips.id, id)) : eq(trips.slug, slug)).limit(1)
-  if (duplicate.length) throw new Error("Ten adres URL jest już używany")
+  if (duplicate.length) return { error: "Ten adres URL jest już używany." }
+
+  let image = clean(formData.get("image")) || "/placeholder.jpg"
+  const coverFile = formData.get("coverFile")
+  if (coverFile instanceof File && coverFile.size > 0) {
+    if (coverFile.size > 8 * 1024 * 1024) return { error: "Zdjęcie może mieć maksymalnie 8 MB." }
+    if (!ALLOWED_IMAGE_TYPES.includes(coverFile.type as (typeof ALLOWED_IMAGE_TYPES)[number])) return { error: "Dozwolone formaty zdjęcia: JPEG, PNG, WebP i AVIF." }
+    const header = new Uint8Array(await coverFile.slice(0, 16).arrayBuffer())
+    if (detectImageType(header) !== coverFile.type) return { error: "Zawartość zdjęcia nie zgadza się z jego formatem." }
+    const safeName = coverFile.name.replace(/[^a-zA-Z0-9._-]/g, "-").slice(0, 80)
+    const blob = await put(`admin/${crypto.randomUUID()}-${safeName}`, coverFile, { access: "private", addRandomSuffix: false })
+    const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: coverFile.type, size: coverFile.size, alt: parsed.data.title, originalName: coverFile.name, createdBy: user.id }).returning({ id: mediaAssets.id })
+    image = `/api/media/${asset.id}`
+  }
+
   const values = {
-    ...parsed.data, slug, endDate: parsed.data.endDate || null, image: clean(formData.get("image")) || "/placeholder.jpg",
+    ...parsed.data, opponent: parsed.data.title, slug, endDate: parsed.data.endDate || null, image,
     featured: formData.get("featured") === "on", includes: clean(formData.get("includes")).split("\n").map((item) => item.trim()).filter(Boolean),
     sortOrder: Number(formData.get("sortOrder")) || 0, seoTitle: clean(formData.get("seoTitle")), seoDescription: clean(formData.get("seoDescription")), updatedAt: new Date(),
   }
@@ -70,6 +86,7 @@ export async function saveTrip(formData: FormData) {
     await logActivity(user.id, "created", "trip", String(created.id), parsed.data.title)
   }
   refreshPublic()
+  return { success: true }
 }
 
 export async function setTripStatus(formData: FormData) {

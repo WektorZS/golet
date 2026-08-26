@@ -1,8 +1,8 @@
-import { Analytics } from "@vercel/analytics/next"
 import type { Metadata, Viewport } from "next"
 import { Geist, Oswald } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { CookieConsent } from "@/components/cookie-consent"
 import { FloatingContact } from "@/components/floating-contact"
 import "./globals.css"
 
@@ -117,8 +117,7 @@ export default function RootLayout({
         </TooltipProvider>
 
         <Toaster richColors />
-
-        {process.env.NODE_ENV === "production" && <Analytics />}
+        <CookieConsent />
       </body>
     </html>
   )

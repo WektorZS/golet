@@ -17,6 +17,7 @@ const inquirySchema = z.object({
   message: z.string().trim().max(1000),
   website: z.string().max(200).optional(),
   formLoadedAt: z.coerce.number().optional(),
+  privacyConsent: z.literal("on"),
 })
 
 export type InquiryState = { status: "idle" | "success" | "error"; message: string }
@@ -37,6 +38,7 @@ export async function createInquiry(_: InquiryState, formData: FormData): Promis
     message: formData.get("message") ?? "",
     website: formData.get("website") ?? "",
     formLoadedAt: formData.get("formLoadedAt") ?? undefined,
+    privacyConsent: formData.get("privacyConsent"),
   })
 
   if (!parsed.success) {
@@ -75,8 +77,8 @@ export async function createInquiry(_: InquiryState, formData: FormData): Promis
       return { status: "error", message: "Osiągnięto dzienny limit zapytań z tego adresu. Spróbuj ponownie później." }
     }
 
-    const { website, formLoadedAt, ...values } = parsed.data
-    await db.insert(inquiries).values(values)
+    const { website, formLoadedAt, privacyConsent, ...values } = parsed.data
+    await db.insert(inquiries).values({ ...values, consentAcceptedAt: new Date() })
     await db.insert(inquiryAttempts).values({ ipHash, emailHash, contentHash, accepted: true })
     return { status: "success", message: "Dziękujemy. Odezwemy się z propozycją w ciągu 24 godzin." }
   } catch {

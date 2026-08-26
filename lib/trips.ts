@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm"
+import { and, asc, desc, eq } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { tripGalleryItems, trips } from "@/lib/db/schema"
 
@@ -9,7 +9,7 @@ export async function getPublishedTrips() {
     .select()
     .from(trips)
     .where(eq(trips.status, "published"))
-    .orderBy(asc(trips.sortOrder), asc(trips.startDate))
+    .orderBy(desc(trips.featured), asc(trips.sortOrder), asc(trips.startDate))
 }
 
 export async function getTripBySlug(slug: string) {
