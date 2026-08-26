@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Analytics } from "@vercel/analytics/next"
 import { Button } from "@/components/ui/button"
+import { Cookie } from "lucide-react"
 
 const COOKIE_NAME = "letsgol_analytics_consent"
 type Consent = "accepted" | "rejected" | null
@@ -57,9 +58,11 @@ export function CookieConsent() {
   type="button"
   size="lg"
   onClick={() => setEditing(true)}
-  className="fixed bottom-3 left-3 z-40 border-1 border-foreground shadow-xl transition-all duration-200 hover:scale-105 md:bottom-3 md:left-3"
+  aria-label="Ustawienia cookies"
+  title="Ustawienia cookies"
+  className="fixed bottom-3 left-3 z-40 border-1 border-foreground bg-white text-black shadow-xl transition-all duration-200 hover:scale-105 hover:bg-white md:bottom-3 md:left-3"
 >
-  Ustawienia cookies
+  <Cookie className="h-6 w-6 text-[#f4b91e]" />
 </Button>
       )}
     </>
