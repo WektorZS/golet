@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { getSiteContent } from "@/lib/content"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
+import Link from "next/link"
 
 export const dynamic = "force-dynamic"
 
