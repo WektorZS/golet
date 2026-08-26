@@ -676,4 +676,3 @@ export default function WarunkiUczestnictwaPage() {
     </main>
   )
 }
-```
