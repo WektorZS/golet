@@ -29,7 +29,25 @@ export default async function LegalPage() {
 
         <section id="cookies" className="scroll-mt-24"><h2 className="font-sans text-3xl font-black uppercase">Pliki cookies</h2><div className="mt-4 flex flex-col gap-4 leading-relaxed text-muted-foreground"><p>Serwis używa niezbędnych cookies do zapamiętania wyboru prywatności i obsługi bezpiecznej sesji. Nie wymagają one zgody, ponieważ są konieczne do działania serwisu.</p><p>Analityka jest uruchamiana dopiero po wybraniu opcji „Akceptuję analitykę”. Zgodę można w każdej chwili zmienić przyciskiem ciasteczka „Ustawienia cookies” widocznym na stronie w lewym dolnym rogu strony.</p></div></section>
 
-        <section id="warunki" className="scroll-mt-24"><h2 className="font-sans text-3xl font-black uppercase">Warunki uczestnictwa</h2><p className="mt-4 leading-relaxed text-muted-foreground">Przed rozpoczęciem sprzedaży należy opublikować zweryfikowane warunki umowy, zakres odpowiedzialności organizatora, zasady płatności, odstąpienia, rezygnacji i reklamacji oraz informacje wymagane dla oferowanego modelu usług turystycznych.</p></section>
+        <section id="warunki" className="scroll-mt-24">
+  <h2 className="font-sans text-3xl font-black uppercase">
+    Warunki uczestnictwa
+  </h2>
+
+  <p className="mt-4 leading-relaxed text-muted-foreground">
+    Przed dokonaniem rezerwacji prosimy o zapoznanie się z Warunkami
+    Uczestnictwa, które określają najważniejsze zasady dotyczące organizacji
+    wyjazdów, zakresu świadczeń, płatności, rezygnacji, reklamacji oraz
+    odpowiedzialności Organizatora. Złożenie rezerwacji wiąże się z potwierdzeniem, że zapoznałeś się z warunkami uczestnictwa.
+  </p>
+
+  <Link
+    href="/warunki-uczestnictwa"
+    className="mt-5 inline-flex font-semibold text-primary underline underline-offset-4 hover:text-primary/80"
+  >
+    Zapoznaj się z Warunkami Uczestnictwa →
+  </Link>
+</section>
       </div>
       <SiteFooter />
     </main>
