@@ -40,19 +40,43 @@ export function CookieConsent() {
     <>
       {process.env.NODE_ENV === "production" && consent === "accepted" ? <Analytics /> : null}
       {!consent || editing ? (
-        <section aria-label="Ustawienia plików cookies" className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl rounded-xl border bg-card p-5 text-card-foreground shadow-xl md:p-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="flex max-w-xl flex-col gap-2">
-              <h2 className="font-sans text-xl font-black uppercase">Twoja prywatność</h2>
-              <p className="text-sm leading-relaxed text-muted-foreground">Niezbędne cookies zapewniają działanie strony. Zezwól na analitykę jeśli zgadzasz się na zbieranie anonimowych informacji o tym, jak użytkownicy korzystają z naszej strony. Pozwala nam to m.in. sprawdzać liczbę odwiedzin, źródła ruchu, popularność poszczególnych podstron oraz poprawiać działanie i funkcjonalność serwisu.</p>
-              <Link href="/informacje-prawne#cookies" className="text-sm font-medium text-primary underline underline-offset-4">Dowiedz się więcej</Link>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Button variant="outline" onClick={() => choose("rejected")}>Tylko niezbędne</Button>
-              <Button onClick={() => choose("accepted")}>Akceptuję analitykę</Button>
-            </div>
-          </div>
-        </section>
+        <section
+  aria-label="Ustawienia plików cookies"
+  className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-5xl rounded-xl border bg-card p-5 text-card-foreground shadow-xl md:p-6"
+>
+  <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
+      <h2 className="font-sans text-xl font-black uppercase">
+        Twoja prywatność
+      </h2>
+
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        Niezbędne cookies zapewniają działanie strony. Zezwól na analitykę jeśli
+        zgadzasz się na zbieranie anonimowych informacji o tym, jak użytkownicy
+        korzystają z naszej strony. Pozwala nam to m.in. sprawdzać liczbę
+        odwiedzin, źródła ruchu, popularność poszczególnych podstron oraz
+        poprawiać działanie i funkcjonalność serwisu.
+      </p>
+
+      <Link
+        href="/informacje-prawne#cookies"
+        className="text-sm font-medium text-primary underline underline-offset-4"
+      >
+        Dowiedz się więcej
+      </Link>
+    </div>
+
+    <div className="flex flex-col gap-2 sm:flex-row">
+      <Button variant="outline" onClick={() => choose("rejected")}>
+        Tylko niezbędne
+      </Button>
+
+      <Button onClick={() => choose("accepted")}>
+        Akceptuję analitykę
+      </Button>
+    </div>
+  </div>
+</section>
       ) : (
     <Button
   type="button"
