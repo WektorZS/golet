@@ -44,41 +44,41 @@ export function CookieConsent() {
   aria-label="Ustawienia plików cookies"
   className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-5xl rounded-xl border bg-card p-5 text-card-foreground shadow-xl md:p-6"
 >
-  <div className="flex flex-col items-center gap-4 text-center">
+  <div className="flex flex-col gap-4">
+    <h2 className="text-center font-sans text-xl font-black uppercase">
+      Twoja prywatność
+    </h2>
 
-    <div className="flex w-full flex-col items-center gap-2">
-      <h2 className="font-sans text-xl font-black uppercase">
-        Twoja prywatność
-      </h2>
+    <p className="text-left text-sm leading-relaxed text-muted-foreground">
+      Niezbędne cookies są konieczne do korzystania ze strony.
+      Zezwól na analitykę jeśli zgadzasz się na zbieranie anonimowych informacji o tym,
+      jak użytkownicy korzystają z naszej strony.
+      <br />
+      Pozwala nam to m.in. sprawdzać liczbę odwiedzin, źródła ruchu,
+      popularność poszczególnych podstron oraz poprawiać działanie i funkcjonalność serwisu.
+    </p>
 
-      <p className="text-sm leading-relaxed text-muted-foreground">
-        Niezbędne cookies zapewniają działanie strony.
-        <br />
-        Zezwól na analitykę jeśli zgadzasz się na zbieranie anonimowych informacji o tym,
-        jak użytkownicy korzystają z naszej strony.
-        <br />
-        Pozwala nam to m.in. sprawdzać liczbę odwiedzin, źródła ruchu,
-        popularność poszczególnych podstron oraz poprawiać działanie i funkcjonalność serwisu.
-      </p>
-
+    <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
       <Link
         href="/informacje-prawne#cookies"
         className="text-sm font-medium text-primary underline underline-offset-4"
       >
         Dowiedz się więcej
       </Link>
+
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          onClick={() => choose("rejected")}
+        >
+          Tylko niezbędne
+        </Button>
+
+        <Button onClick={() => choose("accepted")}>
+          Akceptuję analitykę
+        </Button>
+      </div>
     </div>
-
-    <div className="flex items-center justify-center gap-2">
-      <Button variant="outline" onClick={() => choose("rejected")}>
-        Tylko niezbędne
-      </Button>
-
-      <Button onClick={() => choose("accepted")}>
-        Akceptuję analitykę
-      </Button>
-    </div>
-
   </div>
 </section>
       ) : (
