@@ -45,17 +45,17 @@ export function CookieConsent() {
   className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-5xl rounded-xl border bg-card p-5 text-card-foreground shadow-xl md:p-6"
 >
   <div className="flex flex-col gap-4">
-    <h2 className="text-center font-sans text-xl font-black uppercase">
+    <h2 className="font-sans text-xl font-black uppercase">
       Twoja prywatność
     </h2>
 
     <p className="text-left text-sm leading-relaxed text-muted-foreground">
-      Niezbędne cookies są konieczne do korzystania ze strony.
-      Zezwól na analitykę jeśli zgadzasz się na zbieranie anonimowych informacji o tym,
-      jak użytkownicy korzystają z naszej strony.
-      <br />
-      Pozwala nam to m.in. sprawdzać liczbę odwiedzin, źródła ruchu,
-      popularność poszczególnych podstron oraz poprawiać działanie i funkcjonalność serwisu.
+Niezbędne cookies są wymagane do prawidłowego działania strony i zapewnienia jej podstawowej funkcjonalności.<br />
+Jeśli wyrazisz zgodę na analitykę, będziemy zbierać anonimowe informacje o tym,
+jak użytkownicy korzystają z naszej strony.
+<br />
+Dzięki temu możemy m.in. analizować liczbę odwiedzin, źródła ruchu,
+popularność poszczególnych podstron oraz poprawiać działanie i funkcjonalność serwisu.
     </p>
 
     <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
