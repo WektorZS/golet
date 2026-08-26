@@ -1,23 +1,41 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import {
+  ArrowLeft,
+  AlertTriangle,
+  CheckCircle2,
+  FileText,
+  Scale,
+  ShieldCheck,
+} from "lucide-react"
+
 import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Warunki uczestnictwa",
+  title: "Warunki uczestnictwa | Let’s Gol",
   description:
-    "Warunki uczestnictwa w wyjazdach na wydarzenia sportowe organizowanych przez Let’s Gol.",
+    "Warunki uczestnictwa w wyjazdach organizowanych przez Let’s Gol na wydarzenia sportowe w Polsce i Europie.",
 }
 
 export default function WarunkiUczestnictwaPage() {
+  const organizer = {
+    name: "LB Coaching Łukasz Borger",
+    address: "ul. Stefana Roweckiego 1/2, 72-010 Police",
+    nip: "8512915273",
+    regon: "520474445"
+    registerNumber: "34/25",
+    ewidencjaNumber: "42848",
+    authority: "Marszałek Województwa Zachodniopomorskiego",
+    email: "kontakt@letsgol.pl",
+    phone: "+48 501 465 318",
+  }
+
   return (
     <main className="min-h-screen bg-background">
-
       {/* HEADER */}
       <header className="border-b bg-foreground text-background">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
-
           <Button
             variant="ghost"
             className="text-background hover:bg-background/10 hover:text-background"
@@ -35,17 +53,15 @@ export default function WarunkiUczestnictwaPage() {
             Let&apos;s Gol{" "}
             <span className="text-primary">/ Warunki uczestnictwa</span>
           </Link>
-
         </div>
       </header>
 
-      {/* TYTUŁ */}
+      {/* HERO */}
       <section className="border-b">
         <div className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-24">
           <div className="max-w-3xl">
-
             <p className="mb-3 text-sm font-bold uppercase tracking-wider text-primary">
-              Informacje dla uczestników
+              Informacje dla podróżnych
             </p>
 
             <h1 className="font-sans text-4xl font-black uppercase tracking-tight md:text-5xl">
@@ -53,18 +69,37 @@ export default function WarunkiUczestnictwaPage() {
             </h1>
 
             <p className="mt-6 text-base leading-relaxed text-muted-foreground md:text-lg">
-              Zanim wybierzesz się z nami na wydarzenie sportowe, zapoznaj się
-              z najważniejszymi zasadami dotyczącymi organizacji i udziału
-              w naszych wyjazdach.
+              Niniejszy dokument określa zasady udziału w wyjazdach
+              organizowanych przez Let&apos;s Gol, w szczególności wyjazdach
+              na wydarzenia sportowe w Polsce i Europie.
             </p>
-
           </div>
         </div>
       </section>
 
-      {/* Treść */}
+      {/* CONTENT */}
       <section className="mx-auto max-w-5xl px-4 py-12 md:px-6 md:py-16">
         <div className="space-y-12">
+
+          {/* INFO BOX */}
+          <aside className="rounded-xl border border-primary bg-primary/10 p-6">
+            <div className="flex gap-4">
+              <ShieldCheck className="mt-1 size-6 shrink-0 text-primary" />
+
+              <div>
+                <h2 className="font-sans text-xl font-black uppercase">
+                  Organizator turystyki
+                </h2>
+
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  Let&apos;s Gol jest marką prowadzoną przez przedsiębiorcę
+                  wpisanego do rejestru organizatorów turystyki oraz
+                  przedsiębiorców ułatwiających nabywanie powiązanych usług
+                  turystycznych.
+                </p>
+              </div>
+            </div>
+          </aside>
 
           {/* 1 */}
           <section>
@@ -74,34 +109,57 @@ export default function WarunkiUczestnictwaPage() {
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Niniejsze Warunki Uczestnictwa określają zasady udziału
+                Niniejsze Warunki Uczestnictwa określają ogólne zasady udziału
                 w wyjazdach organizowanych przez{" "}
-                <strong className="text-foreground">[NAZWA FIRMY]</strong>,
-                z siedzibą w{" "}
-                <strong className="text-foreground">[ADRES]</strong>,
-                NIP: <strong className="text-foreground">[NIP]</strong>,
-                REGON: <strong className="text-foreground">[REGON]</strong>,
-                zwaną dalej „Organizatorem”.
+                <strong className="text-foreground">
+                  {organizer.name}
+                </strong>
+                , z adresem prowadzenia działalności:{" "}
+                <strong className="text-foreground">
+                  {organizer.address}
+                </strong>
+                , NIP:{" "}
+                <strong className="text-foreground">
+                  {organizer.nip}
+                </strong>
+                , zwanego dalej „Organizatorem”.
               </p>
 
               <p>
-                Organizujemy wspólne wyjazdy na wydarzenia sportowe odbywające
-                się w Polsce oraz innych krajach Europy, w szczególności na
-                mecze piłkarskie, turnieje, zawody i inne wydarzenia sportowe.
+                Organizator prowadzi działalność jako Organizator Turystyki
+                oraz Przedsiębiorca Ułatwiający Nabywanie Powiązanych Usług
+                Turystycznych.
               </p>
 
               <p>
-                Szczegółowe informacje dotyczące każdego wyjazdu, w tym termin,
-                miejsce, program, zakres świadczeń, transport, zakwaterowanie,
-                wydarzenie sportowe oraz cena, są określone w ofercie danego
-                wyjazdu oraz dokumentach przekazanych uczestnikowi przed
+                Numer wpisu do rejestru:{" "}
+                <strong className="text-foreground">
+                  {organizer.registerNumber}
+                </strong>
+                . Numer ewidencyjny:{" "}
+                <strong className="text-foreground">
+                  {organizer.ewidencjaNumber}
+                </strong>
+                . Organ dokonujący wpisu:{" "}
+                <strong className="text-foreground">
+                  {organizer.authority}
+                </strong>
+                .
+              </p>
+
+              <p>
+                Niniejsze Warunki Uczestnictwa mają zastosowanie do umów,
+                w których Organizator występuje jako organizator turystyki,
+                chyba że z dokumentów dotyczących konkretnej usługi wyraźnie
+                wynika inny charakter prawny danej usługi.
+              </p>
+
+              <p>
+                Szczegółowe informacje dotyczące konkretnego wyjazdu, w tym
+                termin, miejsce, zakres świadczeń, transport, zakwaterowanie,
+                wydarzenie sportowe, cena oraz warunki szczególne, są określone
+                w ofercie oraz dokumentach przekazywanych podróżnemu przed
                 zawarciem umowy.
-              </p>
-
-              <p>
-                Dokonując rezerwacji, uczestnik potwierdza, że zapoznał się
-                z niniejszymi Warunkami Uczestnictwa oraz informacjami
-                dotyczącymi wybranego wyjazdu.
               </p>
             </div>
           </section>
@@ -109,36 +167,39 @@ export default function WarunkiUczestnictwaPage() {
           {/* 2 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              2. Charakter naszych wyjazdów
+              2. Definicje
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Nasze wyjazdy są przygotowywane z myślą o osobach, które chcą
-                wspólnie przeżywać najważniejsze wydarzenia sportowe w Europie.
-                W zależności od wybranej oferty możemy zapewnić kompleksową
-                organizację wyjazdu.
+                <strong className="text-foreground">Podróżny</strong> - osoba,
+                która zamierza zawrzeć umowę o udział w imprezie turystycznej
+                albo jest uprawniona do podróżowania na podstawie zawartej umowy.
               </p>
 
               <p>
-                W ramach poszczególnych wyjazdów mogą być zapewnione między
-                innymi:
+                <strong className="text-foreground">Uczestnik</strong> - osoba
+                korzystająca ze świadczeń objętych konkretną umową lub ofertą.
               </p>
 
-              <ul className="list-disc space-y-2 pl-6">
-                <li>przelot lub inny transport,</li>
-                <li>zakwaterowanie w hotelu,</li>
-                <li>ubezpieczenie podróżne,</li>
-                <li>bilet na wydarzenie sportowe,</li>
-                <li>transfery,</li>
-                <li>opieka koordynatora wyjazdu,</li>
-                <li>atrakcje dodatkowe i zwiedzanie.</li>
-              </ul>
+              <p>
+                <strong className="text-foreground">Impreza turystyczna</strong>{" "}
+                - połączenie co najmniej dwóch różnych rodzajów usług
+                turystycznych na potrzeby tej samej podróży lub wakacji,
+                jeżeli spełnione są warunki przewidziane w obowiązujących
+                przepisach prawa.
+              </p>
 
               <p>
-                Zakres świadczeń może różnić się w zależności od konkretnego
-                wyjazdu. Wszystkie elementy zawarte w cenie są wskazane
-                w jego indywidualnej ofercie.
+                <strong className="text-foreground">Oferta</strong> - opis
+                konkretnego wyjazdu lub usługi, zawierający istotne informacje
+                dotyczące proponowanych świadczeń.
+              </p>
+
+              <p>
+                <strong className="text-foreground">Umowa</strong> - umowa
+                dotycząca udziału w konkretnej imprezie turystycznej lub innej
+                usłudze świadczonej przez Organizatora.
               </p>
             </div>
           </section>
@@ -146,32 +207,34 @@ export default function WarunkiUczestnictwaPage() {
           {/* 3 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              3. Rezerwacja miejsca
+              3. Charakter oferowanych wyjazdów
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Rezerwacji można dokonać za pośrednictwem strony internetowej,
-                telefonicznie, mailowo lub w inny sposób wskazany przez
-                Organizatora.
+                Organizator organizuje w szczególności wyjazdy na wydarzenia
+                sportowe, w tym mecze piłkarskie, turnieje, zawody i inne
+                wydarzenia odbywające się w Polsce i innych państwach Europy.
               </p>
 
               <p>
-                Rezerwacja zostaje potwierdzona po przekazaniu wymaganych danych
-                oraz dokonaniu płatności w wysokości i terminie określonym
-                w ofercie lub dokumentach rezerwacyjnych.
+                W zależności od konkretnej oferty wyjazd może obejmować
+                w szczególności transport, zakwaterowanie, bilety na wydarzenie,
+                transfery, ubezpieczenie lub inne świadczenia wskazane w umowie
+                albo ofercie.
               </p>
 
               <p>
-                Liczba miejsc na poszczególne wyjazdy może być ograniczona.
-                O dostępności miejsc decyduje kolejność prawidłowo dokonanych
-                rezerwacji, chyba że oferta stanowi inaczej.
+                Każdorazowo charakter prawny konkretnej usługi wynika
+                z jej rzeczywistego zakresu oraz sposobu sprzedaży, zgodnie
+                z obowiązującymi przepisami prawa.
               </p>
 
               <p>
-                W przypadku braku wymaganej płatności w terminie Organizator
-                może anulować rezerwację, z uwzględnieniem warunków zawartej
-                umowy oraz obowiązujących przepisów prawa.
+                Niniejsze Warunki Uczestnictwa nie zastępują obowiązkowych
+                informacji przekazywanych podróżnemu przed zawarciem konkretnej
+                umowy, w tym odpowiedniego standardowego formularza
+                informacyjnego, jeżeli jest wymagany przez przepisy prawa.
               </p>
             </div>
           </section>
@@ -179,28 +242,39 @@ export default function WarunkiUczestnictwaPage() {
           {/* 4 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              4. Cena i zakres świadczeń
+              4. Zawarcie umowy i rezerwacja
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Cena każdego wyjazdu jest podana w jego indywidualnej ofercie.
-                Organizator wskazuje również, jakie świadczenia są zawarte
-                w cenie.
+                Przed zawarciem umowy Organizator przekazuje podróżnemu
+                informacje wymagane obowiązującymi przepisami prawa, w zakresie
+                właściwym dla rodzaju oferowanej usługi.
               </p>
 
               <p>
-                W zależności od wybranego pakietu cena może obejmować przelot,
-                zakwaterowanie, ubezpieczenie, bilet na wydarzenie sportowe,
-                transfery, atrakcje oraz inne świadczenia wymienione w ofercie.
+                Rezerwacja może być dokonywana w sposób wskazany przez
+                Organizatora, w szczególności za pośrednictwem strony
+                internetowej, poczty elektronicznej, telefonu lub innego
+                udostępnionego kanału komunikacji.
               </p>
 
               <p>
-                Wydatki niewymienione w ofercie jako zawarte w cenie nie są
-                objęte ceną wyjazdu. Dotyczy to w szczególności wydatków
-                osobistych, posiłków i napojów, dodatkowego bagażu lub
-                dodatkowych atrakcji, jeżeli nie zostały wskazane jako
-                element pakietu.
+                Umowa zostaje zawarta w sposób zgodny z obowiązującymi
+                przepisami oraz procedurą przedstawioną podróżnemu podczas
+                procesu rezerwacji.
+              </p>
+
+              <p>
+                Po zawarciu umowy podróżny otrzymuje potwierdzenie jej zawarcia
+                lub inny dokument potwierdzający treść uzgodnionych świadczeń.
+              </p>
+
+              <p>
+                Osoba dokonująca rezerwacji dla innych uczestników powinna
+                posiadać uprawnienie do przekazania danych oraz informacji
+                dotyczących tych osób w zakresie niezbędnym do realizacji
+                wyjazdu.
               </p>
             </div>
           </section>
@@ -208,32 +282,39 @@ export default function WarunkiUczestnictwaPage() {
           {/* 5 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              5. Transport i przelot
+              5. Cena i płatności
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Transport podczas wyjazdu może być realizowany samolotem,
-                autokarem, koleją, samochodem lub innym środkiem transportu
-                wskazanym w ofercie.
+                Cena konkretnego wyjazdu oraz zakres świadczeń objętych ceną
+                są wskazywane w ofercie lub umowie.
               </p>
 
               <p>
-                W przypadku transportu lotniczego uczestnika obowiązują również
-                warunki przewoźnika lotniczego, w szczególności dotyczące
-                odprawy, bagażu oraz bezpieczeństwa.
+                Informacje o wymaganych zaliczkach, płatnościach częściowych
+                oraz terminie zapłaty pozostałej części ceny są przekazywane
+                podróżnemu przed zawarciem umowy lub określane w umowie.
               </p>
 
               <p>
-                Uczestnik zobowiązany jest do punktualnego stawienia się
-                w miejscu i czasie wskazanym przez Organizatora lub przewoźnika.
+                Cena może zostać zmieniona wyłącznie w przypadkach
+                dopuszczonych przez obowiązujące przepisy prawa oraz zgodnie
+                z warunkami przewidzianymi w konkretnej umowie.
               </p>
 
               <p>
-                Godziny lotów, numery rejsów, miejsca zbiórek oraz szczegóły
-                dotyczące transportu mogą ulec zmianie. O istotnych zmianach
-                Organizator poinformuje uczestników w możliwie najkrótszym
-                terminie.
+                Jeżeli umowa przewiduje możliwość podwyższenia ceny,
+                podróżny posiada również prawo do odpowiedniego obniżenia ceny
+                w przypadkach i na zasadach określonych przez obowiązujące
+                przepisy.
+              </p>
+
+              <p>
+                Jeżeli podwyżka ceny przekroczy próg określony w obowiązujących
+                przepisach, podróżnemu przysługują uprawnienia przewidziane
+                przez prawo, w tym możliwość rozwiązania umowy bez ponoszenia
+                opłaty za odstąpienie, jeżeli spełnione są ustawowe przesłanki.
               </p>
             </div>
           </section>
@@ -241,29 +322,35 @@ export default function WarunkiUczestnictwaPage() {
           {/* 6 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              6. Zakwaterowanie
+              6. Transport
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Zakwaterowanie odbywa się w hotelu lub innym obiekcie wskazanym
-                w ofercie danego wyjazdu.
+                Rodzaj transportu, miejsce rozpoczęcia podróży, planowane
+                godziny oraz inne istotne informacje są określane w ofercie,
+                umowie lub dokumentach podróży.
               </p>
 
               <p>
-                Standard obiektu, rodzaj pokoju oraz liczba osób w pokoju
-                określone są w ofercie.
+                W przypadku transportu lotniczego uczestnika obowiązują
+                również uzasadnione wymogi przewoźnika, w szczególności
+                dotyczące dokumentów podróży, odprawy, bagażu oraz zasad
+                bezpieczeństwa.
               </p>
 
               <p>
-                Uczestnik zobowiązany jest do przestrzegania regulaminu hotelu
-                lub innego obiektu zakwaterowania.
+                Podróżny jest zobowiązany do posiadania dokumentów niezbędnych
+                do realizacji podróży, jeżeli obowiązek ich posiadania wynika
+                z przepisów lub warunków przewoźnika.
               </p>
 
               <p>
-                Uczestnik ponosi odpowiedzialność za szkody wyrządzone przez
-                siebie w hotelu lub innym obiekcie na zasadach określonych
-                przepisami prawa oraz regulaminem danego obiektu.
+                Godziny lotów, numery rejsów, miejsce zbiórki oraz inne elementy
+                organizacyjne mogą ulec zmianie z przyczyn niezależnych od
+                Organizatora. W przypadku zmian Organizator informuje
+                podróżnego zgodnie z obowiązującymi przepisami i charakterem
+                danej zmiany.
               </p>
             </div>
           </section>
@@ -271,35 +358,28 @@ export default function WarunkiUczestnictwaPage() {
           {/* 7 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              7. Bilety na wydarzenia sportowe
+              7. Zakwaterowanie
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Jeżeli bilet na wydarzenie sportowe jest elementem wyjazdu,
-                jego rodzaj oraz kategoria są określone w ofercie.
+                Zakwaterowanie odbywa się w obiekcie wskazanym w ofercie,
+                umowie lub dokumentach podróży.
               </p>
 
               <p>
-                Sposób odbioru lub przekazania biletu jest każdorazowo
-                przekazywany uczestnikowi przed wydarzeniem.
+                Standard obiektu, rodzaj pokoju, liczba osób w pokoju oraz
+                inne istotne informacje są określane dla konkretnego wyjazdu.
               </p>
 
               <p>
-                Konkretne miejsce na stadionie, hali lub innym obiekcie jest
-                gwarantowane wyłącznie wtedy, gdy zostało wyraźnie określone
-                w ofercie lub dokumentach dotyczących wyjazdu.
+                Uczestnik zobowiązany jest do przestrzegania uzasadnionych
+                zasad obowiązujących w obiekcie zakwaterowania.
               </p>
 
               <p>
-                Uczestnik zobowiązany jest do przestrzegania regulaminu
-                obiektu oraz zasad organizatora wydarzenia sportowego.
-              </p>
-
-              <p>
-                Organizator wydarzenia może stosować własne zasady dotyczące
-                wejścia na obiekt, kontroli bezpieczeństwa, przedmiotów
-                dozwolonych na stadionie oraz zachowania podczas wydarzenia.
+                Uczestnik ponosi odpowiedzialność za szkody wyrządzone przez
+                siebie zgodnie z obowiązującymi przepisami prawa.
               </p>
             </div>
           </section>
@@ -307,31 +387,40 @@ export default function WarunkiUczestnictwaPage() {
           {/* 8 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              8. Zmiana lub odwołanie wydarzenia sportowego
+              8. Bilety na wydarzenia sportowe
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Wydarzenie sportowe może zostać przełożone, odwołane,
-                skrócone, przeniesione do innej lokalizacji lub odbyć się
-                bez udziału publiczności.
+                Jeżeli bilet na wydarzenie sportowe jest objęty zakresem
+                konkretnej umowy, jego rodzaj, kategoria lub inne istotne
+                cechy są określane w ofercie, umowie albo dokumentach
+                przekazywanych podróżnemu.
               </p>
 
               <p>
-                Decyzje dotyczące terminu, miejsca i sposobu przeprowadzenia
-                wydarzenia podejmuje jego organizator lub właściwe organy.
+                Sposób przekazania biletu może zależeć od zasad organizatora
+                wydarzenia, operatora systemu biletowego lub innych podmiotów
+                odpowiedzialnych za dystrybucję biletów.
               </p>
 
               <p>
-                W przypadku zmiany lub odwołania wydarzenia Organizator podejmie
-                działania zgodne z warunkami zawartej umowy, zasadami organizatora
-                wydarzenia oraz obowiązującymi przepisami prawa.
+                Uczestnik zobowiązany jest przestrzegać zasad wejścia na obiekt,
+                zasad bezpieczeństwa oraz regulaminu obowiązującego podczas
+                wydarzenia.
               </p>
 
               <p>
-                Szczegółowe zasady dotyczące ewentualnych zmian, zwrotów lub
-                świadczeń zastępczych wynikają z umowy oraz obowiązujących
-                przepisów prawa.
+                Jeżeli określone miejsce na stadionie, hali lub innym obiekcie
+                zostało wyraźnie zagwarantowane w umowie, Organizator realizuje
+                świadczenie zgodnie z jej treścią.
+              </p>
+
+              <p>
+                Organizator nie odpowiada za odmowę wstępu na wydarzenie
+                wynikającą z zachowania uczestnika, braku wymaganych dokumentów,
+                naruszenia regulaminu obiektu lub innych okoliczności
+                leżących po stronie uczestnika.
               </p>
             </div>
           </section>
@@ -339,28 +428,37 @@ export default function WarunkiUczestnictwaPage() {
           {/* 9 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              9. Program i atrakcje dodatkowe
+              9. Zmiana terminu lub odwołanie wydarzenia sportowego
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Program wyjazdu może obejmować zwiedzanie, transfery, wspólne
-                aktywności, wydarzenia towarzyszące oraz inne atrakcje wskazane
-                w ofercie.
+                Wydarzenia sportowe mogą zostać przełożone, odwołane,
+                przeniesione do innej lokalizacji, odbyć się bez udziału
+                publiczności lub ulec innym zmianom.
               </p>
 
               <p>
-                Kolejność poszczególnych punktów programu może ulec zmianie,
-                jeżeli jest to uzasadnione względami organizacyjnymi,
-                logistycznymi, bezpieczeństwa lub innymi okolicznościami
-                niezależnymi od Organizatora.
+                Decyzje dotyczące terminu, miejsca lub sposobu przeprowadzenia
+                wydarzenia podejmują właściwe podmioty, w szczególności
+                organizator wydarzenia, federacja sportowa, liga lub właściwe
+                organy publiczne.
               </p>
 
               <p>
-                W przypadku konieczności zastąpienia atrakcji Organizator,
-                w miarę możliwości, zapewni świadczenie o porównywalnym
-                charakterze i wartości, zgodnie z warunkami umowy
-                i obowiązującymi przepisami.
+                Sama zmiana terminu wydarzenia sportowego nie oznacza
+                automatycznie, że Organizator może dowolnie zmienić warunki
+                zawartej umowy. Każda zmiana dotycząca świadczeń objętych
+                umową jest oceniana zgodnie z obowiązującymi przepisami oraz
+                charakterem i znaczeniem tej zmiany dla konkretnego wyjazdu.
+              </p>
+
+              <p>
+                Jeżeli zmiana istotnie wpływa na realizację imprezy turystycznej,
+                podróżnemu przysługują uprawnienia przewidziane w obowiązujących
+                przepisach, w tym - w odpowiednich przypadkach - możliwość
+                zaakceptowania proponowanej zmiany, przyjęcia świadczenia
+                zastępczego lub rozwiązania umowy bez opłaty za odstąpienie.
               </p>
             </div>
           </section>
@@ -368,26 +466,33 @@ export default function WarunkiUczestnictwaPage() {
           {/* 10 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              10. Ubezpieczenie
+              10. Zmiany przed rozpoczęciem wyjazdu
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Jeżeli ubezpieczenie jest elementem danego pakietu, uczestnik
-                otrzymuje ochronę ubezpieczeniową na zasadach określonych
-                w warunkach ubezpieczenia.
+                Organizator może dokonać zmian w umowie przed rozpoczęciem
+                wyjazdu wyłącznie na zasadach przewidzianych w obowiązujących
+                przepisach oraz w umowie.
               </p>
 
               <p>
-                Uczestnik powinien przed wyjazdem zapoznać się z zakresem
-                ochrony, sumami ubezpieczenia oraz wyłączeniami odpowiedzialności
-                ubezpieczyciela.
+                W przypadku zmiany nieznacznej Organizator może poinformować
+                podróżnego o zmianie na trwałym nośniku informacji.
               </p>
 
               <p>
-                W przypadku wystąpienia zdarzenia objętego ubezpieczeniem
-                uczestnik powinien postępować zgodnie z instrukcjami
-                ubezpieczyciela.
+                Jeżeli Organizator jest zmuszony istotnie zmienić główne
+                właściwości usług turystycznych lub nie może spełnić
+                szczególnych wymagań zaakceptowanych przez strony, podróżnemu
+                przysługują uprawnienia określone przez obowiązujące przepisy.
+              </p>
+
+              <p>
+                Informacja o zmianie powinna zawierać dane pozwalające
+                podróżnemu na podjęcie decyzji w zakresie przysługujących mu
+                uprawnień, w tym - jeżeli jest to wymagane - termin na
+                udzielenie odpowiedzi.
               </p>
             </div>
           </section>
@@ -395,26 +500,31 @@ export default function WarunkiUczestnictwaPage() {
           {/* 11 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              11. Dokumenty podróży
+              11. Przeniesienie umowy na inną osobę
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Uczestnik jest odpowiedzialny za posiadanie ważnych dokumentów
-                wymaganych do odbycia podróży, w szczególności dowodu osobistego
-                lub paszportu, zależnie od kraju docelowego.
+                Podróżny może przenieść prawa i obowiązki wynikające z umowy
+                na inną osobę spełniającą warunki udziału w wyjeździe, na
+                zasadach określonych w obowiązujących przepisach.
               </p>
 
               <p>
-                W przypadku konieczności posiadania wizy, zezwolenia lub
-                spełnienia dodatkowych warunków wjazdu uczestnik jest zobowiązany
-                do ich uzyskania przed rozpoczęciem podróży.
+                Informację o przeniesieniu umowy należy przekazać
+                Organizatorowi odpowiednio wcześniej, na trwałym nośniku.
               </p>
 
               <p>
-                Wymagania dotyczące dokumentów i przekraczania granic mogą
-                ulegać zmianie. Uczestnik powinien przed wyjazdem sprawdzić
-                aktualne wymagania dotyczące kraju docelowego.
+                Osoba przekazująca prawa i obowiązki oraz osoba przejmująca
+                je mogą ponosić odpowiedzialność za zapłatę pozostałej części
+                ceny oraz uzasadnionych kosztów wynikających z przeniesienia.
+              </p>
+
+              <p>
+                Organizator może pobrać wyłącznie rzeczywiste i uzasadnione
+                koszty bezpośrednio związane z przeniesieniem umowy, zgodnie
+                z obowiązującymi przepisami.
               </p>
             </div>
           </section>
@@ -422,38 +532,42 @@ export default function WarunkiUczestnictwaPage() {
           {/* 12 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              12. Zasady zachowania uczestnika
+              12. Rezygnacja i odstąpienie przez podróżnego
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Uczestnik zobowiązany jest do zachowania zgodnego z prawem,
-                zasadami współżycia społecznego oraz zasadami bezpieczeństwa.
+                Podróżny może przed rozpoczęciem imprezy turystycznej odstąpić
+                od umowy na zasadach określonych w obowiązujących przepisach.
               </p>
 
               <p>
-                Podczas wyjazdu uczestnik zobowiązany jest w szczególności do:
-              </p>
-
-              <ul className="list-disc space-y-2 pl-6">
-                <li>przestrzegania zasad bezpieczeństwa,</li>
-                <li>stosowania się do uzasadnionych poleceń Organizatora,</li>
-                <li>przestrzegania regulaminów hoteli i obiektów sportowych,</li>
-                <li>punktualnego stawiania się w miejscach zbiórek,</li>
-                <li>poszanowania innych uczestników wyjazdu,</li>
-                <li>poszanowania mienia,</li>
-                <li>przestrzegania przepisów obowiązujących w kraju pobytu.</li>
-              </ul>
-
-              <p>
-                Niedopuszczalne jest zachowanie stwarzające zagrożenie dla
-                innych osób, mienia lub bezpieczeństwa wyjazdu.
+                Jeżeli odstąpienie następuje z przyczyn leżących po stronie
+                podróżnego, Organizator może pobrać odpowiednią i uzasadnioną
+                opłatę za odstąpienie, o ile możliwość taka wynika z umowy
+                i obowiązujących przepisów.
               </p>
 
               <p>
-                W przypadku wyrządzenia szkody przez uczestnika może on ponosić
-                odpowiedzialność za jej naprawienie na zasadach określonych
-                przepisami prawa.
+                Wysokość ewentualnej opłaty za odstąpienie powinna uwzględniać
+                w szczególności moment odstąpienia, oczekiwane oszczędności
+                kosztów oraz możliwość wykorzystania świadczeń w inny sposób,
+                zgodnie z obowiązującymi przepisami.
+              </p>
+
+              <p>
+                Na żądanie podróżnego Organizator przedstawia uzasadnienie
+                wysokości pobranej opłaty, jeżeli obowiązek taki wynika
+                z przepisów prawa.
+              </p>
+
+              <p>
+                Podróżny może odstąpić od umowy bez ponoszenia opłaty
+                za odstąpienie, jeżeli w miejscu docelowym lub jego
+                bezpośrednim sąsiedztwie wystąpią nieuniknione
+                i nadzwyczajne okoliczności znacząco wpływające na realizację
+                imprezy turystycznej lub przewóz podróżnych do miejsca
+                docelowego - jeżeli spełnione są ustawowe przesłanki.
               </p>
             </div>
           </section>
@@ -461,32 +575,33 @@ export default function WarunkiUczestnictwaPage() {
           {/* 13 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              13. Rezygnacja z wyjazdu
+              13. Odwołanie wyjazdu przez Organizatora
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Uczestnik może zrezygnować z udziału w wyjeździe na zasadach
-                określonych w zawartej umowie oraz obowiązujących przepisach
-                prawa.
+                Organizator może rozwiązać umowę przed rozpoczęciem wyjazdu
+                w przypadkach przewidzianych przez obowiązujące przepisy prawa.
               </p>
 
               <p>
-                Rezygnację należy zgłosić Organizatorowi w formie umożliwiającej
-                jej udokumentowanie.
+                Jeżeli umowa przewiduje minimalną liczbę uczestników
+                niezbędną do realizacji wyjazdu, Organizator może odwołać
+                wyjazd z powodu nieosiągnięcia tej liczby wyłącznie na zasadach
+                i w terminach wynikających z obowiązujących przepisów oraz
+                umowy.
               </p>
 
               <p>
-                W przypadku rezygnacji mogą wystąpić koszty związane
-                z usługami już zarezerwowanymi lub zakupionymi na rzecz
-                uczestnika, w zakresie dopuszczonym przez obowiązujące
-                przepisy prawa.
+                Organizator może również rozwiązać umowę, jeżeli realizację
+                wyjazdu uniemożliwiają nieuniknione i nadzwyczajne okoliczności,
+                zgodnie z obowiązującymi przepisami.
               </p>
 
               <p>
-                Szczegółowe zasady dotyczące rezygnacji, wysokości ewentualnych
-                kosztów oraz zwrotów są każdorazowo określone w umowie dotyczącej
-                danego wyjazdu.
+                W przypadku rozwiązania umowy przez Organizatora podróżnemu
+                przysługują zwroty oraz inne uprawnienia wynikające
+                z obowiązujących przepisów.
               </p>
             </div>
           </section>
@@ -494,26 +609,36 @@ export default function WarunkiUczestnictwaPage() {
           {/* 14 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              14. Zmiany w programie wyjazdu
+              14. Realizacja świadczeń i niezgodność
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Organizator może dokonywać zmian w programie wyjazdu, jeżeli
-                jest to uzasadnione przyczynami organizacyjnymi, logistycznymi,
-                bezpieczeństwa lub innymi okolicznościami przewidzianymi
-                w umowie i obowiązujących przepisach prawa.
+                Organizator odpowiada za prawidłowe wykonanie usług objętych
+                umową w zakresie wynikającym z obowiązujących przepisów,
+                niezależnie od tego, czy dane świadczenie jest wykonywane
+                bezpośrednio przez Organizatora czy przez innego usługodawcę.
               </p>
 
               <p>
-                W przypadku istotnej zmiany warunków wyjazdu uczestnik zostanie
-                poinformowany o zmianie oraz przysługujących mu prawach zgodnie
-                z obowiązującymi przepisami.
+                Jeżeli podczas wyjazdu podróżny stwierdzi niezgodność
+                świadczenia z umową, powinien - w miarę możliwości -
+                niezwłocznie poinformować Organizatora lub jego przedstawiciela,
+                aby umożliwić podjęcie działań naprawczych.
               </p>
 
               <p>
-                Organizator dokłada starań, aby wszelkie zmiany miały możliwie
-                najmniejszy wpływ na komfort i przebieg wyjazdu.
+                Organizator podejmuje działania w celu usunięcia stwierdzonej
+                niezgodności, chyba że jest to niemożliwe albo wymagałoby
+                niewspółmiernych kosztów, z uwzględnieniem charakteru
+                niezgodności oraz wartości świadczeń.
+              </p>
+
+              <p>
+                Jeżeli istotnej części usług nie można zrealizować zgodnie
+                z umową, Organizator podejmuje działania przewidziane
+                obowiązującymi przepisami, w tym - w odpowiednich przypadkach -
+                proponuje odpowiednie świadczenia zastępcze.
               </p>
             </div>
           </section>
@@ -521,35 +646,23 @@ export default function WarunkiUczestnictwaPage() {
           {/* 15 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              15. Sytuacje niezależne od Organizatora
+              15. Obniżenie ceny i odszkodowanie
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Na przebieg wyjazdu mogą wpływać okoliczności niezależne od
-                Organizatora, w szczególności:
+                Podróżnemu mogą przysługiwać uprawnienia do obniżenia ceny
+                oraz naprawienia szkody wynikającej z niewykonania lub
+                nienależytego wykonania usług, na zasadach określonych
+                w obowiązujących przepisach.
               </p>
 
-              <ul className="list-disc space-y-2 pl-6">
-                <li>opóźnienia lub odwołania lotów,</li>
-                <li>strajki,</li>
-                <li>decyzje przewoźników,</li>
-                <li>niekorzystne warunki pogodowe,</li>
-                <li>klęski żywiołowe,</li>
-                <li>decyzje władz państwowych,</li>
-                <li>ograniczenia w podróżowaniu,</li>
-                <li>sytuacje związane z bezpieczeństwem,</li>
-                <li>konflikty zbrojne,</li>
-                <li>zamknięcie granic,</li>
-                <li>odwołanie lub przełożenie wydarzenia sportowego,</li>
-                <li>inne nadzwyczajne okoliczności.</li>
-              </ul>
-
               <p>
-                W przypadku wystąpienia takich okoliczności Organizator podejmuje
-                działania mające na celu ograniczenie ich wpływu na realizację
-                wyjazdu, zgodnie z zawartą umową oraz obowiązującymi przepisami
-                prawa.
+                Odpowiedzialność Organizatora oraz zakres ewentualnego
+                odszkodowania są oceniane zgodnie z przepisami prawa,
+                w tym - jeżeli ma to zastosowanie - z odpowiednimi
+                przepisami prawa Unii Europejskiej i konwencjami
+                międzynarodowymi.
               </p>
             </div>
           </section>
@@ -557,26 +670,30 @@ export default function WarunkiUczestnictwaPage() {
           {/* 16 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              16. Odpowiedzialność Organizatora
+              16. Pomoc podróżnemu
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Organizator odpowiada za realizację świadczeń objętych umową
-                na zasadach określonych w tej umowie oraz obowiązujących
-                przepisach prawa.
+                W przypadku gdy podróżny znajdzie się w trudnej sytuacji
+                podczas realizacji imprezy turystycznej, Organizator udziela
+                odpowiedniej pomocy bez zbędnej zwłoki, na zasadach określonych
+                w obowiązujących przepisach.
               </p>
 
               <p>
-                W przypadku gdy poszczególne świadczenia realizowane są przez
-                innych usługodawców, mogą mieć zastosowanie również warunki
-                świadczenia usług określone przez tych usługodawców.
+                Pomoc może obejmować w szczególności przekazanie informacji
+                dotyczących lokalnych służb, placówek medycznych, władz
+                publicznych lub pomocy konsularnej oraz pomoc w komunikacji
+                na odległość lub znalezieniu alternatywnych rozwiązań.
               </p>
 
               <p>
-                Odpowiedzialność Organizatora nie wyłącza ani nie ogranicza
-                praw uczestnika wynikających z bezwzględnie obowiązujących
-                przepisów prawa.
+                Jeżeli trudna sytuacja została spowodowana umyślnie przez
+                podróżnego lub wskutek jego rażącego zaniedbania, Organizator
+                może pobrać opłatę za faktycznie poniesione i uzasadnione
+                koszty pomocy, jeżeli jest to dopuszczalne przez obowiązujące
+                przepisy.
               </p>
             </div>
           </section>
@@ -584,40 +701,32 @@ export default function WarunkiUczestnictwaPage() {
           {/* 17 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              17. Reklamacje
+              17. Obowiązki uczestnika
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Uczestnik ma prawo zgłosić reklamację dotyczącą realizacji
-                świadczeń objętych umową.
+                Uczestnik zobowiązany jest do przestrzegania obowiązujących
+                przepisów prawa, zasad bezpieczeństwa oraz uzasadnionych
+                instrukcji przekazywanych przez Organizatora lub osoby
+                odpowiedzialne za realizację wyjazdu.
               </p>
 
               <p>
-                Reklamację można złożyć drogą mailową:
-              </p>
-
-              <p className="font-semibold text-foreground">
-                [ADRES E-MAIL]
-              </p>
-
-              <p>
-                W reklamacji zaleca się wskazanie imienia i nazwiska uczestnika,
-                numeru rezerwacji lub umowy, opisu problemu, daty i miejsca
-                jego wystąpienia oraz oczekiwanego sposobu rozwiązania sprawy,
-                jeżeli uczestnik go wskazuje.
+                Uczestnik powinien posiadać dokumenty wymagane do odbycia
+                podróży, przekroczenia granic lub skorzystania z określonych
+                świadczeń.
               </p>
 
               <p>
-                W przypadku problemu występującego podczas wyjazdu uczestnik
-                powinien, w miarę możliwości, niezwłocznie poinformować
-                Organizatora lub jego przedstawiciela, aby umożliwić podjęcie
-                działań naprawczych.
+                Uczestnik odpowiada za podanie prawidłowych danych osobowych
+                oraz niezwłoczne poinformowanie Organizatora o zmianach,
+                które mogą mieć znaczenie dla realizacji wyjazdu.
               </p>
 
               <p>
-                Reklamacje są rozpatrywane w terminach wynikających
-                z obowiązujących przepisów prawa.
+                Uczestnik zobowiązany jest szanować prawa innych uczestników,
+                pracowników usługodawców oraz osób trzecich.
               </p>
             </div>
           </section>
@@ -625,33 +734,41 @@ export default function WarunkiUczestnictwaPage() {
           {/* 18 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              18. Dane osobowe
+              18. Reklamacje i zgłoszenia
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Dane osobowe uczestników są przetwarzane w celu realizacji
-                rezerwacji, organizacji wyjazdu, dokonania niezbędnych
-                rezerwacji oraz realizacji obowiązków prawnych Organizatora.
+                Podróżny ma prawo zgłosić Organizatorowi niezgodność
+                świadczenia z umową oraz złożyć reklamację dotyczącą realizacji
+                usług.
               </p>
 
               <p>
-                Szczegółowe informacje dotyczące przetwarzania danych osobowych
-                znajdują się w{" "}
-                <Link
-                  href="/polityka-prywatnosci"
-                  className="font-medium text-primary underline underline-offset-4"
-                >
-                  Polityce Prywatności
-                </Link>
-                .
+                W przypadku problemu występującego podczas wyjazdu zaleca się
+                niezwłoczne poinformowanie Organizatora lub jego przedstawiciela,
+                aby umożliwić podjęcie działań naprawczych.
               </p>
 
               <p>
-                W zakresie niezbędnym do realizacji wyjazdu dane uczestnika
-                mogą być przekazywane podmiotom uczestniczącym w organizacji
-                poszczególnych świadczeń, w szczególności przewoźnikom,
-                hotelom, ubezpieczycielom oraz organizatorom wydarzeń sportowych.
+                Reklamację można przesłać na adres e-mail:
+              </p>
+
+              <p className="font-semibold text-foreground">
+                {organizer.email}
+              </p>
+
+              <p>
+                W reklamacji warto wskazać dane umożliwiające identyfikację
+                sprawy, w szczególności imię i nazwisko, numer rezerwacji,
+                opis problemu, datę i miejsce jego wystąpienia oraz oczekiwany
+                sposób rozwiązania sprawy.
+              </p>
+
+              <p>
+                Brak wskazania wszystkich powyższych informacji nie pozbawia
+                podróżnego praw wynikających z obowiązujących przepisów,
+                jeżeli zgłoszenie pozwala na identyfikację sprawy.
               </p>
             </div>
           </section>
@@ -659,81 +776,280 @@ export default function WarunkiUczestnictwaPage() {
           {/* 19 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              19. Kontakt i komunikacja
+              19. Dokumenty podróży i kontakt podczas wyjazdu
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Uczestnik powinien podać aktualne dane kontaktowe umożliwiające
-                Organizatorowi przekazywanie informacji związanych z wyjazdem.
+                Przed rozpoczęciem wyjazdu uczestnik otrzymuje informacje
+                organizacyjne niezbędne do realizacji świadczeń, w zakresie
+                właściwym dla konkretnego wyjazdu.
               </p>
 
               <p>
-                Komunikacja może obejmować informacje dotyczące godzin lotów,
-                miejsca zbiórki, zakwaterowania, biletów, zmian programu oraz
-                innych kwestii organizacyjnych.
+                Informacje mogą obejmować w szczególności dane dotyczące
+                transportu, miejsca zbiórki, zakwaterowania, biletów,
+                transferów, programu oraz danych kontaktowych do Organizatora
+                lub osoby odpowiedzialnej za obsługę wyjazdu.
               </p>
 
               <p>
-                Za aktualność przekazanych Organizatorowi danych kontaktowych
-                odpowiada uczestnik.
+                Uczestnik powinien zapewnić możliwość kontaktu pod wskazanym
+                przez siebie numerem telefonu lub adresem e-mail oraz
+                poinformować Organizatora o zmianie danych kontaktowych.
               </p>
+
+              <div className="rounded-xl border bg-card p-5">
+                <p className="font-semibold text-foreground">
+                  Kontakt Organizatora:
+                </p>
+
+                <p className="mt-2">
+                  E-mail: {organizer.email}
+                </p>
+
+                <p>
+                  Telefon: {organizer.phone}
+                </p>
+
+                <p className="mt-3 text-xs">
+                  W przypadku konkretnych wyjazdów dane do kontaktu podczas
+                  podróży mogą zostać przekazane uczestnikom oddzielnie.
+                </p>
+              </div>
             </div>
           </section>
 
           {/* 20 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              20. Postanowienia końcowe
+              20. Ubezpieczenie i bezpieczeństwo
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                Niniejsze Warunki Uczestnictwa stanowią integralną część
-                informacji dotyczących organizowanych wyjazdów.
+                Informacja o tym, czy ubezpieczenie jest objęte ceną konkretnego
+                wyjazdu, jest każdorazowo wskazywana w ofercie lub umowie.
+              </p>
+
+              <p>
+                Zakres ochrony ubezpieczeniowej wynika z warunków konkretnej
+                umowy ubezpieczenia oraz dokumentów przekazywanych przez
+                ubezpieczyciela.
+              </p>
+
+              <p>
+                Uczestnik powinien zapoznać się z zakresem ubezpieczenia,
+                w tym z wyłączeniami i ograniczeniami odpowiedzialności,
+                przed rozpoczęciem podróży.
+              </p>
+            </div>
+          </section>
+
+          {/* 21 */}
+          <section>
+            <h2 className="text-2xl font-black uppercase">
+              21. Ochrona na wypadek niewypłacalności
+            </h2>
+
+            <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
+              <p>
+                Organizator posiada wymagane prawem zabezpieczenie finansowe
+                na wypadek niewypłacalności.
+              </p>
+
+              <p>
+                Szczegółowe informacje dotyczące aktualnego zabezpieczenia
+                finansowego oraz danych przedsiębiorcy są dostępne
+                w Centralnej Ewidencji Organizatorów Turystyki
+                i Przedsiębiorców Ułatwiających Nabywanie Powiązanych Usług
+                Turystycznych.
+              </p>
+
+              <p>
+                Numer ewidencyjny Organizatora:{" "}
+                <strong className="text-foreground">
+                  {organizer.ewidencjaNumber}
+                </strong>
+                .
+              </p>
+
+              <Link
+                href="/informacje-prawne"
+                className="inline-flex items-center gap-2 font-semibold text-primary underline underline-offset-4"
+              >
+                <FileText className="size-4" />
+                Informacje prawne i dane Organizatora
+              </Link>
+            </div>
+          </section>
+
+          {/* 22 */}
+          <section>
+            <h2 className="text-2xl font-black uppercase">
+              22. Siła wyższa i nadzwyczajne okoliczności
+            </h2>
+
+            <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
+              <p>
+                Realizacja wyjazdu może zostać dotknięta przez nieuniknione
+                i nadzwyczajne okoliczności pozostające poza kontrolą stron,
+                których skutków nie można było uniknąć mimo podjęcia
+                rozsądnych działań.
+              </p>
+
+              <p>
+                Mogą do nich należeć między innymi poważne zagrożenia
+                bezpieczeństwa, konflikty zbrojne, istotne zagrożenia zdrowia,
+                katastrofy naturalne, poważne zakłócenia transportu lub inne
+                zdarzenia znacząco wpływające na możliwość realizacji wyjazdu.
+              </p>
+
+              <p>
+                Skutki takich okoliczności dla praw i obowiązków stron są
+                oceniane indywidualnie zgodnie z obowiązującymi przepisami
+                prawa i okolicznościami konkretnej sprawy.
+              </p>
+            </div>
+          </section>
+
+          {/* 23 */}
+          <section>
+            <h2 className="text-2xl font-black uppercase">
+              23. Ochrona danych osobowych
+            </h2>
+
+            <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
+              <p>
+                Zasady przetwarzania danych osobowych przez Organizatora zostały
+                opisane w dokumencie „Informacje prawne”.
+              </p>
+
+              <Link
+                href="/informacje-prawne"
+                className="inline-flex items-center gap-2 font-semibold text-primary underline underline-offset-4"
+              >
+                <ShieldCheck className="size-4" />
+                Informacje prawne i ochrona danych
+              </Link>
+            </div>
+          </section>
+
+          {/* 24 */}
+          <section>
+            <h2 className="text-2xl font-black uppercase">
+              24. Pozasądowe rozwiązywanie sporów
+            </h2>
+
+            <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
+              <p>
+                Konsument może korzystać z pozasądowych sposobów rozwiązywania
+                sporów konsumenckich na zasadach określonych w obowiązujących
+                przepisach.
+              </p>
+
+              <p>
+                Szczegółowe informacje dotyczące dostępnych form pomocy
+                konsumenckiej można uzyskać w szczególności u właściwych
+                instytucji publicznych oraz organizacji zajmujących się ochroną
+                konsumentów.
+              </p>
+            </div>
+          </section>
+
+          {/* 25 */}
+          <section>
+            <h2 className="text-2xl font-black uppercase">
+              25. Postanowienia końcowe
+            </h2>
+
+            <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
+              <p>
+                Niniejsze Warunki Uczestnictwa stanowią ogólne warunki
+                obowiązujące w zakresie, w jakim mają zastosowanie do konkretnej
+                umowy.
               </p>
 
               <p>
                 W sprawach nieuregulowanych niniejszym dokumentem zastosowanie
-                mają postanowienia zawartej umowy oraz właściwe przepisy prawa.
+                mają postanowienia konkretnej umowy oraz obowiązujące przepisy
+                prawa, w szczególności przepisy dotyczące imprez turystycznych,
+                ochrony konsumentów oraz prawa cywilnego.
               </p>
 
               <p>
-                W przypadku rozbieżności pomiędzy niniejszymi Warunkami
-                Uczestnictwa a bezwzględnie obowiązującymi przepisami prawa,
-                zastosowanie mają przepisy prawa.
+                Postanowienia niniejszego dokumentu nie ograniczają praw
+                podróżnego wynikających z bezwzględnie obowiązujących
+                przepisów prawa.
               </p>
 
               <p>
-                Organizator zastrzega sobie prawo do aktualizacji niniejszych
-                Warunków Uczestnictwa. Zmiany nie naruszają praw nabytych przez
-                uczestników, którzy zawarli umowę przed ich wejściem w życie.
+                Zmiany niniejszych Warunków Uczestnictwa nie wpływają
+                na prawa i obowiązki wynikające z umów zawartych przed wejściem
+                zmian w życie, chyba że obowiązujące przepisy stanowią inaczej
+                lub zmiana została skutecznie uzgodniona zgodnie z prawem.
               </p>
             </div>
           </section>
 
-          {/* Organizator */}
+          {/* ORGANIZER */}
           <section className="rounded-xl border bg-card p-6 md:p-8">
-            <h2 className="text-xl font-black uppercase">
-              Organizator
-            </h2>
+            <div className="flex gap-4">
+              <Scale className="mt-1 size-6 shrink-0 text-primary" />
 
-            <div className="mt-4 space-y-1 text-sm text-muted-foreground">
-              <p className="font-semibold text-foreground">
-                [NAZWA FIRMY]
-              </p>
-              <p>[ADRES]</p>
-              <p>NIP: [NIP]</p>
-              <p>REGON: [REGON]</p>
-              <p>E-mail: [ADRES E-MAIL]</p>
-              <p>Telefon: [NUMER TELEFONU]</p>
+              <div>
+                <h2 className="text-xl font-black uppercase">
+                  Organizator
+                </h2>
+
+                <div className="mt-4 space-y-2 text-sm text-muted-foreground">
+                  <p className="font-semibold text-foreground">
+                    {organizer.name}
+                  </p>
+
+                  <p>{organizer.address}</p>
+
+                  <p>NIP: {organizer.nip}</p>
+                  <p>REGON : REGON: 520474445</p>
+
+                  <p>
+                    Numer wpisu do rejestru:{" "}
+                    {organizer.registerNumber}
+                  </p>
+
+                  <p>
+                    Numer ewidencyjny:{" "}
+                    {organizer.ewidencjaNumber}
+                  </p>
+
+                  <p>
+                    Organ wpisujący:{" "}
+                    {organizer.authority}
+                  </p>
+
+                  <p>E-mail: {organizer.email}</p>
+
+                  <p>Telefon: {organizer.phone}</p>
+                </div>
+              </div>
             </div>
 
-            <p className="mt-6 text-xs text-muted-foreground">
-              Data ostatniej aktualizacji: [DATA]
+            <div className="mt-6 flex gap-3 rounded-lg bg-muted p-4 text-xs text-muted-foreground">
+              <AlertTriangle className="size-5 shrink-0 text-primary" />
+
+              <p>
+                Szczegółowe warunki konkretnego wyjazdu, zakres świadczeń,
+                cena, terminy płatności oraz informacje wymagane przepisami
+                prawa są każdorazowo przekazywane podróżnemu w dokumentach
+                dotyczących konkretnej rezerwacji.
+              </p>
+            </div>
+
+            <p className="mt-6 flex items-center gap-2 text-xs text-muted-foreground">
+              <CheckCircle2 className="size-4 text-primary" />
+              Ostatnia aktualizacja: 26 sierpnia 2026 r.
             </p>
           </section>
-
         </div>
       </section>
 

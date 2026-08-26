@@ -206,7 +206,7 @@ export default function LegalPage() {
                 <strong className="text-foreground">
                   Forma zabezpieczenia:
                 </strong>{" "}
-                gwarancja ubezpieczeniowa
+                Gwarancja Ubezpieczeniowa
               </p>
 
               <p className="mt-2">
