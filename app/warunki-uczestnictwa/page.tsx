@@ -1,11 +1,49 @@
+import type { Metadata } from "next"
 import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
+import { SiteFooter } from "@/components/site-footer"
+import { Button } from "@/components/ui/button"
+
+export const metadata: Metadata = {
+  title: "Warunki uczestnictwa",
+  description:
+    "Warunki uczestnictwa w wyjazdach na wydarzenia sportowe organizowanych przez Let’s Gol.",
+}
 
 export default function WarunkiUczestnictwaPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen bg-background">
+
+      {/* HEADER */}
+      <header className="border-b bg-foreground text-background">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
+
+          <Button
+            variant="ghost"
+            className="text-background hover:bg-background/10 hover:text-background"
+            nativeButton={false}
+            render={<Link href="/" />}
+          >
+            <ArrowLeft data-icon="inline-start" />
+            Strona główna
+          </Button>
+
+          <Link
+            href="/"
+            className="font-sans text-xl font-black uppercase"
+          >
+            Let&apos;s Gol{" "}
+            <span className="text-primary">/ Warunki uczestnictwa</span>
+          </Link>
+
+        </div>
+      </header>
+
+      {/* TYTUŁ */}
       <section className="border-b">
         <div className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-24">
           <div className="max-w-3xl">
+
             <p className="mb-3 text-sm font-bold uppercase tracking-wider text-primary">
               Informacje dla uczestników
             </p>
@@ -19,13 +57,16 @@ export default function WarunkiUczestnictwaPage() {
               z najważniejszymi zasadami dotyczącymi organizacji i udziału
               w naszych wyjazdach.
             </p>
+
           </div>
         </div>
       </section>
 
+      {/* Treść */}
       <section className="mx-auto max-w-5xl px-4 py-12 md:px-6 md:py-16">
         <div className="space-y-12">
 
+          {/* 1 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               1. Postanowienia ogólne
@@ -65,6 +106,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 2 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               2. Charakter naszych wyjazdów
@@ -101,6 +143,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 3 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               3. Rezerwacja miejsca
@@ -133,6 +176,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 4 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               4. Cena i zakres świadczeń
@@ -161,6 +205,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 5 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               5. Transport i przelot
@@ -193,6 +238,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 6 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               6. Zakwaterowanie
@@ -222,6 +268,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 7 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               7. Bilety na wydarzenia sportowe
@@ -257,6 +304,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 8 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               8. Zmiana lub odwołanie wydarzenia sportowego
@@ -288,6 +336,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 9 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               9. Program i atrakcje dodatkowe
@@ -316,6 +365,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 10 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               10. Ubezpieczenie
@@ -342,6 +392,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 11 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               11. Dokumenty podróży
@@ -368,6 +419,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 12 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               12. Zasady zachowania uczestnika
@@ -379,7 +431,9 @@ export default function WarunkiUczestnictwaPage() {
                 zasadami współżycia społecznego oraz zasadami bezpieczeństwa.
               </p>
 
-              <p>Podczas wyjazdu uczestnik zobowiązany jest w szczególności do:</p>
+              <p>
+                Podczas wyjazdu uczestnik zobowiązany jest w szczególności do:
+              </p>
 
               <ul className="list-disc space-y-2 pl-6">
                 <li>przestrzegania zasad bezpieczeństwa,</li>
@@ -404,6 +458,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 13 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               13. Rezygnacja z wyjazdu
@@ -436,6 +491,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 14 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               14. Zmiany w programie wyjazdu
@@ -462,6 +518,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 15 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               15. Sytuacje niezależne od Organizatora
@@ -497,6 +554,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 16 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               16. Odpowiedzialność Organizatora
@@ -523,6 +581,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 17 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               17. Reklamacje
@@ -563,6 +622,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 18 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               18. Dane osobowe
@@ -596,6 +656,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 19 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               19. Kontakt i komunikacja
@@ -620,6 +681,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* 20 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
               20. Postanowienia końcowe
@@ -650,6 +712,7 @@ export default function WarunkiUczestnictwaPage() {
             </div>
           </section>
 
+          {/* Organizator */}
           <section className="rounded-xl border bg-card p-6 md:p-8">
             <h2 className="text-xl font-black uppercase">
               Organizator
@@ -673,6 +736,8 @@ export default function WarunkiUczestnictwaPage() {
 
         </div>
       </section>
+
+      <SiteFooter />
     </main>
   )
 }
