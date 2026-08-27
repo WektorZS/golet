@@ -56,13 +56,13 @@ export function FloatingContact() {
       <DialogTrigger
         render={
           <Button
-            className={`fixed bottom-2 right-2 border-1 border-foreground shadow-xl transition-all duration-200 hover:scale-105 md:bottom-3 md:right-3 ${
-              showMobileButton
-                ? "translate-y-0 opacity-100"
-                : "pointer-events-none translate-y-4 opacity-0 md:pointer-events-auto md:translate-y-0 md:opacity-100"
-            }`}
-            size="lg"
-          />
+  className={`fixed bottom-2 right-2 border border-[#f4b91e] bg-black text-[#f4b91e] shadow-xl transition-all duration-200 hover:scale-105 hover:bg-white md:bottom-3 md:right-3 ${
+    showMobileButton
+      ? "translate-y-0 opacity-100"
+      : "pointer-events-none translate-y-4 opacity-0 md:pointer-events-auto md:translate-y-0 md:opacity-100"
+  }`}
+  size="lg"
+/>
         }
       >
         <MessageCircle data-icon="inline-start" />
