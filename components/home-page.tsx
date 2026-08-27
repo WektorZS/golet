@@ -139,7 +139,7 @@ type Testimonial = {
 const FALLBACK_GALLERY: GalleryItem[] = [
   {
     id: -1,
-    image: "/images/barcelona-trip.png",
+    image: "/images/barcelona-trip.webp",
     mediaId: null,
     alt: "Stadion w Barcelonie",
     title: "Barcelona",
@@ -147,7 +147,7 @@ const FALLBACK_GALLERY: GalleryItem[] = [
   },
   {
     id: -2,
-    image: "/images/milan-trip.png",
+    image: "/images/milan-trip.webp",
     mediaId: null,
     alt: "Wieczór meczowy w Mediolanie",
     title: "Mediolan",
@@ -155,7 +155,7 @@ const FALLBACK_GALLERY: GalleryItem[] = [
   },
   {
     id: -3,
-    image: "/images/madrid-trip.png",
+    image: "/images/madrid-trip.webp",
     mediaId: null,
     alt: "Stadion w Madrycie",
     title: "Madryt",
@@ -221,7 +221,7 @@ export function HomePage({
   
       <section className="relative isolate flex flex-col overflow-hidden bg-foreground text-background md:h-dvh md:min-h-[700px]">
         <Image
-          src="/images/hero-stadium.png"
+          src="/images/hero-stadium.webp"
           alt="Kibice na trybunach podczas wieczornego meczu w Barcelonie"
           fill
           priority
@@ -688,7 +688,7 @@ export function HomePage({
 
           <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
             <Image
-              src="/images/hero-stadium.png"
+              src="/images/hero-stadium.webp"
               alt="Kibice Let’s Gol na stadionie"
               fill
               className="object-cover"
