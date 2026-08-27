@@ -183,16 +183,20 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
             }`}
           >
             <Image
-              src={
-                item.mediaId
-                  ? `/api/media/${item.mediaId}`
-                  : item.image
-              }
-              alt={item.alt || item.title}
-              fill
-              className="object-cover"
-              sizes={isFeatured ? "66vw" : "33vw"}
-            />
+  src={
+    item.mediaId
+      ? `/api/media/${item.mediaId}`
+      : item.image
+  }
+  alt={item.alt || item.title}
+  fill
+  className="object-cover"
+  sizes={
+    isFeatured
+      ? "(max-width: 640px) 100vw, 66vw"
+      : "(max-width: 640px) 50vw, 33vw"
+  }
+/>
           </div>
         )
       })}
@@ -221,13 +225,13 @@ export function HomePage({
   
       <section className="relative isolate flex flex-col overflow-hidden bg-foreground text-background md:h-dvh md:min-h-[700px]">
         <Image
-          src="/images/hero-stadium.webp"
-          alt="Kibice na trybunach podczas wieczornego meczu w Barcelonie"
-          fill
-          priority
-          className="object-cover object-center"
-          sizes="100vw"
-        />
+  src="/images/hero-stadium.webp"
+  alt="Kibice na trybunach podczas wieczornego meczu w Barcelonie"
+  fill
+  priority
+  className="object-cover object-center"
+  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1920px"
+/>
 
         <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/75 to-transparent" />
 
@@ -340,12 +344,12 @@ export function HomePage({
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
           <div className="relative min-h-[430px] overflow-hidden rounded-xl">
             <Image
-              src="/images/about-us.webp"
-              alt="Trybuny stadionu Camp Nou Let's Gol"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
+  src="/images/about-us.webp"
+  alt="Trybuny stadionu Camp Nou Let's Gol"
+  fill
+  className="object-cover"
+  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
+/>
 
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 to-transparent" />
 
@@ -689,12 +693,12 @@ export function HomePage({
 
           <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
             <Image
-              src="/images/hero-stadium.webp"
-              alt="Kibice Let’s Gol na stadionie"
-              fill
-              className="object-cover"
-              sizes="50vw"
-            />
+  src="/images/hero-stadium.webp"
+  alt="Kibice Let’s Gol na stadionie"
+  fill
+  className="object-cover"
+  sizes="(max-width: 1024px) 100vw, 50vw"
+/>
           </div>
         </div>
       </section>
