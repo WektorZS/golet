@@ -39,7 +39,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
         <Button variant="ghost" size="icon" nativeButton={false} render={<Link href="/" />} className="text-background hover:bg-background/10 hover:text-background"><Home /><span className="sr-only">Strona główna</span></Button>
       </div>
       <TabsList variant="line" className="flex h-auto w-full flex-row justify-start overflow-x-auto rounded-none bg-transparent p-3 text-background/70 lg:flex-col lg:items-stretch">
-        {sections.map(([value, label, Icon]) => <TabsTrigger key={value} value={value} className="min-w-max justify-start px-3 py-2.5 text-background/65 hover:text-background/65 data-active:text-primary"><Icon />{label}{value === "inquiries" && newLeads > 0 ? <Badge className="ml-auto">{newLeads}</Badge> : null}</TabsTrigger>)}
+        {sections.map(([value, label, Icon]) => <TabsTrigger key={value} value={value} className="min-w-max justify-start px-3 py-2.5 text-background/65 transition-all duration-200 hover:translate-x-1 hover:bg-background/10 hover:text-background data-active:text-primary"><Icon />{label}{value === "inquiries" && newLeads > 0 ? <Badge className="ml-auto">{newLeads}</Badge> : null}</TabsTrigger>)}
       </TabsList>
       <div className="hidden border-t border-background/10 p-4 lg:block"><p className="truncate text-xs text-background/50">{data.email}</p><form action={signOutAdmin}><Button type="submit" variant="ghost" className="mt-2 w-full justify-start text-background hover:bg-background/10 hover:text-background"><LogOut />Wyloguj</Button></form></div>
     </aside>
