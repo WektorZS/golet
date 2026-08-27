@@ -49,7 +49,7 @@ export function CookieConsent() {
       Twoja prywatność
     </h2>
 
-    <p className="text-left text-sm leading-relaxed text-muted-foreground">
+    <p className="text-left text-sm leading-relaxed text-[#4f5258]">
 Niezbędne cookies są wymagane do prawidłowego działania strony i zapewnienia jej podstawowej funkcjonalności.<br />
 Jeśli wyrazisz zgodę na analitykę, będziemy zbierać anonimowe informacje o tym,
 jak użytkownicy korzystają z naszej strony.
@@ -61,7 +61,7 @@ popularność poszczególnych podstron oraz poprawiać działanie i funkcjonalno
     <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
       <Link
         href="/polityka-prywatnosci#cookies"
-        className="text-sm font-medium text-primary underline underline-offset-4"
+        className="text-sm font-medium text-[#7a5a00] underline underline-offset-4"
       >
         Dowiedz się więcej
       </Link>
