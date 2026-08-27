@@ -88,7 +88,7 @@ popularność poszczególnych podstron oraz poprawiać działanie i funkcjonalno
   onClick={() => setEditing(true)}
   aria-label="Ustawienia cookies"
   title="Ustawienia cookies"
-  className="fixed bottom-3 left-3 z-40 h-0 w-0 border border-[#f4b91e] bg-black text-black transition-all duration-200 hover:scale-105 hover:bg-white md:bottom-3 md:left-3"
+  className="fixed bottom-1 left-1 z-40 h-12 w-12 border border-[#f4b91e] bg-black text-black transition-all duration-200 hover:scale-105 hover:bg-white md:bottom-3 md:left-3"
 >
   <Cookie className="!h-7 !w-7 text-[#f4b91e]" />
 </Button>
