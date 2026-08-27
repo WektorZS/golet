@@ -617,25 +617,22 @@ export function HomePage({
 
           <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {process.map(([number, title, copy]) => (
-             <article
-  key={number}
-  className="relative flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md"
->
-  <div>
-    <div className="flex items-center justify-between gap-4">
-      <h3 className="font-bold uppercase tracking-wide text-card-foreground">
-        {title}
-      </h3>
-      <span className="font-mono text-3xl font-black text-primary opacity-80 [-webkit-text-stroke:1px_rgba(0,0,0,0.5)]">
-        {number}
-      </span>
-    </div>
+              <article
+                key={number}
+                className="rounded-xl border p-6"
+              >
+                <span className="font-mono text-3xl font-black text-primary [-webkit-text-stroke:1px_rgba(0,0,0,0.5)]">
+                  {number}
+                </span>
 
-    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-      {copy}
-    </p>
-  </div>
-</article>
+                <h3 className="mt-8 font-bold uppercase">
+                  {title}
+                </h3>
+
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {copy}
+                </p>
+              </article>
             ))}
           </div>
         </div>
