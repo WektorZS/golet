@@ -54,10 +54,9 @@ export default function PrivacyPolicyPage() {
               </h2>
 
               <p className="mt-3 leading-relaxed text-muted-foreground">
-                W tej Polityce prywatności wyjaśniamy, jakie dane osobowe mogą
+                Wyjaśniamy, jakie dane osobowe mogą
                 być przetwarzane w związku z korzystaniem z serwisu Let&apos;s
-                Gol oraz kontaktowaniem się z nami i korzystaniem z oferowanych
-                usług.
+                Gol, korzystaniem z naszych usług i kontaktowaniem się.
               </p>
             </div>
           </div>
