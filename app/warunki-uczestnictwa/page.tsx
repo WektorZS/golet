@@ -35,7 +35,7 @@ export default function WarunkiUczestnictwaPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* HEADER */}
-      <header className="border-b bg-foreground text-background">
+      <header className="sticky top-0 z-50 border-b bg-foreground text-background">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
           <Button
             variant="ghost"
