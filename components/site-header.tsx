@@ -50,19 +50,10 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-  const handleScroll = () => {
-    console.log("SCROLL Y:", window.scrollY)
-    setScrolled(window.scrollY > 300)
-  }
-
-  handleScroll()
-
-  window.addEventListener("scroll", handleScroll, { passive: true })
-
-  return () => {
-    window.removeEventListener("scroll", handleScroll)
-  }
-}, [])
+    const handleScroll = () => {
+      console.log("SCROLL Y:", window.scrollY)
+      setScrolled(window.scrollY > 300)
+    }
 
     handleScroll()
 
@@ -74,13 +65,13 @@ export function SiteHeader() {
   }, [])
 
   return (
-  <header
-  className={`fixed inset-x-0 top-0 z-[99999] isolate border-b border-background/15 transition-all duration-300 ${
-    scrolled
-      ? "bg-black"
-      : "bg-foreground/70 backdrop-blur-md"
-  }`}
->
+    <header
+      className={`fixed inset-x-0 top-0 z-[99999] isolate border-b border-background/15 transition-all duration-300 ${
+        scrolled
+          ? "bg-black"
+          : "bg-foreground/70 backdrop-blur-md"
+      }`}
+    >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 md:px-6">
         {/* LOGO */}
         <Brand />
