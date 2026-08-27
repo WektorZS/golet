@@ -621,7 +621,7 @@ export function HomePage({
                 key={number}
                 className="rounded-xl border p-6"
               >
-                <span className="font-mono text-3xl font-black text-primary">
+                <span className="font-mono text-3xl font-black text-[#8a6500]">
                   {number}
                 </span>
 
