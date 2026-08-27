@@ -1,9 +1,9 @@
-export const DEFAULT_ADMIN_EMAIL = "michu1209@gmail.com"
-
 export function getAdminEmail() {
-  return (process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL).trim().toLowerCase()
-}
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase()
 
-export function isAdminEmail(email?: string | null) {
-  return Boolean(email && email.trim().toLowerCase() === getAdminEmail())
+  if (!email) {
+    throw new Error("ADMIN_EMAIL is not configured")
+  }
+
+  return email
 }
