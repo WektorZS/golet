@@ -193,17 +193,81 @@ export async function updateMedia(formData: FormData) {
 }
 
 export async function deleteMedia(formData: FormData) {
-  const user = await requireAdmin(); const id = Number(formData.get("id"))
-  const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, id)).limit(1)
-  if (!asset) return
+  const user = await requireAdmin()
+  const id = Number(formData.get("id"))
+
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error("Nieprawidłowe ID zdjęcia")
+  }
+
+  const [asset] = await db
+    .select()
+    .from(mediaAssets)
+    .where(eq(mediaAssets.id, id))
+    .limit(1)
+
+  if (!asset) {
+    throw new Error("Nie znaleziono zdjęcia")
+  }
+
   const [globalUse, tripUse, coverUse] = await Promise.all([
-    db.select({ id: galleryItems.id }).from(galleryItems).where(eq(galleryItems.mediaId, id)).limit(1),
-    db.select({ id: tripGalleryItems.id }).from(tripGalleryItems).where(eq(tripGalleryItems.mediaId, id)).limit(1),
-    db.select({ id: trips.id }).from(trips).where(eq(trips.image, `/api/media/${id}`)).limit(1),
+    db
+      .select({ id: galleryItems.id })
+      .from(galleryItems)
+      .where(eq(galleryItems.mediaId, id))
+      .limit(1),
+
+    db
+      .select({ id: tripGalleryItems.id })
+      .from(tripGalleryItems)
+      .where(eq(tripGalleryItems.mediaId, id))
+      .limit(1),
+
+    db
+      .select({ id: trips.id })
+      .from(trips)
+      .where(eq(trips.image, `/api/media/${id}`))
+      .limit(1),
   ])
-  if (globalUse.length || tripUse.length || coverUse.length) throw new Error("To zdjęcie jest używane w galerii lub jako okładka wyjazdu")
-  await del(asset.pathname); await db.delete(mediaAssets).where(eq(mediaAssets.id, id))
-  await logActivity(user.id, "deleted", "media", String(id), asset.originalName); revalidatePath("/admin")
+
+  if (globalUse.length || tripUse.length || coverUse.length) {
+    throw new Error(
+      "Nie można usunąć tego zdjęcia, ponieważ jest używane w galerii lub jako okładka wyjazdu."
+    )
+  }
+
+  try {
+    await del(asset.pathname)
+  } catch (error) {
+    console.error("Błąd usuwania pliku z Vercel Blob:", error)
+    throw new Error("Nie udało się usunąć pliku ze storage.")
+  }
+
+  try {
+    await db
+      .delete(mediaAssets)
+      .where(eq(mediaAssets.id, id))
+  } catch (error) {
+    console.error("Błąd usuwania rekordu mediaAssets:", error)
+
+    // Próba przywrócenia pliku, jeśli baza nie pozwoliła usunąć rekordu.
+    // Tego nie robimy tutaj automatycznie, bo Vercel Blob nie gwarantuje
+    // prostego odtworzenia po pathname.
+    throw new Error("Plik został usunięty, ale nie udało się usunąć wpisu z biblioteki.")
+  }
+
+  await logActivity(
+    user.id,
+    "deleted",
+    "media",
+    String(id),
+    asset.originalName
+  )
+
+  revalidatePath("/admin")
+  revalidatePath("/")
+  revalidatePath("/galeria")
+  revalidatePath("/wyjazdy")
 }
 
 export type AddGalleryItemState = { error?: string; success?: boolean; message?: string }
