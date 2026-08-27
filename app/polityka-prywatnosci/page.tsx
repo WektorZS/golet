@@ -8,7 +8,7 @@ import { SiteHeader } from "@/components/site-header"
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
-  title: "Polityka prywatności i cookies | Let’s Gol",
+  title: "Polityka prywatności i cookies",
   description:
     "Polityka prywatności i cookies Let’s Gol. Informacje o przetwarzaniu danych osobowych, prawach użytkowników oraz wykorzystywaniu plików cookies.",
 }

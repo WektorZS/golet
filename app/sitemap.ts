@@ -9,7 +9,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: base, changeFrequency: "weekly", priority: 1 },
     { url: `${base}/wyjazdy`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${base}/informacje-prawne`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${base}/polityka-prywatnosci`, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${base}/warunki-uczestnictwa`, changeFrequency: "yearly", priority: 0.3 },
     ...trips.map((trip) => ({ url: `${base}/wyjazdy/${trip.slug}`, lastModified: trip.updatedAt, changeFrequency: "weekly" as const, priority: 0.8 })),
   ]
 }

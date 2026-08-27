@@ -13,7 +13,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Warunki uczestnictwa | Let’s Gol",
+  title: "Warunki uczestnictwa",
   description:
     "Warunki uczestnictwa w wyjazdach organizowanych przez Let’s Gol na wydarzenia sportowe w Polsce i Europie.",
 }

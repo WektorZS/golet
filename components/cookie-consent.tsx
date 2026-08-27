@@ -60,7 +60,7 @@ popularność poszczególnych podstron oraz poprawiać działanie i funkcjonalno
 
     <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
       <Link
-        href="/informacje-prawne#cookies"
+        href="/polityka-prywatnosci#cookies"
         className="text-sm font-medium text-primary underline underline-offset-4"
       >
         Dowiedz się więcej
