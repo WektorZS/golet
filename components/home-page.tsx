@@ -577,18 +577,19 @@ export function HomePage({
                 key={item.id}
                 className="mt-4 rounded-xl bg-card p-7 shadow-sm"
               >
-                <div
-                  className="flex gap-1 text-primary"
-                  aria-label={`Ocena ${item.rating} na 5`}
-                >
-                  {Array.from({ length: item.rating }).map((_, i) => (
-                    <Star
-                      key={i}
-                      fill="currentColor"
-                      aria-hidden="true"
-                    />
-                  ))}
-                </div>
+                <div className="flex gap-1 text-primary">
+  <span className="sr-only">
+    Ocena {item.rating} na 5
+  </span>
+
+  {Array.from({ length: item.rating }).map((_, i) => (
+    <Star
+      key={i}
+      fill="currentColor"
+      aria-hidden="true"
+    />
+  ))}
+</div>
 
                 <p className="mt-5 text-lg leading-relaxed">
                   „{item.content}”
