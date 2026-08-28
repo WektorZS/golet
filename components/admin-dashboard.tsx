@@ -809,7 +809,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                         <TableCell>
                           {trip.startDate}
                           {trip.endDate
-                            ? ` – ${trip.endDate}`
+                            ? ` - ${trip.endDate}`
                             : ""}
                         </TableCell>
 
@@ -2124,7 +2124,7 @@ function TripDialog({
 
           <Field
             label="Adres strony"
-            hint="Końcowa część adresu strony wyjazdu, np. real-madryt-vs-barcelona. Jeśli nie wiesz, co wpisać, zostaw pole puste — adres utworzy się automatycznie z tytułu."
+            hint="Końcowa część adresu strony wyjazdu, np. real-madryt-vs-barcelona. Jeśli nie wiesz, co wpisać, zostaw pole puste - adres utworzy się automatycznie z tytułu."
           >
             <Input
               name="slug"
@@ -2189,11 +2189,11 @@ function TripDialog({
               className="h-9 rounded-lg border bg-background px-3"
             >
               <option value="draft">
-                Szkic — niewidoczny
+                Szkic - niewidoczny
               </option>
 
               <option value="published">
-                Opublikowany — widoczny
+                Opublikowany - widoczny
               </option>
             </select>
           </Field>
@@ -2288,7 +2288,7 @@ function TripDialog({
 
           <Field
             label="Tytuł strony w Google"
-            hint="Tytuł, który może być wyświetlany przy stronie w wynikach Google. Najlepiej około 50–60 znaków."
+            hint="Tytuł, który może być wyświetlany przy stronie w wynikach Google. Najlepiej około 50-60 znaków."
           >
             <Input
               name="seoTitle"
@@ -2301,7 +2301,7 @@ function TripDialog({
 
           <Field
             label="Opis strony w Google"
-            hint="Krótki opis, który może pojawić się pod tytułem strony w Google. Najlepiej napisać 1–2 zdania zachęcające do wyjazdu."
+            hint="Krótki opis, który może pojawić się pod tytułem strony w Google. Najlepiej napisać 1-2 zdania zachęcające do wyjazdu."
           >
             <Textarea
               name="seoDescription"
@@ -2502,11 +2502,11 @@ function LegacyTripDialog({
               className="h-9 rounded-lg border bg-background px-3"
             >
               <option value="draft">
-                Szkic — niewidoczny
+                Szkic - niewidoczny
               </option>
 
               <option value="published">
-                Opublikowany — widoczny
+                Opublikowany - widoczny
               </option>
 
               <option value="archived">
@@ -3191,7 +3191,7 @@ function SettingsForm({
       "seoTitle",
       "Tytuł strony w Google",
       "Tytuł, który może pojawić się przy stronie w wynikach Google.",
-      "Let’s Gol — wyjazdy na mecze piłkarskie",
+      "Let’s Gol - wyjazdy na mecze piłkarskie",
     ],
     [
       "seoDescription",
