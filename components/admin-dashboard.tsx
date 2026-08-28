@@ -28,6 +28,8 @@ const sections = [
   ["inquiries", "Zapytania", Inbox], ["account", "Bezpieczeństwo", Settings],
 ] as const
 
+const formatActivityDate = (date: Date | string) => { return new Intl.DateTimeFormat("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", }).format(new Date(date)) }
+
 export function AdminDashboard({ data }: { data: AdminData }) {
   const [query, setQuery] = useState("")
   const filteredTrips = useMemo(() => data.trips.filter((trip) => `${trip.title} ${trip.city}`.toLowerCase().includes(query.toLowerCase())), [data.trips, query])
@@ -86,79 +88,243 @@ export function AdminDashboard({ data }: { data: AdminData }) {
 <CardContent>
   <div className="flex flex-col">
     {data.activity.slice(0, 6).map((item) => {
-      const entityName =
-        item.entityType === "trip"
-          ? "Wyjazd"
-          : item.entityType === "media"
-            ? "Zdjęcie"
-            : item.entityType === "inquiry"
-              ? "Zapytanie"
-              : item.entityType === "settings"
-                ? "Ustawienia"
-                : item.entityType === "youtube"
-                  ? "YouTube"
-                  : item.entityType
+      const getActivity = () => {
+        switch (item.action) {
+          case "created":
+            if (item.entityType === "trip") {
+              return {
+                title: "Utworzono wyjazd",
+                description: item.details
+                  ? `Dodano wyjazd „${item.details}”.`
+                  : "Dodano nowy wyjazd.",
+              }
+            }
+            if (item.entityType === "testimonial") {
+              return {
+                title: "Dodano opinię",
+                description: item.details
+                  ? `Dodano opinię klienta „${item.details}”.`
+                  : "Dodano nową opinię klienta.",
+              }
+            }
+            return {
+              title: "Utworzono",
+              description: item.details || "Dodano nowy element.",
+            }
 
-      const actionName =
-        item.action === "created"
-          ? "Utworzono"
-          : item.action === "updated"
-            ? "Zaktualizowano"
-            : item.action === "deleted"
-              ? "Usunięto"
-              : item.action === "uploaded"
-                ? "Wgrano"
-                : item.action === "duplicated"
-                  ? "Zduplikowano"
-                  : item.action === "published"
-                    ? "Opublikowano"
-                    : item.action === "synced"
-                      ? "Zsynchronizowano"
-                      : item.action
+          case "updated":
+            if (item.entityType === "trip") {
+              return {
+                title: "Zaktualizowano wyjazd",
+                description: item.details
+                  ? `Zmieniono dane wyjazdu „${item.details}”.`
+                  : "Zmieniono dane wyjazdu.",
+              }
+            }
+            if (item.entityType === "settings") {
+              return {
+                title: "Zaktualizowano treści strony",
+                description: "Zmieniono ustawienia treści strony.",
+              }
+            }
+            if (item.entityType === "media") {
+              return {
+                title: "Zaktualizowano zdjęcie",
+                description: "Zmieniono informacje dotyczące zdjęcia.",
+              }
+            }
+            if (item.entityType === "gallery") {
+              return {
+                title: "Zaktualizowano galerię",
+                description: "Zmieniono informacje dotyczące zdjęcia w galerii.",
+              }
+            }
+            if (item.entityType === "trip_gallery") {
+              return {
+                title: "Zaktualizowano zdjęcie w galerii",
+                description: "Zmieniono informacje dotyczące zdjęcia przypisanego do wyjazdu.",
+              }
+            }
+            if (item.entityType === "inquiry") {
+              return {
+                title: "Zaktualizowano zapytanie",
+                description: item.details
+                  ? `Zmieniono status zapytania: ${item.details}.`
+                  : "Zmieniono dane zapytania.",
+              }
+            }
+            return {
+              title: "Zaktualizowano",
+              description: item.details || "Wprowadzono zmianę.",
+            }
+
+          case "deleted":
+            if (item.entityType === "trip") {
+              return {
+                title: "Usunięto wyjazd",
+                description: item.details
+                  ? `Usunięto wyjazd „${item.details}”.`
+                  : "Wyjazd został usunięty.",
+              }
+            }
+            if (item.entityType === "media") {
+              return {
+                title: "Usunięto zdjęcie",
+                description: item.details
+                  ? `Usunięto zdjęcie „${item.details}”.`
+                  : "Zdjęcie zostało usunięte z biblioteki.",
+              }
+            }
+            return {
+              title: "Usunięto",
+              description: item.details || "Element został usunięty.",
+            }
+
+          case "uploaded":
+            return {
+              title: "Wgrano zdjęcie",
+              description: item.details
+                ? `Dodano zdjęcie „${item.details}” do biblioteki.`
+                : "Dodano nowe zdjęcie do biblioteki.",
+            }
+
+          case "duplicated":
+            return {
+              title: "Zduplikowano wyjazd",
+              description: item.details
+                ? `Utworzono kopię wyjazdu „${item.details}”.`
+                : "Utworzono kopię wyjazdu.",
+            }
+
+          case "published":
+            return {
+              title: "Opublikowano wyjazd",
+              description: item.details
+                ? `Wyjazd „${item.details}” jest teraz widoczny na stronie.`
+                : "Wyjazd został opublikowany.",
+            }
+
+          case "draft":
+            return {
+              title: "Ukryto wyjazd",
+              description: item.details
+                ? `Wyjazd „${item.details}” został ukryty na stronie.`
+                : "Wyjazd został przeniesiony do szkiców.",
+            }
+
+          case "synced":
+            return {
+              title: "Odświeżono filmy YouTube",
+              description:
+                item.details || "Lista filmów YouTube została zaktualizowana.",
+            }
+
+          case "updated_cover":
+            return {
+              title: "Zmieniono zdjęcie główne",
+              description: "Zmieniono zdjęcie główne wyjazdu.",
+            }
+
+          case "added":
+            if (item.entityType === "trip_gallery") {
+              return {
+                title: "Dodano zdjęcie do galerii wyjazdu",
+                description: "Zdjęcie zostało przypisane do galerii wyjazdu.",
+              }
+            }
+            if (item.entityType === "gallery") {
+              return {
+                title: "Dodano zdjęcie do galerii",
+                description: "Zdjęcie zostało dodane do galerii strony głównej.",
+              }
+            }
+            return {
+              title: "Dodano element",
+              description: item.details || "Dodano nowy element.",
+            }
+
+          case "removed":
+            if (item.entityType === "trip_gallery") {
+              return {
+                title: "Usunięto zdjęcie z galerii wyjazdu",
+                description: "Zdjęcie zostało usunięte z galerii wyjazdu.",
+              }
+            }
+            if (item.entityType === "global_gallery") {
+              return {
+                title: "Usunięto zdjęcie z galerii",
+                description: "Zdjęcie zostało usunięte z galerii strony głównej.",
+              }
+            }
+            return {
+              title: "Usunięto element z galerii",
+              description: "Element został usunięty z galerii.",
+            }
+
+          default:
+            return {
+              title: "Wprowadzono zmianę",
+              description: item.details || "Wykonano zmianę w panelu.",
+            }
+        }
+      }
+
+      const activity = getActivity()
+
+      const icon =
+        item.entityType === "trip" ? (
+          <Plane className="size-4" />
+        ) : item.entityType === "media" ||
+          item.entityType === "gallery" ||
+          item.entityType === "trip_gallery" ? (
+          <FileImage className="size-4" />
+        ) : item.entityType === "inquiry" ? (
+          <Inbox className="size-4" />
+        ) : item.entityType === "settings" ? (
+          <Settings className="size-4" />
+        ) : item.entityType === "youtube" ? (
+          <Clapperboard className="size-4" />
+        ) : item.entityType === "testimonial" ? (
+          <Star className="size-4" />
+        ) : (
+          <RefreshCw className="size-4" />
+        )
 
       return (
         <div
           key={item.id}
-          className="flex gap-3 py-3 first:pt-0 last:pb-0"
+          className="flex gap-3 border-b py-3 last:border-0 first:pt-0 last:pb-0"
         >
-          <div className="flex shrink-0 items-center justify-center">
+          <div className="flex shrink-0 items-start justify-center">
             <div className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-              {item.entityType === "trip" ? (
-                <Plane className="size-4" />
-              ) : item.entityType === "media" ? (
-                <FileImage className="size-4" />
-              ) : item.entityType === "inquiry" ? (
-                <Inbox className="size-4" />
-              ) : item.entityType === "settings" ? (
-                <Settings className="size-4" />
-              ) : item.entityType === "youtube" ? (
-                <Clapperboard className="size-4" />
-              ) : (
-                <RefreshCw className="size-4" />
-              )}
+              {icon}
             </div>
           </div>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-medium">
-                {actionName}
-              </p>
+<div className="min-w-0 flex-1">
+  <div className="flex items-start justify-between gap-3">
+    <p className="text-sm font-semibold leading-5">
+      {activity.title}
+    </p>
 
-              <span className="shrink-0 text-xs text-muted-foreground">
-                {entityName}
-              </span>
-            </div>
+    <time
+      dateTime={new Date(item.createdAt).toISOString()}
+      className="shrink-0 text-xs text-muted-foreground"
+    >
+      {formatActivityDate(item.createdAt)}
+    </time>
+  </div>
 
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">
-              {item.details || item.entityId || "Zmiana w panelu"}
-            </p>
-          </div>
+  <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
+    {activity.description}
+  </p>
+</div>
         </div>
       )
     })}
   </div>
 </CardContent>
+
 
 </Card></div>
       </TabsContent>
