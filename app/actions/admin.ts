@@ -401,50 +401,7 @@ export async function syncYouTubeNow(_: SyncYouTubeState, _formData: FormData): 
     
   }
 }
-export async function reorderGallery(formData: FormData) {
-  const user = await requireAdmin()
 
-  const items = JSON.parse(String(formData.get("items") || "[]")) as {
-    id: number
-    sortOrder: number
-  }[]
-
-  for (const item of items) {
-    if (!Number.isInteger(item.id)) continue
-
-    await db
-      .update(galleryItems)
-      .set({ sortOrder: item.sortOrder })
-      .where(eq(galleryItems.id, item.id))
-  }
-
-  await logActivity(user.id, "reordered", "gallery")
-  refreshPublic()
-}
-
-export async function reorderTripGallery(formData: FormData) {
-  const user = await requireAdmin()
-
-  const items = JSON.parse(String(formData.get("items") || "[]")) as {
-    id: number
-    sortOrder: number
-  }[]
-
-  for (const item of items) {
-    if (!Number.isInteger(item.id)) continue
-
-    await db
-      .update(tripGalleryItems)
-      .set({
-        sortOrder: item.sortOrder,
-        updatedAt: new Date(),
-      })
-      .where(eq(tripGalleryItems.id, item.id))
-  }
-
-  await logActivity(user.id, "reordered", "trip_gallery")
-  refreshPublic()
-}
 export async function reorderGalleryItems(formData: FormData) {
   const user = await requireAdmin()
 
