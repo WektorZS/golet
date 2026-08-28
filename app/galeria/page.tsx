@@ -1,11 +1,9 @@
-
 import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { ImageLightbox } from "@/components/image-lightbox"
 import { Button } from "@/components/ui/button"
 import { getPublishedGallery, getSiteContent } from "@/lib/content"
-import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
 export const dynamic = "force-dynamic"
@@ -22,7 +20,6 @@ export default async function GalleryPage() {
     getSiteContent(),
   ])
 
-  // Cała lista zdjęć przekazywana do lightboxa
   const lightboxImages = gallery.map((item) => ({
     src: item.mediaId ? `/api/media/${item.mediaId}` : item.image,
     alt: item.alt || item.title || "Zdjęcie z wyjazdu Let's Gol",
@@ -31,35 +28,46 @@ export default async function GalleryPage() {
 
   return (
     <>
-      <SiteHeader />
-
       <main className="min-h-screen bg-background text-foreground">
-        <section className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 md:px-6 md:py-16">
-          <header className="flex flex-col items-start gap-4">
+        {/* HEADER */}
+        <header className="sticky top-0 z-50 border-b bg-foreground text-background">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
             <Button
               variant="ghost"
+              className="text-background hover:bg-background/10 hover:text-background"
               nativeButton={false}
               render={<Link href="/" />}
             >
               <ArrowLeft data-icon="inline-start" />
-              Wróć na stronę główną
+              Strona główna
             </Button>
 
-            <div className="flex max-w-3xl flex-col gap-3">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                Wspomnienia z trybun
-              </p>
+            <Link
+              href="/"
+              className="font-sans text-xl font-black uppercase"
+            >
+              Let&apos;s Gol{" "}
+              <span className="text-primary">/ Galeria</span>
+            </Link>
+          </div>
+        </header>
 
-              <h1 className="text-balance font-sans text-4xl font-black uppercase md:text-6xl">
-                {content.galleryTitle || "Galeria z wyjazdów"}
-              </h1>
+        {/* GALERIA */}
+        <section className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 md:px-6 md:py-16">
+          <div className="flex max-w-3xl flex-col gap-3">
+            <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-primary">
+              Wspomnienia z trybun
+            </p>
 
-              <p className="text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">
-                Wszystkie opublikowane zdjęcia z naszych piłkarskich podróży w
-                jednym miejscu.
-              </p>
-            </div>
-          </header>
+            <h1 className="text-balance font-sans text-4xl font-black uppercase md:text-6xl">
+              {content.galleryTitle || "Galeria z wyjazdów"}
+            </h1>
+
+            <p className="text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">
+              Wszystkie opublikowane zdjęcia z naszych piłkarskich podróży w
+              jednym miejscu.
+            </p>
+          </div>
 
           {gallery.length ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -115,4 +123,3 @@ export default async function GalleryPage() {
     </>
   )
 }
-
