@@ -445,3 +445,38 @@ export async function reorderTripGallery(formData: FormData) {
   await logActivity(user.id, "reordered", "trip_gallery")
   refreshPublic()
 }
+export async function reorderGalleryItems(formData: FormData) {
+  const user = await requireAdmin()
+
+  const scope = clean(formData.get("scope"))
+  const items = JSON.parse(String(formData.get("items") || "[]")) as {
+    id: number
+    sortOrder: number
+  }[]
+
+  if (!Array.isArray(items)) return
+
+  if (scope === "trip") {
+    for (const item of items) {
+      await db
+        .update(tripGalleryItems)
+        .set({ sortOrder: item.sortOrder, updatedAt: new Date() })
+        .where(eq(tripGalleryItems.id, item.id))
+    }
+  } else {
+    for (const item of items) {
+      await db
+        .update(galleryItems)
+        .set({ sortOrder: item.sortOrder })
+        .where(eq(galleryItems.id, item.id))
+    }
+  }
+
+  await logActivity(
+    user.id,
+    "reordered",
+    scope === "trip" ? "trip_gallery" : "gallery"
+  )
+
+  refreshPublic()
+}
