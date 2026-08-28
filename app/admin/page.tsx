@@ -25,7 +25,7 @@ export default async function AdminPage() {
     db.select().from(galleryItems).orderBy(asc(galleryItems.sortOrder)),
     db.select().from(tripGalleryItems).orderBy(asc(tripGalleryItems.sortOrder)),
     db.select().from(siteSettings),
-    db.select().from(adminActivity).orderBy(desc(adminActivity.createdAt)).limit(20),
+    db.select().from(adminActivity).orderBy(desc(adminActivity.createdAt)).limit(10),
   ])
   const settings = Object.fromEntries(rawSettings.map((item) => [item.key, item.value]))
   const videos = await getYouTubeVideos(settings)

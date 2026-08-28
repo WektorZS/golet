@@ -1,7 +1,7 @@
 "use server"
 
 import { del, put } from "@vercel/blob"
-import { and, eq, ne } from "drizzle-orm"
+import { and, eq, ne, sql } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { requireAdmin } from "@/lib/auth/require-admin"
@@ -16,6 +16,7 @@ import {
   tripGalleryItems,
   trips,
 } from "@/lib/db/schema"
+import { optimizeUploadedImage } from "@/lib/optimize-image"
 import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
 import { syncYouTubeVideos } from "@/lib/youtube-sync"
 
@@ -24,7 +25,15 @@ const clean = (value: FormDataEntryValue | null) => String(value ?? "").trim()
 const slugify = (value: string) => value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
 
 async function logActivity(userId: string, action: string, entityType: string, entityId?: string, details = "") {
-  await db.insert(adminActivity).values({ userId, action, entityType, entityId, details })
+  await db.transaction(async (tx) => {
+    await tx.insert(adminActivity).values({ userId, action, entityType, entityId, details })
+    await tx.execute(sql`
+      DELETE FROM admin_activity
+      WHERE id NOT IN (
+        SELECT id FROM admin_activity ORDER BY created_at DESC, id DESC LIMIT 10
+      )
+    `)
+  })
 }
 
 function refreshPublic() {
@@ -63,14 +72,14 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   let image = clean(formData.get("image")) || "/placeholder.jpg"
   const coverFile = formData.get("coverFile")
   if (coverFile instanceof File && coverFile.size > 0) {
-    if (coverFile.size > 8 * 1024 * 1024) return { error: "Zdjęcie może mieć maksymalnie 8 MB." }
-    if (!ALLOWED_IMAGE_TYPES.includes(coverFile.type as (typeof ALLOWED_IMAGE_TYPES)[number])) return { error: "Dozwolone formaty zdjęcia: JPEG, PNG, WebP i AVIF." }
-    const header = new Uint8Array(await coverFile.slice(0, 16).arrayBuffer())
-    if (detectImageType(header) !== coverFile.type) return { error: "Zawartość zdjęcia nie zgadza się z jego formatem." }
-    const safeName = coverFile.name.replace(/[^a-zA-Z0-9._-]/g, "-").slice(0, 80)
-    const blob = await put(`admin/${crypto.randomUUID()}-${safeName}`, coverFile, { access: "private", addRandomSuffix: false })
-    const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: coverFile.type, size: coverFile.size, alt: parsed.data.title, originalName: coverFile.name, createdBy: user.id }).returning({ id: mediaAssets.id })
-    image = `/api/media/${asset.id}`
+    try {
+      const optimized = await optimizeUploadedImage(coverFile)
+      const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
+      const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt: parsed.data.title, originalName: coverFile.name, createdBy: user.id }).returning({ id: mediaAssets.id })
+      image = `/api/media/${asset.id}`
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : "Nie udało się zoptymalizować zdjęcia." }
+    }
   }
 
   const values = {
@@ -107,6 +116,100 @@ export async function duplicateTrip(formData: FormData) {
   refreshPublic()
 }
 
+export async function deleteTrip(formData: FormData) {
+  const user = await requireAdmin()
+  const id = Number(formData.get("id"))
+
+  if (!Number.isInteger(id) || id <= 0) return
+
+  const [trip] = await db
+    .select()
+    .from(trips)
+    .where(eq(trips.id, id))
+    .limit(1)
+
+  if (!trip) return
+
+  // Pobierz wszystkie zdjęcia przypisane do tego wyjazdu
+  const tripGallery = await db
+    .select({ mediaId: tripGalleryItems.mediaId })
+    .from(tripGalleryItems)
+    .where(eq(tripGalleryItems.tripId, id))
+
+  const mediaIds = new Set<number>()
+
+
+  const coverMatch = trip.image?.match(/^\/api\/media\/(\d+)$/)
+  if (coverMatch) {
+    mediaIds.add(Number(coverMatch[1]))
+  }
+
+ 
+  for (const item of tripGallery) {
+    if (item.mediaId) {
+      mediaIds.add(item.mediaId)
+    }
+  }
+
+  await db
+    .delete(tripGalleryItems)
+    .where(eq(tripGalleryItems.tripId, id))
+
+  await db
+    .delete(trips)
+    .where(eq(trips.id, id))
+
+
+  for (const mediaId of mediaIds) {
+    const [globalUse, tripUse, coverUse] = await Promise.all([
+      db
+        .select({ id: galleryItems.id })
+        .from(galleryItems)
+        .where(eq(galleryItems.mediaId, mediaId))
+        .limit(1),
+
+      db
+        .select({ id: tripGalleryItems.id })
+        .from(tripGalleryItems)
+        .where(eq(tripGalleryItems.mediaId, mediaId))
+        .limit(1),
+
+      db
+        .select({ id: trips.id })
+        .from(trips)
+        .where(eq(trips.image, `/api/media/${mediaId}`))
+        .limit(1),
+    ])
+
+    if (globalUse.length || tripUse.length || coverUse.length) {
+      continue
+    }
+
+    const [asset] = await db
+      .select()
+      .from(mediaAssets)
+      .where(eq(mediaAssets.id, mediaId))
+      .limit(1)
+
+    if (!asset) continue
+
+    await del(asset.pathname)
+
+    await db
+      .delete(mediaAssets)
+      .where(eq(mediaAssets.id, mediaId))
+  }
+
+  await logActivity(
+    user.id,
+    "deleted",
+    "trip",
+    String(id),
+    trip.title
+  )
+
+  refreshPublic()
+}
 export async function updateInquiry(formData: FormData) {
   const user = await requireAdmin(); const id = Number(formData.get("id")); const status = clean(formData.get("status"))
   if (!Number.isInteger(id) || !["new", "contacted", "closed"].includes(status)) return
@@ -160,28 +263,12 @@ export async function saveSettings(_: SaveSettingsState, formData: FormData): Pr
   }
 }
 
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"] as const
-
-/** Confirms the file's magic bytes match a claimed image type; rejects mislabeled or disguised uploads. */
-function detectImageType(bytes: Uint8Array): (typeof ALLOWED_IMAGE_TYPES)[number] | null {
-  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg"
-  if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return "image/png"
-  if (bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) return "image/webp"
-  if (bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70) return "image/avif"
-  return null
-}
-
 export async function uploadMedia(formData: FormData) {
   const user = await requireAdmin(); const file = formData.get("file")
-  if (!(file instanceof File) || file.size === 0) throw new Error("Wybierz plik")
-  if (file.size > 8 * 1024 * 1024) throw new Error("Plik może mieć maksymalnie 8 MB")
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number])) throw new Error("Dozwolone formaty: JPEG, PNG, WebP i AVIF")
-  const header = new Uint8Array(await file.slice(0, 16).arrayBuffer())
-  const detectedType = detectImageType(header)
-  if (!detectedType || detectedType !== file.type) throw new Error("Zawartość pliku nie zgadza się z jego typem")
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-").slice(0, 80)
-  const blob = await put(`admin/${crypto.randomUUID()}-${safeName}`, file, { access: "private", addRandomSuffix: false })
-  const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: file.type, size: file.size, alt: clean(formData.get("alt")), originalName: file.name, createdBy: user.id }).returning({ id: mediaAssets.id })
+  if (!(file instanceof File)) throw new Error("Wybierz plik")
+  const optimized = await optimizeUploadedImage(file)
+  const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
+  const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt: clean(formData.get("alt")), originalName: file.name, createdBy: user.id }).returning({ id: mediaAssets.id })
   await logActivity(user.id, "uploaded", "media", String(asset.id), file.name)
   revalidatePath("/admin")
 }
@@ -268,6 +355,24 @@ export async function updateGalleryItem(_: UpdateGalleryItemState, formData: For
       city: clean(formData.get("city")),
     }).where(eq(galleryItems.id, id))
     await logActivity(user.id, "updated", "gallery", String(id))
+    refreshPublic()
+    return { success: true }
+  } catch {
+    return { error: "Nie udało się zapisać zmian zdjęcia." }
+  }
+}
+
+export async function updateTripGalleryItem(_: UpdateGalleryItemState, formData: FormData): Promise<UpdateGalleryItemState> {
+  try {
+    const user = await requireAdmin()
+    const id = Number(formData.get("id"))
+    if (!Number.isInteger(id) || id <= 0) return { error: "Nieprawidłowe zdjęcie galerii." }
+    await db.update(tripGalleryItems).set({
+      caption: clean(formData.get("caption")).slice(0, 160),
+      alt: clean(formData.get("alt")).slice(0, 240),
+      updatedAt: new Date(),
+    }).where(eq(tripGalleryItems.id, id))
+    await logActivity(user.id, "updated", "trip_gallery", String(id))
     refreshPublic()
     return { success: true }
   } catch {

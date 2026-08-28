@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
+import { ImageLightbox } from "@/components/image-lightbox"
 import { Button } from "@/components/ui/button"
 import { getPublishedGallery, getSiteContent } from "@/lib/content"
 
@@ -34,12 +34,10 @@ export default async function GalleryPage() {
             {gallery.map((item, index) => (
               <figure key={item.id} className="group overflow-hidden rounded-xl border bg-card">
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <Image
+                  <ImageLightbox
                     src={item.mediaId ? `/api/media/${item.mediaId}` : item.image}
                     alt={item.alt || item.title || "Zdjęcie z wyjazdu Let's Gol"}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    caption={[item.title, item.city].filter(Boolean).join(" · ")}
                     priority={index < 3}
                   />
                 </div>

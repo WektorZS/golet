@@ -22,6 +22,7 @@ import { SocialLinks } from "@/components/social-links"
 import { TripCard } from "@/components/trip-card"
 import { SectionHeading } from "@/components/section-heading"
 import { InquiryForm } from "@/components/inquiry-form"
+import { ImageLightbox } from "@/components/image-lightbox"
 import { Button } from "@/components/ui/button"
 import {
   Accordion,
@@ -182,21 +183,19 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
                 : ""
             }`}
           >
-            <Image
-  src={
-    item.mediaId
-      ? `/api/media/${item.mediaId}`
-      : item.image
-  }
-  alt={item.alt || item.title}
-  fill
-  className="object-cover"
-  sizes={
-    isFeatured
-      ? "(max-width: 640px) 100vw, 66vw"
-      : "(max-width: 640px) 50vw, 33vw"
-  }
-/>
+            <ImageLightbox
+              src={item.mediaId ? `/api/media/${item.mediaId}` : item.image}
+              alt={item.alt || item.title}
+              caption={[item.title, item.city].filter(Boolean).join(" · ")}
+            >
+              <Image
+                src={item.mediaId ? `/api/media/${item.mediaId}` : item.image}
+                alt={item.alt || item.title}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes={isFeatured ? "(max-width: 640px) 100vw, 66vw" : "(max-width: 640px) 50vw, 33vw"}
+              />
+            </ImageLightbox>
           </div>
         )
       })}
