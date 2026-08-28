@@ -1,7 +1,7 @@
 "use server"
 
 import { del, put } from "@vercel/blob"
-import { and, eq, ne, sql } from "drizzle-orm"
+import { and, asc, eq, ne, sql } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { requireAdmin } from "@/lib/auth/require-admin"
@@ -398,5 +398,50 @@ export async function syncYouTubeNow(_: SyncYouTubeState, _formData: FormData): 
     return { success: true }
   } catch {
     return { error: "Nie udało się odświeżyć listy filmów. Sprawdź adres kanału YouTube w ustawieniach." }
+    
   }
+}
+export async function reorderGallery(formData: FormData) {
+  const user = await requireAdmin()
+
+  const items = JSON.parse(String(formData.get("items") || "[]")) as {
+    id: number
+    sortOrder: number
+  }[]
+
+  for (const item of items) {
+    if (!Number.isInteger(item.id)) continue
+
+    await db
+      .update(galleryItems)
+      .set({ sortOrder: item.sortOrder })
+      .where(eq(galleryItems.id, item.id))
+  }
+
+  await logActivity(user.id, "reordered", "gallery")
+  refreshPublic()
+}
+
+export async function reorderTripGallery(formData: FormData) {
+  const user = await requireAdmin()
+
+  const items = JSON.parse(String(formData.get("items") || "[]")) as {
+    id: number
+    sortOrder: number
+  }[]
+
+  for (const item of items) {
+    if (!Number.isInteger(item.id)) continue
+
+    await db
+      .update(tripGalleryItems)
+      .set({
+        sortOrder: item.sortOrder,
+        updatedAt: new Date(),
+      })
+      .where(eq(tripGalleryItems.id, item.id))
+  }
+
+  await logActivity(user.id, "reordered", "trip_gallery")
+  refreshPublic()
 }

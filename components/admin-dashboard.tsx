@@ -17,6 +17,22 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { DeleteTripDialog } from "@/components/delete-trip-dialog"
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
+
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable"
+
+import { CSS } from "@dnd-kit/utilities"
 
 export type AdminData = {
   trips: any[]; inquiries: any[]; testimonials: any[]; media: any[]; gallery: any[]; tripGallery: any[]; settings: Record<string, string>; activity: any[]; videos: any[]; email: string
