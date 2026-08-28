@@ -64,34 +64,25 @@ export function ImageLightbox({
     )
   }
 
-  // Obsługa strzałek na klawiaturze
   useEffect(() => {
     if (!hasMultipleImages) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
         event.preventDefault()
-        event.stopPropagation()
         previousImage()
       }
 
       if (event.key === "ArrowRight") {
         event.preventDefault()
-        event.stopPropagation()
         nextImage()
       }
     }
 
-    const element = contentRef.current
-
-    if (element) {
-      element.addEventListener("keydown", handleKeyDown)
-    }
+    window.addEventListener("keydown", handleKeyDown)
 
     return () => {
-      if (element) {
-        element.removeEventListener("keydown", handleKeyDown)
-      }
+      window.removeEventListener("keydown", handleKeyDown)
     }
   }, [hasMultipleImages, gallery.length])
 
@@ -145,8 +136,7 @@ export function ImageLightbox({
 
       <DialogContent
         ref={contentRef}
-        tabIndex={-1}
-        className="top-[calc(50%+2.5rem)] max-h-[calc(100dvh-6rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] gap-3 overflow-hidden bg-foreground p-2 text-background sm:w-[calc(100vw-2rem)] sm:max-w-6xl"
+        className="top-[calc(50%+2.5rem)] flex max-h-[calc(100dvh-6rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-hidden bg-foreground p-2 text-background sm:w-[calc(100vw-2rem)] sm:max-w-6xl"
         showCloseButton
       >
         <DialogTitle className="sr-only">
@@ -154,12 +144,12 @@ export function ImageLightbox({
         </DialogTitle>
 
         <DialogDescription className="sr-only">
-          Powiększone zdjęcie. Użyj strzałek na klawiaturze lub przesuń
-          zdjęcie palcem, aby przejść do kolejnego.
+          Powiększone zdjęcie. Użyj strzałek, aby przechodzić między
+          zdjęciami lub przesuń zdjęcie palcem.
         </DialogDescription>
 
         <div
-          className="relative h-[calc(100dvh-10rem)] max-h-[min(80dvh,900px)] w-full min-w-0 overflow-hidden rounded-lg touch-pan-y"
+          className="relative flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden rounded-lg"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -167,9 +157,10 @@ export function ImageLightbox({
             key={currentImage.src}
             src={currentImage.src}
             alt={currentImage.alt}
-            fill
-            sizes="100vw"
-            className="object-contain"
+            width={1600}
+            height={1200}
+            sizes="calc(100vw - 1rem)"
+            className="max-h-full max-w-full object-contain"
             priority
           />
 
@@ -205,7 +196,7 @@ export function ImageLightbox({
         </div>
 
         {currentImage.caption ? (
-          <p className="px-2 pb-1 text-sm text-background/80">
+          <p className="shrink-0 px-2 pb-1 text-sm text-background/80">
             {currentImage.caption}
           </p>
         ) : null}
