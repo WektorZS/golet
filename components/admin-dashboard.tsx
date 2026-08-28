@@ -936,12 +936,11 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                     label="Zdjęcie"
                     hint=""
                   >
-                    <Input
-                      name="file"
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/avif"
-                      required
-                    />
+                    <ImageDropzone
+  name="file"
+  accept="image/jpeg,image/png,image/webp,image/avif"
+  required
+/>
                   </Field>
 
                   <Field
