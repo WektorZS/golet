@@ -75,7 +75,67 @@ export function AdminDashboard({ data }: { data: AdminData }) {
 >
   <BookOpen />
   Edytuj stronę
-</Button></CardContent></Card><Card><CardHeader><CardTitle>Ostatnia aktywność</CardTitle></CardHeader><CardContent className="flex flex-col gap-3">{data.activity.slice(0, 6).map((item) => <div key={item.id} className="border-b pb-3 last:border-0"><p className="font-medium">{item.action} · {item.entityType}</p><p className="text-xs text-muted-foreground">{item.details || item.entityId || "Zmiana w panelu"}</p></div>)}</CardContent></Card></div>
+</Button></CardContent></Card><Card>
+  <CardHeader>
+    <CardTitle>Ostatnia aktywność</CardTitle>
+    <CardDescription>
+      Ostatnie zmiany wykonane w panelu.
+    </CardDescription>
+  </CardHeader>
+
+  <CardContent>
+    <div className="flex flex-col">
+      {data.activity.slice(0, 6).map((item, index) => (
+        <div
+          key={item.id}
+          className="flex gap-3 py-3 first:pt-0 last:pb-0"
+        >
+          <div className="flex shrink-0 items-center justify-center">
+            <div className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+              {item.entityType === "trip" ? (
+                <Plane className="size-4" />
+              ) : item.entityType === "media" ? (
+                <FileImage className="size-4" />
+              ) : item.entityType === "inquiry" ? (
+                <Inbox className="size-4" />
+              ) : (
+                <RefreshCw className="size-4" />
+              )}
+            </div>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-sm font-medium">
+                {item.action === "created"
+                  ? "Utworzono"
+                  : item.action === "updated"
+                    ? "Zaktualizowano"
+                    : item.action === "deleted"
+                      ? "Usunięto"
+                      : item.action === "uploaded"
+                        ? "Wgrano"
+                        : item.action === "duplicated"
+                          ? "Zduplikowano"
+                          : item.action === "published"
+                            ? "Opublikowano"
+                            : item.action}
+              </p>
+
+              <span className="shrink-0 text-xs text-muted-foreground">
+                {item.entityType}
+              </span>
+            </div>
+
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+              {item.details || item.entityId || "Zmiana w panelu"}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </CardContent>
+</Card></div>
       </TabsContent>
 
       <TabsContent value="trips"><SectionHeader eyebrow="Oferta" title="Wyjazdy" description="Twórz, edytuj, publikuj, duplikuj i archiwizuj oferty." action={<TripDialog trigger={<Button><Plus />Nowy wyjazd</Button>} />} />
