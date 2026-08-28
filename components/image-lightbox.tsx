@@ -47,21 +47,35 @@ export function ImageLightbox({
   const currentImage = gallery[currentIndex]
   const hasMultipleImages = gallery.length > 1
 
-  useEffect(() => {
-    setCurrentIndex(initialIndex)
-  }, [initialIndex])
+useEffect(() => {
+  if (!hasMultipleImages) return
 
-  const previousImage = () => {
-    setCurrentIndex((current) =>
-      current === 0 ? gallery.length - 1 : current - 1
-    )
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault()
+      event.stopPropagation()
+
+      setCurrentIndex((current) =>
+        current === 0 ? gallery.length - 1 : current - 1
+      )
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault()
+      event.stopPropagation()
+
+      setCurrentIndex((current) =>
+        current === gallery.length - 1 ? 0 : current + 1
+      )
+    }
   }
 
-  const nextImage = () => {
-    setCurrentIndex((current) =>
-      current === gallery.length - 1 ? 0 : current + 1
-    )
+  document.addEventListener("keydown", handleKeyDown, true)
+
+  return () => {
+    document.removeEventListener("keydown", handleKeyDown, true)
   }
+}, [hasMultipleImages, gallery.length])
 
   useEffect(() => {
     if (!hasMultipleImages) return
