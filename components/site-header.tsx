@@ -11,7 +11,7 @@ import { SocialLinks } from "@/components/social-links"
 const links = [
   ["Wyjazdy", "/#wyjazdy"],
   ["Bilety", "/#bilety"],
-  ["Dla grup", "/#grupy"],
+  ["Galeria", "/galeria"],
   ["O nas", "/#o-nas"],
   ["FAQ", "/#faq"],
 ] as const
