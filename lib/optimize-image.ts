@@ -86,12 +86,7 @@ export async function optimizeUploadedImage(file: File) {
   }
 
   const { data, info } = await image
-    // Automatycznie poprawia zdjęcia wykonane telefonem
-    // w pionie/poziomie według EXIF.
     .rotate()
-
-    // Maksymalnie 2560 px na dłuższym boku.
-    // Małe zdjęcia NIE są powiększane.
     .resize({
       width: MAX_DIMENSION,
       height: MAX_DIMENSION,
@@ -99,19 +94,11 @@ export async function optimizeUploadedImage(file: File) {
       withoutEnlargement: true,
       kernel: sharp.kernel.lanczos3,
     })
-
-    // WebP dobrze sprawdza się jako format bazowy.
     .webp({
-      quality: 80,
+      quality: 75,
       effort: 6,
       smartSubsample: true,
     })
-
-    // Usuń metadane, które nie są potrzebne użytkownikowi.
-    .withMetadata({
-      orientation: undefined,
-    })
-
     .toBuffer({
       resolveWithObject: true,
     })
