@@ -139,7 +139,7 @@ export async function deleteTrip(formData: FormData) {
   const mediaIds = new Set<number>()
 
 
- const coverMatch = trip.image?.match(/^\/api\/media\/(\d+)$/)
+const coverMatch = trip.image?.match(/^\/api\/media\/(\d+)$/)
   if (coverMatch) {
     mediaIds.add(Number(coverMatch[1]))
   }
