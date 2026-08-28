@@ -40,15 +40,42 @@ export function AdminDashboard({ data }: { data: AdminData }) {
         <Button variant="ghost" size="icon" nativeButton={false} render={<Link href="/" />} className="text-background hover:bg-background/10 hover:text-background"><Home /><span className="sr-only">Strona główna</span></Button>
       </div>
       <TabsList variant="line" className="flex h-auto w-full flex-row justify-start overflow-x-auto rounded-none bg-transparent p-3 text-background/70 lg:flex-col lg:items-stretch">
-        {sections.map(([value, label, Icon]) => <TabsTrigger key={value} value={value} className="min-w-max justify-start px-3 py-2.5 text-background/65 transition-all duration-200 hover:translate-x-1 hover:bg-background/10 hover:text-background data-active:text-primary"><Icon />{label}{value === "inquiries" && newLeads > 0 ? <Badge className="ml-auto">{newLeads}</Badge> : null}</TabsTrigger>)}
+       {sections.map(([value, label, Icon]) => (
+  <TabsTrigger
+    key={value}
+    id={`tab-${value}`}
+    value={value}
+    className="min-w-max justify-start px-3 py-2.5 text-background/65 transition-all duration-200 hover:translate-x-1 hover:bg-background/10 hover:text-background data-active:text-primary"
+  >
+    <Icon />
+    {label}
+    {value === "inquiries" && newLeads > 0 ? (
+      <Badge className="ml-auto">{newLeads}</Badge>
+    ) : null}
+  </TabsTrigger>
+))}
       </TabsList>
       <div className="hidden border-t border-background/10 p-4 lg:block"><p className="truncate text-xs text-background/50">{data.email}</p><form action={signOutAdmin}><Button type="submit" variant="ghost" className="mt-2 w-full justify-start text-background hover:bg-background/10 hover:text-background"><LogOut />Wyloguj</Button></form></div>
     </aside>
 
     <main className="min-w-0 flex-1 p-4 md:p-6 lg:p-8">
       <TabsContent value="dashboard"><SectionHeader eyebrow="Przegląd" title="Pulpit" description="Najważniejsze informacje i szybkie akcje w jednym miejscu." />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={Plane} label="Opublikowane" value={data.trips.filter((t) => t.status === "published").length} /><Metric icon={Archive} label="Szkice i archiwum" value={data.trips.filter((t) => t.status !== "published").length} /><Metric icon={Inbox} label="Nowe zapytania" value={newLeads} /><Metric icon={FileImage} label="Pliki w bibliotece" value={data.media.length} /></div>
-        <div className="mt-6 grid gap-6 xl:grid-cols-[1.3fr_.7fr]"><Card><CardHeader><CardTitle>Szybkie działania</CardTitle><CardDescription>Najczęściej używane operacje.</CardDescription></CardHeader><CardContent className="grid gap-3 sm:grid-cols-3"><TripDialog trigger={<Button><Plus />Nowy wyjazd</Button>} /><Button variant="outline" onClick={() => document.querySelector<HTMLElement>('[data-value="media"]')?.click()}><Upload />Dodaj zdjęcia</Button><Button variant="outline" onClick={() => document.querySelector<HTMLElement>('[data-value="content"]')?.click()}><BookOpen />Edytuj stronę</Button></CardContent></Card><Card><CardHeader><CardTitle>Ostatnia aktywność</CardTitle></CardHeader><CardContent className="flex flex-col gap-3">{data.activity.slice(0, 6).map((item) => <div key={item.id} className="border-b pb-3 last:border-0"><p className="font-medium">{item.action} · {item.entityType}</p><p className="text-xs text-muted-foreground">{item.details || item.entityId || "Zmiana w panelu"}</p></div>)}</CardContent></Card></div>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={Plane} label="Opublikowane" value={data.trips.filter((t) => t.status === "published").length} /><Metric icon={Archive} label="Szkice wyjazdów" value={data.trips.filter((t) => t.status !== "published").length} /><Metric icon={Inbox} label="Nowe zapytania" value={newLeads} /><Metric icon={FileImage} label="Pliki w bibliotece" value={data.media.length} /></div>
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1.3fr_.7fr]"><Card><CardHeader><CardTitle>Szybkie działania</CardTitle><CardDescription>Najczęściej używane operacje.</CardDescription></CardHeader><CardContent className="grid gap-3 sm:grid-cols-3"><TripDialog trigger={<Button><Plus />Nowy wyjazd</Button>} /><Button
+  variant="outline"
+  onClick={() => document.getElementById("tab-media")?.click()}
+>
+  <Upload />
+  Dodaj zdjęcia
+</Button>
+
+<Button
+  variant="outline"
+  onClick={() => document.getElementById("tab-content")?.click()}
+>
+  <BookOpen />
+  Edytuj stronę
+</Button></CardContent></Card><Card><CardHeader><CardTitle>Ostatnia aktywność</CardTitle></CardHeader><CardContent className="flex flex-col gap-3">{data.activity.slice(0, 6).map((item) => <div key={item.id} className="border-b pb-3 last:border-0"><p className="font-medium">{item.action} · {item.entityType}</p><p className="text-xs text-muted-foreground">{item.details || item.entityId || "Zmiana w panelu"}</p></div>)}</CardContent></Card></div>
       </TabsContent>
 
       <TabsContent value="trips"><SectionHeader eyebrow="Oferta" title="Wyjazdy" description="Twórz, edytuj, publikuj, duplikuj i archiwizuj oferty." action={<TripDialog trigger={<Button><Plus />Nowy wyjazd</Button>} />} />
