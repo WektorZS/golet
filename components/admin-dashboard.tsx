@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useActionState, useEffect, useMemo, useRef, useState } from "react"
 import { Archive, BookOpen, Clapperboard, Copy, ExternalLink, FileImage, HelpCircle, Home, Inbox, KeyRound, LayoutDashboard, LogOut, Pencil, Plane, Plus, RefreshCw, Search, Settings, Star, Upload, Users } from "lucide-react"
 import { toast } from "sonner"
-import { archiveTestimonial, addGalleryItem, type AddGalleryItemState, deleteMedia, deleteTrip, duplicateTrip, removeGalleryItem, type SaveSettingsState, type SaveTripState, saveSettings, saveTestimonial, saveTrip, setTripCover, setTripStatus, type SyncYouTubeState, syncYouTubeNow, type UpdateGalleryItemState, updateGalleryItem, updateTripGalleryItem, updateInquiry, updateMedia, uploadMedia } from "@/app/actions/admin"
+import { archiveTestimonial, addGalleryItem, type AddGalleryItemState, duplicateTrip, removeGalleryItem, type SaveSettingsState, type SaveTripState, saveSettings, saveTestimonial, saveTrip, setTripCover, setTripStatus, type SyncYouTubeState, syncYouTubeNow, type UpdateGalleryItemState, updateGalleryItem, updateTripGalleryItem, updateInquiry, updateMedia, uploadMedia } from "@/app/actions/admin"
 import { changeAdminPassword, type ChangePasswordState, signOutAdmin } from "@/app/actions/auth"
 import { DescriptionEditor } from "@/components/description-editor"
 import { Badge } from "@/components/ui/badge"
@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
+import { DeleteTripDialog } from "@/components/delete-trip-dialog"
 
 export type AdminData = {
   trips: any[]; inquiries: any[]; testimonials: any[]; media: any[]; gallery: any[]; tripGallery: any[]; settings: Record<string, string>; activity: any[]; videos: any[]; email: string
@@ -51,20 +52,11 @@ export function AdminDashboard({ data }: { data: AdminData }) {
       </TabsContent>
 
       <TabsContent value="trips"><SectionHeader eyebrow="Oferta" title="Wyjazdy" description="Twórz, edytuj, publikuj, duplikuj i archiwizuj oferty." action={<TripDialog trigger={<Button><Plus />Nowy wyjazd</Button>} />} />
-        <Card><CardContent className="pt-6"><div className="mb-5 flex max-w-md items-center gap-2"><Search className="text-muted-foreground" /><Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Szukaj po nazwie lub mieście" /></div><div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>Oferta</TableHead><TableHead>Termin</TableHead><TableHead>Cena</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Operacje</TableHead></TableRow></TableHeader><TableBody>{filteredTrips.map((trip) => <TableRow key={trip.id}><TableCell><strong>{trip.title}</strong><span className="block text-xs text-muted-foreground">{trip.city}, {trip.country}</span></TableCell><TableCell>{trip.startDate}{trip.endDate ? ` – ${trip.endDate}` : ""}</TableCell><TableCell>{trip.price.toLocaleString("pl-PL")} zł</TableCell><TableCell><StatusBadge status={trip.status} /></TableCell><TableCell><div className="flex justify-end gap-2"><TripDialog trip={trip} trigger={<Button size="icon-sm" variant="outline"><Pencil /><span className="sr-only">Edytuj</span></Button>} /><form action={duplicateTrip}><input type="hidden" name="id" value={trip.id} /><Button type="submit" size="icon-sm" variant="outline"><Copy /><span className="sr-only">Duplikuj</span></Button></form><form action={setTripStatus}><input type="hidden" name="id" value={trip.id} /><input type="hidden" name="status" value={trip.status === "published" ? "draft" : "published"} /><Button type="submit" size="sm" variant="outline">{trip.status === "published" ? "Ukryj" : "Publikuj"}</Button></form><form action={setTripStatus}><input type="hidden" name="id" value={trip.id} /><input type="hidden" name="status" value="archived" /><Button type="submit" size="icon-sm" variant="ghost"><Archive /><span className="sr-only">Archiwizuj</span></Button></form><form
-  action={deleteTrip}
-  onSubmit={(e) => {
-    if (!window.confirm(`Czy na pewno chcesz usunąć wyjazd „${trip.title}”?`)) {
-      e.preventDefault()
-    }
-  }}
->
-  <input type="hidden" name="id" value={trip.id} />
-  <Button type="submit" size="icon-sm" variant="ghost">
-    Usuń
-    <span className="sr-only">Usuń wyjazd</span>
-  </Button>
-</form></div></TableCell></TableRow>)}</TableBody></Table></div></CardContent></Card>
+        <Card><CardContent className="pt-6"><div className="mb-5 flex max-w-md items-center gap-2"><Search className="text-muted-foreground" /><Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Szukaj po nazwie lub mieście" /></div><div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>Oferta</TableHead><TableHead>Termin</TableHead><TableHead>Cena</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Operacje</TableHead></TableRow></TableHeader><TableBody>{filteredTrips.map((trip) => <TableRow key={trip.id}><TableCell><strong>{trip.title}</strong><span className="block text-xs text-muted-foreground">{trip.city}, {trip.country}</span></TableCell><TableCell>{trip.startDate}{trip.endDate ? ` – ${trip.endDate}` : ""}</TableCell><TableCell>{trip.price.toLocaleString("pl-PL")} zł</TableCell><TableCell><StatusBadge status={trip.status} /></TableCell><TableCell><div className="flex justify-end gap-2"><TripDialog trip={trip} trigger={<Button size="icon-sm" variant="outline"><Pencil /><span className="sr-only">Edytuj</span></Button>} /><form action={duplicateTrip}><input type="hidden" name="id" value={trip.id} /><Button type="submit" size="icon-sm" variant="outline"><Copy /><span className="sr-only">Duplikuj</span></Button></form><form action={setTripStatus}><input type="hidden" name="id" value={trip.id} /><input type="hidden" name="status" value={trip.status === "published" ? "draft" : "published"} /><Button type="submit" size="sm" variant="outline">{trip.status === "published" ? "Ukryj" : "Publikuj"}</Button></form><form action={setTripStatus}><input type="hidden" name="id" value={trip.id} /><input type="hidden" name="status" value="archived" /><Button type="submit" size="icon-sm" variant="ghost"><Archive /><span className="sr-only">Archiwizuj</span></Button></form><DeleteTripDialog
+  tripId={trip.id}
+  tripTitle={trip.title}
+  /></div>
+  </TableCell></TableRow>)}</TableBody></Table></div></CardContent></Card>
       </TabsContent>
 
       <TabsContent value="media"><SectionHeader eyebrow="Biblioteka" title="Media i galerie" description="Wgrywaj zdjęcia raz i wykorzystuj je w wielu miejscach." />

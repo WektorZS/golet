@@ -1,1 +1,108 @@
-"use client" import { useState } from "react" import { Trash2 } from "lucide-react" import { toast } from "sonner" import { Button } from "@/components/ui/button" import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog" export function DeleteTripDialog({ tripId, tripTitle, deleteTrip, }: { tripId: string tripTitle: string deleteTrip: (formData: FormData) => Promise<void> }) { const [open, setOpen] = useState(false) const [isDeleting, setIsDeleting] = useState(false) const handleDelete = async () => { setIsDeleting(true) try { const formData = new FormData() formData.set("id", tripId) await deleteTrip(formData) setOpen(false) toast.success("Wyjazd usunięty", { description: "Usunięto wyjazd oraz jego grafikę z biblioteki zdjęć.", }) } catch { toast.error("Nie udało się usunąć wyjazdu", { description: "Spróbuj ponownie.", }) } finally { setIsDeleting(false) } } return ( <Dialog open={open} onOpenChange={setOpen}> <DialogTrigger render={ <Button type="button" size="icon-sm" variant="outline" className="text-destructive hover:bg-destructive/10 hover:text-destructive" aria-label={`Usuń wyjazd ${tripTitle}`} /> } > <Trash2 /> <span className="sr-only">Usuń wyjazd</span> </DialogTrigger> <DialogContent> <DialogHeader> <DialogTitle>Usunąć wyjazd?</DialogTitle> <DialogDescription> Czy na pewno chcesz usunąć wyjazd „{tripTitle}”? <br /> <br /> Wyjazd zostanie usunięty razem z przypisaną do niego grafiką z biblioteki zdjęć. Tej operacji nie można cofnąć. </DialogDescription> </DialogHeader> <div className="flex flex-col gap-3 sm:flex-row sm:justify-end"> <Button type="button" variant="outline" size="lg" disabled={isDeleting} onClick={() => setOpen(false)} > Anuluj </Button> <Button type="button" size="lg" disabled={isDeleting} onClick={handleDelete} className="bg-destructive text-white hover:bg-destructive/90" > <Trash2 data-icon="inline-start" /> {isDeleting ? "Usuwanie..." : "Usuń wyjazd"} </Button> </div> </DialogContent> </Dialog> ) }
+"use client"
+
+import { useState } from "react"
+import { Trash2 } from "lucide-react"
+import { toast } from "sonner"
+import { deleteTrip } from "@/app/actions/admin"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+
+
+export function DeleteTripDialog({
+  tripId,
+  tripTitle,
+}: {
+  tripId: string
+  tripTitle: string
+}) {
+  const [open, setOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    setIsDeleting(true)
+
+    try {
+      const formData = new FormData()
+      formData.set("id", tripId)
+
+      await deleteTrip(formData)
+
+      setOpen(false)
+
+      toast.success("Wyjazd usunięty", {
+        description:
+          "Usunięto wyjazd oraz jego grafikę z biblioteki zdjęć.",
+      })
+    } catch {
+      toast.error("Nie udało się usunąć wyjazdu", {
+        description: "Spróbuj ponownie.",
+      })
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger
+        render={
+          <Button
+            type="button"
+            size="icon-sm"
+            variant="outline"
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+            aria-label={`Usuń wyjazd ${tripTitle}`}
+          />
+        }
+      >
+        <Trash2 />
+        <span className="sr-only">Usuń wyjazd</span>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Usunąć wyjazd?</DialogTitle>
+
+          <DialogDescription>
+            Czy na pewno chcesz usunąć wyjazd „{tripTitle}”?
+            <br />
+            <br />
+            Wyjazd zostanie usunięty razem z przypisaną do niego grafiką
+            z biblioteki zdjęć. Tej operacji nie można cofnąć.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            disabled={isDeleting}
+            onClick={() => setOpen(false)}
+          >
+            Anuluj
+          </Button>
+
+          <Button
+            type="button"
+            size="lg"
+            disabled={isDeleting}
+            onClick={handleDelete}
+            className="bg-destructive text-white hover:bg-destructive/90"
+          >
+            <Trash2 data-icon="inline-start" />
+            {isDeleting ? "Usuwanie..." : "Usuń wyjazd"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
