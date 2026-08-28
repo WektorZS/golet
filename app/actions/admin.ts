@@ -278,10 +278,8 @@ export async function updateMedia(formData: FormData) {
   await db.update(mediaAssets).set({ alt: clean(formData.get("alt")), updatedAt: new Date() }).where(eq(mediaAssets.id, id))
   await logActivity(user.id, "updated", "media", String(id)); refreshPublic()
 }
-
 export async function deleteMedia(formData: FormData) {
   const user = await requireAdmin()
-
   const id = Number(formData.get("id"))
 
   if (!Number.isInteger(id) || id <= 0) {
@@ -298,37 +296,10 @@ export async function deleteMedia(formData: FormData) {
     throw new Error("Nie znaleziono zdjęcia")
   }
 
-  // Sprawdź, czy zdjęcie jest używane jako zdjęcie główne wyjazdu
-  const [coverUse] = await db
-    .select({ id: trips.id })
-    .from(trips)
-    .where(eq(trips.image, `/api/media/${id}`))
-    .limit(1)
-
-  // Sprawdź, czy zdjęcie jest przypisane do galerii głównej
-  const [galleryUse] = await db
-    .select({ id: galleryItems.id })
-    .from(galleryItems)
-    .where(eq(galleryItems.mediaId, id))
-    .limit(1)
-
-  // Sprawdź, czy zdjęcie jest przypisane do galerii któregoś wyjazdu
-  const [tripGalleryUse] = await db
-    .select({ id: tripGalleryItems.id })
-    .from(tripGalleryItems)
-    .where(eq(tripGalleryItems.mediaId, id))
-    .limit(1)
-
-  if (coverUse || galleryUse || tripGalleryUse) {
-    throw new Error(
-      "Nie można usunąć zdjęcia, ponieważ jest ono nadal używane na stronie."
-    )
-  }
-
   // Usuń plik z Vercel Blob
   await del(asset.pathname)
 
-  // Usuń zdjęcie z biblioteki mediów
+  // Usuń zdjęcie z biblioteki
   await db
     .delete(mediaAssets)
     .where(eq(mediaAssets.id, id))
@@ -410,108 +381,10 @@ export async function updateTripGalleryItem(_: UpdateGalleryItemState, formData:
 }
 
 export async function removeGalleryItem(formData: FormData) {
-  const user = await requireAdmin()
-
-  const id = Number(formData.get("id"))
-  const scope = clean(formData.get("scope"))
-
-  if (!Number.isInteger(id) || id <= 0) {
-    throw new Error("Nieprawidłowe ID zdjęcia galerii")
-  }
-
-  if (scope !== "trip" && scope !== "gallery") {
-    throw new Error("Nieprawidłowy typ galerii")
-  }
-
-  let mediaId: number | null = null
-
-  if (scope === "trip") {
-    const [item] = await db
-      .select({ mediaId: tripGalleryItems.mediaId })
-      .from(tripGalleryItems)
-      .where(eq(tripGalleryItems.id, id))
-      .limit(1)
-
-    if (!item) {
-      throw new Error("Nie znaleziono zdjęcia w galerii wyjazdu")
-    }
-
-    mediaId = item.mediaId
-
-    await db
-      .delete(tripGalleryItems)
-      .where(eq(tripGalleryItems.id, id))
-  } else {
-    const [item] = await db
-      .select({ mediaId: galleryItems.mediaId })
-      .from(galleryItems)
-      .where(eq(galleryItems.id, id))
-      .limit(1)
-
-    if (!item) {
-      throw new Error("Nie znaleziono zdjęcia w galerii")
-    }
-
-    mediaId = item.mediaId
-
-    await db
-      .delete(galleryItems)
-      .where(eq(galleryItems.id, id))
-  }
-
-  // Jeśli zdjęcie nie ma powiązanego mediaId,
-  // nie ma czego więcej sprzątać.
-  if (mediaId) {
-    // Sprawdź, czy zdjęcie jest jeszcze używane jako cover wyjazdu
-    const [coverUse] = await db
-      .select({ id: trips.id })
-      .from(trips)
-      .where(eq(trips.image, `/api/media/${mediaId}`))
-      .limit(1)
-
-    // Sprawdź, czy zdjęcie jest jeszcze w galerii głównej
-    const [galleryUse] = await db
-      .select({ id: galleryItems.id })
-      .from(galleryItems)
-      .where(eq(galleryItems.mediaId, mediaId))
-      .limit(1)
-
-    // Sprawdź, czy zdjęcie jest jeszcze w galerii któregoś wyjazdu
-    const [tripGalleryUse] = await db
-      .select({ id: tripGalleryItems.id })
-      .from(tripGalleryItems)
-      .where(eq(tripGalleryItems.mediaId, mediaId))
-      .limit(1)
-
-    // Jeżeli nigdzie już nie jest używane,
-    // usuń plik z Vercel Blob oraz rekord mediaAssets.
-    if (!coverUse && !galleryUse && !tripGalleryUse) {
-      const [asset] = await db
-        .select()
-        .from(mediaAssets)
-        .where(eq(mediaAssets.id, mediaId))
-        .limit(1)
-
-      if (asset) {
-        await del(asset.pathname)
-
-        await db
-          .delete(mediaAssets)
-          .where(eq(mediaAssets.id, mediaId))
-      }
-    }
-  }
-
-  await logActivity(
-    user.id,
-    "removed",
-    `${scope}_gallery`,
-    String(id)
-  )
-
-  refreshPublic()
+  const user = await requireAdmin(); const id = Number(formData.get("id")); const scope = clean(formData.get("scope"))
+  if (scope === "trip") await db.delete(tripGalleryItems).where(eq(tripGalleryItems.id, id)); else await db.delete(galleryItems).where(eq(galleryItems.id, id))
+  await logActivity(user.id, "removed", `${scope}_gallery`, String(id)); refreshPublic()
 }
-
 
 export type SyncYouTubeState = { error?: string; success?: boolean }
 
