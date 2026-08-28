@@ -83,9 +83,40 @@ export function AdminDashboard({ data }: { data: AdminData }) {
     </CardDescription>
   </CardHeader>
 
-  <CardContent>
-    <div className="flex flex-col">
-      {data.activity.slice(0, 6).map((item, index) => (
+<CardContent>
+  <div className="flex flex-col">
+    {data.activity.slice(0, 6).map((item) => {
+      const entityName =
+        item.entityType === "trip"
+          ? "Wyjazd"
+          : item.entityType === "media"
+            ? "Zdjęcie"
+            : item.entityType === "inquiry"
+              ? "Zapytanie"
+              : item.entityType === "settings"
+                ? "Ustawienia"
+                : item.entityType === "youtube"
+                  ? "YouTube"
+                  : item.entityType
+
+      const actionName =
+        item.action === "created"
+          ? "Utworzono"
+          : item.action === "updated"
+            ? "Zaktualizowano"
+            : item.action === "deleted"
+              ? "Usunięto"
+              : item.action === "uploaded"
+                ? "Wgrano"
+                : item.action === "duplicated"
+                  ? "Zduplikowano"
+                  : item.action === "published"
+                    ? "Opublikowano"
+                    : item.action === "synced"
+                      ? "Zsynchronizowano"
+                      : item.action
+
+      return (
         <div
           key={item.id}
           className="flex gap-3 py-3 first:pt-0 last:pb-0"
@@ -98,6 +129,10 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                 <FileImage className="size-4" />
               ) : item.entityType === "inquiry" ? (
                 <Inbox className="size-4" />
+              ) : item.entityType === "settings" ? (
+                <Settings className="size-4" />
+              ) : item.entityType === "youtube" ? (
+                <Clapperboard className="size-4" />
               ) : (
                 <RefreshCw className="size-4" />
               )}
@@ -107,23 +142,11 @@ export function AdminDashboard({ data }: { data: AdminData }) {
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-3">
               <p className="text-sm font-medium">
-                {item.action === "created"
-                  ? "Utworzono"
-                  : item.action === "updated"
-                    ? "Zaktualizowano"
-                    : item.action === "deleted"
-                      ? "Usunięto"
-                      : item.action === "uploaded"
-                        ? "Wgrano"
-                        : item.action === "duplicated"
-                          ? "Zduplikowano"
-                          : item.action === "published"
-                            ? "Opublikowano"
-                            : item.action}
+                {actionName}
               </p>
 
               <span className="shrink-0 text-xs text-muted-foreground">
-                {item.entityType}
+                {entityName}
               </span>
             </div>
 
@@ -132,9 +155,11 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             </p>
           </div>
         </div>
-      ))}
-    </div>
-  </CardContent>
+      )
+    })}
+  </div>
+</CardContent>
+
 </Card></div>
       </TabsContent>
 
