@@ -12,8 +12,7 @@ import {
 import {
   Archive,
   BookOpen,
-  CheckCircle2,
-  ChevronDown,
+  Check,
   Clapperboard,
   Copy,
   ExternalLink,
@@ -24,7 +23,6 @@ import {
   KeyRound,
   LayoutDashboard,
   LogOut,
-  MoreHorizontal,
   Pencil,
   Plane,
   Plus,
@@ -32,10 +30,9 @@ import {
   Search,
   Settings,
   Star,
+  Trash2,
   Upload,
-  Users,
-  AlertCircle,
-  ImagePlus,
+  X,
 } from "lucide-react"
 
 import { toast } from "sonner"
@@ -72,9 +69,9 @@ import {
 } from "@/app/actions/auth"
 
 import { DescriptionEditor } from "@/components/description-editor"
+import { DeleteTripDialog } from "@/components/delete-trip-dialog"
 
 import { Badge } from "@/components/ui/badge"
-
 import { Button } from "@/components/ui/button"
 
 import {
@@ -97,7 +94,6 @@ import {
 } from "@/components/ui/dialog"
 
 import { Input } from "@/components/ui/input"
-
 import { Label } from "@/components/ui/label"
 
 import {
@@ -109,16 +105,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-
-import { DeleteTripDialog } from "@/components/delete-trip-dialog"
 
 import {
   DndContext,
@@ -150,49 +138,16 @@ export type AdminData = {
   email: string
 }
 
-/* -------------------------------------------------------------------------- */
-/* NAVIGATION                                                                 */
-/* -------------------------------------------------------------------------- */
-
-const navigationGroups = [
-  {
-    label: null,
-    items: [
-      ["dashboard", "Pulpit", LayoutDashboard],
-    ],
-  },
-  {
-    label: "Sprzedaż",
-    items: [
-      ["trips", "Wyjazdy", Plane],
-      ["inquiries", "Zapytania", Inbox],
-    ],
-  },
-  {
-    label: "Zawartość",
-    items: [
-      ["media", "Media", FileImage],
-      ["testimonials", "Opinie", Star],
-      ["youtube", "YouTube", Clapperboard],
-    ],
-  },
-  {
-    label: "Strona",
-    items: [
-      ["content", "Treści strony", BookOpen],
-    ],
-  },
-  {
-    label: "System",
-    items: [
-      ["account", "Ustawienia", Settings],
-    ],
-  },
+const sections = [
+  ["dashboard", "Pulpit", LayoutDashboard],
+  ["trips", "Wyjazdy", Plane],
+  ["media", "Media i galerie", FileImage],
+  ["content", "Treści strony", BookOpen],
+  ["testimonials", "Opinie", Star],
+  ["youtube", "YouTube", Clapperboard],
+  ["inquiries", "Zapytania", Inbox],
+  ["account", "Bezpieczeństwo", Settings],
 ] as const
-
-/* -------------------------------------------------------------------------- */
-/* HELPERS                                                                    */
-/* -------------------------------------------------------------------------- */
 
 const formatActivityDate = (date: Date | string) =>
   new Intl.DateTimeFormat("pl-PL", {
@@ -202,229 +157,6 @@ const formatActivityDate = (date: Date | string) =>
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(date))
-
-function getActivityInfo(item: any) {
-  switch (item.action) {
-    case "created":
-      if (item.entityType === "trip") {
-        return {
-          title: "Utworzono wyjazd",
-          description: item.details
-            ? `Dodano wyjazd „${item.details}”.`
-            : "Dodano nowy wyjazd.",
-          icon: Plane,
-        }
-      }
-
-      if (item.entityType === "testimonial") {
-        return {
-          title: "Dodano opinię",
-          description: item.details
-            ? `Dodano opinię klienta „${item.details}”.`
-            : "Dodano nową opinię klienta.",
-          icon: Star,
-        }
-      }
-
-      return {
-        title: "Utworzono",
-        description: item.details || "Dodano nowy element.",
-        icon: Plus,
-      }
-
-    case "updated":
-      if (item.entityType === "trip") {
-        return {
-          title: "Zaktualizowano wyjazd",
-          description: item.details
-            ? `Zmieniono dane wyjazdu „${item.details}”.`
-            : "Zmieniono dane wyjazdu.",
-          icon: Plane,
-        }
-      }
-
-      if (item.entityType === "settings") {
-        return {
-          title: "Zaktualizowano treści strony",
-          description: "Zmieniono ustawienia treści strony.",
-          icon: Settings,
-        }
-      }
-
-      if (
-        item.entityType === "media" ||
-        item.entityType === "gallery" ||
-        item.entityType === "trip_gallery"
-      ) {
-        return {
-          title:
-            item.entityType === "trip_gallery"
-              ? "Zaktualizowano zdjęcie w galerii"
-              : item.entityType === "gallery"
-                ? "Zaktualizowano galerię"
-                : "Zaktualizowano zdjęcie",
-          description:
-            item.entityType === "trip_gallery"
-              ? "Zmieniono informacje dotyczące zdjęcia przypisanego do wyjazdu."
-              : item.entityType === "gallery"
-                ? "Zmieniono informacje dotyczące zdjęcia w galerii."
-                : "Zmieniono informacje dotyczące zdjęcia.",
-          icon: FileImage,
-        }
-      }
-
-      if (item.entityType === "inquiry") {
-        return {
-          title: "Zaktualizowano zapytanie",
-          description: item.details
-            ? `Zmieniono status zapytania: ${item.details}.`
-            : "Zmieniono dane zapytania.",
-          icon: Inbox,
-        }
-      }
-
-      return {
-        title: "Zaktualizowano",
-        description: item.details || "Wprowadzono zmianę.",
-        icon: RefreshCw,
-      }
-
-    case "deleted":
-      if (item.entityType === "trip") {
-        return {
-          title: "Usunięto wyjazd",
-          description: item.details
-            ? `Usunięto wyjazd „${item.details}”.`
-            : "Wyjazd został usunięty.",
-          icon: Archive,
-        }
-      }
-
-      if (item.entityType === "media") {
-        return {
-          title: "Usunięto zdjęcie",
-          description: item.details
-            ? `Usunięto zdjęcie „${item.details}”.`
-            : "Zdjęcie zostało usunięte z biblioteki.",
-          icon: FileImage,
-        }
-      }
-
-      return {
-        title: "Usunięto",
-        description: item.details || "Element został usunięty.",
-        icon: Archive,
-      }
-
-    case "uploaded":
-      return {
-        title: "Wgrano zdjęcie",
-        description: item.details
-          ? `Dodano zdjęcie „${item.details}” do biblioteki.`
-          : "Dodano nowe zdjęcie do biblioteki.",
-        icon: Upload,
-      }
-
-    case "duplicated":
-      return {
-        title: "Zduplikowano wyjazd",
-        description: item.details
-          ? `Utworzono kopię wyjazdu „${item.details}”.`
-          : "Utworzono kopię wyjazdu.",
-        icon: Copy,
-      }
-
-    case "published":
-      return {
-        title: "Opublikowano wyjazd",
-        description: item.details
-          ? `Wyjazd „${item.details}” jest teraz widoczny na stronie.`
-          : "Wyjazd został opublikowany.",
-        icon: CheckCircle2,
-      }
-
-    case "draft":
-      return {
-        title: "Ukryto wyjazd",
-        description: item.details
-          ? `Wyjazd „${item.details}” został ukryty na stronie.`
-          : "Wyjazd został przeniesiony do szkiców.",
-        icon: Archive,
-      }
-
-    case "synced":
-      return {
-        title: "Odświeżono filmy YouTube",
-        description:
-          item.details || "Lista filmów YouTube została zaktualizowana.",
-        icon: Clapperboard,
-      }
-
-    case "updated_cover":
-      return {
-        title: "Zmieniono zdjęcie główne",
-        description: "Zmieniono zdjęcie główne wyjazdu.",
-        icon: ImagePlus,
-      }
-
-    case "added":
-      if (item.entityType === "trip_gallery") {
-        return {
-          title: "Dodano zdjęcie do galerii wyjazdu",
-          description: "Zdjęcie zostało przypisane do galerii wyjazdu.",
-          icon: ImagePlus,
-        }
-      }
-
-      if (item.entityType === "gallery") {
-        return {
-          title: "Dodano zdjęcie do galerii",
-          description: "Zdjęcie zostało dodane do galerii strony głównej.",
-          icon: ImagePlus,
-        }
-      }
-
-      return {
-        title: "Dodano element",
-        description: item.details || "Dodano nowy element.",
-        icon: Plus,
-      }
-
-    case "removed":
-      if (item.entityType === "trip_gallery") {
-        return {
-          title: "Usunięto zdjęcie z galerii wyjazdu",
-          description: "Zdjęcie zostało usunięte z galerii wyjazdu.",
-          icon: Archive,
-        }
-      }
-
-      if (item.entityType === "global_gallery") {
-        return {
-          title: "Usunięto zdjęcie z galerii",
-          description: "Zdjęcie zostało usunięte z galerii strony głównej.",
-          icon: Archive,
-        }
-      }
-
-      return {
-        title: "Usunięto element z galerii",
-        description: "Element został usunięty z galerii.",
-        icon: Archive,
-      }
-
-    default:
-      return {
-        title: "Wprowadzono zmianę",
-        description: item.details || "Wykonano zmianę w panelu.",
-        icon: RefreshCw,
-      }
-  }
-}
-
-/* -------------------------------------------------------------------------- */
-/* SORTABLE GALLERY ITEM                                                      */
-/* -------------------------------------------------------------------------- */
 
 function SortableGalleryItem({
   item,
@@ -439,9 +171,7 @@ function SortableGalleryItem({
     setNodeRef,
     transform,
     transition,
-  } = useSortable({
-    id: item.id,
-  })
+  } = useSortable({ id: item.id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -460,10 +190,6 @@ function SortableGalleryItem({
     </div>
   )
 }
-
-/* -------------------------------------------------------------------------- */
-/* MAIN DASHBOARD                                                             */
-/* -------------------------------------------------------------------------- */
 
 export function AdminDashboard({ data }: { data: AdminData }) {
   const [query, setQuery] = useState("")
@@ -490,24 +216,6 @@ export function AdminDashboard({ data }: { data: AdminData }) {
   const newLeads = data.inquiries.filter(
     (item) => item.status === "new"
   ).length
-
-  const publishedTrips = data.trips.filter(
-    (trip) => trip.status === "published"
-  ).length
-
-  const draftTrips = data.trips.filter(
-    (trip) => trip.status !== "published"
-  ).length
-
-  const averageRating =
-    data.testimonials.length > 0
-      ? (
-          data.testimonials.reduce(
-            (sum, item) => sum + Number(item.rating || 0),
-            0
-          ) / data.testimonials.length
-        ).toFixed(1)
-      : "0.0"
 
   const handleGalleryDragEnd = async (event: any) => {
     const { active, over } = event
@@ -557,18 +265,14 @@ export function AdminDashboard({ data }: { data: AdminData }) {
       orientation="vertical"
       className="min-h-screen gap-0 bg-muted/40 lg:flex-row"
     >
-      {/* ------------------------------------------------------------------ */}
-      {/* SIDEBAR                                                            */}
-      {/* ------------------------------------------------------------------ */}
-
       <aside className="border-b bg-foreground text-background lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:shrink-0 lg:border-b-0 lg:border-r">
-        <div className="flex items-center justify-between border-b border-background/10 px-5 py-5">
-          <div className="min-w-0">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
+        <div className="flex items-center justify-between gap-4 border-b border-background/10 px-6 py-6">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
               Let&apos;s Gol
             </p>
 
-            <p className="mt-1 truncate text-lg font-black uppercase tracking-tight">
+            <p className="mt-1 font-sans text-xl font-black uppercase tracking-tight">
               Centrum dowodzenia
             </p>
           </div>
@@ -578,88 +282,60 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             size="icon"
             nativeButton={false}
             render={<Link href="/" />}
-            className="shrink-0 text-background hover:bg-background/10 hover:text-background"
+            className="size-10 rounded-xl text-background hover:bg-background/10 hover:text-background"
           >
-            <Home className="size-4" />
-            <span className="sr-only">Strona główna</span>
+            <Home className="size-5" />
+
+            <span className="sr-only">
+              Strona główna
+            </span>
           </Button>
         </div>
 
         <TabsList
           variant="line"
-          className="flex h-auto w-full flex-row justify-start overflow-x-auto rounded-none bg-transparent p-3 text-background/60 lg:flex-col lg:items-stretch lg:overflow-visible"
+          className="flex h-auto w-full flex-row justify-start overflow-x-auto rounded-none bg-transparent p-3 text-background/70 lg:flex-col lg:items-stretch lg:p-4"
         >
-          {navigationGroups.map((group, groupIndex) => (
-            <div
-              key={groupIndex}
-              className="flex flex-row gap-1 lg:flex-col"
+          {sections.map(([value, label, Icon]) => (
+            <TabsTrigger
+              key={value}
+              id={`tab-${value}`}
+              value={value}
+              className="min-w-max justify-start gap-3 rounded-xl px-4 py-3 text-sm font-medium text-background/65 transition-all duration-200 hover:bg-background/10 hover:text-background data-active:bg-background/10 data-active:text-primary"
             >
-              {group.label ? (
-                <p className="hidden px-3 pb-1 pt-5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-background/35 lg:block">
-                  {group.label}
-                </p>
+              <Icon className="size-5" />
+
+              <span>{label}</span>
+
+              {value === "inquiries" && newLeads > 0 ? (
+                <Badge className="ml-auto min-w-6 justify-center">
+                  {newLeads}
+                </Badge>
               ) : null}
-
-              {group.items.map(([value, label, Icon]) => (
-                <TabsTrigger
-                  key={value}
-                  id={`tab-${value}`}
-                  value={value}
-                  className="group min-w-max justify-start gap-3 rounded-lg px-3 py-2.5 text-background/55 transition-all duration-200 hover:bg-background/8 hover:text-background data-active:bg-primary/15 data-active:text-primary data-active:shadow-[inset_3px_0_0_currentColor] lg:min-w-0"
-                >
-                  <Icon className="size-4 shrink-0 transition-transform group-hover:scale-105" />
-
-                  <span>{label}</span>
-
-                  {value === "inquiries" && newLeads > 0 ? (
-                    <Badge className="ml-auto min-w-6 justify-center rounded-full px-1.5 text-[10px]">
-                      {newLeads}
-                    </Badge>
-                  ) : null}
-                </TabsTrigger>
-              ))}
-            </div>
+            </TabsTrigger>
           ))}
         </TabsList>
 
-        <div className="hidden border-t border-background/10 p-4 lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:block">
-          <div className="mb-3 flex items-center gap-3 rounded-xl bg-background/5 p-3">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-black text-primary-foreground">
-              {data.email.charAt(0).toUpperCase()}
-            </div>
-
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-background">
-                {data.email}
-              </p>
-
-              <p className="text-xs text-background/40">
-                Administrator
-              </p>
-            </div>
-          </div>
+        <div className="hidden border-t border-background/10 p-5 lg:block">
+          <p className="truncate text-sm text-background/50">
+            {data.email}
+          </p>
 
           <form action={signOutAdmin}>
             <Button
               type="submit"
               variant="ghost"
-              className="w-full justify-start text-background/60 hover:bg-background/10 hover:text-background"
+              className="mt-3 h-11 w-full justify-start rounded-xl text-background hover:bg-background/10 hover:text-background"
             >
-              <LogOut className="size-4" />
+              <LogOut className="size-5" />
               Wyloguj
             </Button>
           </form>
         </div>
       </aside>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* MAIN                                                               */}
-      {/* ------------------------------------------------------------------ */}
-
-      <main className="min-w-0 flex-1 p-4 md:p-6 lg:p-8 xl:p-10">
-        {/* ================================================================ */}
-        {/* DASHBOARD                                                        */}
-        {/* ================================================================ */}
+      <main className="min-w-0 flex-1 p-5 md:p-8 xl:p-10">
+        {/* DASHBOARD */}
 
         <TabsContent value="dashboard">
           <SectionHeader
@@ -668,242 +344,434 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             description="Najważniejsze informacje i szybkie akcje w jednym miejscu."
           />
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
             <Metric
               icon={Plane}
-              label="Aktywne wyjazdy"
-              value={publishedTrips}
+              label="Opublikowane"
+              value={
+                data.trips.filter(
+                  (t) => t.status === "published"
+                ).length
+              }
+            />
+
+            <Metric
+              icon={Archive}
+              label="Szkice wyjazdów"
+              value={
+                data.trips.filter(
+                  (t) => t.status !== "published"
+                ).length
+              }
             />
 
             <Metric
               icon={Inbox}
               label="Nowe zapytania"
               value={newLeads}
-              accent={newLeads > 0}
             />
 
             <Metric
               icon={FileImage}
-              label="Zdjęcia w bibliotece"
+              label="Pliki w bibliotece"
               value={data.media.length}
-            />
-
-            <Metric
-              icon={Star}
-              label="Średnia ocena"
-              value={Number(averageRating)}
-              suffix="/ 5"
             />
           </div>
 
-          {(newLeads > 0 || draftTrips > 0) && (
-            <Card className="mt-6 overflow-hidden">
-              <CardHeader className="border-b bg-background/50">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <AlertCircle className="size-5" />
-                  </div>
+          <div className="mt-7 grid gap-6 xl:grid-cols-[1.1fr_.9fr]">
+            <Card className="overflow-hidden">
+              <CardHeader className="border-b bg-background/50 px-6 py-5">
+                <CardTitle className="text-xl">
+                  Szybkie działania
+                </CardTitle>
 
-                  <div>
-                    <CardTitle>Wymaga uwagi</CardTitle>
-                    <CardDescription>
-                      Elementy, które mogą wymagać Twojej reakcji.
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="divide-y p-0">
-                {newLeads > 0 && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      document
-                        .getElementById("tab-inquiries")
-                        ?.click()
-                    }
-                    className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-muted/50"
-                  >
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <Inbox className="size-4" />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium">
-                        {newLeads}{" "}
-                        {newLeads === 1
-                          ? "nowe zapytanie"
-                          : "nowe zapytania"}{" "}
-                        klientów
-                      </p>
-
-                      <p className="text-sm text-muted-foreground">
-                        Otwórz skrzynkę zapytań i odpowiedz klientom.
-                      </p>
-                    </div>
-
-                    <span className="text-sm font-medium text-primary">
-                      Przejdź →
-                    </span>
-                  </button>
-                )}
-
-                {draftTrips > 0 && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      document
-                        .getElementById("tab-trips")
-                        ?.click()
-                    }
-                    className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-muted/50"
-                  >
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
-                      <Archive className="size-4" />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium">
-                        {draftTrips}{" "}
-                        {draftTrips === 1
-                          ? "wyjazd wymaga"
-                          : "wyjazdy wymagają"}{" "}
-                        sprawdzenia
-                      </p>
-
-                      <p className="text-sm text-muted-foreground">
-                        Szkice nie są obecnie widoczne na stronie.
-                      </p>
-                    </div>
-
-                    <span className="text-sm font-medium text-primary">
-                      Zobacz →
-                    </span>
-                  </button>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_.85fr]">
-            {/* QUICK ACTIONS */}
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Szybkie działania</CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   Najczęściej używane operacje.
                 </CardDescription>
               </CardHeader>
 
-              <CardContent className="grid gap-3 sm:grid-cols-3">
-                <QuickAction
-                  icon={Plus}
-                  title="Nowy wyjazd"
-                  description="Utwórz nową ofertę"
-                  onClick={() => {
-                    const button = document.querySelector(
-                      '[data-new-trip]'
-                    ) as HTMLButtonElement | null
-
-                    button?.click()
-                  }}
-                />
-
-                <QuickAction
-                  icon={Upload}
-                  title="Dodaj zdjęcia"
-                  description="Do biblioteki mediów"
-                  onClick={() =>
-                    document
-                      .getElementById("tab-media")
-                      ?.click()
+              <CardContent className="grid gap-3 p-6 sm:grid-cols-3">
+                <TripDialog
+                  trigger={
+                    <Button className="h-12 rounded-xl text-sm font-semibold">
+                      <Plus />
+                      Nowy wyjazd
+                    </Button>
                   }
                 />
 
-                <QuickAction
-                  icon={BookOpen}
-                  title="Edytuj stronę"
-                  description="Treści i SEO"
+                <Button
+                  variant="outline"
+                  className="h-12 rounded-xl text-sm font-semibold"
+                  onClick={() =>
+                    document.getElementById("tab-media")?.click()
+                  }
+                >
+                  <Upload />
+                  Dodaj zdjęcie
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="h-12 rounded-xl text-sm font-semibold"
                   onClick={() =>
                     document
                       .getElementById("tab-content")
                       ?.click()
                   }
-                />
+                >
+                  <BookOpen />
+                  Edytuj stronę
+                </Button>
               </CardContent>
             </Card>
 
-            {/* ACTIVITY */}
+            <Card className="overflow-hidden">
+              <CardHeader className="border-b bg-background/50 px-6 py-5">
+                <CardTitle className="text-xl">
+                  Ostatnia aktywność
+                </CardTitle>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Ostatnia aktywność</CardTitle>
-                <CardDescription>
-                  Ostatnie zmiany w panelu.
+                <CardDescription className="text-sm">
+                  Ostatnie zmiany wykonane w panelu.
                 </CardDescription>
               </CardHeader>
 
-              <CardContent>
-                <div className="relative">
-                  {data.activity.slice(0, 6).map(
-                    (item, index) => {
-                      const activity = getActivityInfo(item)
-                      const Icon = activity.icon
+              <CardContent className="p-6">
+                <div className="flex flex-col">
+                  {data.activity.slice(0, 6).map((item) => {
+                    const getActivity = () => {
+                      switch (item.action) {
+                        case "created":
+                          if (item.entityType === "trip") {
+                            return {
+                              title: "Utworzono wyjazd",
+                              description: item.details
+                                ? `Dodano wyjazd „${item.details}”.`
+                                : "Dodano nowy wyjazd.",
+                            }
+                          }
 
-                      return (
-                        <div
-                          key={item.id}
-                          className="relative flex gap-3 pb-5 last:pb-0"
-                        >
-                          {index !==
-                            Math.min(
-                              data.activity.length,
-                              6
-                            ) -
-                              1 && (
-                            <span className="absolute left-[15px] top-8 h-[calc(100%-12px)] w-px bg-border" />
-                          )}
+                          if (
+                            item.entityType ===
+                            "testimonial"
+                          ) {
+                            return {
+                              title: "Dodano opinię",
+                              description: item.details
+                                ? `Dodano opinię klienta „${item.details}”.`
+                                : "Dodano nową opinię klienta.",
+                            }
+                          }
 
-                          <div className="relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary ring-4 ring-background">
-                            <Icon className="size-3.5" />
-                          </div>
+                          return {
+                            title: "Utworzono",
+                            description:
+                              item.details ||
+                              "Dodano nowy element.",
+                          }
 
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-start justify-between gap-3">
-                              <p className="text-sm font-semibold leading-5">
-                                {activity.title}
-                              </p>
+                        case "updated":
+                          if (item.entityType === "trip") {
+                            return {
+                              title:
+                                "Zaktualizowano wyjazd",
+                              description: item.details
+                                ? `Zmieniono dane wyjazdu „${item.details}”.`
+                                : "Zmieniono dane wyjazdu.",
+                            }
+                          }
 
-                              <time
-                                dateTime={new Date(
-                                  item.createdAt
-                                ).toISOString()}
-                                className="shrink-0 text-[10px] text-muted-foreground"
-                              >
-                                {formatActivityDate(
-                                  item.createdAt
-                                )}
-                              </time>
-                            </div>
+                          if (
+                            item.entityType ===
+                            "settings"
+                          ) {
+                            return {
+                              title:
+                                "Zaktualizowano treści strony",
+                              description:
+                                "Zmieniono ustawienia treści strony.",
+                            }
+                          }
 
-                            <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
-                              {activity.description}
-                            </p>
+                          if (
+                            item.entityType === "media"
+                          ) {
+                            return {
+                              title:
+                                "Zaktualizowano zdjęcie",
+                              description:
+                                "Zmieniono informacje dotyczące zdjęcia.",
+                            }
+                          }
+
+                          if (
+                            item.entityType === "gallery"
+                          ) {
+                            return {
+                              title:
+                                "Zaktualizowano galerię",
+                              description:
+                                "Zmieniono informacje dotyczące zdjęcia w galerii.",
+                            }
+                          }
+
+                          if (
+                            item.entityType ===
+                            "trip_gallery"
+                          ) {
+                            return {
+                              title:
+                                "Zaktualizowano zdjęcie w galerii",
+                              description:
+                                "Zmieniono informacje dotyczące zdjęcia przypisanego do wyjazdu.",
+                            }
+                          }
+
+                          if (
+                            item.entityType ===
+                            "inquiry"
+                          ) {
+                            return {
+                              title:
+                                "Zaktualizowano zapytanie",
+                              description: item.details
+                                ? `Zmieniono status zapytania: ${item.details}.`
+                                : "Zmieniono dane zapytania.",
+                            }
+                          }
+
+                          return {
+                            title: "Zaktualizowano",
+                            description:
+                              item.details ||
+                              "Wprowadzono zmianę.",
+                          }
+
+                        case "deleted":
+                          if (
+                            item.entityType === "trip"
+                          ) {
+                            return {
+                              title: "Usunięto wyjazd",
+                              description: item.details
+                                ? `Usunięto wyjazd „${item.details}”.`
+                                : "Wyjazd został usunięty.",
+                            }
+                          }
+
+                          if (
+                            item.entityType === "media"
+                          ) {
+                            return {
+                              title: "Usunięto zdjęcie",
+                              description: item.details
+                                ? `Usunięto zdjęcie „${item.details}”.`
+                                : "Zdjęcie zostało usunięte z biblioteki.",
+                            }
+                          }
+
+                          return {
+                            title: "Usunięto",
+                            description:
+                              item.details ||
+                              "Element został usunięty.",
+                          }
+
+                        case "uploaded":
+                          return {
+                            title: "Wgrano zdjęcie",
+                            description: item.details
+                              ? `Dodano zdjęcie „${item.details}” do biblioteki.`
+                              : "Dodano nowe zdjęcie do biblioteki.",
+                          }
+
+                        case "duplicated":
+                          return {
+                            title:
+                              "Zduplikowano wyjazd",
+                            description: item.details
+                              ? `Utworzono kopię wyjazdu „${item.details}”.`
+                              : "Utworzono kopię wyjazdu.",
+                          }
+
+                        case "published":
+                          return {
+                            title:
+                              "Opublikowano wyjazd",
+                            description: item.details
+                              ? `Wyjazd „${item.details}” jest teraz widoczny na stronie.`
+                              : "Wyjazd został opublikowany.",
+                          }
+
+                        case "draft":
+                          return {
+                            title: "Ukryto wyjazd",
+                            description: item.details
+                              ? `Wyjazd „${item.details}” został ukryty na stronie.`
+                              : "Wyjazd został przeniesiony do szkiców.",
+                          }
+
+                        case "synced":
+                          return {
+                            title:
+                              "Odświeżono filmy YouTube",
+                            description:
+                              item.details ||
+                              "Lista filmów YouTube została zaktualizowana.",
+                          }
+
+                        case "updated_cover":
+                          return {
+                            title:
+                              "Zmieniono zdjęcie główne",
+                            description:
+                              "Zmieniono zdjęcie główne wyjazdu.",
+                          }
+
+                        case "added":
+                          if (
+                            item.entityType ===
+                            "trip_gallery"
+                          ) {
+                            return {
+                              title:
+                                "Dodano zdjęcie do galerii wyjazdu",
+                              description:
+                                "Zdjęcie zostało przypisane do galerii wyjazdu.",
+                            }
+                          }
+
+                          if (
+                            item.entityType === "gallery"
+                          ) {
+                            return {
+                              title:
+                                "Dodano zdjęcie do galerii",
+                              description:
+                                "Zdjęcie zostało dodane do galerii strony głównej.",
+                            }
+                          }
+
+                          return {
+                            title: "Dodano element",
+                            description:
+                              item.details ||
+                              "Dodano nowy element.",
+                          }
+
+                        case "removed":
+                          if (
+                            item.entityType ===
+                            "trip_gallery"
+                          ) {
+                            return {
+                              title:
+                                "Usunięto zdjęcie z galerii wyjazdu",
+                              description:
+                                "Zdjęcie zostało usunięte z galerii wyjazdu.",
+                            }
+                          }
+
+                          if (
+                            item.entityType ===
+                            "global_gallery"
+                          ) {
+                            return {
+                              title:
+                                "Usunięto zdjęcie z galerii",
+                              description:
+                                "Zdjęcie zostało usunięte z galerii strony głównej.",
+                            }
+                          }
+
+                          return {
+                            title:
+                              "Usunięto element z galerii",
+                            description:
+                              "Element został usunięty z galerii.",
+                          }
+
+                        default:
+                          return {
+                            title:
+                              "Wprowadzono zmianę",
+                            description:
+                              item.details ||
+                              "Wykonano zmianę w panelu.",
+                          }
+                      }
+                    }
+
+                    const activity = getActivity()
+
+                    const icon =
+                      item.entityType === "trip" ? (
+                        <Plane className="size-4" />
+                      ) : item.entityType === "media" ||
+                        item.entityType === "gallery" ||
+                        item.entityType ===
+                          "trip_gallery" ? (
+                        <FileImage className="size-4" />
+                      ) : item.entityType ===
+                        "inquiry" ? (
+                        <Inbox className="size-4" />
+                      ) : item.entityType ===
+                        "settings" ? (
+                        <Settings className="size-4" />
+                      ) : item.entityType ===
+                        "youtube" ? (
+                        <Clapperboard className="size-4" />
+                      ) : item.entityType ===
+                        "testimonial" ? (
+                        <Star className="size-4" />
+                      ) : (
+                        <RefreshCw className="size-4" />
+                      )
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex gap-4 border-b py-4 last:border-0 first:pt-0 last:pb-0"
+                      >
+                        <div className="flex shrink-0 items-start justify-center">
+                          <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                            {icon}
                           </div>
                         </div>
-                      )
-                    }
-                  )}
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-3">
+                            <p className="text-sm font-semibold leading-5">
+                              {activity.title}
+                            </p>
+
+                            <time
+                              dateTime={new Date(
+                                item.createdAt
+                              ).toISOString()}
+                              className="shrink-0 text-xs text-muted-foreground"
+                            >
+                              {formatActivityDate(
+                                item.createdAt
+                              )}
+                            </time>
+                          </div>
+
+                          <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                            {activity.description}
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
-        {/* ================================================================ */}
-        {/* TRIPS                                                            */}
-        {/* ================================================================ */}
+        {/* TRIPS */}
 
         <TabsContent value="trips">
           <SectionHeader
@@ -913,7 +781,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             action={
               <TripDialog
                 trigger={
-                  <Button data-new-trip>
+                  <Button className="h-11 rounded-xl px-5 font-semibold">
                     <Plus />
                     Nowy wyjazd
                   </Button>
@@ -922,286 +790,185 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             }
           />
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div className="relative w-full md:max-w-md">
-                  <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Card className="overflow-hidden">
+            <CardContent className="p-5 md:p-6">
+              <div className="mb-6 flex max-w-xl items-center gap-3">
+                <Search className="size-5 shrink-0 text-muted-foreground" />
 
-                  <Input
-                    value={query}
-                    onChange={(e) =>
-                      setQuery(e.target.value)
-                    }
-                    placeholder="Szukaj po nazwie lub mieście"
-                    className="pl-9"
-                  />
-                </div>
-
-                <p className="text-sm text-muted-foreground">
-                  {filteredTrips.length}{" "}
-                  {filteredTrips.length === 1
-                    ? "oferta"
-                    : "ofert"}
-                </p>
+                <Input
+                  value={query}
+                  onChange={(e) =>
+                    setQuery(e.target.value)
+                  }
+                  placeholder="Szukaj po nazwie lub mieście"
+                  className="h-11 rounded-xl"
+                />
               </div>
 
-              <div className="space-y-3">
-                {filteredTrips.map((trip) => (
-                  <div
-                    key={trip.id}
-                    className="group rounded-xl border bg-background p-4 transition-all hover:border-primary/30 hover:shadow-sm"
-                  >
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-                      <div className="flex min-w-0 flex-1 items-center gap-4">
-                        <div className="hidden size-16 shrink-0 overflow-hidden rounded-lg bg-muted sm:block">
-                          {trip.image ? (
-                            <img
-                              src={
-                                trip.image.startsWith(
-                                  "/api/"
-                                )
-                                  ? trip.image
-                                  : trip.image
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="h-12 text-sm">
+                        Oferta
+                      </TableHead>
+
+                      <TableHead className="h-12 text-sm">
+                        Termin
+                      </TableHead>
+
+                      <TableHead className="h-12 text-sm">
+                        Cena
+                      </TableHead>
+
+                      <TableHead className="h-12 text-sm">
+                        Status
+                      </TableHead>
+
+                      <TableHead className="h-12 text-right text-sm">
+                        Operacje
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+
+                  <TableBody>
+                    {filteredTrips.map((trip) => (
+                      <TableRow
+                        key={trip.id}
+                        className="h-20"
+                      >
+                        <TableCell>
+                          <strong className="text-sm">
+                            {trip.title}
+                          </strong>
+
+                          <span className="mt-1 block text-sm text-muted-foreground">
+                            {trip.city}, {trip.country}
+                          </span>
+                        </TableCell>
+
+                        <TableCell className="text-sm">
+                          {trip.startDate}
+                          {trip.endDate
+                            ? ` – ${trip.endDate}`
+                            : ""}
+                        </TableCell>
+
+                        <TableCell className="text-sm font-semibold">
+                          {trip.price.toLocaleString(
+                            "pl-PL"
+                          )}{" "}
+                          zł
+                        </TableCell>
+
+                        <TableCell>
+                          <StatusBadge
+                            status={trip.status}
+                          />
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="flex justify-end gap-2">
+                            <TripDialog
+                              trip={trip}
+                              trigger={
+                                <Button
+                                  size="icon"
+                                  variant="outline"
+                                  className="size-10 rounded-xl"
+                                >
+                                  <Pencil />
+                                  <span className="sr-only">
+                                    Edytuj
+                                  </span>
+                                </Button>
                               }
-                              alt=""
-                              className="size-full object-cover"
                             />
-                          ) : (
-                            <div className="flex size-full items-center justify-center text-muted-foreground">
-                              <Plane className="size-5" />
-                            </div>
-                          )}
-                        </div>
 
-                        <div className="min-w-0">
-                          <div className="mb-1 flex flex-wrap items-center gap-2">
-                            <h3 className="truncate font-bold">
-                              {trip.title}
-                            </h3>
+                            <ConfirmDuplicateButton
+                              tripId={trip.id}
+                            />
 
-                            <StatusBadge
-                              status={trip.status}
+                            <form
+                              action={setTripStatus}
+                            >
+                              <input
+                                type="hidden"
+                                name="id"
+                                value={trip.id}
+                              />
+
+                              <input
+                                type="hidden"
+                                name="status"
+                                value={
+                                  trip.status ===
+                                  "published"
+                                    ? "draft"
+                                    : "published"
+                                }
+                              />
+
+                              <Button
+                                type="submit"
+                                size="sm"
+                                variant="outline"
+                                className="h-10 rounded-xl px-4"
+                              >
+                                {trip.status ===
+                                "published"
+                                  ? "Ukryj"
+                                  : "Publikuj"}
+                              </Button>
+                            </form>
+
+                            <DeleteTripDialog
+                              tripId={trip.id}
+                              tripTitle={trip.title}
                             />
                           </div>
-
-                          <p className="text-sm text-muted-foreground">
-                            {trip.city}, {trip.country}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 border-t pt-3 sm:grid-cols-3 lg:min-w-[420px] lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
-                        <div>
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                            Termin
-                          </p>
-                          <p className="mt-1 text-sm font-medium">
-                            {trip.startDate}
-                            {trip.endDate
-                              ? ` – ${trip.endDate}`
-                              : ""}
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                            Cena
-                          </p>
-                          <p className="mt-1 text-sm font-bold">
-                            {trip.price.toLocaleString(
-                              "pl-PL"
-                            )}{" "}
-                            zł
-                          </p>
-                        </div>
-
-                        <div className="flex items-center justify-end gap-2 sm:col-span-1">
-                          <TripDialog
-                            trip={trip}
-                            trigger={
-                              <Button
-                                size="icon-sm"
-                                variant="outline"
-                                title="Edytuj"
-                              >
-                                <Pencil />
-                                <span className="sr-only">
-                                  Edytuj
-                                </span>
-                              </Button>
-                            }
-                          />
-
-                          <form action={duplicateTrip}>
-                            <input
-                              type="hidden"
-                              name="id"
-                              value={trip.id}
-                            />
-
-                            <Button
-                              type="submit"
-                              size="icon-sm"
-                              variant="outline"
-                              title="Duplikuj"
-                            >
-                              <Copy />
-                              <span className="sr-only">
-                                Duplikuj
-                              </span>
-                            </Button>
-                          </form>
-
-                          <TripActionsMenu trip={trip} />
-
-                          <DeleteTripDialog
-                            tripId={trip.id}
-                            tripTitle={trip.title}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {filteredTrips.length === 0 && (
-                  <EmptyState
-                    icon={Search}
-                    title="Nie znaleziono wyjazdów"
-                    description="Spróbuj zmienić wyszukiwaną frazę."
-                  />
-                )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* ================================================================ */}
-        {/* MEDIA                                                             */}
-        {/* ================================================================ */}
+        {/* MEDIA */}
 
         <TabsContent value="media">
           <SectionHeader
             eyebrow="Biblioteka"
-            title="Media"
+            title="Media i galerie"
             description="Wgrywaj zdjęcia raz i wykorzystuj je w wielu miejscach."
-            action={
-              <Button
-                onClick={() =>
-                  document
-                    .getElementById("media-upload")
-                    ?.scrollIntoView({
-                      behavior: "smooth",
-                    })
-                }
-              >
-                <Upload />
-                Dodaj zdjęcia
-              </Button>
-            }
           />
 
-          <div className="mb-6 grid gap-4 sm:grid-cols-3">
-            <MiniStat
-              label="Wszystkie pliki"
-              value={data.media.length}
-              icon={FileImage}
-            />
+          <div className="grid gap-7 xl:grid-cols-[380px_1fr]">
+            <MediaUploadCard />
 
-            <MiniStat
-              label="Galeria główna"
-              value={data.gallery.length}
-              icon={ImagePlus}
-            />
-
-            <MiniStat
-              label="Galerie wyjazdów"
-              value={data.tripGallery.length}
-              icon={Plane}
-            />
-          </div>
-
-          <div
-            id="media-upload"
-            className="grid gap-6 xl:grid-cols-[360px_1fr]"
-          >
-            <Card className="h-fit">
-              <CardHeader>
-                <CardTitle>Dodaj zdjęcie</CardTitle>
-                <CardDescription>
-                  JPEG, PNG, WebP lub AVIF. Maksymalnie 15
-                  MB. Plik zostanie automatycznie
-                  zoptymalizowany.
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent>
-                <form
-                  action={uploadMedia}
-                  className="flex flex-col gap-5"
-                >
-                  <div className="rounded-xl border-2 border-dashed bg-muted/20 p-6 text-center">
-                    <Upload className="mx-auto mb-3 size-8 text-muted-foreground" />
-
-                    <p className="text-sm font-medium">
-                      Wybierz zdjęcie
-                    </p>
-
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      JPG, PNG, WebP, AVIF
-                    </p>
-
-                    <Input
-                      name="file"
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/avif"
-                      required
-                      className="mt-4"
-                    />
-                  </div>
-
-                  <Field label="Opis alternatywny">
-                    <Input
-                      name="alt"
-                      placeholder="Kibice na stadionie w Mediolanie"
-                    />
-                  </Field>
-
-                  <Button type="submit">
-                    <Upload />
-                    Wgraj do biblioteki
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-
-            <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 2xl:grid-cols-3">
               {data.media.map((asset) => (
                 <Card
                   key={asset.id}
-                  className="group overflow-hidden"
+                  className="overflow-hidden"
                 >
-                  <div className="relative aspect-video overflow-hidden bg-muted">
+                  <div className="relative overflow-hidden bg-muted">
                     <img
                       src={`/api/media/${asset.id}`}
                       alt={
                         asset.alt ||
                         asset.originalName
                       }
-                      className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="aspect-video w-full object-cover transition-transform duration-500 hover:scale-[1.03]"
                     />
-
-                    <div className="absolute right-2 top-2">
-                      <Badge className="bg-black/70 text-white backdrop-blur-sm">
-                        #{asset.id}
-                      </Badge>
-                    </div>
                   </div>
 
-                  <CardContent className="flex flex-col gap-3 pt-4">
+                  <CardContent className="flex flex-col gap-4 p-5">
                     <div>
-                      <p className="truncate font-medium">
+                      <p className="truncate text-sm font-semibold">
                         {asset.originalName}
                       </p>
 
@@ -1209,7 +976,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                         {Math.round(
                           asset.size / 1024
                         )}{" "}
-                        KB
+                        KB · ID {asset.id}
                       </p>
                     </div>
 
@@ -1227,11 +994,13 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                         name="alt"
                         defaultValue={asset.alt}
                         placeholder="Tekst alternatywny"
+                        className="h-10 rounded-xl"
                       />
 
                       <Button
                         type="submit"
                         size="sm"
+                        className="h-10 rounded-xl"
                       >
                         Zapisz
                       </Button>
@@ -1243,7 +1012,18 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                         trips={data.trips}
                       />
 
-                      <form action={deleteMedia}>
+                      <form
+                        action={deleteMedia}
+                        onSubmit={(event) => {
+                          if (
+                            !window.confirm(
+                              "Czy na pewno chcesz usunąć to zdjęcie? Tej operacji nie można cofnąć."
+                            )
+                          ) {
+                            event.preventDefault()
+                          }
+                        }}
+                      >
                         <input
                           type="hidden"
                           name="id"
@@ -1252,10 +1032,10 @@ export function AdminDashboard({ data }: { data: AdminData }) {
 
                         <Button
                           type="submit"
-                          className="w-full"
+                          className="h-10 w-full rounded-xl"
                           variant="ghost"
-                          size="sm"
                         >
+                          <Trash2 />
                           Usuń
                         </Button>
                       </form>
@@ -1263,40 +1043,22 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                   </CardContent>
                 </Card>
               ))}
-
-              {data.media.length === 0 && (
-                <EmptyState
-                  icon={FileImage}
-                  title="Biblioteka jest pusta"
-                  description="Dodaj pierwsze zdjęcie, aby rozpocząć."
-                />
-              )}
             </div>
           </div>
 
-          {/* GLOBAL GALLERY */}
+          <Card className="mt-8 overflow-hidden">
+            <CardHeader className="border-b bg-background/50 px-6 py-5">
+              <CardTitle className="text-xl">
+                Galeria strony głównej
+              </CardTitle>
 
-          <Card className="mt-8">
-            <CardHeader>
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <CardTitle>
-                    Galeria strony głównej
-                  </CardTitle>
-
-                  <CardDescription>
-                    Przeciągaj zdjęcia, aby zmienić ich
-                    kolejność.
-                  </CardDescription>
-                </div>
-
-                <Badge variant="secondary">
-                  {galleryItems.length} zdjęć
-                </Badge>
-              </div>
+              <CardDescription className="text-sm">
+                Przeciągaj zdjęcia, aby zmienić ich kolejność.
+                Zmiany zapisują się automatycznie.
+              </CardDescription>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="p-6">
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -1308,14 +1070,14 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                   )}
                   strategy={rectSortingStrategy}
                 >
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {galleryItems.map((item, index) => (
+                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {galleryItems.map((item) => (
                       <SortableGalleryItem
                         key={item.id}
                         item={item}
                       >
-                        <div className="overflow-hidden rounded-xl border bg-background transition-shadow hover:shadow-md">
-                          <div className="relative aspect-video overflow-hidden bg-muted">
+                        <div className="group overflow-hidden rounded-2xl border bg-background shadow-sm transition-shadow hover:shadow-md">
+                          <div className="relative overflow-hidden">
                             <img
                               src={
                                 item.mediaId
@@ -1326,21 +1088,21 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                                 item.alt ||
                                 item.title
                               }
-                              className="size-full object-cover"
+                              className="aspect-video w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                             />
 
-                            <div className="absolute left-2 top-2 flex size-7 items-center justify-center rounded-full bg-black/70 text-xs font-bold text-white backdrop-blur-sm">
-                              {index + 1}
+                            <div className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+                              Przeciągnij
                             </div>
                           </div>
 
-                          <div className="flex flex-col gap-3 p-3">
+                          <div className="flex flex-col gap-4 p-4">
                             <div>
-                              <p className="truncate font-medium">
+                              <p className="font-semibold">
                                 {item.title}
                               </p>
 
-                              <p className="text-xs text-muted-foreground">
+                              <p className="mt-1 text-sm text-muted-foreground">
                                 {item.city}
                               </p>
                             </div>
@@ -1354,6 +1116,15 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                                 action={
                                   removeGalleryItem
                                 }
+                                onSubmit={(event) => {
+                                  if (
+                                    !window.confirm(
+                                      "Usunąć zdjęcie z galerii strony głównej?"
+                                    )
+                                  ) {
+                                    event.preventDefault()
+                                  }
+                                }}
                               >
                                 <input
                                   type="hidden"
@@ -1371,7 +1142,9 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                                   type="submit"
                                   size="sm"
                                   variant="ghost"
+                                  className="rounded-xl"
                                 >
+                                  <Trash2 />
                                   Usuń
                                 </Button>
                               </form>
@@ -1386,19 +1159,18 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             </CardContent>
           </Card>
 
-          {/* TRIP GALLERIES */}
+          <Card className="mt-8 overflow-hidden">
+            <CardHeader className="border-b bg-background/50 px-6 py-5">
+              <CardTitle className="text-xl">
+                Galerie wyjazdów
+              </CardTitle>
 
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Galerie wyjazdów</CardTitle>
-
-              <CardDescription>
-                Zdjęcia przypisane do poszczególnych
-                ofert.
+              <CardDescription className="text-sm">
+                Zdjęcia przypisane do poszczególnych ofert.
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="flex flex-col gap-8">
+            <CardContent className="flex flex-col gap-8 p-6">
               {data.trips
                 .filter((trip) =>
                   data.tripGallery.some(
@@ -1406,60 +1178,54 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                       item.tripId === trip.id
                   )
                 )
-                .map((trip) => {
-                  const tripItems =
-                    data.tripGallery.filter(
-                      (item) =>
-                        item.tripId === trip.id
-                    )
-
-                  return (
-                    <section key={trip.id}>
-                      <div className="mb-4 flex items-center justify-between gap-3">
-                        <div>
-                          <h3 className="font-bold">
-                            {trip.title}
-                          </h3>
-
-                          <p className="text-sm text-muted-foreground">
-                            {trip.city}
-                          </p>
-                        </div>
-
-                        <Badge variant="secondary">
-                          {tripItems.length}{" "}
-                          {tripItems.length === 1
-                            ? "zdjęcie"
-                            : "zdjęć"}
-                        </Badge>
+                .map((trip) => (
+                  <section key={trip.id}>
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                        <Plane className="size-5" />
                       </div>
 
-                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        {tripItems.map((item) => (
+                      <div>
+                        <h3 className="font-bold">
+                          {trip.title}
+                        </h3>
+
+                        <p className="text-sm text-muted-foreground">
+                          {trip.city}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                      {data.tripGallery
+                        .filter(
+                          (item) =>
+                            item.tripId ===
+                            trip.id
+                        )
+                        .map((item) => (
                           <div
                             key={item.id}
-                            className="overflow-hidden rounded-xl border bg-background"
+                            className="overflow-hidden rounded-2xl border bg-background"
                           >
-                            <div className="aspect-video overflow-hidden bg-muted">
-                              <img
-                                src={`/api/media/${item.mediaId}`}
-                                alt={
-                                  item.alt ||
-                                  item.caption ||
-                                  trip.title
-                                }
-                                className="size-full object-cover"
-                              />
-                            </div>
+                            <img
+                              src={`/api/media/${item.mediaId}`}
+                              alt={
+                                item.alt ||
+                                item.caption ||
+                                trip.title
+                              }
+                              className="aspect-video w-full object-cover"
+                            />
 
-                            <div className="flex flex-col gap-3 p-3">
+                            <div className="flex flex-col gap-4 p-4">
                               <div>
-                                <p className="truncate text-sm font-medium">
+                                <p className="truncate text-sm font-semibold">
                                   {item.caption ||
                                     "Bez podpisu"}
                                 </p>
 
-                                <p className="text-xs text-muted-foreground">
+                                <p className="mt-1 text-xs text-muted-foreground">
                                   {trip.city}
                                 </p>
                               </div>
@@ -1474,6 +1240,15 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                                   action={
                                     removeGalleryItem
                                   }
+                                  onSubmit={(event) => {
+                                    if (
+                                      !window.confirm(
+                                        "Usunąć zdjęcie z galerii tego wyjazdu?"
+                                      )
+                                    ) {
+                                      event.preventDefault()
+                                    }
+                                  }}
                                 >
                                   <input
                                     type="hidden"
@@ -1491,7 +1266,9 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                                     type="submit"
                                     size="sm"
                                     variant="ghost"
+                                    className="rounded-xl"
                                   >
+                                    <Trash2 />
                                     Usuń
                                   </Button>
                                 </form>
@@ -1499,25 +1276,14 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                             </div>
                           </div>
                         ))}
-                      </div>
-                    </section>
-                  )
-                })}
-
-              {data.tripGallery.length === 0 && (
-                <EmptyState
-                  icon={ImagePlus}
-                  title="Brak galerii wyjazdów"
-                  description="Przypisz zdjęcia do wyjazdów z poziomu biblioteki mediów."
-                />
-              )}
+                    </div>
+                  </section>
+                ))}
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* ================================================================ */}
-        {/* CONTENT                                                           */}
-        {/* ================================================================ */}
+        {/* CONTENT */}
 
         <TabsContent value="content">
           <SectionHeader
@@ -1529,9 +1295,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
           <SettingsForm settings={data.settings} />
         </TabsContent>
 
-        {/* ================================================================ */}
-        {/* TESTIMONIALS                                                      */}
-        {/* ================================================================ */}
+        {/* TESTIMONIALS */}
 
         <TabsContent value="testimonials">
           <SectionHeader
@@ -1541,7 +1305,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             action={
               <TestimonialDialog
                 trigger={
-                  <Button>
+                  <Button className="h-11 rounded-xl px-5 font-semibold">
                     <Plus />
                     Dodaj opinię
                   </Button>
@@ -1550,24 +1314,22 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             }
           />
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-5 lg:grid-cols-2">
             {data.testimonials.map((item) => (
-              <Card key={item.id}>
-                <CardHeader>
+              <Card
+                key={item.id}
+                className="overflow-hidden"
+              >
+                <CardHeader className="border-b bg-background/50 px-6 py-5">
                   <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="mb-1 flex items-center gap-2">
-                        <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <Users className="size-4" />
-                        </div>
+                    <div>
+                      <CardTitle className="text-xl">
+                        {item.author}
+                      </CardTitle>
 
-                        <CardTitle className="truncate">
-                          {item.author}
-                        </CardTitle>
-                      </div>
-
-                      <CardDescription>
-                        {item.tripName || "Wyjazd klienta"}
+                      <CardDescription className="mt-1 text-sm">
+                        {item.tripName} ·{" "}
+                        {"★".repeat(item.rating)}
                       </CardDescription>
                     </div>
 
@@ -1577,13 +1339,9 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                   </div>
                 </CardHeader>
 
-                <CardContent>
-                  <div className="mb-3 flex gap-0.5 text-primary">
-                    {"★".repeat(item.rating)}
-                  </div>
-
-                  <p className="mb-5 text-sm leading-6 text-muted-foreground">
-                    „{item.content}”
+                <CardContent className="p-6">
+                  <p className="mb-5 text-base leading-7 text-muted-foreground">
+                    {item.content}
                   </p>
 
                   <div className="flex gap-2">
@@ -1593,6 +1351,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                         <Button
                           variant="outline"
                           size="sm"
+                          className="rounded-xl"
                         >
                           <Pencil />
                           Edytuj
@@ -1606,9 +1365,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
           </div>
         </TabsContent>
 
-        {/* ================================================================ */}
-        {/* YOUTUBE                                                           */}
-        {/* ================================================================ */}
+        {/* YOUTUBE */}
 
         <TabsContent value="youtube">
           <SectionHeader
@@ -1617,26 +1374,26 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             description="Podaj adres kanału, a najnowsze filmy pojawią się na stronie głównej."
           />
 
-          <div className="grid gap-6 xl:grid-cols-[.8fr_1.2fr]">
-            <Card>
-              <CardHeader>
-                <CardTitle>
+          <div className="grid gap-7 xl:grid-cols-[.8fr_1.2fr]">
+            <Card className="overflow-hidden">
+              <CardHeader className="border-b bg-background/50 px-6 py-5">
+                <CardTitle className="text-xl">
                   Konfiguracja kanału
                 </CardTitle>
 
-                <CardDescription>
+                <CardDescription className="text-sm">
                   Obsługiwane są adresy /channel/UC…,
                   /@nazwa oraz /user/nazwa.
                 </CardDescription>
               </CardHeader>
 
-              <CardContent>
+              <CardContent className="p-6">
                 <YouTubeSettingsForm
                   settings={data.settings}
                 />
               </CardContent>
 
-              <CardFooter className="flex flex-col items-start gap-3 border-t pt-5">
+              <CardFooter className="flex flex-col items-start gap-3 border-t p-6">
                 <YouTubeSyncStatus
                   lastSyncedAt={
                     data.settings
@@ -1650,38 +1407,36 @@ export function AdminDashboard({ data }: { data: AdminData }) {
               </CardFooter>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>
+            <Card className="overflow-hidden">
+              <CardHeader className="border-b bg-background/50 px-6 py-5">
+                <CardTitle className="text-xl">
                   Podgląd najnowszych filmów
                 </CardTitle>
 
-                <CardDescription>
+                <CardDescription className="text-sm">
                   {data.videos.length
                     ? `Pobrano ${data.videos.length} filmów z kanału.`
                     : "Po zapisaniu poprawnego kanału zobaczysz tutaj podgląd."}
                 </CardDescription>
               </CardHeader>
 
-              <CardContent className="grid gap-4 sm:grid-cols-2">
+              <CardContent className="grid gap-5 p-6 sm:grid-cols-2">
                 {data.videos.map((video) => (
                   <a
                     key={video.id}
                     href={video.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="group overflow-hidden rounded-xl border transition-shadow hover:shadow-md"
+                    className="group overflow-hidden rounded-2xl border transition-shadow hover:shadow-md"
                   >
-                    <div className="aspect-video overflow-hidden bg-muted">
-                      <img
-                        src={video.thumbnail}
-                        alt={video.title}
-                        className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      className="aspect-video w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
 
-                    <div className="flex gap-3 p-3">
-                      <p className="line-clamp-2 flex-1 text-sm font-medium">
+                    <div className="flex gap-3 p-4">
+                      <p className="line-clamp-2 flex-1 text-sm font-semibold">
                         {video.title}
                       </p>
 
@@ -1694,9 +1449,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
           </div>
         </TabsContent>
 
-        {/* ================================================================ */}
-        {/* INQUIRIES                                                        */}
-        {/* ================================================================ */}
+        {/* INQUIRIES */}
 
         <TabsContent value="inquiries">
           <SectionHeader
@@ -1706,6 +1459,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             action={
               <Button
                 variant="outline"
+                className="h-11 rounded-xl"
                 nativeButton={false}
                 render={
                   <a href="/api/admin/inquiries.csv" />
@@ -1717,55 +1471,41 @@ export function AdminDashboard({ data }: { data: AdminData }) {
             }
           />
 
-          <div className="mb-5 flex items-center gap-2">
-            <Badge>
-              {newLeads} nowych
-            </Badge>
-
-            <span className="text-sm text-muted-foreground">
-              {data.inquiries.length} wszystkich zapytań
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-5">
             {data.inquiries.map((lead) => (
               <Card
                 key={lead.id}
-                className={
-                  lead.status === "new"
-                    ? "border-primary/30 shadow-sm"
-                    : ""
-                }
+                className="overflow-hidden"
               >
-                <CardContent className="grid gap-5 pt-6 lg:grid-cols-[.8fr_1.2fr_auto]">
+                <CardContent className="grid gap-6 p-6 lg:grid-cols-[1fr_1.4fr_auto]">
                   <div>
-                    <div className="mb-2 flex flex-wrap items-center gap-2">
-                      <strong>{lead.name}</strong>
+                    <div className="flex items-center gap-3">
+                      <strong className="text-base">
+                        {lead.name}
+                      </strong>
 
                       <StatusBadge
                         status={lead.status}
                       />
                     </div>
 
-                    <div className="flex flex-col gap-1">
-                      <a
-                        className="text-sm text-primary underline-offset-4 hover:underline"
-                        href={`mailto:${lead.email}`}
-                      >
-                        {lead.email}
-                      </a>
+                    <a
+                      className="mt-3 block text-sm text-primary underline-offset-4 hover:underline"
+                      href={`mailto:${lead.email}`}
+                    >
+                      {lead.email}
+                    </a>
 
-                      <a
-                        className="text-sm text-primary underline-offset-4 hover:underline"
-                        href={`tel:${lead.phone}`}
-                      >
-                        {lead.phone}
-                      </a>
-                    </div>
+                    <a
+                      className="mt-1 block text-sm text-primary underline-offset-4 hover:underline"
+                      href={`tel:${lead.phone}`}
+                    >
+                      {lead.phone}
+                    </a>
                   </div>
 
                   <div>
-                    <p className="font-semibold">
+                    <p className="text-base font-semibold">
                       {lead.matchName}
                     </p>
 
@@ -1782,7 +1522,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
 
                   <form
                     action={updateInquiry}
-                    className="flex min-w-72 flex-col gap-2"
+                    className="flex min-w-72 flex-col gap-3"
                   >
                     <input
                       type="hidden"
@@ -1793,7 +1533,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                     <select
                       name="status"
                       defaultValue={lead.status}
-                      className="h-9 rounded-lg border bg-background px-3 text-sm"
+                      className="h-11 rounded-xl border bg-background px-3 text-sm"
                     >
                       <option value="new">
                         Nowe
@@ -1812,12 +1552,14 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                       name="adminNote"
                       defaultValue={lead.adminNote}
                       placeholder="Notatka wewnętrzna"
-                      rows={2}
+                      rows={3}
+                      className="rounded-xl"
                     />
 
                     <Button
                       type="submit"
                       size="sm"
+                      className="h-10 rounded-xl"
                     >
                       Zapisz obsługę
                     </Button>
@@ -1828,74 +1570,62 @@ export function AdminDashboard({ data }: { data: AdminData }) {
           </div>
         </TabsContent>
 
-        {/* ================================================================ */}
-        {/* ACCOUNT                                                           */}
-        {/* ================================================================ */}
+        {/* ACCOUNT */}
 
         <TabsContent value="account">
           <SectionHeader
-            eyebrow="System"
-            title="Ustawienia"
-            description="Bezpieczeństwo konta administratora i dostęp do panelu."
+            eyebrow="Konto"
+            title="Bezpieczeństwo"
+            description="Zmień hasło administratora i chroń dostęp do panelu."
           />
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>
+          <div className="grid gap-7 lg:grid-cols-2">
+            <Card className="overflow-hidden">
+              <CardHeader className="border-b bg-background/50 px-6 py-5">
+                <CardTitle className="text-xl">
                   Zmiana hasła
                 </CardTitle>
 
-                <CardDescription>
-                  Nowe hasło powinno mieć co najmniej 12
-                  znaków.
+                <CardDescription className="text-sm">
+                  Nowe hasło powinno mieć co najmniej
+                  12 znaków.
                 </CardDescription>
               </CardHeader>
 
-              <CardContent>
+              <CardContent className="p-6">
                 <ChangePasswordForm />
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Administrator</CardTitle>
-
-                <CardDescription>
-                  Informacje o aktualnym koncie.
-                </CardDescription>
+            <Card className="overflow-hidden">
+              <CardHeader className="border-b bg-background/50 px-6 py-5">
+                <CardTitle className="text-xl">
+                  Administrator
+                </CardTitle>
               </CardHeader>
 
-              <CardContent className="flex flex-col gap-5">
-                <div className="flex items-center gap-3">
-                  <span className="flex size-12 items-center justify-center rounded-full bg-primary text-lg font-black text-primary-foreground">
-                    {data.email
-                      .charAt(0)
-                      .toUpperCase()}
+              <CardContent className="flex flex-col gap-5 p-6">
+                <div className="flex items-center gap-4">
+                  <span className="flex size-12 items-center justify-center rounded-2xl bg-primary font-black text-primary-foreground">
+                    M
                   </span>
 
                   <div>
-                    <p className="font-medium">
+                    <p className="font-semibold">
                       {data.email}
                     </p>
 
-                    <p className="text-sm text-muted-foreground">
+                    <p className="mt-1 text-sm text-muted-foreground">
                       Pełny dostęp do panelu
                     </p>
                   </div>
                 </div>
 
-                <div className="rounded-xl border bg-muted/30 p-4">
-                  <div className="flex gap-3">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
-
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      Dostęp jest dodatkowo ograniczony do
-                      zatwierdzonego adresu e-mail oraz
-                      zaufanych domen Neon Auth.
-                    </p>
-                  </div>
-                </div>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Dostęp jest dodatkowo ograniczony do
+                  zatwierdzonego adresu e-mail oraz zaufanych
+                  domen Neon Auth.
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -1906,7 +1636,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
 }
 
 /* -------------------------------------------------------------------------- */
-/* SECTION HEADER                                                             */
+/* UI HELPERS                                                                 */
 /* -------------------------------------------------------------------------- */
 
 function SectionHeader({
@@ -1921,17 +1651,17 @@ function SectionHeader({
   action?: React.ReactNode
 }) {
   return (
-    <header className="mb-7 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-      <div className="min-w-0">
-        <p className="mb-2 inline-flex bg-black px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+    <header className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+      <div>
+        <p className="inline-flex rounded-md bg-black px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
           {eyebrow}
         </p>
 
-        <h1 className="text-balance font-sans text-3xl font-black uppercase tracking-tight md:text-4xl">
+        <h1 className="mt-3 text-balance font-sans text-4xl font-black uppercase tracking-tight md:text-5xl">
           {title}
         </h1>
 
-        <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
+        <p className="mt-2 max-w-2xl text-base leading-6 text-muted-foreground md:text-lg">
           {description}
         </p>
       </div>
@@ -1941,47 +1671,28 @@ function SectionHeader({
   )
 }
 
-/* -------------------------------------------------------------------------- */
-/* METRIC                                                                    */
-/* -------------------------------------------------------------------------- */
-
 function Metric({
   icon: Icon,
   label,
   value,
-  suffix,
-  accent = false,
 }: {
   icon: typeof Plane
   label: string
   value: number
-  suffix?: string
-  accent?: boolean
 }) {
   return (
-    <Card
-      className={
-        accent
-          ? "border-primary/30 shadow-sm"
-          : ""
-      }
-    >
-      <CardContent className="flex items-center gap-4 pt-6">
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-          <Icon className="size-5" />
+    <Card className="overflow-hidden transition-shadow hover:shadow-md">
+      <CardContent className="flex items-center gap-4 p-6">
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+          <Icon className="size-6" />
         </span>
 
-        <div className="min-w-0">
+        <div>
           <p className="text-3xl font-black tracking-tight">
             {value}
-            {suffix ? (
-              <span className="ml-1 text-sm font-medium text-muted-foreground">
-                {suffix}
-              </span>
-            ) : null}
           </p>
 
-          <p className="text-sm text-muted-foreground">
+          <p className="mt-1 text-sm font-medium text-muted-foreground">
             {label}
           </p>
         </div>
@@ -1989,213 +1700,6 @@ function Metric({
     </Card>
   )
 }
-
-/* -------------------------------------------------------------------------- */
-/* MINI STAT                                                                  */
-/* -------------------------------------------------------------------------- */
-
-function MiniStat({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Plane
-  label: string
-  value: number
-}) {
-  return (
-    <div className="flex items-center gap-3 rounded-xl border bg-background p-4">
-      <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-        <Icon className="size-4" />
-      </div>
-
-      <div>
-        <p className="font-bold">{value}</p>
-        <p className="text-xs text-muted-foreground">
-          {label}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-/* -------------------------------------------------------------------------- */
-/* QUICK ACTION                                                               */
-/* -------------------------------------------------------------------------- */
-
-function QuickAction({
-  icon: Icon,
-  title,
-  description,
-  onClick,
-}: {
-  icon: typeof Plus
-  title: string
-  description: string
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group flex flex-col items-start rounded-xl border bg-background p-4 text-left transition-all hover:border-primary/30 hover:bg-primary/[0.03] hover:shadow-sm"
-    >
-      <span className="mb-5 flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform group-hover:scale-105">
-        <Icon className="size-4" />
-      </span>
-
-      <p className="font-semibold">
-        {title}
-      </p>
-
-      <p className="mt-1 text-xs leading-5 text-muted-foreground">
-        {description}
-      </p>
-    </button>
-  )
-}
-
-/* -------------------------------------------------------------------------- */
-/* EMPTY STATE                                                                */
-/* -------------------------------------------------------------------------- */
-
-function EmptyState({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: typeof Search
-  title: string
-  description: string
-}) {
-  return (
-    <div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20 px-6 py-12 text-center">
-      <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted">
-        <Icon className="size-5 text-muted-foreground" />
-      </div>
-
-      <p className="font-semibold">
-        {title}
-      </p>
-
-      <p className="mt-1 max-w-md text-sm text-muted-foreground">
-        {description}
-      </p>
-    </div>
-  )
-}
-
-/* -------------------------------------------------------------------------- */
-/* TRIP ACTIONS MENU                                                          */
-/* -------------------------------------------------------------------------- */
-
-function TripActionsMenu({ trip }: { trip: any }) {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button
-            size="icon-sm"
-            variant="outline"
-            title="Więcej operacji"
-          />
-        }
-      >
-        <MoreHorizontal />
-        <span className="sr-only">
-          Więcej operacji
-        </span>
-      </DialogTrigger>
-
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            Operacje wyjazdu
-          </DialogTitle>
-
-          <DialogDescription>
-            {trip.title}
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="grid gap-2">
-          <form action={setTripStatus}>
-            <input
-              type="hidden"
-              name="id"
-              value={trip.id}
-            />
-
-            <input
-              type="hidden"
-              name="status"
-              value={
-                trip.status === "published"
-                  ? "draft"
-                  : "published"
-              }
-            />
-
-            <Button
-              type="submit"
-              variant="outline"
-              className="w-full justify-start"
-            >
-              {trip.status === "published" ? (
-                <>
-                  <Archive />
-                  Ukryj wyjazd
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 />
-                  Publikuj wyjazd
-                </>
-              )}
-            </Button>
-          </form>
-
-          <TripDialog
-            trip={trip}
-            trigger={
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => setOpen(false)}
-              >
-                <Pencil />
-                Edytuj wyjazd
-              </Button>
-            }
-          />
-
-          <form action={duplicateTrip}>
-            <input
-              type="hidden"
-              name="id"
-              value={trip.id}
-            />
-
-            <Button
-              type="submit"
-              variant="outline"
-              className="w-full justify-start"
-            >
-              <Copy />
-              Duplikuj wyjazd
-            </Button>
-          </form>
-        </div>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-/* -------------------------------------------------------------------------- */
-/* STATUS BADGE                                                               */
-/* -------------------------------------------------------------------------- */
 
 function StatusBadge({
   status,
@@ -2219,16 +1723,12 @@ function StatusBadge({
           ? "default"
           : "secondary"
       }
-      className="whitespace-nowrap"
+      className="px-2.5 py-1 text-xs font-semibold"
     >
       {labels[status] || status}
     </Badge>
   )
 }
-
-/* -------------------------------------------------------------------------- */
-/* FIELD                                                                      */
-/* -------------------------------------------------------------------------- */
 
 function Field({
   label,
@@ -2240,8 +1740,8 @@ function Field({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col gap-2">
-      <Label className="flex items-center gap-2">
+    <div className="flex flex-col gap-2.5">
+      <Label className="flex items-center gap-2 text-sm font-semibold">
         {label}
 
         {hint ? (
@@ -2267,7 +1767,270 @@ function Field({
 }
 
 /* -------------------------------------------------------------------------- */
-/* YOUTUBE SETTINGS                                                           */
+/* MEDIA UPLOAD                                                               */
+/* -------------------------------------------------------------------------- */
+
+function MediaUploadCard() {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const [selectedFile, setSelectedFile] =
+    useState<File | null>(null)
+
+  const [dragging, setDragging] = useState(false)
+
+  const handleFile = (file?: File) => {
+    if (!file) return
+
+    setSelectedFile(file)
+
+    if (inputRef.current) {
+      const dataTransfer = new DataTransfer()
+      dataTransfer.items.add(file)
+      inputRef.current.files = dataTransfer.files
+    }
+  }
+
+  const handleDrop = (
+    event: React.DragEvent<HTMLDivElement>
+  ) => {
+    event.preventDefault()
+    setDragging(false)
+
+    const file = event.dataTransfer.files?.[0]
+
+    if (file) {
+      handleFile(file)
+    }
+  }
+
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b bg-background/50 px-6 py-5">
+        <CardTitle className="text-xl">
+          Dodaj zdjęcie
+        </CardTitle>
+
+        <CardDescription className="text-sm leading-5">
+          JPEG, PNG, WebP lub AVIF, maksymalnie 15 MB.
+          Zdjęcie zostanie automatycznie zoptymalizowane.
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="p-6">
+        <form
+          action={uploadMedia}
+          className="flex flex-col gap-5"
+        >
+          <input
+            ref={inputRef}
+            name="file"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/avif"
+            className="sr-only"
+            required
+            onChange={(event) =>
+              handleFile(event.target.files?.[0])
+            }
+          />
+
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() =>
+              inputRef.current?.click()
+            }
+            onKeyDown={(event) => {
+              if (
+                event.key === "Enter" ||
+                event.key === " "
+              ) {
+                event.preventDefault()
+                inputRef.current?.click()
+              }
+            }}
+            onDragEnter={(event) => {
+              event.preventDefault()
+              setDragging(true)
+            }}
+            onDragOver={(event) => {
+              event.preventDefault()
+              setDragging(true)
+            }}
+            onDragLeave={(event) => {
+              event.preventDefault()
+              setDragging(false)
+            }}
+            onDrop={handleDrop}
+            className={[
+              "group flex min-h-56 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 text-center transition-all",
+              dragging
+                ? "border-primary bg-primary/10"
+                : "border-muted-foreground/25 bg-muted/30 hover:border-primary/50 hover:bg-primary/5",
+            ].join(" ")}
+          >
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform group-hover:scale-105">
+              <Upload className="size-7" />
+            </div>
+
+            <p className="mt-4 text-base font-semibold">
+              {dragging
+                ? "Upuść zdjęcie tutaj"
+                : "Przeciągnij zdjęcie tutaj"}
+            </p>
+
+            <p className="mt-1 text-sm text-muted-foreground">
+              albo kliknij, aby wybrać plik
+            </p>
+
+            <p className="mt-3 text-xs text-muted-foreground">
+              Jedno zdjęcie na raz
+            </p>
+          </div>
+
+          {selectedFile ? (
+            <div className="flex items-center gap-3 rounded-2xl border bg-muted/30 p-4">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <FileImage className="size-5" />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">
+                  {selectedFile.name}
+                </p>
+
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {Math.max(
+                    1,
+                    Math.round(
+                      selectedFile.size / 1024
+                    )
+                  )}{" "}
+                  KB
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-9 rounded-xl"
+                onClick={() => {
+                  setSelectedFile(null)
+
+                  if (inputRef.current) {
+                    inputRef.current.value = ""
+                  }
+                }}
+              >
+                <X />
+
+                <span className="sr-only">
+                  Usuń wybrany plik
+                </span>
+              </Button>
+            </div>
+          ) : null}
+
+          <Field label="Opis alternatywny">
+            <Input
+              name="alt"
+              placeholder="Kibice na stadionie w Mediolanie"
+              className="h-11 rounded-xl"
+            />
+          </Field>
+
+          <Button
+            type="submit"
+            disabled={!selectedFile}
+            className="h-11 rounded-xl font-semibold"
+          >
+            <Upload />
+            Wgraj do biblioteki
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* DUPLICATE TRIP                                                             */
+/* -------------------------------------------------------------------------- */
+
+function ConfirmDuplicateButton({
+  tripId,
+}: {
+  tripId: number
+}) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+    >
+      <DialogTrigger
+        render={
+          <Button
+            size="icon"
+            variant="outline"
+            className="size-10 rounded-xl"
+          />
+        }
+      >
+        <Copy />
+
+        <span className="sr-only">
+          Duplikuj wyjazd
+        </span>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            Zduplikować wyjazd?
+          </DialogTitle>
+
+          <DialogDescription className="text-sm leading-6">
+            Zostanie utworzona kopia tego wyjazdu z
+            jego obecnymi danymi. Możesz ją później
+            edytować niezależnie od oryginału.
+          </DialogDescription>
+        </DialogHeader>
+
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setOpen(false)}
+            className="rounded-xl"
+          >
+            Anuluj
+          </Button>
+
+          <form action={duplicateTrip}>
+            <input
+              type="hidden"
+              name="id"
+              value={tripId}
+            />
+
+            <Button
+              type="submit"
+              className="rounded-xl"
+            >
+              <Copy />
+              Tak, zduplikuj
+            </Button>
+          </form>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* YOUTUBE                                                                    */
 /* -------------------------------------------------------------------------- */
 
 const initialSaveSettingsState: SaveSettingsState = {}
@@ -2294,6 +2057,7 @@ function YouTubeSettingsForm({
           type="url"
           defaultValue={settings.youtubeUrl}
           placeholder="https://www.youtube.com/@twojkanal"
+          className="h-11 rounded-xl"
         />
       </Field>
 
@@ -2307,6 +2071,7 @@ function YouTubeSettingsForm({
             defaultValue={
               settings.youtubeLimit || "6"
             }
+            className="h-11 rounded-xl"
           />
         </Field>
 
@@ -2314,10 +2079,9 @@ function YouTubeSettingsForm({
           <select
             name="setting.youtubeEnabled"
             defaultValue={
-              settings.youtubeEnabled ||
-              "true"
+              settings.youtubeEnabled || "true"
             }
-            className="h-9 rounded-lg border bg-background px-3 text-sm"
+            className="h-11 rounded-xl border bg-background px-3 text-sm"
           >
             <option value="true">
               Sekcja włączona
@@ -2337,14 +2101,15 @@ function YouTubeSettingsForm({
       )}
 
       {state.success && (
-        <p className="text-sm text-primary">
+        <p className="flex items-center gap-2 text-sm font-medium text-primary">
+          <Check className="size-4" />
           Zapisano konfigurację.
         </p>
       )}
 
       <Button
         type="submit"
-        className="self-start"
+        className="h-11 self-start rounded-xl font-semibold"
         disabled={pending}
       >
         <Clapperboard />
@@ -2356,10 +2121,6 @@ function YouTubeSettingsForm({
     </form>
   )
 }
-
-/* -------------------------------------------------------------------------- */
-/* YOUTUBE SYNC                                                               */
-/* -------------------------------------------------------------------------- */
 
 const initialSyncState: SyncYouTubeState = {}
 
@@ -2413,26 +2174,21 @@ function YouTubeSyncStatus({
       return
 
     automaticSyncStarted.current = true
-
     formRef.current?.requestSubmit()
   }, [lastSyncedAt, lastSyncStatus])
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <div className="rounded-xl border bg-muted/30 p-4">
-        <p className="text-sm leading-6 text-muted-foreground">
-          Lista filmów odświeża się automatycznie
-          raz dziennie. Jeśli nocna próba się nie
-          powiedzie, panel ponowi ją automatycznie
-          po otwarciu.
-        </p>
-      </div>
+      <p className="text-sm leading-6 text-muted-foreground">
+        Lista filmów odświeża się automatycznie raz
+        dziennie. Jeśli nocna próba się nie powiedzie,
+        panel ponowi ją automatycznie po otwarciu.
+      </p>
 
       <p className="text-sm">
         Ostatnie odświeżenie:{" "}
         <span className="font-medium text-foreground">
-          {formatted ??
-            "jeszcze nie wykonano"}
+          {formatted ?? "jeszcze nie wykonano"}
         </span>
       </p>
 
@@ -2449,7 +2205,7 @@ function YouTubeSyncStatus({
       )}
 
       {state.success && (
-        <p className="text-sm text-primary">
+        <p className="text-sm font-medium text-primary">
           Lista filmów została odświeżona.
         </p>
       )}
@@ -2463,6 +2219,7 @@ function YouTubeSyncStatus({
           variant="outline"
           size="sm"
           disabled={pending}
+          className="h-10 rounded-xl"
         >
           <RefreshCw
             className={
@@ -2496,10 +2253,12 @@ function ChangePasswordForm() {
   return (
     <form
       key={
-        state.success ? "done" : "form"
+        state.success
+          ? "done"
+          : "form"
       }
       action={action}
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-5"
     >
       <Field label="Aktualne hasło">
         <Input
@@ -2507,6 +2266,7 @@ function ChangePasswordForm() {
           type="password"
           autoComplete="current-password"
           required
+          className="h-11 rounded-xl"
         />
       </Field>
 
@@ -2517,6 +2277,7 @@ function ChangePasswordForm() {
           minLength={12}
           autoComplete="new-password"
           required
+          className="h-11 rounded-xl"
         />
       </Field>
 
@@ -2527,17 +2288,21 @@ function ChangePasswordForm() {
           minLength={12}
           autoComplete="new-password"
           required
+          className="h-11 rounded-xl"
         />
       </Field>
 
-      <label className="flex items-center gap-2 text-sm">
+      <label className="flex items-center gap-3 rounded-xl border bg-muted/20 p-4 text-sm">
         <input
           name="revokeOtherSessions"
           type="checkbox"
           defaultChecked
+          className="size-4"
         />
 
-        Wyloguj pozostałe sesje
+        <span>
+          Wyloguj pozostałe sesje
+        </span>
       </label>
 
       {state.error && (
@@ -2547,7 +2312,8 @@ function ChangePasswordForm() {
       )}
 
       {state.success && (
-        <p className="text-sm text-primary">
+        <p className="flex items-center gap-2 text-sm font-medium text-primary">
+          <Check className="size-4" />
           Hasło zostało zmienione.
         </p>
       )}
@@ -2555,6 +2321,7 @@ function ChangePasswordForm() {
       <Button
         type="submit"
         disabled={pending}
+        className="h-11 rounded-xl font-semibold"
       >
         <KeyRound />
 
@@ -2567,7 +2334,7 @@ function ChangePasswordForm() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* TRIP DIALOG                                                                */
+/* TRIP                                                                       */
 /* -------------------------------------------------------------------------- */
 
 const initialTripState: SaveTripState = {}
@@ -2579,8 +2346,7 @@ function TripDialog({
   trip?: any
   trigger: React.ReactNode
 }) {
-  const [open, setOpen] =
-    useState(false)
+  const [open, setOpen] = useState(false)
 
   const [state, action, pending] =
     useActionState(
@@ -2613,21 +2379,21 @@ function TripDialog({
 
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-2xl">
             {trip
               ? "Edytuj wyjazd"
               : "Nowy wyjazd"}
           </DialogTitle>
 
-          <DialogDescription>
-            Uzupełnij ofertę. Pod każdym polem
-            znajdziesz krótką podpowiedź.
+          <DialogDescription className="text-sm leading-6">
+            Uzupełnij ofertę. Pod każdym polem znajdziesz
+            krótką podpowiedź.
           </DialogDescription>
         </DialogHeader>
 
         <form
           action={action}
-          className="grid gap-4 sm:grid-cols-2"
+          className="grid gap-5 sm:grid-cols-2"
         >
           {trip && (
             <input
@@ -2645,6 +2411,7 @@ function TripDialog({
               name="title"
               defaultValue={trip?.title}
               required
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -2656,6 +2423,7 @@ function TripDialog({
               name="slug"
               defaultValue={trip?.slug}
               placeholder="utworzy-sie-automatycznie"
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -2667,6 +2435,7 @@ function TripDialog({
               name="city"
               defaultValue={trip?.city}
               required
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -2678,6 +2447,7 @@ function TripDialog({
               name="country"
               defaultValue={trip?.country}
               required
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -2691,6 +2461,7 @@ function TripDialog({
               min="0"
               defaultValue={trip?.price}
               required
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -2703,7 +2474,7 @@ function TripDialog({
               defaultValue={
                 trip?.status || "draft"
               }
-              className="h-9 rounded-lg border bg-background px-3 text-sm"
+              className="h-11 rounded-xl border bg-background px-3 text-sm"
             >
               <option value="draft">
                 Szkic
@@ -2726,6 +2497,7 @@ function TripDialog({
                 trip?.startDate
               }
               required
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -2739,6 +2511,7 @@ function TripDialog({
               defaultValue={
                 trip?.endDate
               }
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -2751,6 +2524,7 @@ function TripDialog({
                 name="coverFile"
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/avif"
+                className="h-11 rounded-xl"
               />
             </Field>
 
@@ -2766,9 +2540,7 @@ function TripDialog({
           <div className="sm:col-span-2">
             <DescriptionEditor
               name="description"
-              defaultValue={
-                trip?.description
-              }
+              defaultValue={trip?.description}
             />
           </div>
 
@@ -2783,6 +2555,7 @@ function TripDialog({
                   "\n"
                 )}
                 rows={5}
+                className="rounded-xl"
               />
             </Field>
           </div>
@@ -2793,10 +2566,9 @@ function TripDialog({
           >
             <Input
               name="seoTitle"
-              defaultValue={
-                trip?.seoTitle
-              }
+              defaultValue={trip?.seoTitle}
               maxLength={70}
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -2811,17 +2583,18 @@ function TripDialog({
               }
               rows={3}
               maxLength={180}
+              className="rounded-xl"
             />
           </Field>
 
-          <label className="flex items-start gap-2 text-sm sm:col-span-2">
+          <label className="flex items-start gap-3 rounded-xl border bg-muted/20 p-4 text-sm sm:col-span-2">
             <input
               name="featured"
               type="checkbox"
               defaultChecked={
                 trip?.featured
               }
-              className="mt-1"
+              className="mt-1 size-4"
             />
 
             <span>
@@ -2829,10 +2602,9 @@ function TripDialog({
                 Wyróżnij wyjazd
               </strong>
 
-              <span className="block text-xs leading-relaxed text-muted-foreground">
-                Oferta pojawi się przed
-                pozostałymi i otrzyma
-                etykietę „Polecany wyjazd”.
+              <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+                Oferta pojawi się przed pozostałymi i
+                otrzyma etykietę „Polecany wyjazd”.
               </span>
             </span>
           </label>
@@ -2846,10 +2618,20 @@ function TripDialog({
             </p>
           ) : null}
 
-          <DialogFooter className="sm:col-span-2">
+          <DialogFooter className="gap-2 sm:col-span-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="rounded-xl"
+            >
+              Anuluj
+            </Button>
+
             <Button
               type="submit"
               disabled={pending}
+              className="rounded-xl font-semibold"
             >
               {pending
                 ? "Zapisuję…"
@@ -2863,7 +2645,7 @@ function TripDialog({
 }
 
 /* -------------------------------------------------------------------------- */
-/* GALLERY DIALOG                                                             */
+/* GALLERY                                                                    */
 /* -------------------------------------------------------------------------- */
 
 const initialGalleryState: AddGalleryItemState =
@@ -2889,6 +2671,7 @@ function GalleryDialog({
           <Button
             variant="outline"
             size="sm"
+            className="h-10 rounded-xl"
           />
         }
       >
@@ -2897,19 +2680,19 @@ function GalleryDialog({
 
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-xl">
             Użyj zdjęcia
           </DialogTitle>
 
-          <DialogDescription>
-            Dodaj zdjęcie do galerii albo ustaw je
-            jako okładkę wyjazdu.
+          <DialogDescription className="text-sm leading-6">
+            Dodaj zdjęcie do galerii albo ustaw je jako
+            okładkę wyjazdu.
           </DialogDescription>
         </DialogHeader>
 
         <form
           action={action}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
         >
           <input
             type="hidden"
@@ -2920,7 +2703,7 @@ function GalleryDialog({
           <Field label="Miejsce w galerii">
             <select
               name="tripId"
-              className="h-9 rounded-lg border bg-background px-3 text-sm"
+              className="h-11 rounded-xl border bg-background px-3 text-sm"
             >
               <option value="0">
                 Galeria strony głównej
@@ -2938,25 +2721,24 @@ function GalleryDialog({
           </Field>
 
           <Field label="Podpis">
-            <Input name="caption" />
+            <Input
+              name="caption"
+              className="h-11 rounded-xl"
+            />
           </Field>
 
           <Field label="Miasto (galeria główna)">
-            <Input name="city" />
+            <Input
+              name="city"
+              className="h-11 rounded-xl"
+            />
           </Field>
 
           <Field label="Alt">
             <Input
               name="alt"
               defaultValue={asset.alt}
-            />
-          </Field>
-
-          <Field label="Kolejność">
-            <Input
-              name="sortOrder"
-              type="number"
-              defaultValue="0"
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -2981,6 +2763,7 @@ function GalleryDialog({
           <Button
             type="submit"
             disabled={pending}
+            className="h-11 rounded-xl font-semibold"
           >
             {pending
               ? "Dodaję…"
@@ -2991,7 +2774,7 @@ function GalleryDialog({
         <div className="border-t pt-5">
           <form
             action={setTripCover}
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-5"
           >
             <input
               type="hidden"
@@ -3002,7 +2785,7 @@ function GalleryDialog({
             <Field label="Ustaw jako zdjęcie główne">
               <select
                 name="tripId"
-                className="h-9 rounded-lg border bg-background px-3 text-sm"
+                className="h-11 rounded-xl border bg-background px-3 text-sm"
                 required
               >
                 <option value="">
@@ -3021,7 +2804,10 @@ function GalleryDialog({
             </Field>
 
             <DialogFooter>
-              <Button variant="outline">
+              <Button
+                variant="outline"
+                className="rounded-xl"
+              >
                 Ustaw okładkę
               </Button>
             </DialogFooter>
@@ -3031,10 +2817,6 @@ function GalleryDialog({
     </Dialog>
   )
 }
-
-/* -------------------------------------------------------------------------- */
-/* EDIT GLOBAL GALLERY                                                        */
-/* -------------------------------------------------------------------------- */
 
 const initialUpdateGalleryState: UpdateGalleryItemState =
   {}
@@ -3057,6 +2839,7 @@ function EditGalleryItemDialog({
           <Button
             variant="outline"
             size="sm"
+            className="rounded-xl"
           />
         }
       >
@@ -3071,14 +2854,14 @@ function EditGalleryItemDialog({
           </DialogTitle>
 
           <DialogDescription>
-            Zmień podpis i miasto wyświetlane
-            przy zdjęciu.
+            Zmień podpis i miasto wyświetlane przy
+            zdjęciu.
           </DialogDescription>
         </DialogHeader>
 
         <form
           action={action}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
         >
           <input
             type="hidden"
@@ -3091,6 +2874,7 @@ function EditGalleryItemDialog({
               name="title"
               defaultValue={item.title}
               required
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -3098,6 +2882,7 @@ function EditGalleryItemDialog({
             <Input
               name="city"
               defaultValue={item.city}
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -3123,6 +2908,7 @@ function EditGalleryItemDialog({
             <Button
               type="submit"
               disabled={pending}
+              className="rounded-xl"
             >
               {pending
                 ? "Zapisuję…"
@@ -3135,10 +2921,6 @@ function EditGalleryItemDialog({
   )
 }
 
-/* -------------------------------------------------------------------------- */
-/* EDIT TRIP GALLERY                                                          */
-/* -------------------------------------------------------------------------- */
-
 function EditTripGalleryItemDialog({
   item,
   city,
@@ -3146,8 +2928,7 @@ function EditTripGalleryItemDialog({
   item: any
   city: string
 }) {
-  const [open, setOpen] =
-    useState(false)
+  const [open, setOpen] = useState(false)
 
   const [state, action, pending] =
     useActionState(
@@ -3175,6 +2956,7 @@ function EditTripGalleryItemDialog({
           <Button
             variant="outline"
             size="sm"
+            className="rounded-xl"
           />
         }
       >
@@ -3189,15 +2971,15 @@ function EditTripGalleryItemDialog({
           </DialogTitle>
 
           <DialogDescription>
-            Miasto wynika z przypisanego
-            wyjazdu. Możesz zmienić podpis i opis
-            alternatywny zdjęcia.
+            Miasto wynika z przypisanego wyjazdu.
+            Możesz zmienić podpis i opis alternatywny
+            zdjęcia.
           </DialogDescription>
         </DialogHeader>
 
         <form
           action={action}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
         >
           <input
             type="hidden"
@@ -3209,16 +2991,16 @@ function EditTripGalleryItemDialog({
             <Input
               value={city}
               disabled
+              className="h-11 rounded-xl"
             />
           </Field>
 
           <Field label="Podpis">
             <Input
               name="caption"
-              defaultValue={
-                item.caption
-              }
+              defaultValue={item.caption}
               maxLength={160}
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -3228,6 +3010,7 @@ function EditTripGalleryItemDialog({
               defaultValue={item.alt}
               maxLength={240}
               placeholder={`Zdjęcie z wyjazdu do ${city}`}
+              className="h-11 rounded-xl"
             />
           </Field>
 
@@ -3244,6 +3027,7 @@ function EditTripGalleryItemDialog({
             <Button
               type="submit"
               disabled={pending}
+              className="rounded-xl"
             >
               {pending
                 ? "Zapisuję…"
@@ -3257,7 +3041,7 @@ function EditTripGalleryItemDialog({
 }
 
 /* -------------------------------------------------------------------------- */
-/* TESTIMONIAL DIALOG                                                         */
+/* TESTIMONIALS                                                               */
 /* -------------------------------------------------------------------------- */
 
 function TestimonialDialog({
@@ -3277,21 +3061,21 @@ function TestimonialDialog({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-xl">
             {item
               ? "Edytuj opinię"
               : "Nowa opinia"}
           </DialogTitle>
 
           <DialogDescription>
-            Opinie opublikowane są widoczne na
-            stronie głównej.
+            Opinie opublikowane są widoczne na stronie
+            głównej.
           </DialogDescription>
         </DialogHeader>
 
         <form
           action={saveTestimonial}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
         >
           {item && (
             <input
@@ -3304,33 +3088,30 @@ function TestimonialDialog({
           <Field label="Autor">
             <Input
               name="author"
-              defaultValue={
-                item?.author
-              }
+              defaultValue={item?.author}
               required
+              className="h-11 rounded-xl"
             />
           </Field>
 
           <Field label="Wyjazd">
             <Input
               name="tripName"
-              defaultValue={
-                item?.tripName
-              }
+              defaultValue={item?.tripName}
+              className="h-11 rounded-xl"
             />
           </Field>
 
           <Field label="Treść">
             <Textarea
               name="content"
-              defaultValue={
-                item?.content
-              }
+              defaultValue={item?.content}
               required
+              className="rounded-xl"
             />
           </Field>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Ocena">
               <Input
                 name="rating"
@@ -3340,16 +3121,7 @@ function TestimonialDialog({
                 defaultValue={
                   item?.rating || 5
                 }
-              />
-            </Field>
-
-            <Field label="Kolejność">
-              <Input
-                name="sortOrder"
-                type="number"
-                defaultValue={
-                  item?.sortOrder || 0
-                }
+                className="h-11 rounded-xl"
               />
             </Field>
 
@@ -3360,7 +3132,7 @@ function TestimonialDialog({
                   item?.status ||
                   "published"
                 }
-                className="h-9 rounded-lg border bg-background px-3 text-sm"
+                className="h-11 rounded-xl border bg-background px-3 text-sm"
               >
                 <option value="published">
                   Widoczna
@@ -3374,7 +3146,10 @@ function TestimonialDialog({
           </div>
 
           <DialogFooter>
-            <Button>
+            <Button
+              type="submit"
+              className="rounded-xl font-semibold"
+            >
               Zapisz opinię
             </Button>
           </DialogFooter>
@@ -3385,7 +3160,7 @@ function TestimonialDialog({
 }
 
 /* -------------------------------------------------------------------------- */
-/* SETTINGS FORM                                                              */
+/* SETTINGS                                                                   */
 /* -------------------------------------------------------------------------- */
 
 function SettingsForm({
@@ -3528,19 +3303,19 @@ function SettingsForm({
     )
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b bg-background/50 px-6 py-5">
+        <CardTitle className="text-xl">
           Najważniejsze teksty
         </CardTitle>
 
-        <CardDescription>
-          Edytuj treści widoczne na stronie bez
-          potrzeby zmiany kodu.
+        <CardDescription className="text-sm">
+          Puste pola użyją bezpiecznych treści
+          domyślnych.
         </CardDescription>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="p-6">
         <form
           action={action}
           className="grid gap-5 md:grid-cols-2"
@@ -3562,6 +3337,7 @@ function SettingsForm({
                       fallback
                     }
                     rows={4}
+                    className="rounded-xl"
                   />
                 ) : (
                   <Input
@@ -3570,6 +3346,7 @@ function SettingsForm({
                       settings[key] ||
                       fallback
                     }
+                    className="h-11 rounded-xl"
                   />
                 )}
               </Field>
@@ -3586,10 +3363,11 @@ function SettingsForm({
                 settings.galleryHomeLimit ||
                 "5"
               }
+              className="h-11 rounded-xl"
             />
           </Field>
 
-          <div className="flex flex-col gap-2 md:col-span-2">
+          <div className="flex flex-col gap-3 md:col-span-2">
             {state.error && (
               <p className="text-sm text-destructive">
                 {state.error}
@@ -3597,14 +3375,15 @@ function SettingsForm({
             )}
 
             {state.success && (
-              <p className="text-sm text-primary">
+              <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                <Check className="size-4" />
                 Treści strony zostały zapisane.
               </p>
             )}
 
             <Button
               type="submit"
-              className="self-start"
+              className="h-11 self-start rounded-xl font-semibold"
               disabled={pending}
             >
               <BookOpen />
