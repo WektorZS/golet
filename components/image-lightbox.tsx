@@ -1,7 +1,6 @@
 "use client"
 
-
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react"
 
@@ -44,6 +43,7 @@ export function ImageLightbox({
 
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   const currentImage = gallery[currentIndex]
   const hasMultipleImages = gallery.length > 1
@@ -64,25 +64,34 @@ export function ImageLightbox({
     )
   }
 
+  // Obsługa strzałek na klawiaturze
   useEffect(() => {
     if (!hasMultipleImages) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
         event.preventDefault()
+        event.stopPropagation()
         previousImage()
       }
 
       if (event.key === "ArrowRight") {
         event.preventDefault()
+        event.stopPropagation()
         nextImage()
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown)
+    const element = contentRef.current
+
+    if (element) {
+      element.addEventListener("keydown", handleKeyDown)
+    }
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown)
+      if (element) {
+        element.removeEventListener("keydown", handleKeyDown)
+      }
     }
   }, [hasMultipleImages, gallery.length])
 
@@ -96,7 +105,6 @@ export function ImageLightbox({
     const touchEndX = event.changedTouches[0].clientX
     const difference = touchStartX - touchEndX
 
-    // Minimalna odległość przesunięcia, żeby zmiana zdjęcia się uruchomiła
     if (Math.abs(difference) > 50) {
       if (difference > 0) {
         nextImage()
@@ -136,7 +144,9 @@ export function ImageLightbox({
       </DialogTrigger>
 
       <DialogContent
-        className="top-[calc(50%+2.5rem)] max-h-[calc(100dvh-6rem)] max-w-[calc(100vw-2rem)] gap-3 overflow-hidden bg-foreground p-2 text-background sm:max-w-6xl"
+        ref={contentRef}
+        tabIndex={-1}
+        className="top-[calc(50%+2.5rem)] max-h-[calc(100dvh-6rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] gap-3 overflow-hidden bg-foreground p-2 text-background sm:w-[calc(100vw-2rem)] sm:max-w-6xl"
         showCloseButton
       >
         <DialogTitle className="sr-only">
@@ -144,12 +154,12 @@ export function ImageLightbox({
         </DialogTitle>
 
         <DialogDescription className="sr-only">
-          Powiększone zdjęcie. Użyj strzałek lub przesuń zdjęcie, aby
-          przejść do kolejnego.
+          Powiększone zdjęcie. Użyj strzałek na klawiaturze lub przesuń
+          zdjęcie palcem, aby przejść do kolejnego.
         </DialogDescription>
 
         <div
-          className="relative h-[min(80dvh,900px)] w-full overflow-hidden rounded-lg touch-pan-y"
+          className="relative h-[calc(100dvh-10rem)] max-h-[min(80dvh,900px)] w-full min-w-0 overflow-hidden rounded-lg touch-pan-y"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -170,7 +180,7 @@ export function ImageLightbox({
                 variant="secondary"
                 size="icon"
                 onClick={previousImage}
-                className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full shadow-lg"
+                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full shadow-lg sm:left-3"
                 aria-label="Poprzednie zdjęcie"
               >
                 <ChevronLeft className="size-5" />
@@ -181,7 +191,7 @@ export function ImageLightbox({
                 variant="secondary"
                 size="icon"
                 onClick={nextImage}
-                className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full shadow-lg"
+                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full shadow-lg sm:right-3"
                 aria-label="Następne zdjęcie"
               >
                 <ChevronRight className="size-5" />
