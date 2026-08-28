@@ -163,7 +163,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
   </Tabs>
 }
 
-function SectionHeader({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: React.ReactNode }) { return <header className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="inline-block rounded-md bg-black px-2.5 py-1 font-mono text-xs uppercase tracking-[0.18em] text-primary">
+function SectionHeader({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: React.ReactNode }) { return <header className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="inline-block bg-black px-2.5 py-1 font-mono text-xs uppercase tracking-[0.18em] text-primary">
   {eyebrow}
 </p><h1 className="text-balance font-sans text-3xl font-black uppercase md:text-4xl">{title}</h1><p className="mt-1 text-muted-foreground">{description}</p></div>{action}</header> }
 function Metric({ icon: Icon, label, value }: { icon: typeof Plane; label: string; value: number }) { return <Card><CardContent className="flex items-center gap-4 pt-6"><span className="flex size-11 items-center justify-center rounded-lg bg-primary text-primary-foreground"><Icon /></span><div><p className="text-3xl font-black">{value}</p><p className="text-sm text-muted-foreground">{label}</p></div></CardContent></Card> }
