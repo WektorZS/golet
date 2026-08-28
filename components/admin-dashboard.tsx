@@ -934,7 +934,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                 >
                   <Field
                     label="Zdjęcie"
-                    hint="Wybierz zdjęcie z komputera lub telefonu. Możesz użyć formatu JPG, PNG, WebP lub AVIF."
+                    hint=""
                   >
                     <Input
                       name="file"
@@ -1675,6 +1675,118 @@ function StatusBadge({
     </Badge>
   )
 }
+function ImageDropzone({
+  name,
+  accept = "image/jpeg,image/png,image/webp,image/avif",
+  required = false,
+}: {
+  name: string
+  accept?: string
+  required?: boolean
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [fileName, setFileName] = useState("")
+
+  const setFiles = (files: FileList | null) => {
+    if (!files || !files.length || !inputRef.current) return
+
+    const file = files[0]
+
+    // Ustawiamy plik również w prawdziwym input[type=file],
+    // dzięki czemu zostanie wysłany normalnie przez FormData.
+    const dataTransfer = new DataTransfer()
+    dataTransfer.items.add(file)
+    inputRef.current.files = dataTransfer.files
+
+    setFileName(file.name)
+  }
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    setIsDragging(false)
+    setFiles(event.dataTransfer.files)
+  }
+
+  return (
+    <div
+      onDragOver={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        setIsDragging(true)
+      }}
+      onDragEnter={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        setIsDragging(true)
+      }}
+      onDragLeave={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+
+        // Nie wyłączaj stanu przy przejściu między elementami wewnątrz dropzone.
+        if (event.currentTarget === event.target) {
+          setIsDragging(false)
+        }
+      }}
+      onDrop={handleDrop}
+      onClick={() => inputRef.current?.click()}
+      className={[
+        "relative flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-8 text-center transition-all",
+        isDragging
+          ? "border-primary bg-primary/10"
+          : "border-muted-foreground/25 bg-muted/20 hover:border-primary/50 hover:bg-muted/40",
+      ].join(" ")}
+    >
+      <input
+        ref={inputRef}
+        name={name}
+        type="file"
+        accept={accept}
+        required={required}
+        className="sr-only"
+        onChange={(event) => {
+          setFiles(event.target.files)
+        }}
+      />
+
+      <Upload
+        className={[
+          "mb-3 size-8 transition-transform",
+          isDragging ? "scale-110 text-primary" : "text-muted-foreground",
+        ].join(" ")}
+      />
+
+      {fileName ? (
+        <>
+          <p className="font-medium">
+            {fileName}
+          </p>
+
+          <p className="mt-1 text-xs text-muted-foreground">
+            Kliknij lub upuść inne zdjęcie, aby je zmienić
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="font-medium">
+            Przeciągnij i upuść zdjęcie tutaj
+          </p>
+
+          <p className="mt-1 text-sm text-muted-foreground">
+            lub kliknij, aby wybrać plik z komputera
+          </p>
+
+          <p className="mt-3 text-xs text-muted-foreground">
+            JPEG, PNG, WebP lub AVIF
+          </p>
+        </>
+      )}
+    </div>
+  )
+}
 
 function Field({
   label,
@@ -2244,11 +2356,11 @@ function TripDialog({
               label="Zdjęcie główne"
               hint="Wybierz zdjęcie, które będzie głównym zdjęciem tego wyjazdu. Możesz wybrać je z komputera lub telefonu."
             >
-              <Input
-                name="coverFile"
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/avif"
-              />
+              <ImageDropzone
+  name="file"
+  accept="image/jpeg,image/png,image/webp,image/avif"
+  required
+/>
             </Field>
 
             {trip?.image ? (
