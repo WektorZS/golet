@@ -137,36 +137,10 @@ type Testimonial = {
   rating: number
 }
 
-const FALLBACK_GALLERY: GalleryItem[] = [
-  {
-    id: -1,
-    image: "/images/barcelona-trip.webp",
-    mediaId: null,
-    alt: "Stadion w Barcelonie",
-    title: "Barcelona",
-    city: "Barcelona",
-  },
-  {
-    id: -2,
-    image: "/images/milan-trip.webp",
-    mediaId: null,
-    alt: "Wieczór meczowy w Mediolanie",
-    title: "Mediolan",
-    city: "Mediolan",
-  },
-  {
-    id: -3,
-    image: "/images/madrid-trip.webp",
-    mediaId: null,
-    alt: "Stadion w Madrycie",
-    title: "Madryt",
-    city: "Madryt",
-  },
-]
 
 
 function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
-  const items = (gallery.length ? gallery : FALLBACK_GALLERY).slice(0, 5)
+  const items = gallery.slice(0, 5)
   const featureFirst = items.length >= 3
 
   return (
