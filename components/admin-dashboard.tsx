@@ -2742,19 +2742,6 @@ function TripDialog({
             />
           </Field>
 
-          <Field
-            label="Kolejność"
-            hint="Niższa liczba oznacza wcześniejsze miejsce wśród ofert o takim samym wyróżnieniu."
-          >
-            <Input
-              name="sortOrder"
-              type="number"
-              defaultValue={
-                trip?.sortOrder || 0
-              }
-            />
-          </Field>
-
           <div className="sm:col-span-2">
             <Field
               label="Zdjęcie główne z urządzenia"
