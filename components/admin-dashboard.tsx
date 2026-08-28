@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useActionState, useEffect, useMemo, useRef, useState } from "react"
 import { Archive, BookOpen, Clapperboard, Copy, ExternalLink, FileImage, HelpCircle, Home, Inbox, KeyRound, LayoutDashboard, LogOut, Pencil, Plane, Plus, RefreshCw, Search, Settings, Star, Upload, Users } from "lucide-react"
 import { toast } from "sonner"
-import { archiveTestimonial, addGalleryItem, type AddGalleryItemState, deleteMedia, duplicateTrip, removeGalleryItem, type SaveSettingsState, type SaveTripState, saveSettings, saveTestimonial, saveTrip, setTripCover, setTripStatus, type SyncYouTubeState, syncYouTubeNow, type UpdateGalleryItemState, updateGalleryItem, updateTripGalleryItem, updateInquiry, updateMedia, uploadMedia } from "@/app/actions/admin"
+import { archiveTestimonial, addGalleryItem, reorderGalleryItems, type AddGalleryItemState, deleteMedia, duplicateTrip, removeGalleryItem, type SaveSettingsState, type SaveTripState, saveSettings, saveTestimonial, saveTrip, setTripCover, setTripStatus, type SyncYouTubeState, syncYouTubeNow, type UpdateGalleryItemState, updateGalleryItem, updateTripGalleryItem, updateInquiry, updateMedia, uploadMedia } from "@/app/actions/admin"
 import { changeAdminPassword, type ChangePasswordState, signOutAdmin } from "@/app/actions/auth"
 import { DescriptionEditor } from "@/components/description-editor"
 import { Badge } from "@/components/ui/badge"
@@ -46,10 +46,86 @@ const sections = [
 
 const formatActivityDate = (date: Date | string) => { return new Intl.DateTimeFormat("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", }).format(new Date(date)) }
 
+function SortableGalleryItem({
+  item,
+  children,
+}: {
+  item: { id: number }
+  children: React.ReactNode
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: item.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="cursor-grab active:cursor-grabbing"
+    >
+      {children}
+    </div>
+  )
+}
+
 export function AdminDashboard({ data }: { data: AdminData }) {
   const [query, setQuery] = useState("")
+  const [galleryItems, setGalleryItems] = useState(data.gallery)
+const sensors = useSensors(
+  useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
+  })
+)
   const filteredTrips = useMemo(() => data.trips.filter((trip) => `${trip.title} ${trip.city}`.toLowerCase().includes(query.toLowerCase())), [data.trips, query])
   const newLeads = data.inquiries.filter((item) => item.status === "new").length
+  const handleGalleryDragEnd = async (event: any) => {
+  const { active, over } = event
+
+  if (!over || active.id === over.id) return
+
+  const oldIndex = galleryItems.findIndex((item) => item.id === active.id)
+  const newIndex = galleryItems.findIndex((item) => item.id === over.id)
+
+  if (oldIndex === -1 || newIndex === -1) return
+
+  const reordered = arrayMove(galleryItems, oldIndex, newIndex)
+
+  setGalleryItems(reordered)
+
+  const formData = new FormData()
+
+  formData.append(
+    "scope",
+    "global"
+  )
+
+  formData.append(
+    "items",
+    JSON.stringify(
+      reordered.map((item, index) => ({
+        id: item.id,
+        sortOrder: index,
+      }))
+    )
+  )
+
+  await reorderGalleryItems(formData)
+
+  toast.success("Kolejność galerii została zapisana")
+}
 
   return <Tabs defaultValue="dashboard" orientation="vertical" className="min-h-screen gap-0 bg-muted/40 lg:flex-row">
     <aside className="border-b bg-foreground text-background lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:border-b-0 lg:border-r">
@@ -355,7 +431,54 @@ export function AdminDashboard({ data }: { data: AdminData }) {
 
       <TabsContent value="media"><SectionHeader eyebrow="Biblioteka" title="Media i galerie" description="Wgrywaj zdjęcia raz i wykorzystuj je w wielu miejscach." />
         <div className="grid gap-6 xl:grid-cols-[360px_1fr]"><Card><CardHeader><CardTitle>Wgraj zdjęcie</CardTitle><CardDescription>JPEG, PNG, WebP lub AVIF, maksymalnie 15 MB. Plik zostanie automatycznie zoptymalizowany.</CardDescription></CardHeader><CardContent><form action={uploadMedia} className="flex flex-col gap-4"><Field label="Plik"><Input name="file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" required /></Field><Field label="Opis alternatywny"><Input name="alt" placeholder="Kibice na stadionie w Mediolanie" /></Field><Button type="submit"><Upload />Wgraj do biblioteki</Button></form></CardContent></Card><div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">{data.media.map((asset) => <Card key={asset.id} className="overflow-hidden"><img src={`/api/media/${asset.id}`} alt={asset.alt || asset.originalName} className="aspect-video w-full object-cover" /><CardContent className="flex flex-col gap-3 pt-4"><p className="truncate font-medium">{asset.originalName}</p><p className="text-xs text-muted-foreground">{Math.round(asset.size / 1024)} KB · ID {asset.id}</p><form action={updateMedia} className="flex gap-2"><input type="hidden" name="id" value={asset.id} /><Input name="alt" defaultValue={asset.alt} placeholder="Tekst alternatywny" /><Button type="submit" size="sm">Zapisz</Button></form><div className="grid grid-cols-2 gap-2"><GalleryDialog asset={asset} trips={data.trips} /><form action={deleteMedia}><input type="hidden" name="id" value={asset.id} /><Button type="submit" className="w-full" variant="ghost" size="sm">Usuń</Button></form></div></CardContent></Card>)}</div></div>
-        <Card className="mt-6"><CardHeader><CardTitle>Galeria strony głównej</CardTitle><CardDescription>Opublikowane zdjęcia pojawią się automatycznie na stronie.</CardDescription></CardHeader><CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{data.gallery.map((item) => <div key={item.id} className="overflow-hidden rounded-xl border"><img src={item.mediaId ? `/api/media/${item.mediaId}` : item.image} alt={item.alt || item.title} className="aspect-video w-full object-cover" /><div className="flex flex-col gap-3 p-3"><div><p className="font-medium">{item.title}</p><p className="text-xs text-muted-foreground">{item.city}</p></div><div className="flex gap-2"><EditGalleryItemDialog item={item} /><form action={removeGalleryItem}><input type="hidden" name="id" value={item.id} /><input type="hidden" name="scope" value="global" /><Button type="submit" size="sm" variant="ghost">Usuń</Button></form></div></div></div>)}</CardContent></Card>
+        <Card className="mt-6"><CardHeader><CardTitle>Galeria strony głównej</CardTitle><CardDescription>Opublikowane zdjęcia pojawią się automatycznie na stronie.</CardDescription></CardHeader><CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <DndContext
+    sensors={sensors}
+    collisionDetection={closestCenter}
+    onDragEnd={handleGalleryDragEnd}
+  >
+    <SortableContext
+      items={galleryItems.map((item) => item.id)}
+      strategy={rectSortingStrategy}
+    >
+      {galleryItems.map((item) => (
+        <SortableGalleryItem key={item.id} item={item}>
+          <div className="overflow-hidden rounded-xl border">
+            <img
+              src={item.mediaId ? `/api/media/${item.mediaId}` : item.image}
+              alt={item.alt || item.title}
+              className="aspect-video w-full object-cover"
+            />
+
+            <div className="flex flex-col gap-3 p-3">
+              <div>
+                <p className="font-medium">{item.title}</p>
+                <p className="text-xs text-muted-foreground">{item.city}</p>
+              </div>
+
+              <div className="flex gap-2">
+                <EditGalleryItemDialog item={item} />
+
+                <form action={removeGalleryItem}>
+                  <input type="hidden" name="id" value={item.id} />
+                  <input type="hidden" name="scope" value="global" />
+
+                  <Button
+                    type="submit"
+                    size="sm"
+                    variant="ghost"
+                  >
+                    Usuń
+                  </Button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </SortableGalleryItem>
+      ))}
+    </SortableContext>
+  </DndContext>
+</CardContent></Card>
         <Card className="mt-6"><CardHeader><CardTitle>Galerie wyjazdów</CardTitle><CardDescription>Zdjęcia przypisane do poszczególnych ofert.</CardDescription></CardHeader><CardContent className="flex flex-col gap-6">{data.trips.filter((trip) => data.tripGallery.some((item) => item.tripId === trip.id)).map((trip) => <section key={trip.id}><h3 className="mb-3 font-bold">{trip.title}</h3><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{data.tripGallery.filter((item) => item.tripId === trip.id).map((item) => <div key={item.id} className="overflow-hidden rounded-xl border"><img src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || trip.title} className="aspect-video w-full object-cover" /><div className="flex flex-col gap-3 p-3"><div><p className="truncate text-sm font-medium">{item.caption || "Bez podpisu"}</p><p className="text-xs text-muted-foreground">{trip.city}</p></div><div className="flex gap-2"><EditTripGalleryItemDialog item={item} city={trip.city} /><form action={removeGalleryItem}><input type="hidden" name="id" value={item.id} /><input type="hidden" name="scope" value="trip" /><Button type="submit" size="sm" variant="ghost">Usuń</Button></form></div></div></div>)}</div></section>)}</CardContent></Card>
       </TabsContent>
 
