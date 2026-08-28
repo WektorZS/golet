@@ -47,6 +47,19 @@ export function ImageLightbox({
   const currentImage = gallery[currentIndex]
   const hasMultipleImages = gallery.length > 1
 
+
+const previousImage = () => {
+  setCurrentIndex((current) =>
+    current === 0 ? gallery.length - 1 : current - 1
+  )
+}
+
+const nextImage = () => {
+  setCurrentIndex((current) =>
+    current === gallery.length - 1 ? 0 : current + 1
+  )
+}
+
 useEffect(() => {
   if (!hasMultipleImages) return
 
@@ -77,27 +90,6 @@ useEffect(() => {
   }
 }, [hasMultipleImages, gallery.length])
 
-  useEffect(() => {
-    if (!hasMultipleImages) return
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft") {
-        event.preventDefault()
-        previousImage()
-      }
-
-      if (event.key === "ArrowRight") {
-        event.preventDefault()
-        nextImage()
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-    }
-  }, [hasMultipleImages, gallery.length])
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     setTouchStartX(event.touches[0].clientX)
