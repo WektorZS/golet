@@ -82,6 +82,7 @@ function SortableGalleryItem({
 export function AdminDashboard({ data }: { data: AdminData }) {
   const [query, setQuery] = useState("")
   const [galleryItems, setGalleryItems] = useState(data.gallery)
+  const [tripGalleryItems, setTripGalleryItems] = useState(data.tripGallery)
 const sensors = useSensors(
   useSensor(PointerSensor, {
     activationConstraint: {
@@ -126,6 +127,57 @@ const sensors = useSensors(
 
   toast.success("Kolejność galerii została zapisana")
 }
+
+  const handleTripGalleryDragEnd = async (
+    tripId: number,
+    event: any
+  ) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) return
+
+    const tripItems = tripGalleryItems.filter(
+      (item) => item.tripId === tripId
+    )
+
+    const oldIndex = tripItems.findIndex(
+      (item) => item.id === active.id
+    )
+
+    const newIndex = tripItems.findIndex(
+      (item) => item.id === over.id
+    )
+
+    if (oldIndex === -1 || newIndex === -1) return
+
+    const reordered = arrayMove(tripItems, oldIndex, newIndex)
+
+    setTripGalleryItems((current) => {
+      const otherItems = current.filter(
+        (item) => item.tripId !== tripId
+      )
+
+      return [...otherItems, ...reordered]
+    })
+
+    const formData = new FormData()
+
+    formData.append("scope", "trip")
+
+    formData.append(
+      "items",
+      JSON.stringify(
+        reordered.map((item, index) => ({
+          id: item.id,
+          sortOrder: index,
+        }))
+      )
+    )
+
+    await reorderGalleryItems(formData)
+
+    toast.success("Kolejność zdjęć została zapisana")
+  }
 
   return <Tabs defaultValue="dashboard" orientation="vertical" className="min-h-screen gap-0 bg-muted/40 lg:flex-row">
     <aside className="border-b bg-foreground text-background lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:border-b-0 lg:border-r">
