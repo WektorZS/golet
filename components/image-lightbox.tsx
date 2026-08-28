@@ -11,7 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 
 type LightboxImage = {
   src: string
@@ -166,27 +165,31 @@ export function ImageLightbox({
 
           {hasMultipleImages && (
             <>
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                onClick={previousImage}
-                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full shadow-lg sm:left-3"
-                aria-label="Poprzednie zdjęcie"
-              >
-                <ChevronLeft className="size-5" />
-              </Button>
+              <button
+  type="button"
+  onClick={(event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    previousImage()
+  }}
+  className="absolute left-2 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg transition-opacity hover:bg-background sm:left-3"
+  aria-label="Poprzednie zdjęcie"
+>
+  <ChevronLeft className="size-5" />
+</button>
 
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                onClick={nextImage}
-                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full shadow-lg sm:right-3"
-                aria-label="Następne zdjęcie"
-              >
-                <ChevronRight className="size-5" />
-              </Button>
+             <button
+  type="button"
+  onClick={(event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    nextImage()
+  }}
+  className="absolute right-2 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg transition-opacity hover:bg-background sm:right-3"
+  aria-label="Następne zdjęcie"
+>
+  <ChevronRight className="size-5" />
+</button>
 
               <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
                 {currentIndex + 1} / {gallery.length}
