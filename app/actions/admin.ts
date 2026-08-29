@@ -69,7 +69,12 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   const duplicate = await db.select({ id: trips.id }).from(trips).where(id ? and(eq(trips.slug, slug), ne(trips.id, id)) : eq(trips.slug, slug)).limit(1)
   if (duplicate.length) return { error: "Ten adres URL jest już używany." }
 
-  let image = clean(formData.get("image")) || "/placeholder.jpg"
+  const isEditing = Number.isInteger(id) && id > 0
+  let image = clean(formData.get("image"))
+  if (isEditing && !image) {
+    const [existingTrip] = await db.select({ image: trips.image }).from(trips).where(eq(trips.id, id)).limit(1)
+    image = existingTrip?.image || ""
+  }
   const coverFile = formData.get("coverFile")
   if (coverFile instanceof File && coverFile.size > 0) {
     try {

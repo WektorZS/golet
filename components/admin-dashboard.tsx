@@ -1700,10 +1700,12 @@ function ImageDropzone({
   name,
   accept = "image/jpeg,image/png,image/webp,image/avif",
   required = false,
+  currentImage,
 }: {
   name: string
   accept?: string
   required?: boolean
+  currentImage?: string
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -1773,12 +1775,24 @@ function ImageDropzone({
         }}
       />
 
-      <Upload
-        className={[
-          "mb-3 size-8 transition-transform",
-          isDragging ? "scale-110 text-primary" : "text-muted-foreground",
-        ].join(" ")}
-      />
+      {currentImage && !fileName ? (
+        <div className="relative mb-4 aspect-video w-full max-w-xs overflow-hidden rounded-lg border bg-muted">
+          <Image
+            src={currentImage}
+            alt="Aktualne zdjęcie główne wyjazdu"
+            fill
+            sizes="320px"
+            className="object-cover"
+          />
+        </div>
+      ) : (
+        <Upload
+          className={[
+            "mb-3 size-8 transition-transform",
+            isDragging ? "scale-110 text-primary" : "text-muted-foreground",
+          ].join(" ")}
+        />
+      )}
 
       {fileName ? (
         <>
