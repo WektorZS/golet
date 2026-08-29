@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { deleteTrip } from "@/app/actions/admin"
@@ -23,6 +24,7 @@ export function DeleteTripDialog({
   tripId: string
   tripTitle: string
 }) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -34,6 +36,7 @@ export function DeleteTripDialog({
       formData.set("id", tripId)
 
       await deleteTrip(formData)
+      router.refresh()
 
       setOpen(false)
 

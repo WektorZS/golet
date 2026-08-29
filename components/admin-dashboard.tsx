@@ -2,6 +2,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useActionState, useEffect, useMemo, useRef, useState } from "react"
 import {
   Archive,
@@ -177,8 +178,27 @@ function SortableGalleryItem({
 }
 
 export function AdminDashboard({ data }: { data: AdminData }) {
+  const router = useRouter()
   const [query, setQuery] = useState("")
+  const [activeSection, setActiveSection] = useState<(typeof sections)[number][0]>("dashboard")
   const [galleryItems, setGalleryItems] = useState(data.gallery)
+
+  useEffect(() => {
+    const savedSection = window.sessionStorage.getItem("admin-active-section")
+    if (sections.some(([value]) => value === savedSection)) {
+      setActiveSection(savedSection as (typeof sections)[number][0])
+    }
+  }, [])
+
+  useEffect(() => {
+    setGalleryItems(data.gallery)
+  }, [data.gallery])
+
+  const handleSectionChange = (value: string) => {
+    const section = value as (typeof sections)[number][0]
+    setActiveSection(section)
+    window.sessionStorage.setItem("admin-active-section", section)
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -240,13 +260,15 @@ export function AdminDashboard({ data }: { data: AdminData }) {
     )
 
     await reorderGalleryItems(formData)
+    router.refresh()
 
     toast.success("Kolejność galerii została zapisana")
   }
 
   return (
     <Tabs
-      defaultValue="dashboard"
+      value={activeSection}
+      onValueChange={handleSectionChange}
       orientation="vertical"
       className="min-h-screen gap-0 bg-muted/40 lg:flex-row"
     >
@@ -3337,7 +3359,7 @@ function SettingsForm({
     [
       "tripsTitle",
       "Nagłówek sekcji wyjazdów",
-      "Tytuł sekcji pokazującej dostępne wyjazdy.",
+      "Tytuł sekcji pokazuj��cej dostępne wyjazdy.",
       "Najbliższe wyjazdy",
     ],
     [
