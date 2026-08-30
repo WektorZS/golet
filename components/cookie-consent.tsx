@@ -226,9 +226,9 @@ export function CookieConsent() {
                             Analityka
                           </p>
 
-                          <span className="shrink-0 text-xs font-bold uppercase tracking-wider text-primary">
-                            Opcjonalne
-                          </span>
+                          <span className="shrink-0 text-xs font-bold uppercase tracking-wider text-foreground">
+  OPCJONALNE
+</span>
                         </div>
 
                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
@@ -385,7 +385,7 @@ export function CookieConsent() {
                           ) : null}
                         </div>
 
-                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                        <p className="mt-1 text-sm leading-relaxed text-foreground/75">
                           Pomaga nam anonimowo analizować
                           korzystanie ze strony i poprawiać
                           jej działanie.
