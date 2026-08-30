@@ -187,13 +187,6 @@ export function CookieConsent() {
                 działanie i funkcjonalność serwisu.
               </p>
 
-              <Link
-                href="/polityka-prywatnosci#cookies"
-                className="w-fit text-sm font-medium text-[#7a5a00] underline underline-offset-4"
-              >
-                Dowiedz się więcej o cookies
-              </Link>
-
               <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:justify-end">
                 <Button
                   variant="outline"
