@@ -226,9 +226,7 @@ export function CookieConsent() {
                             Analityka
                           </p>
 
-                          <span className="shrink-0 text-xs font-bold uppercase tracking-wider text-foreground">
-  OPCJONALNE
-</span>
+                          <span className="shrink-0 text-xs font-bold uppercase tracking-wider text-[#8a6500]"> OPCJONALNE </span>
                         </div>
 
                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
