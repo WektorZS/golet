@@ -194,7 +194,7 @@ export function CookieConsent() {
                           </p>
 
                           <span className="shrink-0 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                            Zawsze aktywne
+                            NIEZBĘDNE
                           </span>
                         </div>
 
@@ -227,7 +227,7 @@ export function CookieConsent() {
                           </p>
 
                           <span className="shrink-0 text-xs font-bold uppercase tracking-wider text-primary">
-                            Opcjonalna
+                            Opcjonalne
                           </span>
                         </div>
 
