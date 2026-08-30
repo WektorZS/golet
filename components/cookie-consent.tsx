@@ -35,7 +35,16 @@ export function CookieConsent() {
   const [consent, setConsent] = useState<Consent>(null)
   const [ready, setReady] = useState(false)
   const [editing, setEditing] = useState(false)
+
   const [showFloatingButton, setShowFloatingButton] =
+    useState(false)
+
+  /*
+   * Pozwala przeglądarce najpierw wyrenderować
+   * przycisk w stanie ukrytym, zanim zacznie
+   * animować jego pojawienie się.
+   */
+  const [floatingButtonReady, setFloatingButtonReady] =
     useState(false)
 
   /*
@@ -69,6 +78,15 @@ export function CookieConsent() {
     }
 
     updateVisibility()
+
+    /*
+     * Najpierw renderujemy ukryty przycisk,
+     * a dopiero w kolejnej klatce pozwalamy
+     * mu przejść do pozycji widocznej.
+     */
+    requestAnimationFrame(() => {
+      setFloatingButtonReady(true)
+    })
 
     window.addEventListener(
       "scroll",
@@ -212,7 +230,9 @@ export function CookieConsent() {
         /*
          * MAŁA IKONA USTAWIEŃ COOKIES
          *
-         * Pokazuje się dopiero po opuszczeniu hero.
+         * Przycisk zawsze pozostaje w DOM,
+         * dzięki czemu pojawianie i chowanie
+         * może być animowane.
          */
         <Button
           type="button"
@@ -220,7 +240,16 @@ export function CookieConsent() {
           onClick={() => setEditing(true)}
           aria-label="Ustawienia cookies"
           title="Ustawienia cookies"
-         className={`fixed bottom-2 left-2 z-40 h-12 w-12 border border-[#f4b91e] bg-black text-black shadow-xl transition-[transform,opacity] duration-500 ease-out hover:scale-105 hover:bg-white md:bottom-3 md:left-3 ${ showFloatingButton ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-8 opacity-0" }`}
+          className={`fixed bottom-2 left-2 z-40 h-12 w-12 border border-[#f4b91e] bg-black text-black shadow-xl
+            transition-[transform,opacity] duration-500 ease-out
+            hover:scale-105 hover:bg-white
+            md:bottom-3 md:left-3
+            ${
+              floatingButtonReady && showFloatingButton
+                ? "translate-y-0 opacity-100"
+                : "pointer-events-none translate-y-10 opacity-0"
+            }
+          `}
         >
           <Cookie className="!h-7 !w-7 text-[#f4b91e]" />
         </Button>
