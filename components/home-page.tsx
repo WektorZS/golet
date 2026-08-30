@@ -260,35 +260,34 @@ export function HomePage({
           </div>
         </div>
 <div className="absolute bottom-28 right-4 z-10 hidden md:block lg:right-8">
-  <div className="border border-background/15 bg-foreground/85 px-5 py-4 text-background shadow-xl backdrop-blur-md">
+  <div className="rounded-xl border border-background/15 bg-foreground/85 px-5 py-4 text-background shadow-xl backdrop-blur-md">
     <div className="flex items-center gap-2">
-      <Star
-        className="size-5 text-primary"
-        fill="currentColor"
-        aria-hidden="true"
-      />
-
-      <span className="text-lg font-black">
-        100% poleca
+      <span className="flex size-8 items-center justify-center rounded-lg bg-primary/15">
+        <Star
+          className="size-4 text-primary"
+          fill="currentColor"
+          aria-hidden="true"
+        />
       </span>
+
+      <div>
+        <p className="text-sm font-black">
+          100% poleca
+        </p>
+
+        <p className="text-xs text-background/55">
+          160 opinii na Facebooku
+        </p>
+      </div>
     </div>
 
-    <p className="mt-1 text-xs font-medium text-background/60">
-      160 opinii na Facebooku
-    </p>
-
     <div className="mt-3 border-t border-background/10 pt-3">
-      <p className="text-lg font-black">
-        5 000+
-      </p>
-
-      <p className="text-xs font-medium text-background/60">
-        obserwujących na Facebooku
+      <p className="text-sm font-black">
+        5 000+ <span className="font-medium text-background/55">obserwujących</span>
       </p>
     </div>
   </div>
 </div>
-
         <div className="relative border-t border-background/15 bg-foreground/75 backdrop-blur-sm">
           <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:grid-cols-2 md:px-6 lg:grid-cols-4">
             {trust.map(([Icon, text]) => (
