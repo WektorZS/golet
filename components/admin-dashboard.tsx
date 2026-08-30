@@ -1656,7 +1656,7 @@ function Metric({
 }) {
   return (
     <Card>
-      <CardContent className="flex items-center gap-4 py-4">
+      <CardContent className="flex items-center gap-4 py-1">
         <span className="flex size-11 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <Icon />
         </span>
