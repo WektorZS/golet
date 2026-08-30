@@ -150,7 +150,7 @@ export default async function TripDetailPage({
 
               <span className="flex items-center gap-2">
                 <MapPin className="size-4 text-primary" />
-                Wyloty z Polski
+                Wybór lotniska najbliżej klienta
               </span>
             </div>
 
