@@ -166,9 +166,7 @@ export function CookieConsent() {
                       Witaj w Let&apos;s Gol!
                     </h2>
 
-                    <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Zanim ruszymy na stadion
-                    </p>
+                  
                   </div>
                 </div>
 
