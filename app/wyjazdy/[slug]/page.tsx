@@ -109,7 +109,7 @@ export default async function TripDetailPage({
         }}
       />
 
-      <section className="relative isolate min-h-[600px] overflow-hidden bg-foreground text-background md:min-h-[640px]">
+      <section className="relative isolate min-h-[480px] overflow-hidden bg-foreground text-background md:min-h-[520px]">
         <Image
           src={trip.image}
           alt={`Wyjazd na mecz ${trip.title} w ${trip.city}`}
@@ -122,7 +122,7 @@ export default async function TripDetailPage({
         <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/80 to-foreground/20" />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground via-transparent to-foreground/20" />
 
-        <div className="relative mx-auto flex min-h-[600px] max-w-7xl flex-col px-4 py-7 md:min-h-[640px] md:px-6">
+        <div className="relative mx-auto flex min-h-[480px] max-w-7xl flex-col px-4 py-7 md:min-h-[520px] md:px-6">
           <Button
             variant="ghost"
             className="w-fit text-background hover:bg-background/10 hover:text-background"
