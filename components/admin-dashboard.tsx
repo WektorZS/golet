@@ -2237,20 +2237,13 @@ function YouTubeSettingsForm({
 }: {
   settings: Record<string, string>
 }) {
-  const [
-    state,
-    action,
-    pending,
-  ] = useActionState(
+  const [state, action, pending] = useActionState(
     saveSettings,
     initialSaveSettingsState
   )
 
   return (
-    <form
-      action={action}
-      className="flex flex-col gap-5"
-    >
+    <form action={action} className="flex flex-col gap-6">
       <Field
         label="Adres kanału YouTube"
         hint="Wklej adres swojego kanału YouTube. Możesz skopiować go bezpośrednio z paska adresu przeglądarki."
@@ -2258,76 +2251,79 @@ function YouTubeSettingsForm({
         <Input
           name="setting.youtubeUrl"
           type="url"
-          defaultValue={
-            settings.youtubeUrl
-          }
+          defaultValue={settings.youtubeUrl}
           placeholder="https://www.youtube.com/@twojkanal"
+          className="h-10"
         />
       </Field>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <Field
           label="Liczba filmów"
-          hint="Określ, ile najnowszych filmów ma być wyświetlanych na stronie."
+          hint="Wybierz, ile najnowszych filmów ma być wyświetlanych na stronie."
         >
           <Input
             name="setting.youtubeLimit"
             type="number"
             min="1"
             max="12"
-            defaultValue={
-              settings.youtubeLimit ||
-              "6"
-            }
+            defaultValue={settings.youtubeLimit || "6"}
+            className="h-10"
           />
         </Field>
 
         <Field
           label="Widoczność filmów"
-          hint="Zdecyduj, czy sekcja z filmami YouTube ma być widoczna na stronie."
+          hint="Możesz tymczasowo ukryć całą sekcję YouTube bez usuwania ustawień."
         >
           <select
             name="setting.youtubeEnabled"
-            defaultValue={
-              settings.youtubeEnabled ||
-              "true"
-            }
-            className="h-9 rounded-lg border bg-background px-3"
+            defaultValue={settings.youtubeEnabled || "true"}
+            className="h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
           >
-            <option value="true">
-              Sekcja włączona
-            </option>
-
-            <option value="false">
-              Sekcja wyłączona
-            </option>
+            <option value="true">Sekcja włączona</option>
+            <option value="false">Sekcja wyłączona</option>
           </select>
         </Field>
       </div>
 
-      {state.error && (
-        <p className="text-sm text-destructive">
-          {state.error}
-        </p>
-      )}
+      {state.error ? (
+        <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+          <AlertCircle className="mt-0.5 size-4 shrink-0" />
 
-      {state.success && (
-        <p className="text-sm text-primary">
-          Ustawienia zostały zapisane.
-        </p>
-      )}
+          <div>
+            <p className="font-medium">
+              Nie udało się zapisać ustawień
+            </p>
 
-      <Button
-        type="submit"
-        className="self-start"
-        disabled={pending}
-      >
-        <Clapperboard />
+            <p className="mt-1 text-destructive/80">
+              {state.error}
+            </p>
+          </div>
+        </div>
+      ) : null}
 
-        {pending
-          ? "Zapisuję…"
-          : "Zapisz ustawienia"}
-      </Button>
+      {state.success ? (
+        <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-primary">
+          <CheckCircle2 className="size-4 shrink-0" />
+
+          <p className="font-medium">
+            Ustawienia YouTube zostały zapisane.
+          </p>
+        </div>
+      ) : null}
+
+      <div className="flex justify-start">
+        <Button
+          type="submit"
+          disabled={pending}
+          className="min-w-[170px]"
+        >
+          <Clapperboard />
+
+          {pending ? "Zapisuję…" : "Zapisz ustawienia"}
+        </Button>
+      </div>
     </form>
   )
 }
@@ -2341,121 +2337,168 @@ function YouTubeSyncStatus({
   lastSyncedAt?: string
   lastSyncStatus?: string
 }) {
-  const [
-    state,
-    action,
-    pending,
-  ] = useActionState(
+  const [state, action, pending] = useActionState(
     syncYouTubeNow,
     initialSyncState
   )
 
-  const formRef =
-    useRef<HTMLFormElement>(null)
-
-  const automaticSyncStarted =
-    useRef(false)
+  const formRef = useRef<HTMLFormElement>(null)
+  const automaticSyncStarted = useRef(false)
 
   const formatted = lastSyncedAt
-    ? new Date(
-        lastSyncedAt
-      ).toLocaleString("pl-PL", {
+    ? new Date(lastSyncedAt).toLocaleString("pl-PL", {
         dateStyle: "medium",
         timeStyle: "short",
       })
     : null
 
+  const lastSyncTime = lastSyncedAt
+    ? new Date(lastSyncedAt).getTime()
+    : 0
+
+  const isStale =
+    !lastSyncTime ||
+    Date.now() - lastSyncTime >= 24 * 60 * 60 * 1000
+
+  const lastAttemptFailed =
+    lastSyncStatus?.startsWith("Błąd:") ?? false
+
   useEffect(() => {
-    if (automaticSyncStarted.current)
-      return
+    if (automaticSyncStarted.current) return
 
-    const lastSyncTime = lastSyncedAt
-      ? new Date(
-          lastSyncedAt
-        ).getTime()
-      : 0
+    if (!isStale && !lastAttemptFailed) return
 
-    const isStale =
-      !lastSyncTime ||
-      Date.now() - lastSyncTime >=
-        24 * 60 * 60 * 1000
-
-    const lastAttemptFailed =
-      lastSyncStatus?.startsWith(
-        "Błąd:"
-      ) ?? false
-
-    if (!isStale && !lastAttemptFailed)
-      return
-
-    automaticSyncStarted.current =
-      true
+    automaticSyncStarted.current = true
 
     formRef.current?.requestSubmit()
-  }, [
-    lastSyncedAt,
-    lastSyncStatus,
-  ])
+  }, [isStale, lastAttemptFailed])
+
+  const hasError =
+    Boolean(state.error) || lastAttemptFailed
+
+  const isSuccessful =
+    Boolean(state.success) ||
+    (!lastAttemptFailed && Boolean(lastSyncedAt))
 
   return (
-    <div className="flex w-full flex-col gap-2">
-      <p className="text-sm text-muted-foreground">
-        Lista filmów odświeża się
-        automatycznie raz dziennie. Jeśli
-        odświeżenie się nie powiedzie, panel
-        spróbuje ponownie przy kolejnym
-        otwarciu.
-      </p>
+    <div className="flex w-full flex-col gap-4">
+      <div className="rounded-xl border bg-muted/30 p-4">
+        <div className="flex items-start gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <RefreshCw className="size-5" />
+          </div>
 
-      <p className="text-sm">
-        Ostatnie odświeżenie:{" "}
-        <span className="font-medium text-foreground">
-          {formatted ??
-            "jeszcze nie wykonano"}
-        </span>
-      </p>
+          <div className="min-w-0">
+            <p className="font-medium">
+              Automatyczna aktualizacja
+            </p>
 
-      {lastSyncStatus && (
-        <p className="text-sm text-muted-foreground">
-          Informacja: {lastSyncStatus}
-        </p>
-      )}
+            <p className="mt-1 text-sm leading-5 text-muted-foreground">
+              Lista filmów jest automatycznie odświeżana
+              raz na 24 godziny. Nie musisz robić tego ręcznie.
+            </p>
+          </div>
+        </div>
+      </div>
 
-      {state.error && (
-        <p className="text-sm text-destructive">
-          {state.error}
-        </p>
-      )}
+      <div className="rounded-xl border p-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div
+              className={`flex size-10 shrink-0 items-center justify-center rounded-full ${
+                hasError
+                  ? "bg-destructive/10 text-destructive"
+                  : isSuccessful
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {hasError ? (
+                <AlertCircle className="size-5" />
+              ) : isSuccessful ? (
+                <CheckCircle2 className="size-5" />
+              ) : (
+                <Clock className="size-5" />
+              )}
+            </div>
 
-      {state.success && (
-        <p className="text-sm text-primary">
-          Lista filmów została odświeżona.
-        </p>
-      )}
+            <div>
+              <p className="text-sm font-medium">
+                {hasError
+                  ? "Wymagana ponowna synchronizacja"
+                  : isSuccessful
+                    ? "Filmy są aktualne"
+                    : "Synchronizacja nie została jeszcze wykonana"}
+              </p>
 
-      <form
-        ref={formRef}
-        action={action}
-      >
-        <Button
-          type="submit"
-          variant="outline"
-          size="sm"
-          disabled={pending}
-        >
-          <RefreshCw
-            className={
-              pending
-                ? "animate-spin"
-                : ""
-            }
-          />
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Ostatnie odświeżenie:{" "}
+                <span className="font-medium text-foreground">
+                  {formatted ?? "jeszcze nie wykonano"}
+                </span>
+              </p>
+            </div>
+          </div>
 
-          {pending
-            ? "Odświeżam…"
-            : "Odśwież teraz"}
-        </Button>
-      </form>
+          <form ref={formRef} action={action}>
+            <Button
+              type="submit"
+              variant="outline"
+              size="sm"
+              disabled={pending}
+              className="w-full sm:w-auto"
+            >
+              <RefreshCw
+                className={pending ? "animate-spin" : ""}
+              />
+
+              {pending ? "Odświeżam…" : "Odśwież teraz"}
+            </Button>
+          </form>
+        </div>
+      </div>
+
+      {state.error ? (
+        <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+          <AlertCircle className="mt-0.5 size-4 shrink-0" />
+
+          <div>
+            <p className="font-medium">
+              Nie udało się odświeżyć filmów
+            </p>
+
+            <p className="mt-1 text-destructive/80">
+              {state.error}
+            </p>
+          </div>
+        </div>
+      ) : null}
+
+      {state.success ? (
+        <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-primary">
+          <CheckCircle2 className="size-4 shrink-0" />
+
+          <p className="font-medium">
+            Lista filmów została pomyślnie odświeżona.
+          </p>
+        </div>
+      ) : null}
+
+      {lastAttemptFailed && !state.error ? (
+        <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+          <AlertCircle className="mt-0.5 size-4 shrink-0" />
+
+          <div>
+            <p className="font-medium">
+              Ostatnia próba aktualizacji nie powiodła się
+            </p>
+
+            <p className="mt-1 text-destructive/80">
+              Panel spróbuje ponownie przy kolejnym otwarciu.
+            </p>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
