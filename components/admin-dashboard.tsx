@@ -3402,7 +3402,7 @@ function SettingsForm({
     [
       "tripsTitle",
       "Nagłówek sekcji wyjazdów",
-      "Tytuł sekcji pokazuj��cej dostępne wyjazdy.",
+      "Tytuł sekcji pokazującej dostępne wyjazdy.",
       "Najbliższe wyjazdy",
     ],
     [
