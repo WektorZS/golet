@@ -11,7 +11,11 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 
 const initialState: InquiryState = { status: "idle", message: "" }
 
-export function InquiryForm() {
+export function InquiryForm({
+  matchName = "",
+}: {
+  matchName?: string
+}) {
   const [state, action, pending] = useActionState(createInquiry, initialState)
   const [formLoadedAt] = useState(() => Date.now())
 
