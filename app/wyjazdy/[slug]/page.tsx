@@ -247,7 +247,7 @@ export default async function TripDetailPage({
             <div className="overflow-hidden rounded-xl bg-foreground text-background shadow-xl">
               <div className="border-b border-background/10 px-6 py-6 md:px-7">
                 <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                  Bez zobowiązań
+                  Skontaktuj się z nami
                 </p>
 
                 <h2 className="mt-2 font-sans text-3xl font-black uppercase leading-tight">
