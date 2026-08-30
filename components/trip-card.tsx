@@ -24,7 +24,7 @@ function formatTripDates(startDate: string, endDate: string | null) {
 
   if (!endDate || endDate === startDate) return start
 
-  return `${start} – ${dateFormatter.format(
+  return `${start} - ${dateFormatter.format(
     new Date(`${endDate}T12:00:00`)
   )}`
 }

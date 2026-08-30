@@ -51,7 +51,7 @@ export async function sendInquiryEmails(
     from: FROM_EMAIL,
     to: inquiry.email,
     replyTo: ADMIN_EMAIL,
-    subject: "Otrzymaliśmy Twoje zapytanie – Let's Gol",
+    subject: "Otrzymaliśmy Twoje zapytanie - Let's Gol",
     html: `
       <div style="margin:0;padding:30px 15px;background:#f5f5f5;font-family:Arial,sans-serif;color:#111;">
         <div style="max-width:620px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;">
@@ -120,7 +120,7 @@ export async function sendInquiryEmails(
     from: FROM_EMAIL,
     to: ADMIN_EMAIL,
     replyTo: inquiry.email,
-    subject: `🔔 Nowe zapytanie – ${inquiry.name} – ${inquiry.matchName}`,
+    subject: `🔔 Nowe zapytanie - ${inquiry.name} - ${inquiry.matchName}`,
     html: `
       <div style="margin:0;padding:30px 15px;background:#f5f5f5;font-family:Arial,sans-serif;color:#111;">
         <div style="max-width:700px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;">

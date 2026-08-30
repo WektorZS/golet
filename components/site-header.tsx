@@ -21,7 +21,7 @@ export function Brand() {
     <Link
       href="/"
       className="flex items-center gap-3 text-background"
-      aria-label="Let’s Gol – strona główna"
+      aria-label="Let’s Gol - strona główna"
     >
       <span className="flex size-16 shrink-0 items-center justify-center">
         <Image

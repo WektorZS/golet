@@ -74,7 +74,7 @@ export default async function TripDetailPage({
 
   const date =
     trip.endDate && trip.endDate !== trip.startDate
-      ? `${startDate} – ${dateFormatter.format(
+      ? `${startDate} - ${dateFormatter.format(
           new Date(`${trip.endDate}T12:00:00`)
         )}`
       : startDate
