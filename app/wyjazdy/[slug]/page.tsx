@@ -168,9 +168,9 @@ export default async function TripDetailPage({
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_0.8fr] lg:gap-14">
           <div className="min-w-0">
             <div>
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                Pełny pakiet
-              </p>
+              <div className="inline-block bg-foreground px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
+  Pełny pakiet
+</div>
 
               <h2 className="mt-2 font-sans text-4xl font-black uppercase leading-tight">
                 Wszystko przygotowane
@@ -184,10 +184,9 @@ export default async function TripDetailPage({
 
             {trip.includes.length > 0 && (
               <div className="mt-9">
-                <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                  W cenie
-                </p>
-
+                <div className="inline-block bg-foreground px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
+  W cenie
+</div>
                 <h3 className="mt-2 font-sans text-2xl font-black uppercase">
                   Co otrzymujesz?
                 </h3>
