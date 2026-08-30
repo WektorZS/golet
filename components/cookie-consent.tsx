@@ -166,71 +166,92 @@ export function CookieConsent() {
                   </div>
                 </div>
 
-                <p className="text-base font-semibold leading-relaxed">
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   Zanim ruszysz z nami na stadion, wybierz,
-                  jak możemy korzystać z cookies.
+                  jak chcesz, abyśmy korzystali z plików cookies.
+                  Niezbędne cookies są zawsze aktywne, a analityka
+                  jest opcjonalna.
                 </p>
 
-                <div className="rounded-lg border bg-background p-4">
-                  <div className="flex gap-3">
-                    <ShieldCheck
-                      className="mt-0.5 size-5 shrink-0 text-primary"
-                      aria-hidden="true"
-                    />
-
-                    <div>
-                      <p className="text-sm font-bold">
-                        Twoja decyzja jest pod Twoją kontrolą
-                      </p>
-
-                      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                        Możesz w każdej chwili zmienić swoje
-                        ustawienia cookies, korzystając z ikony
-                        ciasteczka widocznej na stronie.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    Niezbędne cookies są wymagane do prawidłowego
-                    działania strony i zapewnienia jej podstawowej
-                    funkcjonalności.
-                  </p>
-
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    Jeśli wyrazisz zgodę na analitykę, będziemy
-                    zbierać anonimowe informacje o tym, jak
-                    użytkownicy korzystają z naszej strony.
-                    Dzięki temu możemy analizować liczbę odwiedzin,
-                    źródła ruchu oraz popularność poszczególnych
-                    podstron.
-                  </p>
-
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    Analityka pomaga nam również poprawiać
-                    działanie i funkcjonalność serwisu.
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:justify-end">
-                  <Button
-                    variant="outline"
-                    size="lg"
+                <div className="grid gap-3">
+                  <button
+                    type="button"
                     onClick={() => choose("rejected")}
-                    className="w-full sm:w-auto"
+                    className="group w-full rounded-xl border border-border bg-background p-4 text-left transition-all duration-200 hover:border-primary/50 hover:bg-primary/5"
                   >
-                    Tylko niezbędne
-                  </Button>
+                    <div className="flex items-start gap-4">
+                      <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+                        <ShieldCheck
+                          className="size-5"
+                          aria-hidden="true"
+                        />
+                      </div>
 
-                  <Button
-                    size="lg"
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="font-bold">
+                            Niezbędne cookies
+                          </p>
+
+                          <span className="shrink-0 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                            Zawsze aktywne
+                          </span>
+                        </div>
+
+                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                          Są potrzebne do prawidłowego działania
+                          strony i zapewnienia jej podstawowej
+                          funkcjonalności.
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => choose("accepted")}
-                    className="w-full sm:w-auto"
+                    className="group w-full rounded-xl border border-border bg-background p-4 text-left transition-all duration-200 hover:border-primary/50 hover:bg-primary/5"
                   >
-                    Akceptuję analitykę
-                  </Button>
+                    <div className="flex items-start gap-4">
+                      <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+                        <Cookie
+                          className="size-5"
+                          aria-hidden="true"
+                        />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="font-bold">
+                            Analityka
+                          </p>
+
+                          <span className="shrink-0 text-xs font-bold uppercase tracking-wider text-primary">
+                            Opcjonalna
+                          </span>
+                        </div>
+
+                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                          Pomaga nam anonimowo analizować
+                          korzystanie ze strony i poprawiać
+                          jej działanie.
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+
+                <div className="flex items-start gap-3 border-t border-border pt-4">
+                  <ShieldCheck
+                    className="mt-0.5 size-5 shrink-0 text-primary"
+                    aria-hidden="true"
+                  />
+
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    Twój wybór zostanie zapisany. W każdej chwili
+                    możesz go zmienić, korzystając z ikony ciasteczka
+                    dostępnej na stronie.
+                  </p>
                 </div>
               </div>
             </div>
@@ -379,7 +400,7 @@ export function CookieConsent() {
                   onClick={() => setEditing(false)}
                   className="mx-auto pt-1 text-sm font-medium text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
                 >
-                  Zamknij
+                  Zamknij bez zmian
                 </button>
               </div>
             </div>
