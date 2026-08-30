@@ -1,4 +1,3 @@
-```tsx
 import { get } from "@vercel/blob"
 import { and, eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
