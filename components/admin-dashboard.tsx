@@ -9,9 +9,13 @@ import {
   AlertCircle,
   Archive,
   BookOpen,
+  CheckCircle2,
   Clapperboard,
+  Clock,
   Copy,
   ExternalLink,
+  Eye,
+  EyeOff,
   FileImage,
   HelpCircle,
   Home,
@@ -19,20 +23,19 @@ import {
   KeyRound,
   LayoutDashboard,
   LogOut,
+  Mail,
+  MessageCircle,
   Pencil,
+  Phone,
   Plane,
   Plus,
   RefreshCw,
   Search,
   Settings,
+  ShieldCheck,
   Star,
-  CheckCircle2,
-  Clock,
-  Mail,
-  MessageCircle,
-  Phone,
-  XCircle,
   Upload,
+  XCircle,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -1893,64 +1896,136 @@ export function AdminDashboard({ data }: { data: AdminData }) {
   </div>
 </TabsContent>
 
-        <TabsContent value="account">
-          <SectionHeader
-            eyebrow="Konto"
-            title="Bezpieczeństwo"
-            description="Zmień hasło administratora i chroń dostęp do panelu."
-          />
+      <TabsContent value="account">
+  <SectionHeader
+    eyebrow="Konto"
+    title="Bezpieczeństwo"
+    description="Zarządzaj dostępem do panelu administratora i zabezpiecz swoje konto."
+  />
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  Zmiana hasła
-                </CardTitle>
-
-                <CardDescription>
-                  Nowe hasło powinno mieć co najmniej
-                  12 znaków.
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent>
-                <ChangePasswordForm />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  Administrator
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent className="flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                  <span className="flex size-11 items-center justify-center rounded-full bg-primary font-black text-primary-foreground">
-                    M
-                  </span>
-
-                  <div>
-                    <p className="font-medium">
-                      {data.email}
-                    </p>
-
-                    <p className="text-sm text-muted-foreground">
-                      Pełny dostęp do panelu
-                    </p>
-                  </div>
-                </div>
-
-                <p className="text-sm text-muted-foreground">
-                  Dostęp jest dodatkowo ograniczony do
-                  zatwierdzonego adresu e-mail oraz
-                  zaufanych domen Neon Auth.
-                </p>
-              </CardContent>
-            </Card>
+  <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+    <Card>
+      <CardHeader>
+        <div className="flex items-start gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <KeyRound className="size-5" />
           </div>
-        </TabsContent>
+
+          <div>
+            <CardTitle>
+              Zmiana hasła
+            </CardTitle>
+
+            <CardDescription className="mt-1">
+              Regularna zmiana hasła pomaga
+              chronić dostęp do panelu.
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <ChangePasswordForm />
+      </CardContent>
+    </Card>
+
+    <div className="flex flex-col gap-6">
+      <Card>
+        <CardHeader>
+          <div className="flex items-start gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <ShieldCheck className="size-5" />
+            </div>
+
+            <div>
+              <CardTitle>
+                Administrator
+              </CardTitle>
+
+              <CardDescription className="mt-1">
+                Konto z pełnym dostępem do panelu.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary font-black text-primary-foreground">
+              {data.email
+                ?.charAt(0)
+                .toUpperCase() || "A"}
+            </span>
+
+            <div className="min-w-0">
+              <p className="truncate font-medium">
+                {data.email}
+              </p>
+
+              <div className="mt-1 flex items-center gap-2">
+                <span className="size-1.5 rounded-full bg-primary" />
+
+                <span className="text-xs text-muted-foreground">
+                  Dostęp administratora
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border bg-muted/30 p-3.5">
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Dostęp do panelu jest przyznawany
+              wyłącznie zatwierdzonemu adresowi
+              e-mail administratora.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            Dodatkowa ochrona
+          </CardTitle>
+
+          <CardDescription>
+            Ważne informacje dotyczące bezpieczeństwa
+            konta.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="flex flex-col gap-3">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
+
+            <p className="text-sm text-muted-foreground">
+              Operacje administracyjne wymagają
+              aktywnej sesji administratora.
+            </p>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
+
+            <p className="text-sm text-muted-foreground">
+              Przy zmianie hasła możesz wylogować
+              wszystkie pozostałe urządzenia.
+            </p>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
+
+            <p className="text-sm text-muted-foreground">
+              Dostęp do panelu jest ograniczony do
+              konta administratora.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  </div>
+</TabsContent>
       </main>
     </Tabs>
   )
@@ -2474,15 +2549,15 @@ function YouTubeSyncStatus({
         </div>
       ) : null}
 
-      {state.success ? (
-        <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-primary">
-          <CheckCircle2 className="size-4 shrink-0" />
+     {state.success ? (
+  <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-primary">
+    <CheckCircle2 className="size-4 shrink-0" />
 
-          <p className="font-medium">
-            Lista filmów została pomyślnie odświeżona.
-          </p>
-        </div>
-      ) : null}
+    <p className="font-medium text-foreground">
+      Lista filmów została pomyślnie odświeżona.
+    </p>
+  </div>
+) : null}
 
       {lastAttemptFailed && !state.error ? (
         <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
@@ -2515,6 +2590,36 @@ function ChangePasswordForm() {
     initialPasswordState
   )
 
+  const [showCurrent, setShowCurrent] =
+    useState(false)
+
+  const [showNew, setShowNew] =
+    useState(false)
+
+  const [showConfirm, setShowConfirm] =
+    useState(false)
+
+  const [newPassword, setNewPassword] =
+    useState("")
+
+  const passwordStrength =
+    newPassword.length === 0
+      ? null
+      : newPassword.length < 12
+        ? "weak"
+        : newPassword.length < 16
+          ? "medium"
+          : "strong"
+
+  const passwordStrengthLabel =
+    passwordStrength === "weak"
+      ? "Za krótkie"
+      : passwordStrength === "medium"
+        ? "Dobre"
+        : passwordStrength === "strong"
+          ? "Silne"
+          : null
+
   return (
     <form
       key={
@@ -2523,82 +2628,232 @@ function ChangePasswordForm() {
           : "form"
       }
       action={action}
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-5"
     >
       <Field
         label="Aktualne hasło"
         hint="Wpisz obecne hasło używane do logowania do panelu."
       >
-        <Input
-          name="currentPassword"
-          type="password"
-          autoComplete="current-password"
-          required
-        />
+        <div className="relative">
+          <Input
+            name="currentPassword"
+            type={
+              showCurrent
+                ? "text"
+                : "password"
+            }
+            autoComplete="current-password"
+            required
+            className="pr-11"
+          />
+
+          <button
+            type="button"
+            onClick={() =>
+              setShowCurrent(
+                (value) => !value
+              )
+            }
+            className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            aria-label={
+              showCurrent
+                ? "Ukryj aktualne hasło"
+                : "Pokaż aktualne hasło"
+            }
+          >
+            {showCurrent ? (
+              <EyeOff className="size-4" />
+            ) : (
+              <Eye className="size-4" />
+            )}
+          </button>
+        </div>
       </Field>
 
       <Field
         label="Nowe hasło"
-        hint="Nowe hasło musi mieć co najmniej 12 znaków."
+        hint="Minimum 12 znaków. Zalecamy 16 lub więcej znaków."
       >
-        <Input
-          name="newPassword"
-          type="password"
-          minLength={12}
-          autoComplete="new-password"
-          required
-        />
+        <div className="relative">
+          <Input
+            name="newPassword"
+            type={
+              showNew
+                ? "text"
+                : "password"
+            }
+            minLength={12}
+            autoComplete="new-password"
+            required
+            value={newPassword}
+            onChange={(event) =>
+              setNewPassword(
+                event.target.value
+              )
+            }
+            className="pr-11"
+          />
+
+          <button
+            type="button"
+            onClick={() =>
+              setShowNew(
+                (value) => !value
+              )
+            }
+            className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            aria-label={
+              showNew
+                ? "Ukryj nowe hasło"
+                : "Pokaż nowe hasło"
+            }
+          >
+            {showNew ? (
+              <EyeOff className="size-4" />
+            ) : (
+              <Eye className="size-4" />
+            )}
+          </button>
+        </div>
+
+        {newPassword && (
+          <div className="mt-2 flex items-center gap-2">
+            <div className="flex flex-1 gap-1">
+              <span
+                className={`h-1.5 flex-1 rounded-full ${
+                  passwordStrength
+                    ? "bg-primary"
+                    : "bg-muted"
+                }`}
+              />
+
+              <span
+                className={`h-1.5 flex-1 rounded-full ${
+                  passwordStrength ===
+                    "medium" ||
+                  passwordStrength ===
+                    "strong"
+                    ? "bg-primary"
+                    : "bg-muted"
+                }`}
+              />
+
+              <span
+                className={`h-1.5 flex-1 rounded-full ${
+                  passwordStrength ===
+                  "strong"
+                    ? "bg-primary"
+                    : "bg-muted"
+                }`}
+              />
+            </div>
+
+            <span className="text-xs font-medium text-muted-foreground">
+              {passwordStrengthLabel}
+            </span>
+          </div>
+        )}
       </Field>
 
       <Field
         label="Powtórz nowe hasło"
-        hint="Wpisz ponownie nowe hasło, aby upewnić się, że nie ma w nim literówki."
+        hint="Wpisz ponownie nowe hasło."
       >
-        <Input
-          name="confirmPassword"
-          type="password"
-          minLength={12}
-          autoComplete="new-password"
-          required
-        />
+        <div className="relative">
+          <Input
+            name="confirmPassword"
+            type={
+              showConfirm
+                ? "text"
+                : "password"
+            }
+            minLength={12}
+            autoComplete="new-password"
+            required
+            className="pr-11"
+          />
+
+          <button
+            type="button"
+            onClick={() =>
+              setShowConfirm(
+                (value) => !value
+              )
+            }
+            className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            aria-label={
+              showConfirm
+                ? "Ukryj powtórzone hasło"
+                : "Pokaż powtórzone hasło"
+            }
+          >
+            {showConfirm ? (
+              <EyeOff className="size-4" />
+            ) : (
+              <Eye className="size-4" />
+            )}
+          </button>
+        </div>
       </Field>
 
-      <label className="flex items-center gap-2 text-sm">
+      <label className="flex cursor-pointer items-start gap-3 rounded-xl border bg-muted/30 p-3.5 transition hover:bg-muted/50">
         <input
           name="revokeOtherSessions"
           type="checkbox"
           defaultChecked
+          className="mt-0.5 size-4 accent-primary"
         />
 
-        Wyloguj pozostałe urządzenia
+        <span className="flex flex-col gap-0.5">
+          <span className="text-sm font-medium">
+            Wyloguj pozostałe urządzenia
+          </span>
+
+          <span className="text-xs leading-relaxed text-muted-foreground">
+            Po zmianie hasła pozostałe aktywne
+            sesje administratora zostaną
+            wylogowane.
+          </span>
+        </span>
       </label>
 
       {state.error && (
-        <p className="text-sm text-destructive">
+        <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3.5 text-sm text-destructive">
           {state.error}
-        </p>
+        </div>
       )}
 
       {state.success && (
-        <p className="text-sm text-primary">
-          Hasło zostało zmienione.
-        </p>
+        <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
+          <CheckCircle2 className="size-5 shrink-0 text-primary" />
+
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              Hasło zostało zmienione.
+            </p>
+
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Twoje konto jest zabezpieczone nowym
+              hasłem.
+            </p>
+          </div>
+        </div>
       )}
 
       <Button
         type="submit"
         disabled={pending}
+        className="w-full sm:w-auto"
       >
         <KeyRound />
 
         {pending
-          ? "Zmieniam…"
+          ? "Zmieniam hasło…"
           : "Zmień hasło"}
       </Button>
     </form>
   )
 }
-
 const initialTripState: SaveTripState = {}
 
 function TripDialog({
