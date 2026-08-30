@@ -1829,35 +1829,26 @@ export function AdminDashboard({ data }: { data: AdminData }) {
   </Button>
 
   {lead.status === "closed" ? (
-    <form
-      action={deleteInquiry}
-      onSubmit={(event) => {
-        if (
-          !window.confirm(
-            `Czy na pewno chcesz usunąć zapytanie klienta „${lead.name}”? Ta operacja jest nieodwracalna.`
-          )
-        ) {
-          event.preventDefault()
-        }
-      }}
-    >
-      <input
-        type="hidden"
-        name="id"
-        value={lead.id}
-      />
-
-      <Button
-        type="submit"
-        size="sm"
-        variant="outline"
-        className="w-full border-red-500/40 text-red-600 hover:bg-red-500/10 hover:text-red-600 sm:w-auto"
-      >
-        <XCircle />
-        Usuń zapytanie
-      </Button>
-    </form>
-  ) : null}
+  <Button
+    type="submit"
+    formAction={deleteInquiry}
+    size="sm"
+    variant="outline"
+    className="w-full border-red-500/40 text-red-600 hover:bg-red-500/10 hover:text-red-600 sm:w-auto"
+    onClick={(event) => {
+      if (
+        !window.confirm(
+          `Czy na pewno chcesz usunąć zapytanie klienta „${lead.name}”? Ta operacja jest nieodwracalna.`
+        )
+      ) {
+        event.preventDefault()
+      }
+    }}
+  >
+    <XCircle />
+    Usuń zapytanie
+  </Button>
+) : null}
 </div>
                 </div>
               </form>
