@@ -69,11 +69,7 @@ export function FloatingContact() {
       <DialogTrigger
         render={
           <Button
-            className={`fixed bottom-2 right-2 z-40 border border-foreground shadow-xl transition-all duration-300 hover:scale-105 md:bottom-3 md:right-3 ${
-              showButton
-                ? "translate-y-0 opacity-100"
-                : "pointer-events-none translate-y-4 opacity-0"
-            }`}
+            className={`fixed bottom-2 right-2 z-40 border border-foreground shadow-xl transition-[transform,opacity] duration-500 ease-out hover:scale-105 md:bottom-3 md:right-3 ${ showButton ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-8 opacity-0" }`}
             size="lg"
           />
         }

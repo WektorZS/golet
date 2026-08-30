@@ -220,11 +220,7 @@ export function CookieConsent() {
           onClick={() => setEditing(true)}
           aria-label="Ustawienia cookies"
           title="Ustawienia cookies"
-          className={`fixed bottom-2 left-2 z-40 h-12 w-12 border border-[#f4b91e] bg-black text-black shadow-xl transition-all duration-300 hover:scale-105 hover:bg-white md:bottom-3 md:left-3 ${
-            showFloatingButton
-              ? "translate-y-0 opacity-100"
-              : "pointer-events-none translate-y-4 opacity-0"
-          }`}
+         className={`fixed bottom-2 left-2 z-40 h-12 w-12 border border-[#f4b91e] bg-black text-black shadow-xl transition-[transform,opacity] duration-500 ease-out hover:scale-105 hover:bg-white md:bottom-3 md:left-3 ${ showFloatingButton ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-8 opacity-0" }`}
         >
           <Cookie className="!h-7 !w-7 text-[#f4b91e]" />
         </Button>
