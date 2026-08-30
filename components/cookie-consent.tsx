@@ -143,7 +143,7 @@ export function CookieConsent() {
               <div className="flex items-center gap-3">
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                   <Cookie
-                    className="size-6 text-primary"
+                    className="size-6 text-black"
                     aria-hidden="true"
                   />
                 </span>
