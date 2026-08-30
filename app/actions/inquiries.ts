@@ -3,9 +3,18 @@
 import { and, eq, gt, sql } from "drizzle-orm"
 import { headers } from "next/headers"
 import { z } from "zod"
+
 import { db } from "@/lib/db"
-import { inquiries, inquiryAttempts } from "@/lib/db/schema"
-import { GENERIC_ERROR, getClientIp, hmac } from "@/lib/security"
+import {
+  inquiries,
+  inquiryAttempts,
+} from "@/lib/db/schema"
+import {
+  GENERIC_ERROR,
+  getClientIp,
+  hmac,
+} from "@/lib/security"
+import { sendInquiryEmails } from "@/lib/email"
 
 const inquirySchema = z.object({
   name: z.string().trim().min(2).max(100),
@@ -20,14 +29,20 @@ const inquirySchema = z.object({
   privacyConsent: z.literal("on"),
 })
 
-export type InquiryState = { status: "idle" | "success" | "error"; message: string }
+export type InquiryState = {
+  status: "idle" | "success" | "error"
+  message: string
+}
 
 const COOLDOWN_MS = 60_000
 const MAX_PER_IP_PER_DAY = 5
 const MAX_PER_EMAIL_PER_DAY = 3
 const MIN_FILL_TIME_MS = 2_500
 
-export async function createInquiry(_: InquiryState, formData: FormData): Promise<InquiryState> {
+export async function createInquiry(
+  _: InquiryState,
+  formData: FormData
+): Promise<InquiryState> {
   const parsed = inquirySchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -37,51 +52,223 @@ export async function createInquiry(_: InquiryState, formData: FormData): Promis
     travelers: formData.get("travelers"),
     message: formData.get("message") ?? "",
     website: formData.get("website") ?? "",
-    formLoadedAt: formData.get("formLoadedAt") ?? undefined,
+    formLoadedAt:
+      formData.get("formLoadedAt") ?? undefined,
     privacyConsent: formData.get("privacyConsent"),
   })
 
   if (!parsed.success) {
-    return { status: "error", message: "Sprawdź wymagane pola i spróbuj ponownie." }
+    return {
+      status: "error",
+      message:
+        "Sprawdź wymagane pola i spróbuj ponownie.",
+    }
   }
 
-  // Honeypot: a hidden field real users never fill; bots that fill every field trip it.
+
   if (parsed.data.website) {
-    return { status: "success", message: "Dziękujemy. Odezwemy się z propozycją w ciągu 24 godzin." }
+    return {
+      status: "success",
+      message:
+        "Dziękujemy. Odezwiemy się z propozycją w ciągu 24 godzin.",
+    }
   }
 
-  // A form submitted implausibly fast after render is almost certainly automated.
-  if (parsed.data.formLoadedAt && Date.now() - parsed.data.formLoadedAt < MIN_FILL_TIME_MS) {
-    return { status: "error", message: "Formularz wysłano zbyt szybko. Spróbuj ponownie." }
+
+  if (
+    parsed.data.formLoadedAt &&
+    Date.now() - parsed.data.formLoadedAt <
+      MIN_FILL_TIME_MS
+  ) {
+    return {
+      status: "error",
+      message:
+        "Formularz wysłano zbyt szybko. Spróbuj ponownie.",
+    }
   }
 
   const requestHeaders = await headers()
-  const ipHash = hmac(getClientIp(requestHeaders))
-  const emailHash = hmac(parsed.data.email)
-  const contentHash = hmac(`${parsed.data.email}|${parsed.data.matchName}|${parsed.data.message}`)
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
-  const cooldownSince = new Date(Date.now() - COOLDOWN_MS)
+
+  const ipHash = hmac(
+    getClientIp(requestHeaders)
+  )
+
+  const emailHash = hmac(
+    parsed.data.email
+  )
+
+  const contentHash = hmac(
+    `${parsed.data.email}|${parsed.data.matchName}|${parsed.data.message}`
+  )
+
+  const oneDayAgo = new Date(
+    Date.now() - 24 * 60 * 60 * 1000
+  )
+
+  const cooldownSince = new Date(
+    Date.now() - COOLDOWN_MS
+  )
 
   try {
-    const [recentByIp, recentByEmail, sameContent] = await Promise.all([
-      db.select({ count: sql<number>`count(*)` }).from(inquiryAttempts).where(and(eq(inquiryAttempts.ipHash, ipHash), eq(inquiryAttempts.accepted, true), gt(inquiryAttempts.createdAt, oneDayAgo))),
-      db.select({ count: sql<number>`count(*)` }).from(inquiryAttempts).where(and(eq(inquiryAttempts.emailHash, emailHash), eq(inquiryAttempts.accepted, true), gt(inquiryAttempts.createdAt, oneDayAgo))),
-      db.select({ count: sql<number>`count(*)` }).from(inquiryAttempts).where(and(eq(inquiryAttempts.contentHash, contentHash), gt(inquiryAttempts.createdAt, cooldownSince))),
+ 
+    const [
+      recentByIp,
+      recentByEmail,
+      sameContent,
+    ] = await Promise.all([
+      db
+        .select({
+          count: sql<number>`count(*)`,
+        })
+        .from(inquiryAttempts)
+        .where(
+          and(
+            eq(
+              inquiryAttempts.ipHash,
+              ipHash
+            ),
+            eq(
+              inquiryAttempts.accepted,
+              true
+            ),
+            gt(
+              inquiryAttempts.createdAt,
+              oneDayAgo
+            )
+          )
+        ),
+
+      db
+        .select({
+          count: sql<number>`count(*)`,
+        })
+        .from(inquiryAttempts)
+        .where(
+          and(
+            eq(
+              inquiryAttempts.emailHash,
+              emailHash
+            ),
+            eq(
+              inquiryAttempts.accepted,
+              true
+            ),
+            gt(
+              inquiryAttempts.createdAt,
+              oneDayAgo
+            )
+          )
+        ),
+
+      db
+        .select({
+          count: sql<number>`count(*)`,
+        })
+        .from(inquiryAttempts)
+        .where(
+          and(
+            eq(
+              inquiryAttempts.contentHash,
+              contentHash
+            ),
+            gt(
+              inquiryAttempts.createdAt,
+              cooldownSince
+            )
+          )
+        ),
     ])
 
-    if (Number(sameContent[0]?.count ?? 0) > 0) {
-      return { status: "error", message: "To zapytanie zostało już wysłane. Odpowiemy wkrótce." }
-    }
-    if (Number(recentByIp[0]?.count ?? 0) >= MAX_PER_IP_PER_DAY || Number(recentByEmail[0]?.count ?? 0) >= MAX_PER_EMAIL_PER_DAY) {
-      await db.insert(inquiryAttempts).values({ ipHash, emailHash, contentHash, accepted: false })
-      return { status: "error", message: "Osiągnięto dzienny limit zapytań z tego adresu. Spróbuj ponownie później." }
+ 
+    if (
+      Number(sameContent[0]?.count ?? 0) > 0
+    ) {
+      return {
+        status: "error",
+        message:
+          "To zapytanie zostało już wysłane. Odpowiemy wkrótce.",
+      }
     }
 
-    const { website, formLoadedAt, privacyConsent, ...values } = parsed.data
-    await db.insert(inquiries).values({ ...values, consentAcceptedAt: new Date() })
-    await db.insert(inquiryAttempts).values({ ipHash, emailHash, contentHash, accepted: true })
-    return { status: "success", message: "Dziękujemy. Odezwemy się z propozycją w ciągu 24 godzin." }
-  } catch {
-    return { status: "error", message: GENERIC_ERROR }
+
+    if (
+      Number(recentByIp[0]?.count ?? 0) >=
+        MAX_PER_IP_PER_DAY ||
+      Number(recentByEmail[0]?.count ?? 0) >=
+        MAX_PER_EMAIL_PER_DAY
+    ) {
+      await db
+        .insert(inquiryAttempts)
+        .values({
+          ipHash,
+          emailHash,
+          contentHash,
+          accepted: false,
+        })
+
+      return {
+        status: "error",
+        message:
+          "Osiągnięto dzienny limit zapytań z tego adresu. Spróbuj ponownie później.",
+      }
+    }
+
+ 
+    const {
+      website,
+      formLoadedAt,
+      privacyConsent,
+      ...values
+    } = parsed.data
+
+    await db.insert(inquiries).values({
+      ...values,
+      consentAcceptedAt: new Date(),
+    })
+
+    await db
+      .insert(inquiryAttempts)
+      .values({
+        ipHash,
+        emailHash,
+        contentHash,
+        accepted: true,
+      })
+
+   
+    try {
+      await sendInquiryEmails({
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        matchName: values.matchName,
+        departureCity:
+          values.departureCity,
+        travelers: values.travelers,
+        message: values.message,
+      })
+    } catch (error) {
+ 
+      console.error(
+        "Nie udało się wysłać wiadomości e-mail dla zapytania:",
+        error
+      )
+    }
+
+    return {
+      status: "success",
+      message:
+        "Dziękujemy. Odezwiemy się z propozycją w ciągu 24 godzin.",
+    }
+  } catch (error) {
+    console.error(
+      "Błąd podczas zapisywania zapytania:",
+      error
+    )
+
+    return {
+      status: "error",
+      message: GENERIC_ERROR,
+    }
   }
 }
