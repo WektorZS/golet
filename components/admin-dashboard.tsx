@@ -4324,116 +4324,185 @@ function SettingsForm({
     ],
   ] as const
 
-  const [
-    state,
-    action,
-    pending,
-  ] = useActionState(
+  const [state, action, pending] = useActionState(
     saveSettings,
     initialSaveSettingsState
   )
 
+  const getField = (key: string) =>
+    fields.find((field) => field[0] === key)
+
+  const renderField = (key: string) => {
+    const field = getField(key)
+
+    if (!field) return null
+
+    const [, label, hint, fallback] = field
+    const isTextarea =
+      key.endsWith("Text") ||
+      key.endsWith("Description")
+
+    return (
+      <Field key={key} label={label} hint={hint}>
+        {isTextarea ? (
+          <Textarea
+            name={`setting.${key}`}
+            defaultValue={settings[key] || fallback}
+            rows={4}
+          />
+        ) : (
+          <Input
+            name={`setting.${key}`}
+            defaultValue={settings[key] || fallback}
+          />
+        )}
+      </Field>
+    )
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          Najważniejsze teksty
-        </CardTitle>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Treści strony</CardTitle>
+          <CardDescription>
+            Zarządzaj tekstami wyświetlanymi na stronie bez
+            konieczności edytowania kodu.
+          </CardDescription>
+        </CardHeader>
+      </Card>
 
-        <CardDescription>
-          Zmieniaj teksty strony bez znajomości
-          kodowania. Przy każdym polu znajdziesz
-          krótkie wyjaśnienie.
-        </CardDescription>
-      </CardHeader>
+      <form action={action} className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Widoczność w Google</CardTitle>
+            <CardDescription>
+              Ustawienia wpływające na tytuł i opis strony
+              wyświetlane w wyszukiwarce Google.
+            </CardDescription>
+          </CardHeader>
 
-      <CardContent>
-        <form
-          action={action}
-          className="grid gap-5 md:grid-cols-2"
-        >
-          {fields.map(
-            ([
-              key,
-              label,
-              hint,
-              fallback,
-            ]) => (
-              <Field
-                key={key}
-                label={label}
-                hint={hint}
-              >
-                {key.endsWith(
-                  "Text"
-                ) ||
-                key.endsWith(
-                  "Description"
-                ) ? (
-                  <Textarea
-                    name={`setting.${key}`}
-                    defaultValue={
-                      settings[key] ||
-                      fallback
-                    }
-                    rows={4}
-                  />
-                ) : (
-                  <Input
-                    name={`setting.${key}`}
-                    defaultValue={
-                      settings[key] ||
-                      fallback
-                    }
-                  />
-                )}
-              </Field>
-            )
-          )}
+          <CardContent className="grid gap-5">
+            {renderField("seoTitle")}
+            {renderField("seoDescription")}
+          </CardContent>
+        </Card>
 
-          <Field
-            label="Liczba zdjęć na stronie głównej"
-            hint="Określ, ile zdjęć ma być widocznych w galerii na stronie głównej."
-          >
-            <Input
-              name="setting.galleryHomeLimit"
-              type="number"
-              min="1"
-              max="5"
-              defaultValue={
-                settings.galleryHomeLimit ||
-                "5"
-              }
-            />
-          </Field>
+        <Card>
+          <CardHeader>
+            <CardTitle>Strona główna</CardTitle>
+            <CardDescription>
+              Najważniejsze treści widoczne zaraz po wejściu
+              na stronę.
+            </CardDescription>
+          </CardHeader>
 
-          <div className="flex flex-col gap-2 md:col-span-2">
-            {state.error && (
-              <p className="text-sm text-destructive">
-                {state.error}
-              </p>
-            )}
+          <CardContent className="grid gap-5">
+            {renderField("heroEyebrow")}
+            {renderField("heroTitle")}
+            {renderField("heroDescription")}
+            {renderField("heroCta")}
+          </CardContent>
+        </Card>
 
-            {state.success && (
-              <p className="text-sm text-primary">
-                Treści strony zostały zapisane.
-              </p>
-            )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Sekcje strony</CardTitle>
+            <CardDescription>
+              Nagłówki i opisy poszczególnych sekcji strony
+              głównej.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="grid gap-5 md:grid-cols-2">
+            {renderField("tripsTitle")}
+            {renderField("tripsDescription")}
+            {renderField("customTripTitle")}
+            {renderField("packageTitle")}
+            {renderField("benefitsTitle")}
+            {renderField("processTitle")}
+            {renderField("galleryTitle")}
+            {renderField("testimonialsTitle")}
+            {renderField("faqTitle")}
+            {renderField("youtubeTitle")}
+            {renderField("aboutTitle")}
+            {renderField("aboutText")}
+            {renderField("contactTitle")}
+            {renderField("footerText")}
+
+            <Field
+              label="Liczba zdjęć na stronie głównej"
+              hint="Określ, ile zdjęć ma być widocznych w galerii na stronie głównej."
+            >
+              <Input
+                name="setting.galleryHomeLimit"
+                type="number"
+                min="1"
+                max="5"
+                defaultValue={settings.galleryHomeLimit || "5"}
+              />
+            </Field>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Kontakt</CardTitle>
+            <CardDescription>
+              Dane kontaktowe wyświetlane klientom na stronie.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="grid gap-5 md:grid-cols-2">
+            {renderField("contactEmail")}
+            {renderField("contactPhone")}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Dane firmy</CardTitle>
+            <CardDescription>
+              Informacje o firmie wyświetlane na stronie.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="grid gap-5 md:grid-cols-2">
+            {renderField("companyName")}
+            {renderField("companyAddress")}
+            {renderField("companyNip")}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              {state.error && (
+                <p className="text-sm text-destructive">
+                  {state.error}
+                </p>
+              )}
+
+              {state.success && (
+                <p className="flex items-center gap-2 text-sm text-primary">
+                  <CheckCircle2 className="size-4" />
+                  Treści strony zostały zapisane.
+                </p>
+              )}
+            </div>
 
             <Button
               type="submit"
-              className="self-start"
               disabled={pending}
+              className="sm:min-w-48"
             >
               <BookOpen />
-
-              {pending
-                ? "Zapisuję…"
-                : "Zapisz treści strony"}
+              {pending ? "Zapisuję…" : "Zapisz treści strony"}
             </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      </form>
+    </div>
   )
 }
+
