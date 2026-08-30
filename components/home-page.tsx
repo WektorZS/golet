@@ -661,9 +661,9 @@ export function HomePage({
       Facebook · 160 opinii
     </p>
 
-    <p className="mt-0.5 text-xs font-semibold text-primary">
-      100% poleca
-    </p>
+    <p className="mt-1 w-fit bg-foreground px-2 py-1 text-xs font-semibold text-background">
+  100% poleca
+</p>
   </div>
 
   <div>
