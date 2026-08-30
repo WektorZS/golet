@@ -1602,7 +1602,7 @@ const [tripSort, setTripSort] = useState("nearest")
 
 <TabsContent value="inquiries">
   <SectionHeader
-    eyebrow="Sprzedaż"
+    eyebrow="KONTAKT"
     title="Zapytania klientów"
     description="Zarządzaj zapytaniami, kontaktami i dalszą obsługą klientów."
     action={
