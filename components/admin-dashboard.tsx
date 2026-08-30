@@ -26,6 +26,12 @@ import {
   Search,
   Settings,
   Star,
+  CheckCircle2,
+  Clock,
+  Mail,
+  MessageCircle,
+  Phone,
+  XCircle,
   Upload,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -146,6 +152,53 @@ const formatActivityDate = (date: Date | string) => {
   }).format(new Date(date))
 }
 
+const formatInquiryDate = (date: Date | string) => {
+  return new Intl.DateTimeFormat("pl-PL", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(date))
+}
+const getInquiryWaitingTime = (date: Date | string) => {
+  const created = new Date(date).getTime()
+  const now = Date.now()
+
+  const diffMs = Math.max(0, now - created)
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffDays === 0) {
+    return {
+      label: "Dzisiaj",
+      className: "text-muted-foreground",
+      dotClassName: "bg-muted-foreground",
+    }
+  }
+
+  if (diffDays === 1) {
+    return {
+      label: "1 dzień temu",
+      className: "font-semibold text-amber-600 dark:text-amber-400",
+      dotClassName: "bg-amber-500",
+    }
+  }
+
+  if (diffDays < 4) {
+    return {
+      label: `${diffDays} dni temu`,
+      className: "font-semibold text-orange-600 dark:text-orange-400",
+      dotClassName: "bg-orange-500",
+    }
+  }
+
+  return {
+    label: `${diffDays} dni temu`,
+    className: "font-bold text-red-600 dark:text-red-400",
+    dotClassName: "bg-red-500",
+  }
+}
+
 function SortableGalleryItem({
   item,
   children,
@@ -182,6 +235,9 @@ function SortableGalleryItem({
 export function AdminDashboard({ data }: { data: AdminData }) {
   const router = useRouter()
   const [query, setQuery] = useState("")
+  const [inquiryTab, setInquiryTab] = useState<
+  "new" | "contacted" | "closed"
+>("new")
   const [activeSection, setActiveSection] = useState<(typeof sections)[number][0]>("dashboard")
   const [galleryItems, setGalleryItems] = useState(data.gallery)
 
@@ -1425,130 +1481,395 @@ export function AdminDashboard({ data }: { data: AdminData }) {
           </div>
         </TabsContent>
 
-        <TabsContent value="inquiries">
-          <SectionHeader
-            eyebrow="Sprzedaż"
-            title="Zapytania klientów"
-            description="Obsługuj zgłoszenia, notatki i status kontaktu."
-            action={
-              <Button
-                variant="outline"
-                nativeButton={false}
-                render={
-                  <a href="/api/admin/inquiries.csv" />
-                }
-              >
-                <ExternalLink />
-                Pobierz zapytania
-              </Button>
-            }
-          />
+<TabsContent value="inquiries">
+  <SectionHeader
+    eyebrow="Sprzedaż"
+    title="Zapytania klientów"
+    description="Zarządzaj zapytaniami, kontaktami i dalszą obsługą klientów."
+    action={
+      <Button
+        variant="outline"
+        nativeButton={false}
+        render={
+          <a href="/api/admin/inquiries.csv" />
+        }
+      >
+        <ExternalLink />
+        Pobierz zapytania
+      </Button>
+    }
+  />
 
-          <div className="flex flex-col gap-4">
-            {data.inquiries.map((lead) => (
-              <Card key={lead.id}>
-                <CardContent className="grid gap-5 pt-6 lg:grid-cols-[1fr_1.4fr_auto]">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <strong>{lead.name}</strong>
+  <div className="mb-6 grid gap-3 sm:grid-cols-3">
+    <button
+      type="button"
+      onClick={() => setInquiryTab("new")}
+      className={`rounded-xl border p-4 text-left transition-all ${
+        inquiryTab === "new"
+          ? "border-primary bg-primary/5 shadow-sm"
+          : "bg-card hover:border-primary/40"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Inbox className="size-5" />
+        </div>
 
-                      <StatusBadge
-                        status={lead.status}
-                      />
-                    </div>
+        <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground">
+          {data.inquiries.filter(
+            (item) => item.status === "new"
+          ).length}
+        </span>
+      </div>
 
+      <p className="mt-3 font-semibold">
+        Nowe zapytania
+      </p>
+
+      <p className="mt-1 text-sm text-muted-foreground">
+        Wymagają Twojej uwagi
+      </p>
+    </button>
+
+    <button
+      type="button"
+      onClick={() => setInquiryTab("contacted")}
+      className={`rounded-xl border p-4 text-left transition-all ${
+        inquiryTab === "contacted"
+          ? "border-primary bg-primary/5 shadow-sm"
+          : "bg-card hover:border-primary/40"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          <MessageCircle className="size-5" />
+        </div>
+
+        <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-bold text-foreground">
+          {data.inquiries.filter(
+            (item) => item.status === "contacted"
+          ).length}
+        </span>
+      </div>
+
+      <p className="mt-3 font-semibold">
+        W trakcie kontaktu
+      </p>
+
+      <p className="mt-1 text-sm text-muted-foreground">
+        Klienci, z którymi już rozmawiasz
+      </p>
+    </button>
+
+    <button
+      type="button"
+      onClick={() => setInquiryTab("closed")}
+      className={`rounded-xl border p-4 text-left transition-all ${
+        inquiryTab === "closed"
+          ? "border-primary bg-primary/5 shadow-sm"
+          : "bg-card hover:border-primary/40"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          <CheckCircle2 className="size-5" />
+        </div>
+
+        <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-bold text-foreground">
+          {data.inquiries.filter(
+            (item) => item.status === "closed"
+          ).length}
+        </span>
+      </div>
+
+      <p className="mt-3 font-semibold">
+        Zamknięte
+      </p>
+
+      <p className="mt-1 text-sm text-muted-foreground">
+        Zakończone zapytania
+      </p>
+    </button>
+  </div>
+
+  <div className="flex flex-col gap-4">
+    {data.inquiries
+      .filter((lead) => lead.status === inquiryTab)
+      .sort(
+  (a, b) =>
+    new Date(a.created_at).getTime() -
+    new Date(b.created_at).getTime()
+)
+      .map((lead) => (
+        <Card
+          key={lead.id}
+          className={
+            lead.status === "new"
+              ? "border-primary/30 shadow-sm"
+              : ""
+          }
+        >
+          <CardHeader className="pb-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex min-w-0 items-start gap-3">
+                <div
+                  className={`flex size-11 shrink-0 items-center justify-center rounded-full ${
+                    lead.status === "new"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {lead.status === "new" ? (
+                    <Inbox className="size-5" />
+                  ) : lead.status === "contacted" ? (
+                    <MessageCircle className="size-5" />
+                  ) : (
+                    <CheckCircle2 className="size-5" />
+                  )}
+                </div>
+
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle className="text-base">
+                      {lead.name}
+                    </CardTitle>
+
+                    <StatusBadge
+                      status={lead.status}
+                    />
+                  </div>
+
+                  <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                     <a
-                      className="block text-sm text-primary underline-offset-4 hover:underline"
                       href={`mailto:${lead.email}`}
+                      className="inline-flex items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline"
                     >
+                      <Mail className="size-3.5" />
                       {lead.email}
                     </a>
 
                     <a
-                      className="text-sm text-primary underline-offset-4 hover:underline"
                       href={`tel:${lead.phone}`}
+                      className="inline-flex items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline"
                     >
+                      <Phone className="size-3.5" />
                       {lead.phone}
                     </a>
                   </div>
+                </div>
+              </div>
 
+              {lead.created_at ? (
+  (() => {
+    const waitingTime = getInquiryWaitingTime(
+      lead.created_at
+    )
+
+    return (
+      <div className="flex shrink-0 flex-col items-end gap-1">
+        <div
+          className={`flex items-center gap-1.5 text-xs ${waitingTime.className}`}
+        >
+          <span
+            className={`size-2 rounded-full ${waitingTime.dotClassName}`}
+          />
+
+          <span>
+            {waitingTime.label}
+          </span>
+        </div>
+
+        <time
+          dateTime={new Date(
+            lead.created_at
+          ).toISOString()}
+          className="text-[11px] text-muted-foreground"
+        >
+          {formatInquiryDate(
+            lead.created_at
+          )}
+        </time>
+      </div>
+    )
+  })()
+) : null}
+            </div>
+          </CardHeader>
+
+          <CardContent className="pt-0">
+            <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
+
+              <div className="rounded-xl border bg-muted/30 p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <Plane className="size-4 text-primary" />
+
+                  <p className="text-sm font-semibold">
+                    Szczegóły wyjazdu
+                  </p>
+                </div>
+
+                <div className="space-y-3">
                   <div>
-                    <p className="font-medium">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Mecz
+                    </p>
+
+                    <p className="mt-0.5 font-semibold">
                       {lead.matchName}
                     </p>
+                  </div>
 
-                    <p className="text-sm text-muted-foreground">
-                      {lead.departureCity} ·{" "}
-                      {lead.travelers} os.
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        Skąd wylot
+                      </p>
+
+                      <p className="mt-0.5 text-sm font-medium">
+                        {lead.departureCity}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        Liczba osób
+                      </p>
+
+                      <p className="mt-0.5 text-sm font-medium">
+                        {lead.travelers} os.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Wiadomość
                     </p>
 
-                    <p className="mt-2 text-sm">
+                    <p className="mt-1 text-sm leading-6">
                       {lead.message ||
                         "Brak dodatkowej wiadomości."}
                     </p>
                   </div>
+                </div>
+              </div>
 
-                  <form
-                    action={updateInquiry}
-                    className="flex min-w-72 flex-col gap-2"
+              {/*
+                Obsługa zapytania
+              */}
+              <form
+                action={updateInquiry}
+                className="rounded-xl border p-4"
+              >
+                <input
+                  type="hidden"
+                  name="id"
+                  value={lead.id}
+                />
+
+                <div className="mb-4 flex items-center gap-2">
+                  <Settings className="size-4 text-primary" />
+
+                  <div>
+                    <p className="text-sm font-semibold">
+                      Obsługa zapytania
+                    </p>
+
+                    <p className="text-xs text-muted-foreground">
+                      Ustaw status i dodaj prywatną notatkę.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-4">
+                  <Field
+                    label="Status kontaktu"
+                    hint=""
                   >
-                    <input
-                      type="hidden"
-                      name="id"
-                      value={lead.id}
+                    <select
+                      name="status"
+                      defaultValue={
+                        lead.status
+                      }
+                      className="h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="new">
+                        Nowe
+                      </option>
+
+                      <option value="contacted">
+                        Skontaktowano
+                      </option>
+
+                      <option value="closed">
+                        Zamknięte
+                      </option>
+                    </select>
+                  </Field>
+
+                  <Field
+                    label="Notatka dla Ciebie"
+                    hint="Prywatna informacja widoczna tylko w panelu."
+                  >
+                    <Textarea
+                      name="adminNote"
+                      defaultValue={
+                        lead.adminNote
+                      }
+                      placeholder="Np. Klient czeka na potwierdzenie terminu..."
+                      rows={3}
                     />
+                  </Field>
 
-                    <Field
-                      label="Status kontaktu"
-                      hint="Wybierz etap obsługi tego zapytania."
-                    >
-                      <select
-                        name="status"
-                        defaultValue={
-                          lead.status
-                        }
-                        className="h-9 rounded-lg border bg-background px-3"
-                      >
-                        <option value="new">
-                          Nowe
-                        </option>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    className="w-full sm:w-auto sm:self-end"
+                  >
+                    Zapisz obsługę
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
 
-                        <option value="contacted">
-                          Skontaktowano
-                        </option>
-
-                        <option value="closed">
-                          Zamknięte
-                        </option>
-                      </select>
-                    </Field>
-
-                    <Field
-                      label="Notatka dla Ciebie"
-                      hint="To prywatna informacja widoczna tylko w panelu administracyjnym."
-                    >
-                      <Textarea
-                        name="adminNote"
-                        defaultValue={
-                          lead.adminNote
-                        }
-                        placeholder="Np. Klient czeka na potwierdzenie terminu"
-                        rows={2}
-                      />
-                    </Field>
-
-                    <Button
-                      type="submit"
-                      size="sm"
-                    >
-                      Zapisz obsługę
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            ))}
+    {data.inquiries.filter(
+      (lead) => lead.status === inquiryTab
+    ).length === 0 ? (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="flex size-14 items-center justify-center rounded-full bg-muted">
+            {inquiryTab === "new" ? (
+              <Inbox className="size-6 text-muted-foreground" />
+            ) : inquiryTab === "contacted" ? (
+              <MessageCircle className="size-6 text-muted-foreground" />
+            ) : (
+              <CheckCircle2 className="size-6 text-muted-foreground" />
+            )}
           </div>
-        </TabsContent>
+
+          <h3 className="mt-4 font-semibold">
+            {inquiryTab === "new"
+              ? "Brak nowych zapytań"
+              : inquiryTab === "contacted"
+                ? "Brak zapytań w trakcie kontaktu"
+                : "Brak zamkniętych zapytań"}
+          </h3>
+
+          <p className="mt-1 max-w-md text-sm text-muted-foreground">
+            {inquiryTab === "new"
+              ? "Świetnie — wszystkie zapytania zostały obsłużone."
+              : inquiryTab === "contacted"
+                ? "Nie masz obecnie klientów oczekujących na dalszą obsługę."
+                : "Zamknięte zapytania pojawią się tutaj."}
+          </p>
+        </CardContent>
+      </Card>
+    ) : null}
+  </div>
+</TabsContent>
 
         <TabsContent value="account">
           <SectionHeader

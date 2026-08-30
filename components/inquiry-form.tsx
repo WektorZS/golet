@@ -177,11 +177,6 @@ export function InquiryForm() {
 
         <ArrowRight data-icon="inline-end" />
       </Button>
-
-      <p className="text-xs leading-relaxed text-background/55">
-        Wysyłając formularz, akceptujesz kontakt w sprawie przygotowania
-        oferty. Nie wysyłamy spamu.
-      </p>
     </form>
   )
 }
