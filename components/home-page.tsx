@@ -634,34 +634,48 @@ export function HomePage({
               align="left"
             />
 
-            <div className="mt-7 flex flex-wrap gap-6">
-              <div>
-                <strong className="text-3xl font-black">
-                  42
-                </strong>
-                <p className="text-sm text-muted-foreground">
-                  stadiony w ofercie
-                </p>
-              </div>
+           <div className="mt-7 flex flex-wrap gap-x-8 gap-y-6">
+  <div>
+    <strong className="text-3xl font-black">
+      42
+    </strong>
+    <p className="text-sm text-muted-foreground">
+      stadiony w ofercie
+    </p>
+  </div>
 
-              <div>
-                <strong className="text-3xl font-black">
-                  4.9/5
-                </strong>
-                <p className="text-sm text-muted-foreground">
-                  średnia ocen
-                </p>
-              </div>
+  <div>
+    <div className="flex items-center gap-1.5">
+      <Star
+        className="size-5 text-primary"
+        fill="currentColor"
+        aria-hidden="true"
+      />
 
-              <div>
-                <strong className="text-3xl font-black">
-                  24/7
-                </strong>
-                <p className="text-sm text-muted-foreground">
-                  pomoc w podróży
-                </p>
-              </div>
-            </div>
+      <strong className="text-3xl font-black">
+        5.0/5
+      </strong>
+    </div>
+
+    <p className="text-sm text-muted-foreground">
+      Facebook · 160 opinii
+    </p>
+
+    <p className="mt-0.5 text-xs font-semibold text-primary">
+      100% poleca
+    </p>
+  </div>
+
+  <div>
+    <strong className="text-3xl font-black">
+      5 000+
+    </strong>
+
+    <p className="text-sm text-muted-foreground">
+      obserwujących na Facebooku
+    </p>
+  </div>
+</div>
           </div>
 
           <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
