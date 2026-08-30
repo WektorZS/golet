@@ -193,9 +193,9 @@ export function CookieConsent() {
                           Wymagane do prawidłowego działania strony.
                         </p>
 
-                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-primary">
-                          Kliknij, aby wybrać
-                        </p>
+                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
+  Kliknij, aby wybrać
+</p>
                       </div>
                     </div>
                   </button>
@@ -230,9 +230,9 @@ export function CookieConsent() {
                           Pomaga nam analizować ruch na stronie, statystyki.
                         </p>
 
-                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-primary">
-                          Kliknij, aby wybrać
-                        </p>
+                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
+  Kliknij, aby wybrać
+</p>
                       </div>
                     </div>
                   </button>
