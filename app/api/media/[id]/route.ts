@@ -27,8 +27,7 @@ export async function GET(
     return new NextResponse("Not found", { status: 404 })
   }
 
-  // Publicly referenced media must remain available even when the auth integration
-  // is temporarily unavailable. Admin-only access is still enforced when auth works.
+
   let isAdmin = false
 
   try {
