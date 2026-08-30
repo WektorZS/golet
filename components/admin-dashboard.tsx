@@ -1338,7 +1338,7 @@ export function AdminDashboard({ data }: { data: AdminData }) {
           />
         </TabsContent>
 
-        <TabsContent value="testimonials">
+<TabsContent value="testimonials">
   <SectionHeader
     eyebrow="Wiarygodność"
     title="Opinie klientów"
@@ -1355,265 +1355,51 @@ export function AdminDashboard({ data }: { data: AdminData }) {
     }
   />
 
-  {(() => {
-    const total = data.testimonials.length
+  <div className="grid gap-4 lg:grid-cols-2">
+    {data.testimonials.map((item) => (
+      <Card key={item.id}>
+        <CardHeader>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <CardTitle>
+                {item.author}
+              </CardTitle>
 
-    const published = data.testimonials.filter(
-      (item) => item.status === "published"
-    ).length
+              <CardDescription>
+                {item.tripName} ·{" "}
+                {"★".repeat(item.rating)}
+              </CardDescription>
+            </div>
 
-    const drafts = data.testimonials.filter(
-      (item) => item.status === "draft"
-    ).length
-
-    const averageRating =
-      total > 0
-        ? (
-            data.testimonials.reduce(
-              (sum, item) => sum + item.rating,
-              0
-            ) / total
-          ).toFixed(1)
-        : "0.0"
-
-    return (
-      <>
-        <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                <MessageCircle className="size-5 text-primary" />
-              </div>
-
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Wszystkie opinie
-                </p>
-
-                <p className="text-2xl font-bold">
-                  {total}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-green-500/10">
-                <CheckCircle2 className="size-5 text-green-600" />
-              </div>
-
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Opublikowane
-                </p>
-
-                <p className="text-2xl font-bold">
-                  {published}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-yellow-500/10">
-                <Pencil className="size-5 text-yellow-600" />
-              </div>
-
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Wersje robocze
-                </p>
-
-                <p className="text-2xl font-bold">
-                  {drafts}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                <Star className="size-5 fill-primary text-primary" />
-              </div>
-
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Średnia ocena
-                </p>
-
-                <div className="flex items-center gap-1.5">
-                  <p className="text-2xl font-bold">
-                    {averageRating}
-                  </p>
-
-                  <span className="text-sm text-muted-foreground">
-                    / 5
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {total === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center px-6 py-16 text-center">
-              <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-muted">
-                <MessageCircle className="size-7 text-muted-foreground" />
-              </div>
-
-              <h3 className="text-lg font-semibold">
-                Nie ma jeszcze żadnych opinii
-              </h3>
-
-              <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                Dodaj pierwszą opinię klienta, aby
-                zaprezentować ją na stronie.
-              </p>
-
-              <TestimonialDialog
-                trigger={
-                  <Button className="mt-5">
-                    <Plus />
-                    Dodaj pierwszą opinię
-                  </Button>
-                }
-              />
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-5 lg:grid-cols-2">
-            {data.testimonials.map((item) => (
-              <Card
-                key={item.id}
-                className="overflow-hidden transition-shadow hover:shadow-md"
-              >
-                <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground">
-                        {item.author
-                          .trim()
-                          .charAt(0)
-                          .toUpperCase()}
-                      </div>
-
-                      <div className="min-w-0">
-                        <CardTitle className="truncate text-base">
-                          {item.author}
-                        </CardTitle>
-
-                        {item.tripName ? (
-                          <CardDescription className="mt-0.5 truncate">
-                            {item.tripName}
-                          </CardDescription>
-                        ) : (
-                          <CardDescription>
-                            Opinia klienta
-                          </CardDescription>
-                        )}
-                      </div>
-                    </div>
-
-                    <StatusBadge
-                      status={item.status}
-                    />
-                  </div>
-                </CardHeader>
-
-                <CardContent className="pb-5">
-                  <div className="mb-4 flex items-center justify-between">
-                    <div
-                      className="flex items-center gap-0.5"
-                      aria-label={`Ocena ${item.rating} na 5`}
-                    >
-                      {Array.from({
-                        length: 5,
-                      }).map((_, index) => (
-                        <Star
-                          key={index}
-                          className={
-                            index < item.rating
-                              ? "size-4 fill-primary text-primary"
-                              : "size-4 text-muted-foreground/25"
-                          }
-                        />
-                      ))}
-                    </div>
-
-                    <span className="text-sm font-semibold text-muted-foreground">
-                      {item.rating}/5
-                    </span>
-                  </div>
-
-                  <div className="rounded-xl border bg-muted/30 p-4">
-                    <div className="mb-2 text-2xl leading-none text-primary/50">
-                      “
-                    </div>
-
-                    <p className="line-clamp-5 text-sm leading-6 text-foreground/80">
-                      {item.content}
-                    </p>
-                  </div>
-                </CardContent>
-
-                <CardFooter className="flex items-center justify-between gap-3 border-t bg-muted/20 px-6 py-4">
-                  <p className="text-xs text-muted-foreground">
-                    {item.rating === 5
-                      ? "⭐ Świetna opinia"
-                      : "Opinia klienta"}
-                  </p>
-
-                  <div className="flex gap-2">
-                    <TestimonialDialog
-                      item={item}
-                      trigger={
-                        <Button
-                          variant="outline"
-                          size="sm"
-                        >
-                          <Pencil />
-                          Edytuj
-                        </Button>
-                      }
-                    />
-
-                    {item.status !==
-                      "archived" && (
-                      <form
-                        action={
-                          archiveTestimonial
-                        }
-                      >
-                        <input
-                          type="hidden"
-                          name="id"
-                          value={item.id}
-                        />
-
-                        <Button
-                          type="submit"
-                          variant="ghost"
-                          size="sm"
-                          title="Archiwizuj opinię"
-                        >
-                          <Archive />
-                          Archiwizuj
-                        </Button>
-                      </form>
-                    )}
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
+            <StatusBadge
+              status={item.status}
+            />
           </div>
-        )}
-      </>
-    )
-  })()}
+        </CardHeader>
+
+        <CardContent>
+          <p className="mb-4 text-muted-foreground">
+            {item.content}
+          </p>
+
+          <div className="flex gap-2">
+            <TestimonialDialog
+              item={item}
+              trigger={
+                <Button
+                  variant="outline"
+                  size="sm"
+                >
+                  <Pencil />
+                  Edytuj
+                </Button>
+              }
+            />
+          </div>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
 </TabsContent>
 
         <TabsContent value="youtube">
@@ -4484,10 +4270,10 @@ function SettingsForm({
               )}
 
               {state.success && (
-                <p className="flex items-center gap-2 text-sm text-primary">
-                  <CheckCircle2 className="size-4" />
-                  Treści strony zostały zapisane.
-                </p>
+                <p className="flex items-center gap-2 text-sm text-foreground">
+  <CheckCircle2 className="size-4" />
+  Treści strony zostały zapisane.
+</p>
               )}
             </div>
 
