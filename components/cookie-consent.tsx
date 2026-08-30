@@ -1,7 +1,6 @@
 
 "use client"
 
-import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Analytics } from "@vercel/analytics/next"
 import { Cookie } from "lucide-react"
@@ -39,26 +38,14 @@ export function CookieConsent() {
   const [showFloatingButton, setShowFloatingButton] =
     useState(false)
 
-  /*
-   * Pozwala przeglądarce najpierw wyrenderować
-   * przycisk w stanie ukrytym, zanim zacznie
-   * animować jego pojawienie się.
-   */
   const [floatingButtonReady, setFloatingButtonReady] =
     useState(false)
 
-  /*
-   * Odczyt zapisanej zgody.
-   */
   useEffect(() => {
     setConsent(readConsent())
     setReady(true)
   }, [])
 
-  /*
-   * Mała ikonka cookies pojawia się dopiero
-   * po opuszczeniu pierwszego ekranu / hero.
-   */
   useEffect(() => {
     const updateVisibility = () => {
       const scrollY = window.scrollY
@@ -66,7 +53,7 @@ export function CookieConsent() {
       const documentHeight =
         document.documentElement.scrollHeight
 
-      const passedHero = scrollY > viewportHeight - 80
+      const passedHero = scrollY > 80
 
       const nearBottom =
         scrollY + viewportHeight >=
@@ -79,11 +66,6 @@ export function CookieConsent() {
 
     updateVisibility()
 
-    /*
-     * Najpierw renderujemy ukryty przycisk,
-     * a dopiero w kolejnej klatce pozwalamy
-     * mu przejść do pozycji widocznej.
-     */
     requestAnimationFrame(() => {
       setFloatingButtonReady(true)
     })
@@ -113,10 +95,6 @@ export function CookieConsent() {
     }
   }, [])
 
-  /*
-   * Blokujemy przewijanie strony, kiedy
-   * użytkownik musi podjąć decyzję.
-   */
   useEffect(() => {
     if (!ready) return
 
@@ -153,16 +131,9 @@ export function CookieConsent() {
         <Analytics />
       ) : null}
 
-      {/*
-       * GŁÓWNE OKNO COOKIES
-       *
-       * Pokazuje się na środku ekranu.
-       * Tło strony zostaje przyciemnione
-       * i rozmazane.
-       */}
       {!consent || editing ? (
         <div
-          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-labelledby="cookie-consent-title"
@@ -227,23 +198,25 @@ export function CookieConsent() {
           </section>
         </div>
       ) : (
-        /*
-         * MAŁA IKONA USTAWIEŃ COOKIES
-         *
-         * Przycisk zawsze pozostaje w DOM,
-         * dzięki czemu pojawianie i chowanie
-         * może być animowane.
-         */
         <Button
           type="button"
           size="lg"
           onClick={() => setEditing(true)}
           aria-label="Ustawienia cookies"
           title="Ustawienia cookies"
-          className={`fixed bottom-2 left-2 z-40 h-12 w-12 border border-[#f4b91e] bg-black text-black shadow-xl
-            transition-[transform,opacity] duration-500 ease-out
-            hover:scale-105 hover:bg-white
-            md:bottom-3 md:left-3
+          className={`
+            fixed bottom-2 left-2 z-40
+            h-12 w-12
+            border border-[#f4b91e]
+            bg-black text-black
+            shadow-xl
+            transition-[transform,opacity]
+            duration-500
+            ease-out
+            hover:scale-105
+            hover:bg-white
+            md:bottom-3
+            md:left-3
             ${
               floatingButtonReady && showFloatingButton
                 ? "translate-y-0 opacity-100"
@@ -251,7 +224,9 @@ export function CookieConsent() {
             }
           `}
         >
-          <Cookie className="!h-7 !w-7 text-[#f4b91e]" />
+          <Cookie
+            className="!h-7 !w-7 text-[#f4b91e]"
+          />
         </Button>
       )}
     </>

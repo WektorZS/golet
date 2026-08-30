@@ -47,8 +47,7 @@ export function FloatingContact() {
        * Przycisk pojawia się dopiero
        * po opuszczeniu pierwszego ekranu.
        */
-      const passedHeader =
-        scrollY > viewportHeight - 80
+      const passedHeader = scrollY > 80
 
       /*
        * Pod koniec strony chowamy przycisk,
