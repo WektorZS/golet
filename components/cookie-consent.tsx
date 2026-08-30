@@ -177,7 +177,7 @@ export function CookieConsent() {
                   <button
                     type="button"
                     onClick={() => choose("rejected")}
-                    className="group w-full rounded-xl border border-border bg-background p-4 text-left transition-all duration-200 hover:border-primary/50 hover:bg-primary/5"
+                    className="group w-full rounded-xl border border-border bg-background p-4 text-left transition-all duration-200 hover:border-primary hover:bg-primary/10 hover:shadow-md"
                   >
                     <div className="flex items-start gap-4">
                       <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
@@ -210,7 +210,7 @@ export function CookieConsent() {
                   <button
                     type="button"
                     onClick={() => choose("accepted")}
-                    className="group w-full rounded-xl border border-border bg-background p-4 text-left transition-all duration-200 hover:border-primary/50 hover:bg-primary/5"
+                    className="group w-full rounded-xl border border-border bg-background p-4 text-left transition-all duration-200 hover:border-primary hover:bg-primary/10 hover:shadow-md"
                   >
                     <div className="flex items-start gap-4">
                       <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
@@ -308,7 +308,7 @@ export function CookieConsent() {
                     className={`group w-full rounded-xl border p-4 text-left transition-all duration-200 ${
                       consent === "rejected"
                         ? "border-primary bg-primary/10 shadow-sm"
-                        : "border-border bg-background hover:border-primary/50 hover:bg-primary/5"
+                        : "border-border bg-background hover:border-primary hover:bg-primary/10 hover:shadow-md"
                     }`}
                   >
                     <div className="flex items-start gap-4">
@@ -354,7 +354,7 @@ export function CookieConsent() {
                     className={`group w-full rounded-xl border p-4 text-left transition-all duration-200 ${
                       consent === "accepted"
                         ? "border-primary bg-primary/10 shadow-sm"
-                        : "border-border bg-background hover:border-primary/50 hover:bg-primary/5"
+                        : "border-border bg-background hover:border-primary hover:bg-primary/10 hover:shadow-md"
                     }`}
                   >
                     <div className="flex items-start gap-4">
