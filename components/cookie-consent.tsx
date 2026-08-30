@@ -88,9 +88,7 @@ export function CookieConsent() {
   useEffect(() => {
     if (!ready) return
 
-    const shouldLock = !consent
-
-    if (shouldLock) {
+    if (!consent) {
       document.body.style.overflow = "hidden"
     } else {
       document.body.style.overflow = ""
@@ -123,10 +121,6 @@ export function CookieConsent() {
     setEditing(false)
   }
 
-  function openSettings() {
-    setEditing(true)
-  }
-
   if (!ready) {
     return null
   }
@@ -136,7 +130,7 @@ export function CookieConsent() {
   return (
     <>
       {process.env.NODE_ENV === "production" &&
-        consent === "accepted" ? (
+      consent === "accepted" ? (
         <Analytics />
       ) : null}
 
@@ -166,7 +160,9 @@ export function CookieConsent() {
                       Witaj w Let&apos;s Gol!
                     </h2>
 
-                  
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Zanim ruszymy na stadion
+                    </p>
                   </div>
                 </div>
 
@@ -255,48 +251,72 @@ export function CookieConsent() {
           <section className="w-full max-w-xl overflow-hidden rounded-xl border border-white/10 bg-card text-card-foreground shadow-2xl">
             <div className="p-6 md:p-8">
               <div className="flex flex-col gap-5">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                      <Cookie
-                        className="size-6 text-black"
-                        aria-hidden="true"
-                      />
-                    </span>
+                <div className="flex items-center gap-3">
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                    <Cookie
+                      className="size-6 text-black"
+                      aria-hidden="true"
+                    />
+                  </span>
 
-                    <div>
-                      <h2
-                        id="cookie-settings-title"
-                        className="font-sans text-2xl font-black uppercase"
-                      >
-                        Ustawienia prywatności
-                      </h2>
+                  <div>
+                    <h2
+                      id="cookie-settings-title"
+                      className="font-sans text-2xl font-black uppercase"
+                    >
+                      Ustawienia prywatności
+                    </h2>
 
-                      <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        Zarządzaj zgodami
-                      </p>
-                    </div>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Zarządzaj zgodami
+                    </p>
                   </div>
                 </div>
 
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Możesz w każdej chwili zmienić swoją decyzję
-                  dotyczącą analitycznych plików cookies.
-                  Twój wybór zostanie zapisany na 12 miesięcy.
+                  Wybierz poniżej, jak chcesz, abyśmy korzystali
+                  z plików cookies. Twoja decyzja zostanie
+                  zapisana i możesz ją zmienić w dowolnym momencie.
                 </p>
 
                 <div className="grid gap-3">
-                  <div className="rounded-lg border bg-background p-4">
-                    <div className="flex items-start gap-3">
-                      <Check
-                        className="mt-0.5 size-5 shrink-0 text-primary"
-                        aria-hidden="true"
-                      />
+                  <button
+                    type="button"
+                    onClick={() => choose("rejected")}
+                    aria-pressed={consent === "rejected"}
+                    className={`group w-full rounded-xl border p-4 text-left transition-all duration-200 ${
+                      consent === "rejected"
+                        ? "border-primary bg-primary/10 shadow-sm"
+                        : "border-border bg-background hover:border-primary/50 hover:bg-primary/5"
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div
+                        className={`mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                          consent === "rejected"
+                            ? "bg-primary text-black"
+                            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                        }`}
+                      >
+                        <ShieldCheck
+                          className="size-5"
+                          aria-hidden="true"
+                        />
+                      </div>
 
-                      <div>
-                        <p className="font-bold">
-                          Niezbędne cookies
-                        </p>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="font-bold">
+                            Niezbędne cookies
+                          </p>
+
+                          {consent === "rejected" ? (
+                            <span className="flex shrink-0 items-center gap-1 text-xs font-bold uppercase tracking-wider text-primary">
+                              <Check className="size-4" />
+                              Wybrane
+                            </span>
+                          ) : null}
+                        </div>
 
                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                           Zawsze aktywne. Są potrzebne do
@@ -304,26 +324,44 @@ export function CookieConsent() {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </button>
 
-                  <div className="rounded-lg border bg-background p-4">
-                    <div className="flex items-start gap-3">
-                      <Cookie
-                        className="mt-0.5 size-5 shrink-0 text-primary"
-                        aria-hidden="true"
-                      />
+                  <button
+                    type="button"
+                    onClick={() => choose("accepted")}
+                    aria-pressed={consent === "accepted"}
+                    className={`group w-full rounded-xl border p-4 text-left transition-all duration-200 ${
+                      consent === "accepted"
+                        ? "border-primary bg-primary/10 shadow-sm"
+                        : "border-border bg-background hover:border-primary/50 hover:bg-primary/5"
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div
+                        className={`mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                          consent === "accepted"
+                            ? "bg-primary text-black"
+                            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                        }`}
+                      >
+                        <Cookie
+                          className="size-5"
+                          aria-hidden="true"
+                        />
+                      </div>
 
-                      <div>
-                        <div className="flex flex-wrap items-center gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
                           <p className="font-bold">
                             Analityka
                           </p>
 
-                          <span className="bg-foreground px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-background">
-                            {consent === "accepted"
-                              ? "Aktywna"
-                              : "Wyłączona"}
-                          </span>
+                          {consent === "accepted" ? (
+                            <span className="flex shrink-0 items-center gap-1 text-xs font-bold uppercase tracking-wider text-primary">
+                              <Check className="size-4" />
+                              Wybrane
+                            </span>
+                          ) : null}
                         </div>
 
                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
@@ -333,31 +371,16 @@ export function CookieConsent() {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 </div>
 
-                <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:justify-end">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={() => choose("rejected")}
-                    className="w-full sm:w-auto"
-                  >
-                    Tylko niezbędne
-                  </Button>
-
-                  <Button
-                    size="lg"
-                    onClick={() => choose("accepted")}
-                    className="w-full sm:w-auto"
-                  >
-                    Akceptuję analitykę
-                  </Button>
-                </div>
-
-                <p className="text-center text-xs text-muted-foreground">
-                  Naciśnij Esc, aby zamknąć bez zmiany ustawień.
-                </p>
+                <button
+                  type="button"
+                  onClick={() => setEditing(false)}
+                  className="mx-auto pt-1 text-sm font-medium text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                >
+                  Zamknij
+                </button>
               </div>
             </div>
           </section>
@@ -366,13 +389,14 @@ export function CookieConsent() {
         <Button
           type="button"
           size="lg"
-          onClick={openSettings}
+          onClick={() => setEditing(true)}
           aria-label="Ustawienia cookies"
           title="Ustawienia cookies"
-          className={`fixed bottom-2 left-2 z-40 h-12 w-12 border border-[#f4b91e] bg-black text-black shadow-xl transition-[transform,opacity] duration-500 ease-out hover:scale-105 hover:bg-white md:bottom-3 md:left-3 ${floatingButtonReady && showFloatingButton
-            ? "translate-y-0 opacity-100"
-            : "pointer-events-none translate-y-10 opacity-0"
-            }`}
+          className={`fixed bottom-2 left-2 z-40 h-12 w-12 border border-[#f4b91e] bg-black text-black shadow-xl transition-[transform,opacity] duration-500 ease-out hover:scale-105 hover:bg-white md:bottom-3 md:left-3 ${
+            floatingButtonReady && showFloatingButton
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none translate-y-10 opacity-0"
+          }`}
         >
           <Cookie className="!h-7 !w-7 text-[#f4b91e]" />
         </Button>
