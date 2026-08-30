@@ -120,7 +120,7 @@ export function CookieConsent() {
         <Analytics />
       ) : null}
 
-      {/* PIERWSZA WIZYTA */}
+    
       {firstVisit ? (
         <div
           className="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-black/55 p-3 backdrop-blur-sm sm:p-4"
@@ -155,15 +155,15 @@ export function CookieConsent() {
                   </div>
                 </div>
 
-                {/* KRÓTKI OPIS */}
+                
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   Wybierz, czy zgadzasz się na opcjonalną analitykę.
                 </p>
 
-                {/* OPCJE */}
+              
                 <div className="grid gap-3">
 
-                  {/* NIEZBĘDNE */}
+                 
                   <button
                     type="button"
                     onClick={() => choose("rejected")}
@@ -190,7 +190,7 @@ export function CookieConsent() {
                         </div>
 
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          Wymagane do działania strony.
+                          Wymagane do prawidłowego działania strony.
                         </p>
 
                         <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-primary">
@@ -227,7 +227,7 @@ export function CookieConsent() {
                         </div>
 
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          Pomaga nam analizować ruch na stronie.
+                          Pomaga nam analizować ruch na stronie, statystyki.
                         </p>
 
                         <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-primary">
@@ -238,10 +238,10 @@ export function CookieConsent() {
                   </button>
                 </div>
 
-                {/* INFORMACJA */}
+                
                 <p className="border-t border-border pt-3 text-center text-[11px] leading-relaxed text-muted-foreground sm:pt-4 sm:text-xs">
                   Zgodę możesz zmienić w każdej chwili,
-                  klikając ikonę ciasteczka w lewym dolnym rogu.
+                  klikając ikonę ciasteczka w lewym dolnym rogu strony.
                 </p>
 
               </div>
@@ -396,7 +396,7 @@ export function CookieConsent() {
                         </div>
 
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          Pomaga nam analizować ruch na stronie.
+                          Pomaga nam analizować ruch na stronie, statystyki.
                         </p>
 
                         <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-primary">
