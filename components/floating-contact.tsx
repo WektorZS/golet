@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Mail, MessageCircle, Phone } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -20,46 +21,58 @@ const EMAIL = "kontakt.letsgol@gmail.com"
 
 export function FloatingContact() {
   const pathname = usePathname()
-  const [showMobileButton, setShowMobileButton] = useState(false)
+  const [showButton, setShowButton] = useState(false)
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => {
+    const updateVisibility = () => {
       const scrollY = window.scrollY
       const viewportHeight = window.innerHeight
       const documentHeight = document.documentElement.scrollHeight
 
-      // Przycisk pojawia się po przewinięciu 240 px
-      const passedHeader = scrollY > 240
+      const heroHeight = viewportHeight
 
-      // Przycisk znika w ostatnich 200 px strony
+      const passedHero = scrollY > heroHeight - 80
+
+    
       const nearBottom =
-        scrollY + viewportHeight >= documentHeight - 500
+        scrollY + viewportHeight >= documentHeight - 350
 
-      setShowMobileButton(passedHeader && !nearBottom)
+      setShowButton(passedHero && !nearBottom)
     }
 
-    onScroll()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll, { passive: true })
+    updateVisibility()
+
+    window.addEventListener("scroll", updateVisibility, {
+      passive: true,
+    })
+
+    window.addEventListener("resize", updateVisibility, {
+      passive: true,
+    })
 
     return () => {
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
+      window.removeEventListener("scroll", updateVisibility)
+      window.removeEventListener("resize", updateVisibility)
     }
   }, [pathname])
 
-  if (pathname.startsWith("/admin") || pathname.startsWith("/auth")) return null
+  if (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/auth")
+  ) {
+    return null
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
           <Button
-            className={`fixed bottom-2 right-2 border-1 border-foreground shadow-xl transition-all duration-200 hover:scale-105 md:bottom-3 md:right-3 ${
-              showMobileButton
+            className={`fixed bottom-2 right-2 z-40 border border-foreground shadow-xl transition-all duration-300 hover:scale-105 md:bottom-3 md:right-3 ${
+              showButton
                 ? "translate-y-0 opacity-100"
-                : "pointer-events-none translate-y-4 opacity-0 md:pointer-events-auto md:translate-y-0 md:opacity-100"
+                : "pointer-events-none translate-y-4 opacity-0"
             }`}
             size="lg"
           />
@@ -71,9 +84,13 @@ export function FloatingContact() {
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Jak chcesz się skontaktować?</DialogTitle>
+          <DialogTitle>
+            Jak chcesz się skontaktować?
+          </DialogTitle>
+
           <DialogDescription>
-            Wybierz najwygodniejszą formę kontaktu z zespołem Let&apos;s Gol.
+            Wybierz najwygodniejszą formę kontaktu z zespołem
+            Let&apos;s Gol.
           </DialogDescription>
         </DialogHeader>
 
