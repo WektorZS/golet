@@ -47,6 +47,7 @@ import {
   type SaveSettingsState,
   type SaveTripState,
   saveSettings,
+  deleteInquiry,
   saveTestimonial,
   saveTrip,
   setTripCover,
@@ -1754,9 +1755,6 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                 </div>
               </div>
 
-              {/*
-                Obsługa zapytania
-              */}
               <form
                 action={updateInquiry}
                 className="rounded-xl border p-4"
@@ -1821,13 +1819,46 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                     />
                   </Field>
 
-                  <Button
-                    type="submit"
-                    size="sm"
-                    className="w-full sm:w-auto sm:self-end"
-                  >
-                    Zapisz obsługę
-                  </Button>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+  <Button
+    type="submit"
+    size="sm"
+    className="w-full sm:w-auto"
+  >
+    Zapisz obsługę
+  </Button>
+
+  {lead.status === "closed" ? (
+    <form
+      action={deleteInquiry}
+      onSubmit={(event) => {
+        if (
+          !window.confirm(
+            `Czy na pewno chcesz usunąć zapytanie klienta „${lead.name}”? Ta operacja jest nieodwracalna.`
+          )
+        ) {
+          event.preventDefault()
+        }
+      }}
+    >
+      <input
+        type="hidden"
+        name="id"
+        value={lead.id}
+      />
+
+      <Button
+        type="submit"
+        size="sm"
+        variant="outline"
+        className="w-full border-red-500/40 text-red-600 hover:bg-red-500/10 hover:text-red-600 sm:w-auto"
+      >
+        <XCircle />
+        Usuń zapytanie
+      </Button>
+    </form>
+  ) : null}
+</div>
                 </div>
               </form>
             </div>

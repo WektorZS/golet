@@ -222,6 +222,37 @@ export async function updateInquiry(formData: FormData) {
   await logActivity(user.id, "updated", "inquiry", String(id), status)
   revalidatePath("/admin")
 }
+export async function deleteInquiry(formData: FormData) {
+  const user = await requireAdmin()
+  const id = Number(formData.get("id"))
+
+  if (!Number.isInteger(id) || id <= 0) return
+
+  const [inquiry] = await db
+    .select()
+    .from(inquiries)
+    .where(eq(inquiries.id, id))
+    .limit(1)
+
+  if (!inquiry) return
+
+  if (inquiry.status !== "closed") return
+
+  await db
+    .delete(inquiries)
+    .where(eq(inquiries.id, id))
+
+  await logActivity(
+    user.id,
+    "deleted",
+    "inquiry",
+    String(id),
+    inquiry.name
+  )
+
+  revalidatePath("/admin")
+}
+
 
 export async function saveTestimonial(formData: FormData) {
   const user = await requireAdmin(); const id = Number(formData.get("id"))
