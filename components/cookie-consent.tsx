@@ -250,7 +250,7 @@ export function CookieConsent() {
                   <p className="text-xs leading-relaxed text-muted-foreground">
                     Twój wybór zostanie zapisany. W każdej chwili
                     możesz go zmienić, korzystając z ikony ciasteczka
-                    dostępnej na stronie.
+                    w lewym dolnym rogu strony.
                   </p>
                 </div>
               </div>
