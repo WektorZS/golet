@@ -38,13 +38,14 @@ export function TripCard({ trip }: { trip: Trip }) {
           : "border-border shadow-sm hover:shadow-md"
       }`}
     >
+
       <div className="relative aspect-[4/3] overflow-hidden">
         <Image
           src={trip.image}
           alt={`Stadion w mieście ${trip.city}`}
           fill
-          sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 25vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, 25vw"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/10 to-transparent" />
