@@ -316,7 +316,7 @@ export function CookieConsent() {
                         className={`mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors ${
                           consent === "rejected"
                             ? "bg-primary text-black"
-                            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                            : "bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black"
                         }`}
                       >
                         <ShieldCheck
@@ -362,7 +362,7 @@ export function CookieConsent() {
                         className={`mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors ${
                           consent === "accepted"
                             ? "bg-primary text-black"
-                            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                            : "bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black"
                         }`}
                       >
                         <Cookie
