@@ -1,6 +1,7 @@
 
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useActionState, useEffect, useMemo, useRef, useState } from "react"
@@ -959,10 +960,10 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                     hint=""
                   >
                     <ImageDropzone
-  name="file"
-  accept="image/jpeg,image/png,image/webp,image/avif"
-  required
-/>
+                      name="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      required
+                    />
                   </Field>
 
                   <Field
@@ -2392,10 +2393,11 @@ function TripDialog({
               hint="Wybierz zdjęcie, które będzie głównym zdjęciem tego wyjazdu. Możesz wybrać je z komputera lub telefonu."
             >
               <ImageDropzone
-  name="file"
-  accept="image/jpeg,image/png,image/webp,image/avif"
-  required
-/>
+                name="coverFile"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                required={!trip?.image}
+                currentImage={trip?.image}
+              />
             </Field>
 
             {trip?.image ? (
