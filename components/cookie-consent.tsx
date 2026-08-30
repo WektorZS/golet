@@ -70,7 +70,6 @@ export function CookieConsent() {
 
     return () => {
       cancelAnimationFrame(frame)
-
       window.removeEventListener("scroll", updateVisibility)
       window.removeEventListener("resize", updateVisibility)
     }
@@ -79,11 +78,7 @@ export function CookieConsent() {
   useEffect(() => {
     if (!ready) return
 
-    if (!consent) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
-    }
+    document.body.style.overflow = consent ? "" : "hidden"
 
     return () => {
       document.body.style.overflow = ""
@@ -125,6 +120,7 @@ export function CookieConsent() {
         <Analytics />
       ) : null}
 
+      {/* PIERWSZA WIZYTA */}
       {firstVisit ? (
         <div
           className="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-black/55 p-3 backdrop-blur-sm sm:p-4"
@@ -135,7 +131,8 @@ export function CookieConsent() {
           <section className="my-auto w-full max-w-xl overflow-hidden rounded-xl border border-white/10 bg-card text-card-foreground shadow-2xl">
             <div className="p-4 sm:p-6 md:p-8">
               <div className="flex flex-col gap-4 sm:gap-5">
-                {/* Nagłówek */}
+
+                {/* NAGŁÓWEK */}
                 <div className="flex items-center gap-3">
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 sm:size-11">
                     <Cookie
@@ -153,29 +150,28 @@ export function CookieConsent() {
                     </h2>
 
                     <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:text-xs">
-                      Zanim ruszymy na stadion
+                      Ustawienia cookies
                     </p>
                   </div>
                 </div>
 
-                {/* Opis */}
+                {/* KRÓTKI OPIS */}
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Zanim ruszysz z nami na stadion, wybierz,
-                  jak chcesz, abyśmy korzystali z plików cookies.
-                  Niezbędne cookies są zawsze aktywne, a analityka
-                  jest opcjonalna.
+                  Wybierz, czy zgadzasz się na opcjonalną analitykę.
                 </p>
 
-                {/* Opcje */}
+                {/* OPCJE */}
                 <div className="grid gap-3">
-                  {/* Niezbędne */}
+
+                  {/* NIEZBĘDNE */}
                   <button
                     type="button"
                     onClick={() => choose("rejected")}
                     className="group w-full rounded-xl border border-border bg-background p-3 text-left transition-all duration-200 hover:border-primary hover:bg-primary/10 hover:shadow-md sm:p-4"
                   >
-                    <div className="flex items-start gap-3 sm:gap-4">
-                      <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black sm:size-10">
+                    <div className="flex items-center gap-3 sm:gap-4">
+
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black sm:size-10">
                         <ShieldCheck
                           className="size-5"
                           aria-hidden="true"
@@ -193,23 +189,26 @@ export function CookieConsent() {
                           </span>
                         </div>
 
-                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                          Są potrzebne do prawidłowego działania
-                          strony i zapewnienia jej podstawowej
-                          funkcjonalności.
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          Wymagane do działania strony.
+                        </p>
+
+                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-primary">
+                          Kliknij, aby wybrać
                         </p>
                       </div>
                     </div>
                   </button>
 
-                  {/* Analityka */}
+                  {/* ANALITYKA */}
                   <button
                     type="button"
                     onClick={() => choose("accepted")}
                     className="group w-full rounded-xl border border-border bg-background p-3 text-left transition-all duration-200 hover:border-primary hover:bg-primary/10 hover:shadow-md sm:p-4"
                   >
-                    <div className="flex items-start gap-3 sm:gap-4">
-                      <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black sm:size-10">
+                    <div className="flex items-center gap-3 sm:gap-4">
+
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black sm:size-10">
                         <Cookie
                           className="size-5"
                           aria-hidden="true"
@@ -227,34 +226,31 @@ export function CookieConsent() {
                           </span>
                         </div>
 
-                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                          Pomaga nam anonimowo analizować
-                          ruch na stronie, zbierać statystyki i poprawiać
-                          jej działanie.
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          Pomaga nam analizować ruch na stronie.
+                        </p>
+
+                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-primary">
+                          Kliknij, aby wybrać
                         </p>
                       </div>
                     </div>
                   </button>
                 </div>
 
-                {/* Informacja */}
-                <div className="flex items-start gap-3 border-t border-border pt-3 sm:pt-4">
-                  <ShieldCheck
-                    className="mt-0.5 size-5 shrink-0 text-primary"
-                    aria-hidden="true"
-                  />
+                {/* INFORMACJA */}
+                <p className="border-t border-border pt-3 text-center text-[11px] leading-relaxed text-muted-foreground sm:pt-4 sm:text-xs">
+                  Zgodę możesz zmienić w każdej chwili,
+                  klikając ikonę ciasteczka w lewym dolnym rogu.
+                </p>
 
-                  <p className="text-xs leading-relaxed text-muted-foreground">
-                    Twój wybór zostanie zapisany. W każdej chwili
-                    możesz go zmienić, korzystając z ikony ciasteczka
-                    w lewym dolnym rogu strony.
-                  </p>
-                </div>
               </div>
             </div>
           </section>
         </div>
       ) : editing ? (
+
+        /* USTAWIENIA COOKIES */
         <div
           className="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-black/45 p-3 backdrop-blur-sm sm:p-4"
           role="dialog"
@@ -269,7 +265,8 @@ export function CookieConsent() {
           <section className="my-auto w-full max-w-xl overflow-hidden rounded-xl border border-white/10 bg-card text-card-foreground shadow-2xl">
             <div className="p-4 sm:p-6 md:p-8">
               <div className="flex flex-col gap-4 sm:gap-5">
-                {/* Nagłówek */}
+
+                {/* NAGŁÓWEK */}
                 <div className="flex items-center gap-3">
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 sm:size-11">
                     <Cookie
@@ -292,16 +289,14 @@ export function CookieConsent() {
                   </div>
                 </div>
 
-                {/* Opis */}
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Wybierz poniżej, jak chcesz, abyśmy korzystali
-                  z plików cookies. Twoja decyzja zostanie
-                  zapisana i możesz ją zmienić w dowolnym momencie.
+                  Kliknij opcję, którą chcesz wybrać.
                 </p>
 
-                {/* Opcje */}
+                {/* OPCJE */}
                 <div className="grid gap-3">
-                  {/* Niezbędne */}
+
+                  {/* NIEZBĘDNE */}
                   <button
                     type="button"
                     onClick={() => choose("rejected")}
@@ -312,12 +307,13 @@ export function CookieConsent() {
                         : "border-border bg-background hover:border-primary hover:bg-primary/10 hover:shadow-md"
                     }`}
                   >
-                    <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
+
                       <div
-                        className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors sm:size-10 ${
+                        className={`flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors sm:size-10 ${
                           consent === "rejected"
                             ? "bg-primary text-black"
-                            : "bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black"
+                            : "bg-muted text-muted-foreground group-hover:bg-primary group-hover:text-black"
                         }`}
                       >
                         <ShieldCheck
@@ -337,18 +333,25 @@ export function CookieConsent() {
                               <Check className="size-4" />
                               Wybrane
                             </span>
-                          ) : null}
+                          ) : (
+                            <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
+                              NIEZBĘDNE
+                            </span>
+                          )}
                         </div>
 
-                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                          Zawsze aktywne. Są potrzebne do
-                          prawidłowego działania strony.
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          Wymagane do działania strony.
+                        </p>
+
+                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-primary">
+                          Kliknij, aby wybrać
                         </p>
                       </div>
                     </div>
                   </button>
 
-                  {/* Analityka */}
+                  {/* ANALITYKA */}
                   <button
                     type="button"
                     onClick={() => choose("accepted")}
@@ -359,12 +362,13 @@ export function CookieConsent() {
                         : "border-border bg-background hover:border-primary hover:bg-primary/10 hover:shadow-md"
                     }`}
                   >
-                    <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
+
                       <div
-                        className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors sm:size-10 ${
+                        className={`flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors sm:size-10 ${
                           consent === "accepted"
                             ? "bg-primary text-black"
-                            : "bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black"
+                            : "bg-muted text-muted-foreground group-hover:bg-primary group-hover:text-black"
                         }`}
                       >
                         <Cookie
@@ -384,20 +388,26 @@ export function CookieConsent() {
                               <Check className="size-4" />
                               Wybrane
                             </span>
-                          ) : null}
+                          ) : (
+                            <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-[#8a6500] sm:text-xs">
+                              OPCJONALNE
+                            </span>
+                          )}
                         </div>
 
-                        <p className="mt-1 text-sm leading-relaxed text-foreground/75">
-                          Pomaga nam anonimowo analizować
-                          korzystanie ze strony i poprawiać
-                          jej działanie.
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          Pomaga nam analizować ruch na stronie.
+                        </p>
+
+                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-primary">
+                          Kliknij, aby wybrać
                         </p>
                       </div>
                     </div>
                   </button>
                 </div>
 
-                {/* Zamknięcie */}
+                {/* ZAMKNIJ */}
                 <button
                   type="button"
                   onClick={() => setEditing(false)}
@@ -405,11 +415,14 @@ export function CookieConsent() {
                 >
                   Zamknij bez zmian
                 </button>
+
               </div>
             </div>
           </section>
         </div>
       ) : (
+
+        /* PRZYCISK USTAWIEŃ */
         <Button
           type="button"
           size="lg"
@@ -428,3 +441,4 @@ export function CookieConsent() {
     </>
   )
 }
+
