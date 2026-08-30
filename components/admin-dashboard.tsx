@@ -239,6 +239,8 @@ function SortableGalleryItem({
 export function AdminDashboard({ data }: { data: AdminData }) {
   const router = useRouter()
   const [query, setQuery] = useState("")
+  const [tripStatusFilter, setTripStatusFilter] = useState("all")
+const [tripSort, setTripSort] = useState("nearest")
   const [inquiryTab, setInquiryTab] = useState<
   "new" | "contacted" | "closed"
 >("new")
@@ -270,15 +272,52 @@ export function AdminDashboard({ data }: { data: AdminData }) {
     })
   )
 
-  const filteredTrips = useMemo(
-    () =>
-      data.trips.filter((trip) =>
-        `${trip.title} ${trip.city}`
-          .toLowerCase()
-          .includes(query.toLowerCase())
-      ),
-    [data.trips, query]
-  )
+  const filteredTrips = useMemo(() => {
+  const result = data.trips.filter((trip) => {
+    const search = query.trim().toLowerCase()
+
+    const matchesSearch =
+      !search ||
+      trip.title.toLowerCase().includes(search) ||
+      trip.city.toLowerCase().includes(search) ||
+      trip.country.toLowerCase().includes(search)
+
+    const expired =
+      trip.status === "published" &&
+      isTripExpired(trip)
+
+    const matchesStatus =
+      tripStatusFilter === "all" ||
+      (tripStatusFilter === "published" &&
+        trip.status === "published" &&
+        !expired) ||
+      (tripStatusFilter === "draft" &&
+        trip.status === "draft") ||
+      (tripStatusFilter === "expired" &&
+        expired)
+
+    return matchesSearch && matchesStatus
+  })
+
+  return [...result].sort((a, b) => {
+    const dateA = new Date(a.startDate).getTime()
+    const dateB = new Date(b.startDate).getTime()
+
+    if (tripSort === "nearest") {
+      return dateA - dateB
+    }
+
+    if (tripSort === "furthest") {
+      return dateB - dateA
+    }
+
+    if (tripSort === "newest") {
+      return b.id - a.id
+    }
+
+    return 0
+  })
+}, [data.trips, query, tripStatusFilter, tripSort])
 
   const newLeads = data.inquiries.filter(
     (item) => item.status === "new"
@@ -834,168 +873,244 @@ export function AdminDashboard({ data }: { data: AdminData }) {
           </div>
         </TabsContent>
 
-        <TabsContent value="trips">
-          <SectionHeader
-            eyebrow="Oferta"
-            title="Wyjazdy"
-            description="Twórz, edytuj, publikuj, duplikuj i archiwizuj oferty."
-            action={
-              <TripDialog
-                trigger={
-                  <Button>
-                    <Plus />
-                    Nowy wyjazd
-                  </Button>
-                }
-              />
+<TabsContent value="trips">
+  <SectionHeader
+    eyebrow="Oferta"
+    title="Wyjazdy"
+    description="Twórz, edytuj, publikuj, duplikuj i archiwizuj oferty."
+    action={
+      <TripDialog
+        trigger={
+          <Button>
+            <Plus />
+            Nowy wyjazd
+          </Button>
+        }
+      />
+    }
+  />
+
+  <Card>
+    <CardContent className="pt-6">
+      <div className="mb-6 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex flex-1 flex-col gap-3 md:flex-row">
+          <div className="relative w-full md:max-w-md">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+
+            <Input
+              value={query}
+              onChange={(e) =>
+                setQuery(e.target.value)
+              }
+              placeholder="Szukaj po nazwie lub mieście"
+              className="pl-9"
+            />
+          </div>
+
+          <select
+            value={tripStatusFilter}
+            onChange={(e) =>
+              setTripStatusFilter(e.target.value)
             }
-          />
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm md:w-44"
+          >
+            <option value="all">
+              Wszystkie statusy
+            </option>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="mb-5 flex max-w-md items-center gap-2">
-                <Search className="text-muted-foreground" />
+            <option value="published">
+              Opublikowane
+            </option>
 
-                <Input
-                  value={query}
-                  onChange={(e) =>
-                    setQuery(e.target.value)
-                  }
-                  placeholder="Szukaj po nazwie lub mieście"
-                />
-              </div>
+            <option value="draft">
+              Szkice
+            </option>
 
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Oferta</TableHead>
-                      <TableHead>Termin</TableHead>
-                      <TableHead>Cena</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">
-                        Operacje
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
+            <option value="expired">
+              Po terminie
+            </option>
+          </select>
 
-                  <TableBody>
-                    {filteredTrips.map((trip) => (
-                      <TableRow key={trip.id}>
-                        <TableCell>
-                          <strong>{trip.title}</strong>
+          <select
+            value={tripSort}
+            onChange={(e) =>
+              setTripSort(e.target.value)
+            }
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm md:w-52"
+          >
+            <option value="nearest">
+              Najbliższy termin
+            </option>
 
-                          <span className="block text-xs text-muted-foreground">
-                            {trip.city}, {trip.country}
-                          </span>
-                        </TableCell>
+            <option value="furthest">
+              Najdalszy termin
+            </option>
 
-                        <TableCell>
-                          {trip.startDate}
-                          {trip.endDate
-                            ? ` - ${trip.endDate}`
-                            : ""}
-                        </TableCell>
+            <option value="newest">
+              Ostatnio dodane
+            </option>
+          </select>
+        </div>
 
-                        <TableCell>
-                          {trip.price.toLocaleString(
-                            "pl-PL"
-                          )}{" "}
-                          zł
-                        </TableCell>
+        <div className="text-sm text-muted-foreground">
+          {filteredTrips.length === 1
+            ? "1 wyjazd"
+            : `${filteredTrips.length} wyjazdów`}
+        </div>
+      </div>
 
-                        <TableCell>
-                          <StatusBadge
-  status={trip.status}
-  expired={
-    trip.status === "published" &&
-    isTripExpired(trip)
-  }
-/>
-                        </TableCell>
+      {filteredTrips.length === 0 ? (
+        <div className="flex min-h-48 flex-col items-center justify-center rounded-lg border border-dashed text-center">
+          <Plane className="mb-3 size-8 text-muted-foreground" />
 
-                        <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <TripDialog
-                              trip={trip}
-                              trigger={
-                                <Button
-                                  size="icon-sm"
-                                  variant="outline"
-                                >
-                                  <Pencil />
-                                  <span className="sr-only">
-                                    Edytuj
-                                  </span>
-                                </Button>
-                              }
-                            />
+          <p className="font-medium">
+            Nie znaleziono wyjazdów
+          </p>
 
-                            <form
-                              action={duplicateTrip}
+          <p className="mt-1 text-sm text-muted-foreground">
+            Zmień kryteria wyszukiwania lub dodaj nowy wyjazd.
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Oferta</TableHead>
+                <TableHead>Termin</TableHead>
+                <TableHead>Cena</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">
+                  Operacje
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {filteredTrips.map((trip) => {
+                const expired =
+                  trip.status === "published" &&
+                  isTripExpired(trip)
+
+                return (
+                  <TableRow key={trip.id}>
+                    <TableCell>
+                      <strong className="font-semibold">
+                        {trip.title}
+                      </strong>
+
+                      <span className="block text-xs text-muted-foreground">
+                        {trip.city}, {trip.country}
+                      </span>
+                    </TableCell>
+
+                    <TableCell className="whitespace-nowrap">
+                      {trip.startDate}
+                      {trip.endDate
+                        ? ` - ${trip.endDate}`
+                        : ""}
+                    </TableCell>
+
+                    <TableCell className="whitespace-nowrap font-medium">
+                      {trip.price.toLocaleString(
+                        "pl-PL"
+                      )}{" "}
+                      zł
+                    </TableCell>
+
+                    <TableCell>
+                      <StatusBadge
+                        status={trip.status}
+                        expired={expired}
+                      />
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex justify-end gap-2">
+                        <TripDialog
+                          trip={trip}
+                          trigger={
+                            <Button
+                              size="icon-sm"
+                              variant="outline"
+                              title="Edytuj wyjazd"
                             >
-                              <input
-                                type="hidden"
-                                name="id"
-                                value={trip.id}
-                              />
+                              <Pencil />
+                              <span className="sr-only">
+                                Edytuj
+                              </span>
+                            </Button>
+                          }
+                        />
 
-                              <Button
-                                type="submit"
-                                size="icon-sm"
-                                variant="outline"
-                              >
-                                <Copy />
-                                <span className="sr-only">
-                                  Duplikuj
-                                </span>
-                              </Button>
-                            </form>
+                        <form
+                          action={duplicateTrip}
+                        >
+                          <input
+                            type="hidden"
+                            name="id"
+                            value={trip.id}
+                          />
 
-                            <form action={setTripStatus}>
-                              <input
-                                type="hidden"
-                                name="id"
-                                value={trip.id}
-                              />
+                          <Button
+                            type="submit"
+                            size="icon-sm"
+                            variant="outline"
+                            title="Duplikuj wyjazd"
+                          >
+                            <Copy />
+                            <span className="sr-only">
+                              Duplikuj
+                            </span>
+                          </Button>
+                        </form>
 
-                              <input
-                                type="hidden"
-                                name="status"
-                                value={
-                                  trip.status ===
-                                  "published"
-                                    ? "draft"
-                                    : "published"
-                                }
-                              />
+                        <form action={setTripStatus}>
+                          <input
+                            type="hidden"
+                            name="id"
+                            value={trip.id}
+                          />
 
-                              <Button
-                                type="submit"
-                                size="sm"
-                                variant="outline"
-                              >
-                                {trip.status ===
-                                "published"
-                                  ? "Ukryj"
-                                  : "Publikuj"}
-                              </Button>
-                            </form>
+                          <input
+                            type="hidden"
+                            name="status"
+                            value={
+                              trip.status ===
+                              "published"
+                                ? "draft"
+                                : "published"
+                            }
+                          />
 
-                            <DeleteTripDialog
-                              tripId={trip.id}
-                              tripTitle={trip.title}
-                            />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                          <Button
+                            type="submit"
+                            size="sm"
+                            variant="outline"
+                          >
+                            {trip.status ===
+                            "published"
+                              ? "Ukryj"
+                              : "Publikuj"}
+                          </Button>
+                        </form>
+
+                        <DeleteTripDialog
+                          tripId={trip.id}
+                          tripTitle={trip.title}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+</TabsContent>
 
         <TabsContent value="media">
           <SectionHeader
