@@ -1700,18 +1700,17 @@ function StatusBadge({
     closed: "Zamknięte",
   }
 
-  if (expired) {
-    return (
-      <Badge
-        variant="destructive"
-        className="gap-1.5"
-      >
-        <AlertCircle className="size-3.5" />
-        Po terminie
-      </Badge>
-    )
-  }
-
+ if (expired) {
+  return (
+    <Badge
+      variant="outline"
+      className="gap-1.5 border-red-500/50 bg-red-500/10 text-red-600 dark:border-red-400/50 dark:bg-red-400/10 dark:text-red-400"
+    >
+      <AlertCircle className="size-3.5" />
+      Po terminie
+    </Badge>
+  )
+}
   return (
     <Badge
       variant={
