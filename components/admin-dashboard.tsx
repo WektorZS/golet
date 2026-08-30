@@ -1597,8 +1597,8 @@ export function AdminDashboard({ data }: { data: AdminData }) {
       .filter((lead) => lead.status === inquiryTab)
       .sort(
   (a, b) =>
-    new Date(a.created_at).getTime() -
-    new Date(b.created_at).getTime()
+    new Date(a.createdAt).getTime() -
+    new Date(b.createdAt).getTime()
 )
       .map((lead) => (
         <Card
@@ -1659,10 +1659,10 @@ export function AdminDashboard({ data }: { data: AdminData }) {
                 </div>
               </div>
 
-              {lead.created_at ? (
+              {lead.createdAt ? (
   (() => {
     const waitingTime = getInquiryWaitingTime(
-      lead.created_at
+      lead.createdAt
     )
 
     return (
@@ -1681,12 +1681,12 @@ export function AdminDashboard({ data }: { data: AdminData }) {
 
         <time
           dateTime={new Date(
-            lead.created_at
+            lead.createdAt
           ).toISOString()}
           className="text-[11px] text-muted-foreground"
         >
           {formatInquiryDate(
-            lead.created_at
+            lead.createdAt
           )}
         </time>
       </div>
