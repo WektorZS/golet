@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useActionState, useEffect, useMemo, useRef, useState } from "react"
 import {
+  AlertCircle,
   Archive,
   BookOpen,
   Clapperboard,
@@ -845,8 +846,12 @@ export function AdminDashboard({ data }: { data: AdminData }) {
 
                         <TableCell>
                           <StatusBadge
-                            status={trip.status}
-                          />
+  status={trip.status}
+  expired={
+    trip.status === "published" &&
+    isTripExpired(trip)
+  }
+/>
                         </TableCell>
 
                         <TableCell>
@@ -1670,10 +1675,21 @@ function Metric({
   )
 }
 
+function isTripExpired(trip: any) {
+  if (!trip?.startDate) return false
+
+  const today = new Date()
+  const todayString = today.toISOString().split("T")[0]
+
+  return trip.startDate < todayString
+}
+
 function StatusBadge({
   status,
+  expired = false,
 }: {
   status: string
+  expired?: boolean
 }) {
   const labels: Record<string, string> = {
     published: "Opublikowane",
@@ -1682,6 +1698,18 @@ function StatusBadge({
     new: "Nowe",
     contacted: "Kontakt",
     closed: "Zamknięte",
+  }
+
+  if (expired) {
+    return (
+      <Badge
+        variant="destructive"
+        className="gap-1.5"
+      >
+        <AlertCircle className="size-3.5" />
+        Po terminie
+      </Badge>
+    )
   }
 
   return (
