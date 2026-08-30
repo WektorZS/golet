@@ -2593,6 +2593,15 @@ function ChangePasswordForm() {
   const [newPassword, setNewPassword] =
     useState("")
 
+  const [showCurrentPassword, setShowCurrentPassword] =
+    useState(false)
+
+  const [showNewPassword, setShowNewPassword] =
+    useState(false)
+
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false)
+
   const passwordLengthOk =
     newPassword.length >= 12
 
@@ -2610,34 +2619,91 @@ function ChangePasswordForm() {
         label="Aktualne hasło"
         hint="Wpisz obecne hasło używane do logowania do panelu."
       >
-        <Input
-          name="currentPassword"
-          type="password"
-          autoComplete="current-password"
-          required
-        />
+        <div className="relative">
+          <Input
+            name="currentPassword"
+            type={
+              showCurrentPassword
+                ? "text"
+                : "password"
+            }
+            autoComplete="current-password"
+            required
+            className="pr-10"
+          />
+
+          <button
+            type="button"
+            onClick={() =>
+              setShowCurrentPassword(
+                (value) => !value
+              )
+            }
+            className="absolute right-0 top-0 flex h-9 w-10 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+            aria-label={
+              showCurrentPassword
+                ? "Ukryj hasło"
+                : "Pokaż hasło"
+            }
+          >
+            {showCurrentPassword ? (
+              <EyeOff className="size-4" />
+            ) : (
+              <Eye className="size-4" />
+            )}
+          </button>
+        </div>
       </Field>
 
       <Field
         label="Nowe hasło"
         hint="Nowe hasło musi mieć co najmniej 12 znaków."
       >
-        <Input
-          name="newPassword"
-          type="password"
-          minLength={12}
-          autoComplete="new-password"
-          required
-          value={newPassword}
-          onChange={(e) =>
-            setNewPassword(e.target.value)
-          }
-        />
+        <div className="relative">
+          <Input
+            name="newPassword"
+            type={
+              showNewPassword
+                ? "text"
+                : "password"
+            }
+            minLength={12}
+            autoComplete="new-password"
+            required
+            value={newPassword}
+            onChange={(e) =>
+              setNewPassword(e.target.value)
+            }
+            className="pr-10"
+          />
+
+          <button
+            type="button"
+            onClick={() =>
+              setShowNewPassword(
+                (value) => !value
+              )
+            }
+            className="absolute right-0 top-0 flex h-9 w-10 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+            aria-label={
+              showNewPassword
+                ? "Ukryj nowe hasło"
+                : "Pokaż nowe hasło"
+            }
+          >
+            {showNewPassword ? (
+              <EyeOff className="size-4" />
+            ) : (
+              <Eye className="size-4" />
+            )}
+          </button>
+        </div>
 
         <div className="mt-2 flex items-center gap-2 text-sm">
           {passwordLengthOk ? (
             <>
               <CheckCircle2 className="size-4 text-green-600" />
+
               <span className="font-medium text-green-600">
                 Minimum 12 znaków zostało osiągnięte
               </span>
@@ -2645,6 +2711,7 @@ function ChangePasswordForm() {
           ) : (
             <>
               <AlertCircle className="size-4 text-muted-foreground" />
+
               <span className="text-muted-foreground">
                 {newPassword.length === 0
                   ? "Minimum 12 znaków"
@@ -2659,13 +2726,41 @@ function ChangePasswordForm() {
         label="Powtórz nowe hasło"
         hint="Wpisz ponownie nowe hasło, aby upewnić się, że nie ma w nim literówki."
       >
-        <Input
-          name="confirmPassword"
-          type="password"
-          minLength={12}
-          autoComplete="new-password"
-          required
-        />
+        <div className="relative">
+          <Input
+            name="confirmPassword"
+            type={
+              showConfirmPassword
+                ? "text"
+                : "password"
+            }
+            minLength={12}
+            autoComplete="new-password"
+            required
+            className="pr-10"
+          />
+
+          <button
+            type="button"
+            onClick={() =>
+              setShowConfirmPassword(
+                (value) => !value
+              )
+            }
+            className="absolute right-0 top-0 flex h-9 w-10 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+            aria-label={
+              showConfirmPassword
+                ? "Ukryj hasło"
+                : "Pokaż hasło"
+            }
+          >
+            {showConfirmPassword ? (
+              <EyeOff className="size-4" />
+            ) : (
+              <Eye className="size-4" />
+            )}
+          </button>
+        </div>
       </Field>
 
       <label className="flex items-center gap-2 text-sm">
