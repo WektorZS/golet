@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -16,12 +17,16 @@ export function InquiryForm({
 }: {
   matchName?: string
 }) {
-  const [state, action, pending] = useActionState(createInquiry, initialState)
+  const [state, action, pending] = useActionState(
+    createInquiry,
+    initialState
+  )
   const [formLoadedAt] = useState(() => Date.now())
+
+  const hasSelectedTrip = Boolean(matchName.trim())
 
   return (
     <form action={action} className="flex flex-col gap-5">
-      {/* Honeypot: hidden from real users via CSS + tabIndex, but bots that fill every field will trip it. */}
       <input
         type="text"
         name="website"
@@ -36,6 +41,14 @@ export function InquiryForm({
         name="formLoadedAt"
         value={formLoadedAt}
       />
+
+      {hasSelectedTrip && (
+        <input
+          type="hidden"
+          name="matchName"
+          value={matchName}
+        />
+      )}
 
       <FieldGroup className="grid gap-4 md:grid-cols-2">
         <Field>
@@ -72,15 +85,17 @@ export function InquiryForm({
           />
         </Field>
 
-        <Field>
-          <FieldLabel htmlFor="matchName">Na jaki mecz?</FieldLabel>
-          <Input
-            id="matchName"
-            name="matchName"
-            required
-            placeholder="np. Barcelona - Real"
-          />
-        </Field>
+        {!hasSelectedTrip && (
+          <Field>
+            <FieldLabel htmlFor="matchName">Na jaki mecz?</FieldLabel>
+            <Input
+              id="matchName"
+              name="matchName"
+              required
+              placeholder="np. Barcelona - Real"
+            />
+          </Field>
+        )}
 
         <Field>
           <FieldLabel htmlFor="departureCity">Skąd wylot?</FieldLabel>
@@ -88,6 +103,7 @@ export function InquiryForm({
             id="departureCity"
             name="departureCity"
             required
+            autoComplete="address-level2"
             placeholder="Warszawa"
           />
         </Field>
@@ -178,7 +194,6 @@ export function InquiryForm({
         disabled={pending}
       >
         {pending ? "Wysyłanie…" : "Wyślij zapytanie"}
-
         <ArrowRight data-icon="inline-end" />
       </Button>
     </form>
