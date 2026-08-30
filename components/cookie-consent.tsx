@@ -233,7 +233,7 @@ export function CookieConsent() {
 
                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                           Pomaga nam anonimowo analizować
-                          korzystanie ze strony i poprawiać
+                          ruch na stronie, zbierać statystyki i poprawiać
                           jej działanie.
                         </p>
                       </div>
