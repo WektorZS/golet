@@ -180,7 +180,7 @@ export function CookieConsent() {
                     className="group w-full rounded-xl border border-border bg-background p-4 text-left transition-all duration-200 hover:border-primary hover:bg-primary/10 hover:shadow-md"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+                      <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black">
                         <ShieldCheck
                           className="size-5"
                           aria-hidden="true"
@@ -213,7 +213,7 @@ export function CookieConsent() {
                     className="group w-full rounded-xl border border-border bg-background p-4 text-left transition-all duration-200 hover:border-primary hover:bg-primary/10 hover:shadow-md"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+                      <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black">
                         <Cookie
                           className="size-5"
                           aria-hidden="true"
