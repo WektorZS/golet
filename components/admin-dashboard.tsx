@@ -2590,35 +2590,11 @@ function ChangePasswordForm() {
     initialPasswordState
   )
 
-  const [showCurrent, setShowCurrent] =
-    useState(false)
-
-  const [showNew, setShowNew] =
-    useState(false)
-
-  const [showConfirm, setShowConfirm] =
-    useState(false)
-
   const [newPassword, setNewPassword] =
     useState("")
 
-  const passwordStrength =
-    newPassword.length === 0
-      ? null
-      : newPassword.length < 12
-        ? "weak"
-        : newPassword.length < 16
-          ? "medium"
-          : "strong"
-
-  const passwordStrengthLabel =
-    passwordStrength === "weak"
-      ? "Za krótkie"
-      : passwordStrength === "medium"
-        ? "Dobre"
-        : passwordStrength === "strong"
-          ? "Silne"
-          : null
+  const passwordLengthOk =
+    newPassword.length >= 12
 
   return (
     <form
@@ -2628,232 +2604,115 @@ function ChangePasswordForm() {
           : "form"
       }
       action={action}
-      className="flex flex-col gap-5"
+      className="flex flex-col gap-4"
     >
       <Field
         label="Aktualne hasło"
         hint="Wpisz obecne hasło używane do logowania do panelu."
       >
-        <div className="relative">
-          <Input
-            name="currentPassword"
-            type={
-              showCurrent
-                ? "text"
-                : "password"
-            }
-            autoComplete="current-password"
-            required
-            className="pr-11"
-          />
-
-          <button
-            type="button"
-            onClick={() =>
-              setShowCurrent(
-                (value) => !value
-              )
-            }
-            className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            aria-label={
-              showCurrent
-                ? "Ukryj aktualne hasło"
-                : "Pokaż aktualne hasło"
-            }
-          >
-            {showCurrent ? (
-              <EyeOff className="size-4" />
-            ) : (
-              <Eye className="size-4" />
-            )}
-          </button>
-        </div>
+        <Input
+          name="currentPassword"
+          type="password"
+          autoComplete="current-password"
+          required
+        />
       </Field>
 
       <Field
         label="Nowe hasło"
-        hint="Minimum 12 znaków. Zalecamy 16 lub więcej znaków."
+        hint="Nowe hasło musi mieć co najmniej 12 znaków."
       >
-        <div className="relative">
-          <Input
-            name="newPassword"
-            type={
-              showNew
-                ? "text"
-                : "password"
-            }
-            minLength={12}
-            autoComplete="new-password"
-            required
-            value={newPassword}
-            onChange={(event) =>
-              setNewPassword(
-                event.target.value
-              )
-            }
-            className="pr-11"
-          />
+        <Input
+          name="newPassword"
+          type="password"
+          minLength={12}
+          autoComplete="new-password"
+          required
+          value={newPassword}
+          onChange={(e) =>
+            setNewPassword(e.target.value)
+          }
+        />
 
-          <button
-            type="button"
-            onClick={() =>
-              setShowNew(
-                (value) => !value
-              )
-            }
-            className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            aria-label={
-              showNew
-                ? "Ukryj nowe hasło"
-                : "Pokaż nowe hasło"
-            }
-          >
-            {showNew ? (
-              <EyeOff className="size-4" />
-            ) : (
-              <Eye className="size-4" />
-            )}
-          </button>
+        <div className="mt-2 flex items-center gap-2 text-sm">
+          {passwordLengthOk ? (
+            <>
+              <CheckCircle2 className="size-4 text-green-600" />
+              <span className="font-medium text-green-600">
+                Minimum 12 znaków zostało osiągnięte
+              </span>
+            </>
+          ) : (
+            <>
+              <AlertCircle className="size-4 text-muted-foreground" />
+              <span className="text-muted-foreground">
+                {newPassword.length === 0
+                  ? "Minimum 12 znaków"
+                  : `${newPassword.length}/12 znaków`}
+              </span>
+            </>
+          )}
         </div>
-
-        {newPassword && (
-          <div className="mt-2 flex items-center gap-2">
-            <div className="flex flex-1 gap-1">
-              <span
-                className={`h-1.5 flex-1 rounded-full ${
-                  passwordStrength
-                    ? "bg-primary"
-                    : "bg-muted"
-                }`}
-              />
-
-              <span
-                className={`h-1.5 flex-1 rounded-full ${
-                  passwordStrength ===
-                    "medium" ||
-                  passwordStrength ===
-                    "strong"
-                    ? "bg-primary"
-                    : "bg-muted"
-                }`}
-              />
-
-              <span
-                className={`h-1.5 flex-1 rounded-full ${
-                  passwordStrength ===
-                  "strong"
-                    ? "bg-primary"
-                    : "bg-muted"
-                }`}
-              />
-            </div>
-
-            <span className="text-xs font-medium text-muted-foreground">
-              {passwordStrengthLabel}
-            </span>
-          </div>
-        )}
       </Field>
 
       <Field
         label="Powtórz nowe hasło"
-        hint="Wpisz ponownie nowe hasło."
+        hint="Wpisz ponownie nowe hasło, aby upewnić się, że nie ma w nim literówki."
       >
-        <div className="relative">
-          <Input
-            name="confirmPassword"
-            type={
-              showConfirm
-                ? "text"
-                : "password"
-            }
-            minLength={12}
-            autoComplete="new-password"
-            required
-            className="pr-11"
-          />
-
-          <button
-            type="button"
-            onClick={() =>
-              setShowConfirm(
-                (value) => !value
-              )
-            }
-            className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            aria-label={
-              showConfirm
-                ? "Ukryj powtórzone hasło"
-                : "Pokaż powtórzone hasło"
-            }
-          >
-            {showConfirm ? (
-              <EyeOff className="size-4" />
-            ) : (
-              <Eye className="size-4" />
-            )}
-          </button>
-        </div>
+        <Input
+          name="confirmPassword"
+          type="password"
+          minLength={12}
+          autoComplete="new-password"
+          required
+        />
       </Field>
 
-      <label className="flex cursor-pointer items-start gap-3 rounded-xl border bg-muted/30 p-3.5 transition hover:bg-muted/50">
+      <label className="flex items-center gap-2 text-sm">
         <input
           name="revokeOtherSessions"
           type="checkbox"
           defaultChecked
-          className="mt-0.5 size-4 accent-primary"
+          className="size-4 rounded border"
         />
 
-        <span className="flex flex-col gap-0.5">
-          <span className="text-sm font-medium">
-            Wyloguj pozostałe urządzenia
-          </span>
-
-          <span className="text-xs leading-relaxed text-muted-foreground">
-            Po zmianie hasła pozostałe aktywne
-            sesje administratora zostaną
-            wylogowane.
-          </span>
-        </span>
+        Wyloguj pozostałe urządzenia
       </label>
 
       {state.error && (
-        <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3.5 text-sm text-destructive">
-          {state.error}
+        <div className="flex items-center gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+          <AlertCircle className="size-4 shrink-0" />
+
+          <p className="font-medium">
+            {state.error}
+          </p>
         </div>
       )}
 
       {state.success && (
-        <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
-          <CheckCircle2 className="size-5 shrink-0 text-primary" />
+        <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">
+          <CheckCircle2 className="size-4 shrink-0 text-primary" />
 
-          <div>
-            <p className="text-sm font-semibold text-foreground">
-              Hasło zostało zmienione.
-            </p>
-
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Twoje konto jest zabezpieczone nowym
-              hasłem.
-            </p>
-          </div>
+          <p className="font-medium text-foreground">
+            Hasło zostało pomyślnie zmienione.
+          </p>
         </div>
       )}
 
       <Button
         type="submit"
         disabled={pending}
-        className="w-full sm:w-auto"
       >
         <KeyRound />
 
         {pending
-          ? "Zmieniam hasło…"
+          ? "Zmieniam…"
           : "Zmień hasło"}
       </Button>
     </form>
   )
 }
+
 const initialTripState: SaveTripState = {}
 
 function TripDialog({
