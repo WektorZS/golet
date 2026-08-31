@@ -1,3 +1,4 @@
+
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -137,8 +138,6 @@ type Testimonial = {
   rating: number
 }
 
-
-
 function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
   const items = gallery.slice(0, 5)
   const featureFirst = items.length >= 3
@@ -167,7 +166,11 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
                 alt={item.alt || item.title}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes={isFeatured ? "(max-width: 640px) 100vw, 66vw" : "(max-width: 640px) 50vw, 33vw"}
+                sizes={
+                  isFeatured
+                    ? "(max-width: 640px) 100vw, 66vw"
+                    : "(max-width: 640px) 50vw, 33vw"
+                }
               />
             </ImageLightbox>
           </div>
@@ -176,7 +179,52 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
     </div>
   )
 }
+function GoogleReviewsCard() {
+  return (
+    <a
+      href="https://share.google/kRvcJRnquoIaDz3YT"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Zobacz opinie Let’s Gol w Google"
+      className="group mt-7 block max-w-md"
+    >
+      <div className="flex items-center gap-4 rounded-2xl border border-foreground/10 bg-background px-5 py-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+        {/* Google G */}
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-background text-xl font-black">
+          <span
+            className="bg-[conic-gradient(from_-45deg,#4285F4_0deg,#4285F4_90deg,#34A853_90deg,#34A853_180deg,#FBBC05_180deg,#FBBC05_270deg,#EA4335_270deg,#EA4335_360deg)] bg-clip-text text-transparent"
+          >
+            G
+          </span>
+        </div>
 
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="truncate font-bold">
+              Let’s Gol · Wyjazdy na mecze
+            </p>
+
+            <span className="shrink-0 text-lg text-primary transition-transform duration-300 group-hover:translate-x-1">
+              →
+            </span>
+          </div>
+
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+            <span className="font-bold">5.0/5</span>
+
+            <span className="tracking-[0.08em] text-primary">
+              ★★★★★
+            </span>
+
+            <span className="text-muted-foreground">
+              Opinie w Google
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+  )
+}
 export function HomePage({
   trips,
   content,
@@ -192,19 +240,18 @@ export function HomePage({
 }) {
   return (
     <main>
-
       <SiteHeader />
 
-  
+      {/* HERO */}
       <section className="relative isolate flex flex-col overflow-hidden bg-foreground text-background md:h-dvh md:min-h-[700px]">
         <Image
-  src="/images/hero-stadium.webp"
-  alt="Kibice na trybunach podczas wieczornego meczu w Barcelonie"
-  fill
-  priority
-  className="object-cover object-center"
-  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1920px"
-/>
+          src="/images/hero-stadium.webp"
+          alt="Kibice na trybunach podczas wieczornego meczu w Barcelonie"
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1920px"
+        />
 
         <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/75 to-transparent" />
 
@@ -259,35 +306,37 @@ export function HomePage({
             </div>
           </div>
         </div>
-<div className="absolute bottom-28 right-4 z-10 hidden md:block lg:right-8">
-  <div className="border border-background/15 bg-foreground/85 px-5 py-4 text-background shadow-xl backdrop-blur-md">
-    <div className="flex items-center gap-2">
-      <Star
-        className="size-5 text-primary"
-        fill="currentColor"
-        aria-hidden="true"
-      />
 
-      <span className="text-lg font-black">
-        100% poleca
-      </span>
-    </div>
+        <div className="absolute bottom-28 right-4 z-10 hidden md:block lg:right-8">
+          <div className="border border-background/15 bg-foreground/85 px-5 py-4 text-background shadow-xl backdrop-blur-md">
+            <div className="flex items-center gap-2">
+              <Star
+                className="size-5 text-primary"
+                fill="currentColor"
+                aria-hidden="true"
+              />
 
-    <p className="mt-1 text-xs font-medium text-background/60">
-      160 opinii na Facebooku
-    </p>
+              <span className="text-lg font-black">
+                100% poleca
+              </span>
+            </div>
 
-    <div className="mt-3 border-t border-background/10 pt-3">
-      <p className="text-lg font-black">
-        5 000+
-      </p>
+            <p className="mt-1 text-xs font-medium text-background/60">
+              160 opinii na Facebooku
+            </p>
 
-      <p className="text-xs font-medium text-background/60">
-        obserwujących na Facebooku
-      </p>
-    </div>
-  </div>
-</div>
+            <div className="mt-3 border-t border-background/10 pt-3">
+              <p className="text-lg font-black">
+                5 000+
+              </p>
+
+              <p className="text-xs font-medium text-background/60">
+                obserwujących na Facebooku
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="relative border-t border-background/15 bg-foreground/75 backdrop-blur-sm">
           <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:grid-cols-2 md:px-6 lg:grid-cols-4">
             {trust.map(([Icon, text]) => (
@@ -296,6 +345,7 @@ export function HomePage({
                 className="flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-3 sm:text-left"
               >
                 <Icon className="text-primary" aria-hidden="true" />
+
                 <span className="text-sm font-semibold leading-tight">
                   {text}
                 </span>
@@ -305,7 +355,7 @@ export function HomePage({
         </div>
       </section>
 
-   
+      {/* WYJAZDY */}
       <section
         id="wyjazdy"
         className="scroll-mt-8 bg-background px-4 py-20 md:px-6 md:py-28"
@@ -340,17 +390,17 @@ export function HomePage({
         </div>
       </section>
 
- 
+      {/* INDYWIDUALNY WYJAZD */}
       <section className="bg-secondary px-4 py-20 md:px-6">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
           <div className="relative min-h-[430px] overflow-hidden rounded-xl">
             <Image
-  src="/images/about-us.webp"
-  alt="Trybuny stadionu Camp Nou Let's Gol"
-  fill
-  className="object-cover"
-  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
-/>
+              src="/images/about-us.webp"
+              alt="Trybuny stadionu Camp Nou Let's Gol"
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
+            />
 
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 to-transparent" />
 
@@ -400,7 +450,7 @@ export function HomePage({
         </div>
       </section>
 
-
+      {/* BILETY / GRUPY */}
       <section
         id="bilety"
         className="bg-background px-4 py-20 md:px-6"
@@ -455,7 +505,7 @@ export function HomePage({
         </div>
       </section>
 
-    
+      {/* PAKIET */}
       <section className="bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
@@ -486,6 +536,7 @@ export function HomePage({
                   className="flex items-center gap-3 rounded-lg border border-background/15 p-4"
                 >
                   <I className="text-primary" aria-hidden="true" />
+
                   <span className="font-semibold">
                     {label as string}
                   </span>
@@ -496,7 +547,7 @@ export function HomePage({
         </div>
       </section>
 
-
+      {/* DLACZEGO MY */}
       <section className="bg-background px-4 py-20 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
@@ -529,6 +580,7 @@ export function HomePage({
         </div>
       </section>
 
+      {/* GALERIA / OPINIE */}
       <section className="bg-secondary px-4 py-20 md:px-6">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.25fr_0.75fr]">
           <div>
@@ -583,18 +635,18 @@ export function HomePage({
                 className="mt-4 rounded-xl bg-card p-7 shadow-sm"
               >
                 <div className="flex gap-1 text-primary">
-  <span className="sr-only">
-    Ocena {item.rating} na 5
-  </span>
+                  <span className="sr-only">
+                    Ocena {item.rating} na 5
+                  </span>
 
-  {Array.from({ length: item.rating }).map((_, i) => (
-    <Star
-      key={i}
-      fill="currentColor"
-      aria-hidden="true"
-    />
-  ))}
-</div>
+                  {Array.from({ length: item.rating }).map((_, i) => (
+                    <Star
+                      key={i}
+                      fill="currentColor"
+                      aria-hidden="true"
+                    />
+                  ))}
+                </div>
 
                 <p className="mt-5 text-lg leading-relaxed">
                   „{item.content}”
@@ -610,6 +662,7 @@ export function HomePage({
         </div>
       </section>
 
+      {/* PROCES */}
       <section className="bg-background px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
@@ -643,6 +696,7 @@ export function HomePage({
         </div>
       </section>
 
+      {/* O NAS */}
       <section
         id="o-nas"
         className="bg-secondary px-4 py-20 md:px-6"
@@ -662,63 +716,65 @@ export function HomePage({
               align="left"
             />
 
-           <div className="mt-7 flex flex-wrap gap-x-8 gap-y-6">
-  <div>
-    <strong className="text-3xl font-black">
-      42
-    </strong>
-    <p className="text-sm text-muted-foreground">
-      stadiony w ofercie
-    </p>
-  </div>
+            <div className="mt-7 flex flex-wrap gap-x-8 gap-y-6">
+              <div>
+                <strong className="text-3xl font-black">
+                  42
+                </strong>
 
-  <div>
-    <div className="flex items-center gap-1.5">
-      <Star
-        className="size-5 text-primary"
-        fill="currentColor"
-        aria-hidden="true"
-      />
+                <p className="text-sm text-muted-foreground">
+                  stadiony w ofercie
+                </p>
+              </div>
 
-      <strong className="text-3xl font-black">
-        5.0/5
-      </strong>
-    </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <Star
+                    className="size-5 text-primary"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  />
 
-    <p className="text-sm text-muted-foreground">
-      Facebook · 160 opinii
-    </p>
+                  <strong className="text-3xl font-black">
+                    5.0/5
+                  </strong>
+                </div>
 
-    <p className="mt-1 w-fit bg-foreground px-2 py-1 text-xs font-semibold text-background">
-  100% poleca
-</p>
-  </div>
+                <p className="text-sm text-muted-foreground">
+                  Facebook · 160 opinii
+                </p>
 
-  <div>
-    <strong className="text-3xl font-black">
-      5 000+
-    </strong>
+                <p className="mt-1 w-fit bg-foreground px-2 py-1 text-xs font-semibold text-background">
+                  100% poleca
+                </p>
+              </div>
 
-    <p className="text-sm text-muted-foreground">
-      obserwujących na Facebooku
-    </p>
-  </div>
-</div>
-          </div>
+              <div>
+                <strong className="text-3xl font-black">
+                  5 000+
+                </strong>
+
+                <p className="text-sm text-muted-foreground">
+                  obserwujących na Facebooku
+                </p>
+              </div>
+            </div>
+
+            <GoogleReviewsCard />
 
           <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
             <Image
-  src="/images/hero-stadium.webp"
-  alt="Kibice Let’s Gol na stadionie"
-  fill
-  className="object-cover"
-  sizes="(max-width: 1024px) 100vw, 50vw"
-/>
+              src="/images/hero-stadium.webp"
+              alt="Kibice Let’s Gol na stadionie"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
           </div>
         </div>
       </section>
 
-
+      {/* FAQ */}
       <section
         id="faq"
         className="bg-background px-4 py-20 md:px-6"
@@ -750,7 +806,7 @@ export function HomePage({
         </div>
       </section>
 
-
+      {/* YOUTUBE */}
       {videos.length > 0 && (
         <section className="bg-secondary px-4 py-20 md:px-6">
           <div className="mx-auto max-w-7xl">
@@ -796,7 +852,7 @@ export function HomePage({
         </section>
       )}
 
-
+      {/* KONTAKT */}
       <section
         id="kontakt"
         className="bg-foreground px-4 py-20 text-background md:px-6 md:py-24"
@@ -822,6 +878,7 @@ export function HomePage({
                 className="text-primary"
                 aria-hidden="true"
               />
+
               <span>
                 Odpowiedź zwykle w ciągu 24 godzin
               </span>
@@ -831,7 +888,6 @@ export function HomePage({
           <InquiryForm />
         </div>
       </section>
-
 
       <SiteFooter content={content} />
     </main>
