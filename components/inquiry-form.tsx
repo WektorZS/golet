@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from "next/link"
@@ -24,6 +23,51 @@ export function InquiryForm({
   const [formLoadedAt] = useState(() => Date.now())
 
   const hasSelectedTrip = Boolean(matchName.trim())
+
+  const handleNameInput = (
+    event: React.FormEvent<HTMLInputElement>
+  ) => {
+    event.currentTarget.value = event.currentTarget.value.replace(
+      /[^A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]/g,
+      ""
+    )
+  }
+
+  const handlePhoneInput = (
+    event: React.FormEvent<HTMLInputElement>
+  ) => {
+    event.currentTarget.value = event.currentTarget.value.replace(
+      /\D/g,
+      ""
+    )
+  }
+
+  const handleMatchNameInput = (
+    event: React.FormEvent<HTMLInputElement>
+  ) => {
+    event.currentTarget.value = event.currentTarget.value.replace(
+      /[<>]/g,
+      ""
+    )
+  }
+
+  const handleDepartureCityInput = (
+    event: React.FormEvent<HTMLInputElement>
+  ) => {
+    event.currentTarget.value = event.currentTarget.value.replace(
+      /[^A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]/g,
+      ""
+    )
+  }
+
+  const handleMessageInput = (
+    event: React.FormEvent<HTMLTextAreaElement>
+  ) => {
+    event.currentTarget.value = event.currentTarget.value.replace(
+      /[<>]/g,
+      ""
+    )
+  }
 
   return (
     <form action={action} className="flex flex-col gap-5">
@@ -57,8 +101,12 @@ export function InquiryForm({
             id="name"
             name="name"
             required
+            maxLength={100}
             autoComplete="name"
             placeholder="Jan Kowalski"
+            pattern="[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]+"
+            title="Wpisz imię i nazwisko używając liter, spacji lub myślnika."
+            onInput={handleNameInput}
           />
         </Field>
 
@@ -68,8 +116,15 @@ export function InquiryForm({
             id="phone"
             name="phone"
             required
+            type="tel"
+            inputMode="numeric"
+            maxLength={15}
+            minLength={7}
             autoComplete="tel"
-            placeholder="+48 500 000 000"
+            placeholder="500000000"
+            pattern="[0-9]{7,15}"
+            title="Numer telefonu powinien zawierać od 7 do 15 cyfr."
+            onInput={handlePhoneInput}
           />
         </Field>
 
@@ -80,8 +135,11 @@ export function InquiryForm({
             name="email"
             type="email"
             required
+            maxLength={160}
             autoComplete="email"
             placeholder="jan@example.com"
+            pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+"
+            title="Wpisz poprawny adres e-mail, np. jan@example.com."
           />
         </Field>
 
@@ -92,7 +150,9 @@ export function InquiryForm({
               id="matchName"
               name="matchName"
               required
+              maxLength={160}
               placeholder="np. Barcelona - Real"
+              onInput={handleMatchNameInput}
             />
           </Field>
         )}
@@ -103,8 +163,12 @@ export function InquiryForm({
             id="departureCity"
             name="departureCity"
             required
+            maxLength={100}
             autoComplete="address-level2"
             placeholder="Warszawa"
+            pattern="[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]+"
+            title="Wpisz nazwę miasta używając liter, spacji lub myślnika."
+            onInput={handleDepartureCityInput}
           />
         </Field>
 
@@ -114,6 +178,7 @@ export function InquiryForm({
             id="travelers"
             name="travelers"
             type="number"
+            inputMode="numeric"
             min="1"
             max="20"
             defaultValue="2"
@@ -131,7 +196,9 @@ export function InquiryForm({
           id="message"
           name="message"
           rows={4}
+          maxLength={1000}
           placeholder="Termin, preferowany standard hotelu, specjalne potrzeby…"
+          onInput={handleMessageInput}
         />
       </Field>
 
@@ -170,25 +237,25 @@ export function InquiryForm({
         </label>
       </Field>
 
-     {state.message && (
-  <div
-    role="status"
-    className={
-      state.status === "success"
-        ? "flex items-center gap-2 rounded-md border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary"
-        : "rounded-md border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm leading-relaxed text-white"
-    }
-  >
-    {state.status === "success" && (
-      <CheckCircle2
-        aria-hidden="true"
-        className="size-4 shrink-0"
-      />
-    )}
+      {state.message && (
+        <div
+          role="status"
+          className={
+            state.status === "success"
+              ? "flex items-center gap-2 rounded-md border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary"
+              : "rounded-md border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm leading-relaxed text-white"
+          }
+        >
+          {state.status === "success" && (
+            <CheckCircle2
+              aria-hidden="true"
+              className="size-4 shrink-0"
+            />
+          )}
 
-    {state.message}
-  </div>
-)}
+          {state.message}
+        </div>
+      )}
 
       <Button
         type="submit"
