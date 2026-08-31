@@ -39,80 +39,117 @@ export async function sendInquiryEmails(
   const email = escapeHtml(inquiry.email)
   const phone = escapeHtml(inquiry.phone)
   const matchName = escapeHtml(inquiry.matchName)
-  const departureCity = escapeHtml(
-    inquiry.departureCity
-  )
+  const departureCity = escapeHtml(inquiry.departureCity)
   const message = escapeHtml(
     inquiry.message || "Brak dodatkowych informacji."
   )
 
-  // E-mail do klienta
   const clientResult = await resend.emails.send({
     from: FROM_EMAIL,
     to: inquiry.email,
     replyTo: ADMIN_EMAIL,
     subject: "Otrzymaliśmy Twoje zapytanie - Let's Gol",
     html: `
-      <div style="margin:0;padding:30px 15px;background:#f5f5f5;font-family:Arial,sans-serif;color:#111;">
-        <div style="max-width:620px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;">
+      <div style="margin:0;padding:32px 16px;background:#f3f3f3;font-family:Arial,Helvetica,sans-serif;color:#111;">
+        <div style="max-width:620px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
 
-          <div style="background:#111;padding:25px;text-align:center;">
-  <img
-    src="https://golet.vercel.app/images/logo.webp"
-    alt="Let's Gol"
-    width="100"
-    style="display:block;margin:0 auto 12px;width:100px;height:auto;"
-  />
+          <div style="background:#111111;padding:32px 24px;text-align:center;">
+            <img
+              src="https://golet.vercel.app/images/logo.webp"
+              alt="Let's Gol"
+              width="90"
+              style="display:block;margin:0 auto 14px;width:90px;height:auto;"
+            />
 
-  <div style="font-size:26px;font-weight:800;color:#f4b91e;">
-    Let's Gol
-  </div>
+            <div style="font-size:27px;line-height:1.1;font-weight:800;color:#f4b91e;letter-spacing:-0.5px;">
+              Let's Gol
+            </div>
 
-  <div style="margin-top:4px;color:#aaa;font-size:13px;">
-    Wyjazdy na mecze
-  </div>
-</div>
+            <div style="margin-top:6px;color:#999999;font-size:13px;letter-spacing:0.5px;">
+              Wyjazdy na mecze
+            </div>
+          </div>
 
-          <div style="padding:30px;">
-            <h1 style="margin:0 0 18px;font-size:24px;">
+          <div style="padding:34px 30px 30px;">
+
+            <div style="display:inline-block;margin-bottom:14px;padding:6px 10px;background:#fff7df;border-radius:6px;color:#9b7300;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">
+              Zapytanie otrzymane
+            </div>
+
+            <h1 style="margin:0 0 14px;font-size:25px;line-height:1.25;font-weight:800;color:#111111;">
               Dziękujemy za kontakt, ${name}!
             </h1>
 
-            <p style="font-size:16px;line-height:1.6;">
-              Otrzymaliśmy Twoje zapytanie dotyczące
-              wyjazdu na mecz.
+            <p style="margin:0;font-size:15px;line-height:1.7;color:#555555;">
+              Otrzymaliśmy Twoje zapytanie dotyczące wyjazdu na mecz. Poniżej znajdziesz podsumowanie przesłanych informacji.
             </p>
 
-            <div style="margin:24px 0;padding:20px;background:#f7f7f7;border-radius:10px;">
-              <p style="margin:0 0 10px;">
-                <strong>Mecz:</strong> ${matchName}
-              </p>
+            <div style="height:1px;margin:28px 0;background:#eeeeee;"></div>
 
-              <p style="margin:0 0 10px;">
-                <strong>Skąd wylot:</strong> ${departureCity}
-              </p>
+            <div style="margin:0 0 24px;">
+              <div style="margin-bottom:12px;font-size:12px;font-weight:700;color:#999999;text-transform:uppercase;letter-spacing:1px;">
+                Szczegóły wyjazdu
+              </div>
 
-              <p style="margin:0;">
-                <strong>Liczba osób:</strong> ${inquiry.travelers}
-              </p>
+              <div style="border:1px solid #eeeeee;border-radius:12px;overflow:hidden;">
+
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Mecz
+                  </div>
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${matchName}
+                  </div>
+                </div>
+
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Skąd wylot
+                  </div>
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${departureCity}
+                  </div>
+                </div>
+
+                <div style="padding:16px 18px;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Liczba osób
+                  </div>
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${inquiry.travelers}
+                  </div>
+                </div>
+
+              </div>
             </div>
 
-            <p style="font-size:16px;line-height:1.6;">
-              Twoje zapytanie zostało przyjęte.
-              Skontaktujemy się z Tobą w ciągu 24 godzin
-              i przygotujemy propozycję wyjazdu.
+            <div style="padding:18px 20px;background:#111111;border-radius:12px;">
+              <div style="margin-bottom:6px;font-size:12px;font-weight:700;color:#f4b91e;text-transform:uppercase;letter-spacing:0.8px;">
+                Co dalej?
+              </div>
+
+              <div style="font-size:14px;line-height:1.65;color:#eeeeee;">
+                Skontaktujemy się z Tobą w ciągu 24 godzin i przygotujemy propozycję wyjazdu dopasowaną do Twoich oczekiwań.
+              </div>
+            </div>
+
+            <p style="margin:24px 0 0;font-size:13px;line-height:1.7;color:#777777;">
+              Jeśli chcesz przekazać nam dodatkowe informacje, możesz odpowiedzieć bezpośrednio na tę wiadomość.
             </p>
 
-            <p style="margin-top:25px;font-size:14px;color:#666;line-height:1.6;">
-              Jeśli chcesz przekazać nam dodatkowe informacje,
-              możesz odpowiedzieć bezpośrednio na tę wiadomość.
-            </p>
-
-            <p style="margin-top:30px;">
+            <p style="margin:28px 0 0;font-size:14px;line-height:1.6;color:#111111;">
               Pozdrawiamy,<br />
               <strong>Zespół Let's Gol</strong>
             </p>
+
           </div>
+
+          <div style="padding:18px 30px;background:#fafafa;border-top:1px solid #eeeeee;text-align:center;">
+            <div style="font-size:11px;color:#999999;line-height:1.6;">
+              Let's Gol · Wyjazdy na mecze
+            </div>
+          </div>
+
         </div>
       </div>
     `,
@@ -122,89 +159,156 @@ export async function sendInquiryEmails(
     throw new Error(clientResult.error.message)
   }
 
-  // E-mail do administratora
   const adminResult = await resend.emails.send({
     from: FROM_EMAIL,
     to: ADMIN_EMAIL,
     replyTo: inquiry.email,
     subject: `🔔 Nowe zapytanie od ${inquiry.name}`,
     html: `
-      <div style="margin:0;padding:30px 15px;background:#f5f5f5;font-family:Arial,sans-serif;color:#111;">
-        <div style="max-width:700px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;">
+      <div style="margin:0;padding:32px 16px;background:#f3f3f3;font-family:Arial,Helvetica,sans-serif;color:#111;">
+        <div style="max-width:700px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
 
-          <div style="background:#111;padding:25px;text-align:center;">
-  <img
-    src="https://golet.vercel.app/images/logo.webp"
-    alt="Let's Gol"
-    width="100"
-    style="display:block;margin:0 auto 12px;width:100px;height:auto;"
-  />
+          <div style="background:#111111;padding:30px 24px;text-align:center;">
+            <img
+              src="https://golet.vercel.app/images/logo.webp"
+              alt="Let's Gol"
+              width="90"
+              style="display:block;margin:0 auto 14px;width:90px;height:auto;"
+            />
 
-  <div style="font-size:26px;font-weight:800;color:#f4b91e;">
-    Let's Gol
-  </div>
+            <div style="font-size:27px;line-height:1.1;font-weight:800;color:#f4b91e;letter-spacing:-0.5px;">
+              Let's Gol
+            </div>
 
-  <div style="margin-top:4px;color:#aaa;font-size:13px;">
-    Nowe zapytanie klienta
-  </div>
-</div>
-          <div style="padding:30px;">
+            <div style="margin-top:6px;color:#999999;font-size:13px;letter-spacing:0.5px;">
+              Nowe zapytanie klienta
+            </div>
+          </div>
 
-            <h1 style="margin:0 0 8px;font-size:24px;">
+          <div style="padding:34px 30px 30px;">
+
+            <div style="display:inline-block;margin-bottom:14px;padding:6px 10px;background:#fff7df;border-radius:6px;color:#9b7300;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">
+              Nowy lead
+            </div>
+
+            <h1 style="margin:0 0 10px;font-size:25px;line-height:1.25;font-weight:800;color:#111111;">
               🔔 Nowe zapytanie
             </h1>
 
-            <p style="color:#666;margin-bottom:28px;">
-              Klient właśnie wysłał nowe zapytanie
-              poprzez formularz na stronie.
+            <p style="margin:0;font-size:15px;line-height:1.7;color:#666666;">
+              Klient właśnie wysłał nowe zapytanie poprzez formularz na stronie Let's Gol.
             </p>
 
-            <h2 style="font-size:18px;">
-              Dane klienta
-            </h2>
+            <div style="height:1px;margin:28px 0;background:#eeeeee;"></div>
 
-            <div style="padding:18px;background:#f7f7f7;border-radius:10px;line-height:1.8;">
-              <strong>Imię i nazwisko:</strong><br />
-              ${name}<br /><br />
+            <div style="margin-bottom:28px;">
+              <div style="margin-bottom:12px;font-size:12px;font-weight:700;color:#999999;text-transform:uppercase;letter-spacing:1px;">
+                Dane klienta
+              </div>
 
-              <strong>E-mail:</strong><br />
-              <a href="mailto:${email}">
-                ${email}
-              </a><br /><br />
+              <div style="border:1px solid #eeeeee;border-radius:12px;overflow:hidden;">
 
-              <strong>Telefon:</strong><br />
-              ${phone}
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Imię i nazwisko
+                  </div>
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${name}
+                  </div>
+                </div>
+
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    E-mail
+                  </div>
+                  <div style="font-size:15px;font-weight:700;">
+                    <a
+                      href="mailto:${email}"
+                      style="color:#111111;text-decoration:underline;text-decoration-color:#f4b91e;text-underline-offset:3px;"
+                    >
+                      ${email}
+                    </a>
+                  </div>
+                </div>
+
+                <div style="padding:16px 18px;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Telefon
+                  </div>
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    <a
+                      href="tel:${phone.replace(/[^+\d]/g, "")}"
+                      style="color:#111111;text-decoration:none;"
+                    >
+                      ${phone}
+                    </a>
+                  </div>
+                </div>
+
+              </div>
             </div>
 
-            <h2 style="font-size:18px;margin-top:28px;">
-              Szczegóły wyjazdu
-            </h2>
+            <div style="margin-bottom:28px;">
+              <div style="margin-bottom:12px;font-size:12px;font-weight:700;color:#999999;text-transform:uppercase;letter-spacing:1px;">
+                Szczegóły wyjazdu
+              </div>
 
-            <div style="padding:18px;background:#f7f7f7;border-radius:10px;line-height:1.8;">
-              <strong>Mecz:</strong><br />
-              ${matchName}<br /><br />
+              <div style="border:1px solid #eeeeee;border-radius:12px;overflow:hidden;">
 
-              <strong>Skąd wylot:</strong><br />
-              ${departureCity}<br /><br />
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Mecz
+                  </div>
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${matchName}
+                  </div>
+                </div>
 
-              <strong>Liczba osób:</strong><br />
-              ${inquiry.travelers}
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Skąd wylot
+                  </div>
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${departureCity}
+                  </div>
+                </div>
+
+                <div style="padding:16px 18px;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Liczba osób
+                  </div>
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${inquiry.travelers}
+                  </div>
+                </div>
+
+              </div>
             </div>
 
-            <h2 style="font-size:18px;margin-top:28px;">
-              Wiadomość klienta
-            </h2>
+            <div>
+              <div style="margin-bottom:12px;font-size:12px;font-weight:700;color:#999999;text-transform:uppercase;letter-spacing:1px;">
+                Wiadomość klienta
+              </div>
 
-            <div style="padding:18px;background:#f7f7f7;border-radius:10px;white-space:pre-wrap;line-height:1.6;">
-              ${message}
+              <div style="padding:20px;background:#f7f7f7;border-left:3px solid #f4b91e;border-radius:0 10px 10px 0;font-size:14px;line-height:1.7;color:#333333;white-space:pre-wrap;">
+                ${message}
+              </div>
             </div>
 
-            <p style="margin-top:30px;color:#666;font-size:13px;">
-              Możesz odpowiedzieć bezpośrednio na tę wiadomość,
-              aby skontaktować się z klientem.
-            </p>
+            <div style="margin-top:28px;padding:18px 20px;background:#111111;border-radius:12px;">
+              <div style="font-size:13px;line-height:1.6;color:#eeeeee;">
+                Możesz odpowiedzieć bezpośrednio na tę wiadomość, aby skontaktować się z klientem.
+              </div>
+            </div>
 
           </div>
+
+          <div style="padding:18px 30px;background:#fafafa;border-top:1px solid #eeeeee;text-align:center;">
+            <div style="font-size:11px;color:#999999;line-height:1.6;">
+              Let's Gol · Panel zapytań
+            </div>
+          </div>
+
         </div>
       </div>
     `,
