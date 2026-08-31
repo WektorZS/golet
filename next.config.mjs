@@ -8,9 +8,9 @@ const scriptSrc =
 const nextConfig = {
   reactCompiler: true,
 
-  images: {
-    unoptimized: false,
-  },
+ images: {
+  formats: ["image/avif", "image/webp"],
+},
 
   experimental: {
     serverActions: {
