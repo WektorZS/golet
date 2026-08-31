@@ -702,28 +702,7 @@ export function HomePage({
                   100% poleca
                 </p>
 
-                {/* GOOGLE REVIEWS */}
-                <a
-                  href="https://share.google/kRvcJRnquoIaDz3YT"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Zobacz opinie Let’s Gol w Google"
-                  className="group mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <span className="font-black text-foreground">
-                    Google
-                  </span>
-
-                  <span className="tracking-[0.08em] text-primary">
-                    ★★★★★
-                  </span>
-
-                  <span>
-                    5.0 · 160 opinii
-                  </span>
-
-                  <ArrowRight className="size-3.5 text-primary transition-transform duration-300 group-hover:translate-x-0.5" />
-                </a>
+            
               </div>
 
               <div>
