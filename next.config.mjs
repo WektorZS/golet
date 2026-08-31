@@ -8,6 +8,10 @@ const scriptSrc =
 const nextConfig = {
   reactCompiler: true,
 
+  images: {
+    unoptimized: false,
+  },
+
   experimental: {
     serverActions: {
       bodySizeLimit: "15mb",
