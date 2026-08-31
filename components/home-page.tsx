@@ -1,4 +1,3 @@
-
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -179,52 +178,7 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
     </div>
   )
 }
-function GoogleReviewsCard() {
-  return (
-    <a
-      href="https://share.google/kRvcJRnquoIaDz3YT"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Zobacz opinie Let’s Gol w Google"
-      className="group mt-7 block max-w-md"
-    >
-      <div className="flex items-center gap-4 rounded-2xl border border-foreground/10 bg-background px-5 py-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-        {/* Google G */}
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-background text-xl font-black">
-          <span
-            className="bg-[conic-gradient(from_-45deg,#4285F4_0deg,#4285F4_90deg,#34A853_90deg,#34A853_180deg,#FBBC05_180deg,#FBBC05_270deg,#EA4335_270deg,#EA4335_360deg)] bg-clip-text text-transparent"
-          >
-            G
-          </span>
-        </div>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <p className="truncate font-bold">
-              Let’s Gol · Wyjazdy na mecze
-            </p>
-
-            <span className="shrink-0 text-lg text-primary transition-transform duration-300 group-hover:translate-x-1">
-              →
-            </span>
-          </div>
-
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-            <span className="font-bold">5.0/5</span>
-
-            <span className="tracking-[0.08em] text-primary">
-              ★★★★★
-            </span>
-
-            <span className="text-muted-foreground">
-              Opinie w Google
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  )
-}
 export function HomePage({
   trips,
   content,
@@ -747,6 +701,29 @@ export function HomePage({
                 <p className="mt-1 w-fit bg-foreground px-2 py-1 text-xs font-semibold text-background">
                   100% poleca
                 </p>
+
+                {/* GOOGLE REVIEWS */}
+                <a
+                  href="https://share.google/kRvcJRnquoIaDz3YT"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Zobacz opinie Let’s Gol w Google"
+                  className="group mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <span className="font-black text-foreground">
+                    Google
+                  </span>
+
+                  <span className="tracking-[0.08em] text-primary">
+                    ★★★★★
+                  </span>
+
+                  <span>
+                    5.0 · 160 opinii
+                  </span>
+
+                  <ArrowRight className="size-3.5 text-primary transition-transform duration-300 group-hover:translate-x-0.5" />
+                </a>
               </div>
 
               <div>
@@ -759,8 +736,7 @@ export function HomePage({
                 </p>
               </div>
             </div>
-
-            <GoogleReviewsCard />
+          </div>
 
           <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
             <Image
