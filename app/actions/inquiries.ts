@@ -1,3 +1,4 @@
+
 "use server"
 
 import { and, eq, gt, sql } from "drizzle-orm"
@@ -9,78 +10,25 @@ import {
   inquiries,
   inquiryAttempts,
 } from "@/lib/db/schema"
-
 import {
   GENERIC_ERROR,
   getClientIp,
   hmac,
 } from "@/lib/security"
-
 import { sendInquiryEmails } from "@/lib/email"
 
-/*
- * IMIĘ I NAZWISKO
- *
- * Dozwolone:
- * - litery łacińskie
- * - polskie znaki
- * - inne znaki z zakresu À-ÿ
- * - spacje
- * - myślnik
- * - apostrof
- */
 const nameRegex =
   /^[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]+$/
 
-/*
- * TELEFON
- *
- * Opcjonalny + na początku.
- * Następnie od 7 do 15 cyfr.
- *
- * Przykłady:
- * 500000000
- * +48500000000
- * +49123456789
- * +447123456789
- */
 const phoneRegex =
   /^\+?\d{7,15}$/
 
-/*
- * MIASTO
- */
 const cityRegex =
   /^[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]+$/
 
-/*
- * NAZWA MECZU
- *
- * Pozwalamy na normalny tekst potrzebny do wpisania
- * nazw drużyn i meczu, ale blokujemy znaki typowe
- * dla HTML, kodu i konstrukcji mogących być problematyczne.
- */
 const matchNameRegex =
   /^[\p{L}\p{N}\s.,!?;:()"'’\-–—…\/%&+]+$/u
 
-/*
- * DODATKOWE INFORMACJE
- *
- * Dozwolone:
- * - litery Unicode, również polskie i inne języki
- * - cyfry
- * - spacje
- * - podstawowa interpunkcja
- *
- * Blokowane:
- * < > { } [ ] ` \ |
- *
- * Dzięki temu użytkownik może normalnie napisać np.:
- *
- * "Interesuje mnie hotel 4-gwiazdkowy.
- * Wylot najlepiej z Warszawy! Czy można dostać
- * pokój 2-osobowy?"
- */
 const messageRegex =
   /^[\p{L}\p{N}\s.,!?;:()"'’\-–—…\/%]+$/u
 
@@ -89,10 +37,7 @@ const inquirySchema = z.object({
     .string()
     .trim()
     .min(2, "Imię i nazwisko jest za krótkie.")
-    .max(
-      100,
-      "Imię i nazwisko jest za długie."
-    )
+    .max(100, "Imię i nazwisko jest za długie.")
     .regex(
       nameRegex,
       "Imię i nazwisko może zawierać tylko litery, spacje, myślniki i apostrofy."
@@ -102,10 +47,7 @@ const inquirySchema = z.object({
     .string()
     .trim()
     .email("Podaj poprawny adres e-mail.")
-    .max(
-      160,
-      "Adres e-mail jest za długi."
-    )
+    .max(160, "Adres e-mail jest za długi.")
     .transform((value) =>
       value.toLowerCase()
     ),
@@ -203,17 +145,8 @@ export type InquiryState = {
 }
 
 const COOLDOWN_MS = 60_000
-
-// Maksymalnie 5 zaakceptowanych zapytań
-// z jednego adresu IP w ciągu 24 godzin.
 const MAX_PER_IP_PER_DAY = 5
-
-// Maksymalnie 3 zaakceptowane zapytania
-// z jednego adresu e-mail w ciągu 24 godzin.
 const MAX_PER_EMAIL_PER_DAY = 3
-
-// Formularz nie może zostać wysłany
-// szybciej niż 2,5 sekundy po załadowaniu.
 const MIN_FILL_TIME_MS = 2_500
 
 export async function createInquiry(
@@ -240,9 +173,6 @@ export async function createInquiry(
         formData.get("privacyConsent"),
     })
 
-  /*
-   * Wszystkie dane muszą przejść walidację.
-   */
   if (!parsed.success) {
     return {
       status: "error",
@@ -251,12 +181,6 @@ export async function createInquiry(
     }
   }
 
-  /*
-   * HONEYPOT
-   *
-   * Normalny użytkownik nigdy nie powinien
-   * wypełnić tego ukrytego pola.
-   */
   if (parsed.data.website) {
     return {
       status: "success",
@@ -265,10 +189,6 @@ export async function createInquiry(
     }
   }
 
-  /*
-   * OCHRONA PRZED BOTAMI WYSYŁAJĄCYMI
-   * FORMULARZ NATYCHMIAST PO JEGO OTWARCIU.
-   */
   if (
     parsed.data.formLoadedAt &&
     Date.now() -
@@ -285,25 +205,14 @@ export async function createInquiry(
   const requestHeaders =
     await headers()
 
-  /*
-   * IP nie jest przechowywane bezpośrednio.
-   * Tworzony jest hash/HMAC.
-   */
   const ipHash = hmac(
     getClientIp(requestHeaders)
   )
 
-  /*
-   * E-mail również jest hashowany.
-   */
   const emailHash = hmac(
     parsed.data.email
   )
 
-  /*
-   * Hash treści służy do wykrywania
-   * ponownego wysłania tego samego zapytania.
-   */
   const contentHash = hmac(
     `${parsed.data.email}|${parsed.data.matchName}|${parsed.data.message}`
   )
@@ -319,18 +228,6 @@ export async function createInquiry(
   )
 
   try {
-    /*
-     * Sprawdzamy jednocześnie:
-     *
-     * 1. Ile zaakceptowanych zapytań
-     *    wysłano z tego IP w ostatnich 24 h.
-     *
-     * 2. Ile zaakceptowanych zapytań
-     *    wysłano z tego e-maila w ostatnich 24 h.
-     *
-     * 3. Czy identyczne zapytanie
-     *    było wysłane w ostatniej minucie.
-     */
     const [
       recentByIp,
       recentByEmail,
@@ -402,9 +299,6 @@ export async function createInquiry(
         ),
     ])
 
-    /*
-     * TEN SAM CONTENT W OSTATNIEJ MINUCIE
-     */
     if (
       Number(
         sameContent[0]?.count ?? 0
@@ -417,13 +311,6 @@ export async function createInquiry(
       }
     }
 
-    /*
-     * LIMIT ANTYSPAMOWY
-     *
-     * 5 zapytań / IP / 24h
-     * LUB
-     * 3 zapytania / e-mail / 24h
-     */
     if (
       Number(
         recentByIp[0]?.count ?? 0
@@ -448,10 +335,6 @@ export async function createInquiry(
       }
     }
 
-    /*
-     * Pola techniczne nie są zapisywane
-     * jako część zapytania.
-     */
     const {
       website,
       formLoadedAt,
@@ -459,9 +342,6 @@ export async function createInquiry(
       ...values
     } = parsed.data
 
-    /*
-     * ZAPIS ZAPYTANIA
-     */
     await db
       .insert(inquiries)
       .values({
@@ -470,10 +350,6 @@ export async function createInquiry(
           new Date(),
       })
 
-    /*
-     * Zapisujemy zaakceptowaną próbę
-     * do systemu antyspamowego.
-     */
     await db
       .insert(inquiryAttempts)
       .values({
@@ -483,10 +359,6 @@ export async function createInquiry(
         accepted: true,
       })
 
-    /*
-     * Wysyłka e-maili nie blokuje
-     * zapisania zapytania.
-     */
     try {
       await sendInquiryEmails({
         name: values.name,
@@ -508,7 +380,6 @@ export async function createInquiry(
       )
     }
 
-  
     return {
       status: "success",
       message:
