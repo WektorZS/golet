@@ -104,7 +104,7 @@ const faqs = [
   ],
   [
     "Z jakich miast organizujecie wyloty?",
-    "Najczęściej z Warszawy, Krakowa, Katowic, Gdańska, Poznania i Wrocławia. Przy wyjazdach indywidualnych szukamy najlepszego połączenia z Twojego regionu.",
+    "Wyloty organizujemy z najbliższego lotniska dla naszego klienta, o ile dane lotnisko zapewnia lot w danym kierunku. Szukamy najlepszego połączenia z Twojego regionu.",
   ],
   [
     "Czy mogę kupić sam bilet?",
@@ -112,7 +112,7 @@ const faqs = [
   ],
   [
     "Czy organizujecie wyjazdy dla firm i grup?",
-    "Tak. Obsługujemy grupy znajomych, firmy, szkółki piłkarskie i kluby kibica, także z programem szytym na miarę.",
+    "Tak. Obsługujemy grupy znajomych, firmy, szkółki piłkarskie i kluby kibica.",
   ],
   [
     "Co jeśli termin meczu zostanie zmieniony?",
