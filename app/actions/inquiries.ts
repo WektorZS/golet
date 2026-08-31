@@ -35,8 +35,8 @@ export type InquiryState = {
 }
 
 const COOLDOWN_MS = 60_000
-const MAX_PER_IP_PER_DAY = 20
-const MAX_PER_EMAIL_PER_DAY = 20
+const MAX_PER_IP_PER_DAY = 5
+const MAX_PER_EMAIL_PER_DAY = 3
 const MIN_FILL_TIME_MS = 2_500
 
 export async function createInquiry(
