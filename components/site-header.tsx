@@ -51,7 +51,6 @@ export function SiteHeader() {
 
   useEffect(() => {
     const handleScroll = () => {
-      console.log("SCROLL Y:", window.scrollY)
       setScrolled(window.scrollY > 100)
     }
 

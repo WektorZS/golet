@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: "Warunki uczestnictwa",
   description:
     "Warunki uczestnictwa w wyjazdach organizowanych przez Let’s Gol na wydarzenia sportowe w Polsce i Europie.",
+  alternates: { canonical: "/warunki-uczestnictwa" },
 }
 
 export default function WarunkiUczestnictwaPage() {

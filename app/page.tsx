@@ -10,6 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: content.seoTitle || "Let’s Gol - wyjazdy na mecze piłkarskie",
     description: content.seoDescription || "Kompleksowe wyjazdy na największe mecze w Europie: bilety, lot, hotel i opieka koordynatora.",
+    alternates: { canonical: "/" },
   }
 }
 

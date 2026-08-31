@@ -18,6 +18,7 @@ import { InquiryForm } from "@/components/inquiry-form"
 import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
 import { stripHtml } from "@/lib/sanitize-html"
+import { absoluteUrl } from "@/lib/site"
 import { getTripBySlug, getTripGallery } from "@/lib/trips"
 
 export const dynamic = "force-dynamic"
@@ -42,9 +43,32 @@ export async function generateMetadata({
       "pl-PL"
     )} zł.`
 
+  const title = trip.seoTitle || trip.title
+  const summary = description.slice(0, 160)
+  const canonical = `/wyjazdy/${trip.slug}`
+
   return {
-    title: trip.seoTitle || trip.title,
-    description: description.slice(0, 160),
+    title,
+    description: summary,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description: summary,
+      type: "website",
+      url: canonical,
+      images: [
+        {
+          url: trip.image,
+          alt: `Wyjazd na mecz ${trip.title} w ${trip.city}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: summary,
+      images: [trip.image],
+    },
   }
 }
 
@@ -82,14 +106,23 @@ export default async function TripDetailPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "TouristTrip",
+    "@id": absoluteUrl(`/wyjazdy/${trip.slug}#trip`),
+    url: absoluteUrl(`/wyjazdy/${trip.slug}`),
     name: trip.title,
     description: stripHtml(trip.description),
+    image: absoluteUrl(trip.image),
     touristType: "Kibice piłkarscy",
+    startDate: trip.startDate,
+    ...(trip.endDate && { endDate: trip.endDate }),
     offers: {
       "@type": "Offer",
+      url: absoluteUrl(`/wyjazdy/${trip.slug}`),
       price: trip.price,
       priceCurrency: "PLN",
       availability: "https://schema.org/InStock",
+      seller: {
+        "@id": absoluteUrl("/#organization"),
+      },
     },
   }
 

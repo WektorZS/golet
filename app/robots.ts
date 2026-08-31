@@ -1,8 +1,16 @@
 import type { MetadataRoute } from "next"
+import { absoluteUrl } from "@/lib/site"
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/api/auth", "/auth"] }],
-    sitemap: "https://letsgol.pl/sitemap.xml",
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/admin", "/api/", "/auth"],
+      },
+    ],
+    sitemap: absoluteUrl("/sitemap.xml"),
+    host: absoluteUrl(),
   }
 }

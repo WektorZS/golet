@@ -1,16 +1,31 @@
 import type { MetadataRoute } from "next"
+import { absoluteUrl } from "@/lib/site"
 import { getPublishedTrips } from "@/lib/trips"
 
 export const dynamic = "force-dynamic"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const trips = await getPublishedTrips()
-  const base = "https://letsgol.pl"
+
   return [
-    { url: base, changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/wyjazdy`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${base}/polityka-prywatnosci`, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${base}/warunki-uczestnictwa`, changeFrequency: "yearly", priority: 0.3 },
-    ...trips.map((trip) => ({ url: `${base}/wyjazdy/${trip.slug}`, lastModified: trip.updatedAt, changeFrequency: "weekly" as const, priority: 0.8 })),
+    { url: absoluteUrl(), changeFrequency: "weekly", priority: 1 },
+    { url: absoluteUrl("/wyjazdy"), changeFrequency: "daily", priority: 0.9 },
+    { url: absoluteUrl("/galeria"), changeFrequency: "weekly", priority: 0.7 },
+    {
+      url: absoluteUrl("/polityka-prywatnosci"),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: absoluteUrl("/warunki-uczestnictwa"),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    ...trips.map((trip) => ({
+      url: absoluteUrl(`/wyjazdy/${trip.slug}`),
+      lastModified: trip.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
   ]
 }

@@ -44,6 +44,8 @@ export function SocialLinks({
               alt=""
               width={20}
               height={20}
+              className="size-5 object-contain"
+              style={{ width: 20, height: 20 }}
               unoptimized
               aria-hidden="true"
             />

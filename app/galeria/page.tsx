@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Galeria z wyjazdów | Let's Gol",
   description:
     "Zobacz zdjęcia z piłkarskich wyjazdów organizowanych przez Let's Gol.",
+  alternates: { canonical: "/galeria" },
 }
 
 export default async function GalleryPage() {

@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { CookieConsent } from "@/components/cookie-consent"
 import { FloatingContact } from "@/components/floating-contact"
+import { absoluteUrl, siteUrl } from "@/lib/site"
 import "./globals.css"
 
 const geist = Geist({
@@ -16,18 +17,13 @@ const oswald = Oswald({
   variable: "--font-oswald",
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
-  : undefined
-
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "TravelAgency",
+  "@id": absoluteUrl("/#organization"),
   name: "Let’s Gol",
-  ...(siteUrl && {
-    url: siteUrl.toString(),
-    logo: new URL("/logo.webp", siteUrl).toString(),
-  }),
+  url: absoluteUrl(),
+  logo: absoluteUrl("/logo.webp"),
   email: "kontakt.letsgol@gmail.com",
   telephone: "+48501465318",
   sameAs: [
@@ -39,9 +35,10 @@ const organizationSchema = {
 }
 
 export const metadata: Metadata = {
-  ...(siteUrl && {
-    metadataBase: siteUrl,
-  }),
+  metadataBase: siteUrl,
+  alternates: {
+    canonical: "/",
+  },
 
   title: {
     default: "Let’s Gol - wyjazdy na mecze w Europie",
@@ -77,6 +74,13 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 
   icons: {

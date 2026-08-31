@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: "Polityka prywatności i cookies",
   description:
     "Polityka prywatności i cookies Let’s Gol. Informacje o przetwarzaniu danych osobowych, prawach użytkowników oraz wykorzystywaniu plików cookies.",
+  alternates: { canonical: "/polityka-prywatnosci" },
 }
 
 export default function PrivacyPolicyPage() {

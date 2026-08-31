@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Wyjazdy na mecze",
   description: "Aktualne pakiety na największe mecze piłkarskie w Europie: bilet, lot, hotel i opieka koordynatora.",
+  alternates: { canonical: "/wyjazdy" },
 }
 
 export default async function TripsPage() {
