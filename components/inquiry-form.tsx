@@ -171,20 +171,23 @@ export function InquiryForm({
       </Field>
 
      {state.message && (
-  <p
+  <div
     role="status"
     className={
       state.status === "success"
-        ? "flex items-center gap-2 text-sm text-primary"
-        : "text-sm text-destructive"
+        ? "flex items-center gap-2 rounded-md border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary"
+        : "rounded-md border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm leading-relaxed text-white"
     }
   >
     {state.status === "success" && (
-      <CheckCircle2 aria-hidden="true" />
+      <CheckCircle2
+        aria-hidden="true"
+        className="size-4 shrink-0"
+      />
     )}
 
     {state.message}
-  </p>
+  </div>
 )}
 
       <Button
