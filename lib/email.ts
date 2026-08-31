@@ -55,7 +55,7 @@ export async function sendInquiryEmails(
 
           <div style="background:#111111;padding:32px 24px;text-align:center;">
             <img
-              src="https://golet.vercel.app/logo.webp"
+              src="https://golet.vercel.app/logoemail.png"
               alt="Let's Gol"
               width="90"
               style="display:block;margin:0 auto 14px;width:90px;height:auto;"
@@ -170,7 +170,7 @@ export async function sendInquiryEmails(
 
           <div style="background:#111111;padding:30px 24px;text-align:center;">
             <img
-              src="https://golet.vercel.app/logo.webp"
+              src="https://golet.vercel.app/logoemail.png"
               alt="Let's Gol"
               width="90"
               style="display:block;margin:0 auto 14px;width:90px;height:auto;"
