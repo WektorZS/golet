@@ -57,14 +57,21 @@ export async function sendInquiryEmails(
         <div style="max-width:620px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;">
 
           <div style="background:#111;padding:25px;text-align:center;">
-            <div style="font-size:26px;font-weight:800;color:#f4b91e;">
-              Let's Gol
-            </div>
+  <img
+    src="https://golet.vercel.app/images/logo.webp"
+    alt="Let's Gol"
+    width="100"
+    style="display:block;margin:0 auto 12px;width:100px;height:auto;"
+  />
 
-            <div style="margin-top:4px;color:#aaa;font-size:13px;">
-              Wyjazdy na mecze
-            </div>
-          </div>
+  <div style="font-size:26px;font-weight:800;color:#f4b91e;">
+    Let's Gol
+  </div>
+
+  <div style="margin-top:4px;color:#aaa;font-size:13px;">
+    Wyjazdy na mecze
+  </div>
+</div>
 
           <div style="padding:30px;">
             <h1 style="margin:0 0 18px;font-size:24px;">
@@ -120,21 +127,27 @@ export async function sendInquiryEmails(
     from: FROM_EMAIL,
     to: ADMIN_EMAIL,
     replyTo: inquiry.email,
-    subject: `🔔 Nowe zapytanie - ${inquiry.name} - ${inquiry.matchName}`,
+    subject: `🔔 Nowe zapytanie od ${inquiry.name}`,
     html: `
       <div style="margin:0;padding:30px 15px;background:#f5f5f5;font-family:Arial,sans-serif;color:#111;">
         <div style="max-width:700px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;">
 
-          <div style="background:#111;padding:25px;">
-            <div style="font-size:26px;font-weight:800;color:#f4b91e;">
-              Let's Gol
-            </div>
+          <div style="background:#111;padding:25px;text-align:center;">
+  <img
+    src="https://golet.vercel.app/images/logo.webp"
+    alt="Let's Gol"
+    width="100"
+    style="display:block;margin:0 auto 12px;width:100px;height:auto;"
+  />
 
-            <div style="margin-top:4px;color:#aaa;font-size:13px;">
-              Nowe zapytanie klienta
-            </div>
-          </div>
+  <div style="font-size:26px;font-weight:800;color:#f4b91e;">
+    Let's Gol
+  </div>
 
+  <div style="margin-top:4px;color:#aaa;font-size:13px;">
+    Nowe zapytanie klienta
+  </div>
+</div>
           <div style="padding:30px;">
 
             <h1 style="margin:0 0 8px;font-size:24px;">
