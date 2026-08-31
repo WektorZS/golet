@@ -85,7 +85,7 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
             {email}
           </a>
 
-          <SocialLinks />
+          
 
           <a
             href="https://share.google/kRvcJRnquoIaDz3YT"
@@ -103,6 +103,7 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
               aria-hidden="true"
             />
           </a>
+          <SocialLinks />
         </div>
       </div>
 
