@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -13,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+
 import {
   Field,
   FieldGroup,
@@ -37,7 +39,6 @@ export function InquiryForm({
   )
 
   const [formLoadedAt] = useState(() => Date.now())
-
   const [messageLength, setMessageLength] = useState(0)
 
   const hasSelectedTrip = Boolean(matchName.trim())
@@ -57,8 +58,10 @@ export function InquiryForm({
   ) => {
     const input = event.currentTarget
 
-    // Pozwalamy na + tylko jako pierwszy znak.
-    let value = input.value.replace(/[^\d+]/g, "")
+    let value = input.value.replace(
+      /[^\d+]/g,
+      ""
+    )
 
     if (value.includes("+")) {
       value =
@@ -66,9 +69,10 @@ export function InquiryForm({
         value.replace(/\+/g, "")
     }
 
-    // Maksymalnie 15 cyfr + opcjonalny znak +
     const hasPlus = value.startsWith("+")
-    const digits = value.replace(/\D/g, "").slice(0, 15)
+    const digits = value
+      .replace(/\D/g, "")
+      .slice(0, 15)
 
     input.value = hasPlus
       ? `+${digits}`
@@ -80,7 +84,7 @@ export function InquiryForm({
   ) => {
     event.currentTarget.value =
       event.currentTarget.value.replace(
-        /[<>{}`[\]\\]/g,
+        /[<>{}\[\]\\`|]/g,
         ""
       )
   }
@@ -100,18 +104,8 @@ export function InquiryForm({
   ) => {
     const input = event.currentTarget
 
-    /*
-     * Dozwolone:
-     * - litery, również polskie i inne znaki Unicode
-     * - cyfry
-     * - spacje i białe znaki
-     * - podstawowa interpunkcja
-     *
-     * Usuwamy znaki mogące być użyte w kodzie/znacznikach:
-     * < > { } [ ] ` \ | oraz znaki sterujące.
-     */
     const sanitized = input.value
-      .replace(/[<>{}`[\]\\|]/g, "")
+      .replace(/[<>{}\[\]\\`|]/g, "")
       .replace(
         /[^\p{L}\p{N}\s.,!?;:()"'’\-–—…\/%]/gu,
         ""
@@ -123,8 +117,10 @@ export function InquiryForm({
   }
 
   return (
-    <form action={action} className="flex flex-col gap-5">
-      {/* Honeypot antyspamowy */}
+    <form
+      action={action}
+      className="flex flex-col gap-5"
+    >
       <input
         type="text"
         name="website"
@@ -149,7 +145,6 @@ export function InquiryForm({
       )}
 
       <FieldGroup className="grid gap-4 md:grid-cols-2">
-        {/* IMIĘ I NAZWISKO */}
         <Field>
           <FieldLabel htmlFor="name">
             Imię i nazwisko
@@ -168,7 +163,6 @@ export function InquiryForm({
           />
         </Field>
 
-        {/* TELEFON */}
         <Field>
           <FieldLabel htmlFor="phone">
             Telefon
@@ -190,7 +184,6 @@ export function InquiryForm({
           />
         </Field>
 
-        {/* E-MAIL */}
         <Field>
           <FieldLabel htmlFor="email">
             E-mail
@@ -209,7 +202,6 @@ export function InquiryForm({
           />
         </Field>
 
-        {/* MECZ */}
         {!hasSelectedTrip && (
           <Field>
             <FieldLabel htmlFor="matchName">
@@ -227,7 +219,6 @@ export function InquiryForm({
           </Field>
         )}
 
-        {/* MIASTO WYLOTU */}
         <Field>
           <FieldLabel htmlFor="departureCity">
             Skąd wylot?
@@ -246,7 +237,6 @@ export function InquiryForm({
           />
         </Field>
 
-        {/* LICZBA OSÓB */}
         <Field>
           <FieldLabel htmlFor="travelers">
             Liczba osób
@@ -265,7 +255,6 @@ export function InquiryForm({
         </Field>
       </FieldGroup>
 
-      {/* DODATKOWE INFORMACJE */}
       <Field>
         <div className="flex items-center justify-between gap-3">
           <FieldLabel htmlFor="message">
@@ -275,8 +264,8 @@ export function InquiryForm({
           <span
             className={`text-xs ${
               messageLength >= MESSAGE_MAX_LENGTH
-                ? "text-destructive"
-                : "text-muted-foreground"
+                ? "text-red-400"
+                : "text-background/60"
             }`}
             aria-live="polite"
           >
@@ -294,7 +283,6 @@ export function InquiryForm({
         />
       </Field>
 
-      {/* ZGODA */}
       <Field>
         <label
           htmlFor="privacyConsent"
@@ -330,7 +318,6 @@ export function InquiryForm({
         </label>
       </Field>
 
-      {/* KOMUNIKAT */}
       {state.message && (
         <div
           role="status"
@@ -351,7 +338,6 @@ export function InquiryForm({
         </div>
       )}
 
-      {/* PRZYCISK */}
       <Button
         type="submit"
         size="lg"
