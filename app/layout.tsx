@@ -12,14 +12,14 @@ const geist = Geist({
   subsets: ["latin-ext"],
   variable: "--font-geist",
   display: "swap",
-  preload: true,
+  preload: false,
 })
 
 const oswald = Oswald({
   subsets: ["latin-ext"],
   variable: "--font-oswald",
   display: "swap",
-  preload: false,
+  preload: true,
 })
 
 const organizationSchema = {
