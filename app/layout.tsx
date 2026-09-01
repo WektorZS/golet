@@ -10,13 +10,11 @@ import "./globals.css"
 const geist = Geist({
   subsets: ["latin", "latin-ext"],
   variable: "--font-geist",
-  display: "swap",
 })
 
 const oswald = Oswald({
   subsets: ["latin", "latin-ext"],
   variable: "--font-oswald",
-  display: "swap",
 })
 
 const organizationSchema = {
@@ -38,7 +36,6 @@ const organizationSchema = {
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
-
   alternates: {
     canonical: "/",
   },
