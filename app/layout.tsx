@@ -1,4 +1,3 @@
-
 import type { Metadata, Viewport } from "next"
 import { Geist, Oswald } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
@@ -9,17 +8,15 @@ import { absoluteUrl, siteUrl } from "@/lib/site"
 import "./globals.css"
 
 const geist = Geist({
-  subsets: ["latin-ext"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-geist",
   display: "swap",
-  preload: false,
 })
 
 const oswald = Oswald({
-  subsets: ["latin-ext"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-oswald",
   display: "swap",
-  preload: true,
 })
 
 const organizationSchema = {
