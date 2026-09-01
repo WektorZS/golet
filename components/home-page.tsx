@@ -1,3 +1,4 @@
+
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -146,6 +147,10 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
       {items.map((item, index) => {
         const isFeatured = featureFirst && index === 0
 
+        const imageSrc = item.mediaId
+          ? `/api/media/${item.mediaId}`
+          : item.image
+
         return (
           <div
             key={item.id}
@@ -156,12 +161,14 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
             }`}
           >
             <ImageLightbox
-              src={item.mediaId ? `/api/media/${item.mediaId}` : item.image}
+              src={imageSrc}
               alt={item.alt || item.title}
-              caption={[item.title, item.city].filter(Boolean).join(" · ")}
+              caption={[item.title, item.city]
+                .filter(Boolean)
+                .join(" · ")}
             >
               <Image
-                src={item.mediaId ? `/api/media/${item.mediaId}` : item.image}
+                src={imageSrc}
                 alt={item.alt || item.title}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -197,33 +204,47 @@ export function HomePage({
       <SiteHeader />
 
       {/* HERO */}
-      <section className="relative isolate flex flex-col overflow-hidden bg-foreground text-background md:h-dvh md:min-h-[700px]">
+      <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-foreground text-background md:min-h-[700px] md:h-dvh">
+        {/* Hero image — jedyny obraz ładowany priorytetowo */}
         <Image
           src="/images/hero-stadium.webp"
           alt="Kibice na trybunach podczas wieczornego meczu w Barcelonie"
           fill
           priority
+          fetchPriority="high"
           className="object-cover object-center"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1920px"
+          sizes="100vw"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/75 to-transparent" />
+        {/* Prostsza warstwa przyciemniająca — mniej pracy dla przeglądarki */}
+        <div
+          className="absolute inset-0 bg-foreground/65"
+          aria-hidden="true"
+        />
 
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-foreground to-transparent" />
+        {/* Dodatkowe przyciemnienie dołu */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-foreground to-transparent"
+          aria-hidden="true"
+        />
 
-        <div className="relative mx-auto flex min-h-svh w-full flex-1 items-center px-4 pb-14 pt-28 md:min-h-0 md:px-6 md:pb-8 md:pt-24 lg:max-w-7xl">
+        {/* Hero content */}
+        <div className="relative z-10 mx-auto flex w-full flex-1 items-center px-4 pb-14 pt-28 md:px-6 md:pb-8 md:pt-24 lg:max-w-7xl">
           <div className="flex max-w-3xl flex-col items-start gap-6">
             <p className="font-mono text-sm font-bold uppercase tracking-[0.25em] text-primary">
               {content.heroEyebrow ||
                 "Mecz zaczyna się dużo wcześniej niż pierwszy gwizdek"}
             </p>
 
-            <h1 className="text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">
+            {/* LCP:
+                usunięte text-balance, żeby ograniczyć koszt
+                obliczania łamania tekstu podczas pierwszego renderu */}
+            <h1 className="font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">
               {content.heroTitle ||
                 "Leć z nami na największe mecze w Europie"}
             </h1>
 
-            <p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">
+            <p className="max-w-xl text-lg leading-relaxed text-background/75">
               {content.heroDescription || ""}
             </p>
 
@@ -261,8 +282,9 @@ export function HomePage({
           </div>
         </div>
 
+        {/* Social proof */}
         <div className="absolute bottom-28 right-4 z-10 hidden md:block lg:right-8">
-          <div className="border border-background/15 bg-foreground/85 px-5 py-4 text-background shadow-xl backdrop-blur-md">
+          <div className="border border-background/15 bg-foreground/90 px-5 py-4 text-background shadow-xl">
             <div className="flex items-center gap-2">
               <Star
                 className="size-5 text-primary"
@@ -280,9 +302,7 @@ export function HomePage({
             </p>
 
             <div className="mt-3 border-t border-background/10 pt-3">
-              <p className="text-lg font-black">
-                5 000+
-              </p>
+              <p className="text-lg font-black">5 000+</p>
 
               <p className="text-xs font-medium text-background/60">
                 obserwujących na Facebooku
@@ -291,14 +311,18 @@ export function HomePage({
           </div>
         </div>
 
-        <div className="relative border-t border-background/15 bg-foreground/75 backdrop-blur-sm">
+        {/* Trust bar */}
+        <div className="relative z-10 border-t border-background/15 bg-foreground/85">
           <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:grid-cols-2 md:px-6 lg:grid-cols-4">
             {trust.map(([Icon, text]) => (
               <div
                 key={text}
                 className="flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-3 sm:text-left"
               >
-                <Icon className="text-primary" aria-hidden="true" />
+                <Icon
+                  className="text-primary"
+                  aria-hidden="true"
+                />
 
                 <span className="text-sm font-semibold leading-tight">
                   {text}
@@ -385,7 +409,10 @@ export function HomePage({
                   key={item}
                   className="flex items-center gap-2 text-sm font-semibold"
                 >
-                  <Check className="text-primary" />
+                  <Check
+                    className="text-primary"
+                    aria-hidden="true"
+                  />
                   {item}
                 </li>
               ))}
@@ -411,7 +438,10 @@ export function HomePage({
       >
         <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-2">
           <article className="flex flex-col gap-5 rounded-xl border bg-card p-7 md:p-10">
-            <TicketCheck className="text-primary" aria-hidden="true" />
+            <TicketCheck
+              className="text-primary"
+              aria-hidden="true"
+            />
 
             <h2 className="font-sans text-3xl font-black uppercase">
               Kup same bilety
@@ -436,7 +466,10 @@ export function HomePage({
             id="grupy"
             className="flex flex-col gap-5 rounded-xl bg-foreground p-7 text-background md:p-10"
           >
-            <Users className="text-primary" aria-hidden="true" />
+            <Users
+              className="text-primary"
+              aria-hidden="true"
+            />
 
             <h2 className="font-sans text-3xl font-black uppercase">
               Wyjazdy dla grup i firm
@@ -489,7 +522,10 @@ export function HomePage({
                   key={label as string}
                   className="flex items-center gap-3 rounded-lg border border-background/15 p-4"
                 >
-                  <I className="text-primary" aria-hidden="true" />
+                  <I
+                    className="text-primary"
+                    aria-hidden="true"
+                  />
 
                   <span className="font-semibold">
                     {label as string}
@@ -701,8 +737,6 @@ export function HomePage({
                 <p className="mt-1 w-fit bg-foreground px-2 py-1 text-xs font-semibold text-background">
                   100% poleca
                 </p>
-
-            
               </div>
 
               <div>
