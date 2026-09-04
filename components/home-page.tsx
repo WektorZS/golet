@@ -23,6 +23,10 @@ import { TripCard } from "@/components/trip-card"
 import { SectionHeading } from "@/components/section-heading"
 import { InquiryForm } from "@/components/inquiry-form"
 import { ImageLightbox } from "@/components/image-lightbox"
+import {
+  HeroBackgroundSlider,
+  HeroTypewriter,
+} from "@/components/hero-background-slider"
 import { Button } from "@/components/ui/button"
 import {
   Accordion,
@@ -198,14 +202,7 @@ export function HomePage({
 
       {/* HERO */}
       <section className="relative isolate flex flex-col overflow-hidden bg-foreground text-background md:h-dvh md:min-h-[700px]">
-        <Image
-          src="/images/hero-stadium.webp"
-          alt="Kibice na trybunach podczas wieczornego meczu w Barcelonie"
-          fill
-          priority
-          className="object-cover object-center"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1920px"
-        />
+        <HeroBackgroundSlider />
 
         <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/75 to-transparent" />
 
@@ -213,10 +210,7 @@ export function HomePage({
 
         <div className="relative mx-auto flex min-h-svh w-full flex-1 items-center px-4 pb-14 pt-28 md:min-h-0 md:px-6 md:pb-8 md:pt-24 lg:max-w-7xl">
           <div className="flex max-w-3xl flex-col items-start gap-6">
-            <p className="font-mono text-sm font-bold uppercase tracking-[0.25em] text-primary">
-              {content.heroEyebrow ||
-                "Mecz zaczyna się dużo wcześniej niż pierwszy gwizdek"}
-            </p>
+            <HeroTypewriter eyebrow={content.heroEyebrow} />
 
             <h1 className="text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">
               {content.heroTitle ||
