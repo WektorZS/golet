@@ -217,11 +217,14 @@ export function HomePage({
                 "Leć z nami na największe mecze w Europie"}
             </h1>
 
-            <p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">
-              {content.heroDescription || ""}
-            </p>
+            {/*
+OPIS W HERO PÓKI CO UKRYTY
+<p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">
+  {content.heroDescription || ""}
+</p>
+*/}
 
-            <div className="flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <Button
                 size="lg"
                 className="h-13 rounded-md px-6 font-bold uppercase"
