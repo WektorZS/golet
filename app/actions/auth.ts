@@ -17,6 +17,7 @@ import {
 export type AuthState = {
   error?: string
   sent?: boolean
+  email?: string
 } | null
 
 
@@ -70,21 +71,55 @@ export async function signInAdmin(
   redirect("/admin")
 }
 
+const setupAttempts = new Map<
+  string,
+  {
+    count: number
+    firstAttempt: number
+    lastSent: number
+  }
+>()
 
+const SETUP_WINDOW_MS = 15 * 60 * 1000
+const MAX_SETUP_ATTEMPTS = 3
+const OTP_COOLDOWN_MS = 60 * 1000
+
+function getClientIp(formData: FormData) {
+
+  return String(formData.get("_setup_client") ?? "unknown")
+}
 export async function requestAdminSetupCode(
   _: AuthState,
-  _formData: FormData
+  formData: FormData
 ): Promise<AuthState> {
-  const email = getAdminEmail()
+  const email = String(
+    formData.get("email") ?? ""
+  )
+    .trim()
+    .toLowerCase()
 
+  const adminEmail = getAdminEmail()
+    .trim()
+    .toLowerCase()
+
+  if (!email) {
+    return {
+      error: "Podaj adres e-mail administratora.",
+    }
+  }
+
+  if (email !== adminEmail) {
+  return {
+    error:
+      "Jeśli podany adres jest uprawniony, otrzymasz wiadomość e-mail.",
+  }
+}
   try {
     const { error } =
-      await getAuth().emailOtp.sendVerificationOtp(
-        {
-          email,
-          type: "forget-password",
-        }
-      )
+      await getAuth().emailOtp.sendVerificationOtp({
+        email: adminEmail,
+        type: "forget-password",
+      })
 
     if (error) {
       return {
@@ -95,6 +130,7 @@ export async function requestAdminSetupCode(
 
     return {
       sent: true,
+      email: adminEmail,
     }
   } catch {
     return {

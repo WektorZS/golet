@@ -47,7 +47,7 @@ export async function sendInquiryEmails(
   const clientResult = await resend.emails.send({
     from: FROM_EMAIL,
     to: inquiry.email,
-    replyTo: ADMIN_EMAIL,
+    replyTo: process.env.RESEND_REPLY_TO_EMAIL,
     subject: "Otrzymaliśmy Twoje zapytanie - Let's Gol",
     html: `
       <div style="margin:0;padding:32px 16px;background:#f3f3f3;font-family:Arial,Helvetica,sans-serif;color:#111;">
