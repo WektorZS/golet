@@ -41,6 +41,7 @@ function refreshPublic() {
   revalidatePath("/")
   revalidatePath("/galeria")
   revalidatePath("/wyjazdy")
+  revalidatePath("/sitemap.xml")
 }
 
 const tripSchema = z.object({
