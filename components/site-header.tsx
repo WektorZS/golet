@@ -10,12 +10,12 @@ import { Button } from "@/components/ui/button"
 import { SocialLinks } from "@/components/social-links"
 
 const links = [
-  ["WYJAZDY", "Gotowe wyjazdy", "/wyjazdy"],
-  ["TWÓJ WYJAZD", "Indywidualna wycena", "/wycena-indywidualna"],
-  ["GALERIA", "Nasze wyjazdy", "/galeria"],
-  ["O NAS", "Łukasz i Mateusz", "/o-nas"],
-  ["FAQ", "Najczęstsze pytania", "/faq"],
-  ["KONTAKT", "Napisz do nas", "/kontakt"],
+  ["WYJAZDY", "/wyjazdy"],
+  ["TWÓJ WYJAZD", "/wycena-indywidualna"],
+  ["GALERIA", "/galeria"],
+  ["O NAS", "/o-nas"],
+  ["FAQ", "/faq"],
+  ["KONTAKT", "/kontakt"],
 ] as const
 
 export function Brand() {
@@ -77,37 +77,36 @@ export function SiteHeader() {
         {/* LOGO */}
         <Brand />
 
-       <nav
+      <nav
   className="hidden items-center justify-center gap-7 lg:flex"
   aria-label="Główna nawigacja"
 >
-  {links.map(([label, description, href]) => (
+  {links.map(([label, href]) => (
     <Link
       key={href}
       href={href}
-      className="group flex flex-col items-center justify-center text-center leading-none"
+      className="font-mono text-xs font-semibold uppercase tracking-wider text-background/80 transition-colors hover:text-primary"
     >
-      <span className="font-mono text-xs font-semibold uppercase tracking-wider text-background/80 transition-colors group-hover:text-primary">
-        {label}
-      </span>
-
-      <span className="mt-1 font-mono text-[9px] font-medium tracking-wide text-background/45 transition-colors group-hover:text-background/70">
-        {description}
-      </span>
+      {label}
     </Link>
   ))}
 </nav>
         {/* DESKTOP CTA */}
-        <Button
-          className="hidden h-11 rounded-md px-4 font-bold uppercase md:inline-flex"
-          nativeButton={false}
-          render={<Link href="/#kontakt" />}
-        >
-          <span className="inline-flex items-center gap-2">
-            Zapytaj o wyjazd
-            <Plane className="h-4 w-4" />
-          </span>
-        </Button>
+    
+<Button
+  type="button"
+  onClick={() => {
+    window.dispatchEvent(
+      new Event("open-floating-contact")
+    )
+  }}
+  className="group hidden h-11 items-center gap-3 rounded-lg border border-primary/60 bg-primary/10 px-5 font-mono text-[11px] font-bold uppercase tracking-wider text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-black lg:inline-flex"
+>
+  <span>Zapytaj o wyjazd</span>
+
+  <Plane className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
+</Button>
+
 
         {/* MOBILE MENU BUTTON */}
         <Button
@@ -122,52 +121,47 @@ export function SiteHeader() {
         </Button>
       </div>
 
-      {/* MOBILE MENU */}
-      {open ? (
-        <nav
-          className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 md:hidden"
-          aria-label="Menu mobilne"
-        >
-          {links.map(([label, description, href]) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setOpen(false)}
-              className="group rounded-md px-3 py-3 transition-colors hover:bg-background/10"
-            >
-              <span className="block font-mono text-sm font-semibold uppercase tracking-wider text-background group-hover:text-primary">
-                {label}
-              </span>
 
-              <span className="mt-1 block font-mono text-[10px] font-medium tracking-wide text-background/45 group-hover:text-background/70">
-                {description}
-              </span>
-            </Link>
-          ))}
+{open ? (
+  <nav
+    className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 md:hidden"
+    aria-label="Menu mobilne"
+  >
+    {links.map(([label, href]) => (
+      <Link
+        key={href}
+        href={href}
+        onClick={() => setOpen(false)}
+        className="rounded-md px-3 py-3 font-mono text-sm font-semibold uppercase tracking-wider text-background hover:bg-background/10 hover:text-primary"
+      >
+        {label}
+      </Link>
+    ))}
 
-          <Button
-            className="mt-2 w-full font-bold uppercase"
-            nativeButton={false}
-            render={
-              <Link
-                href="/#kontakt"
-                onClick={() => setOpen(false)}
-              />
-            }
-          >
-            Zapytaj o wyjazd
-            <Plane data-icon="inline-end" />
-          </Button>
+    <Button
+  type="button"
+  className="mt-2 w-full font-bold uppercase"
+  onClick={() => {
+    setOpen(false)
 
-          <div className="mt-auto border-t border-background/15 pt-5">
-            <p className="mb-3 font-mono text-xs font-bold uppercase tracking-widest text-primary">
-              Obserwuj nas
-            </p>
+    window.dispatchEvent(
+      new Event("open-floating-contact")
+    )
+  }}
+>
+  Zapytaj o wyjazd
+  <Plane data-icon="inline-end" />
+</Button>
 
-            <SocialLinks showLabels />
-          </div>
-        </nav>
-      ) : null}
+    <div className="mt-auto border-t border-background/15 pt-5">
+      <p className="mb-3 font-mono text-xs font-bold uppercase tracking-widest text-primary">
+        Obserwuj nas
+      </p>
+
+      <SocialLinks showLabels />
+    </div>
+  </nav>
+) : null}
     </header>
   )
 }

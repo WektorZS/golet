@@ -23,7 +23,28 @@ import {
 
 const PHONE_DISPLAY = "+48 501 465 318"
 const PHONE_HREF = "tel:+48501465318"
+const WHATSAPP_HREF = "https://wa.me/48501465318"
 const EMAIL = "kontakt.letsgol@gmail.com"
+
+/*
+ * Ikona WhatsApp bez dodatkowej biblioteki.
+ * Kontener ma dokładnie 20x20 px,
+ * tak samo jak pozostałe ikony.
+ */
+function WhatsappIcon() {
+  return (
+    <span className="flex size-5 shrink-0 items-center justify-center">
+      <svg
+        viewBox="0 0 24 24"
+        className="size-5"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M20.52 3.48A11.86 11.86 0 0 0 12.05 0C5.5 0 .17 5.33.17 11.89c0 2.1.55 4.15 1.6 5.96L.1 24l6.3-1.65a11.86 11.86 0 0 0 5.65 1.44h.01c6.55 0 11.88-5.33 11.88-11.89 0-3.17-1.23-6.15-3.42-8.42ZM12.06 21.8h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.23-.37a9.88 9.88 0 0 1-1.52-5.28C2.17 6.43 6.6 2 12.05 2c2.64 0 5.12 1.03 6.99 2.9a9.86 9.86 0 0 1 2.89 7c0 5.45-4.43 9.9-9.87 9.9Zm5.43-7.4c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.77-1.67-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.03 1.01-1.03 2.46s1.06 2.85 1.2 3.05c.15.2 2.08 3.18 5.04 4.46.7.3 1.25.48 1.68.61.56-.08 1.76-.72 2.01-1.41.25-.69.25-1.28.17-1.41-.07-.12-.27-.2-.57-.35Z" />
+      </svg>
+    </span>
+  )
+}
 
 export function FloatingContact() {
   const pathname = usePathname()
@@ -33,8 +54,7 @@ export function FloatingContact() {
   const [open, setOpen] = useState(false)
 
   /*
-   * Sprawdzamy, czy użytkownik opuścił
-   * pierwszy ekran / hero.
+   * Pokazywanie / ukrywanie pływającego przycisku.
    */
   useEffect(() => {
     const updateVisibility = () => {
@@ -44,8 +64,8 @@ export function FloatingContact() {
         document.documentElement.scrollHeight
 
       /*
-       * Przycisk pojawia się dopiero
-       * po opuszczeniu pierwszego ekranu.
+       * Przycisk pojawia się po opuszczeniu
+       * pierwszego ekranu.
        */
       const passedHeader = scrollY > 80
 
@@ -65,9 +85,8 @@ export function FloatingContact() {
     updateVisibility()
 
     /*
-     * Pozwala przeglądarce najpierw wyrenderować
-     * przycisk w pozycji ukrytej, a dopiero potem
-     * uruchomić animację.
+     * Najpierw renderujemy przycisk w pozycji
+     * ukrytej, a następnie uruchamiamy animację.
      */
     requestAnimationFrame(() => {
       setButtonReady(true)
@@ -99,7 +118,29 @@ export function FloatingContact() {
   }, [])
 
   /*
-   * Nie pokazujemy przycisku w panelu admina
+   * Pozwala otworzyć FloatingContact
+   * z poziomu głównego menu.
+   */
+  useEffect(() => {
+    const openContact = () => {
+      setOpen(true)
+    }
+
+    window.addEventListener(
+      "open-floating-contact",
+      openContact
+    )
+
+    return () => {
+      window.removeEventListener(
+        "open-floating-contact",
+        openContact
+      )
+    }
+  }, [])
+
+  /*
+   * Nie pokazujemy kontaktu w panelu admina
    * ani na stronie logowania.
    */
   if (
@@ -142,7 +183,7 @@ export function FloatingContact() {
           />
         }
       >
-        <MessageCircle data-icon="inline-start" />
+        <MessageCircle className="size-5 shrink-0" />
         Skontaktuj się
       </DialogTrigger>
 
@@ -158,16 +199,8 @@ export function FloatingContact() {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-3">
-          <Button
-            nativeButton={false}
-            render={<a href={PHONE_HREF} />}
-            size="lg"
-          >
-            <Phone data-icon="inline-start" />
-            Zadzwoń: {PHONE_DISPLAY}
-          </Button>
-
+   
+          {/* FORMULARZ */}
           <Button
             nativeButton={false}
             render={
@@ -179,10 +212,11 @@ export function FloatingContact() {
             variant="outline"
             size="lg"
           >
-            <MessageCircle data-icon="inline-start" />
+            <MessageCircle className="size-5 shrink-0" />
             Przejdź do formularza
           </Button>
 
+          {/* E-MAIL */}
           <Button
             nativeButton={false}
             render={
@@ -191,8 +225,36 @@ export function FloatingContact() {
             variant="outline"
             size="lg"
           >
-            <Mail data-icon="inline-start" />
+            <Mail className="size-5 shrink-0" />
             Napisz e-mail
+          </Button>
+               <div className="flex flex-col gap-3">
+          {/* TELEFON */}
+          <Button
+            nativeButton={false}
+            render={
+              <a href={PHONE_HREF} />
+            }
+            size="lg"
+          >
+            <Phone className="size-5 shrink-0" />
+            Zadzwoń: {PHONE_DISPLAY}
+          </Button>
+
+          {/* WHATSAPP */}
+          <Button
+            nativeButton={false}
+            render={
+              <a
+                href={WHATSAPP_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            }
+            size="lg"
+          >
+            <WhatsappIcon />
+            Napisz na WhatsApp
           </Button>
         </div>
       </DialogContent>
