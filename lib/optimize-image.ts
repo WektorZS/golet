@@ -3,6 +3,7 @@ import sharp from "sharp"
 const MAX_INPUT_SIZE = 15 * 1024 * 1024
 const MAX_DIMENSION = 1600
 const MAX_TEAM_LOGO_DIMENSION = 128
+const TEAM_LOGO_PADDING = 8
 const MAX_INPUT_PIXELS = 40_000_000
 
 const allowedTypes = [
@@ -56,6 +57,7 @@ function detectImageType(bytes: Uint8Array): AllowedImageType | null {
 type OptimizeOptions = {
   maxDimension?: number
   pathnamePrefix?: string
+  teamLogo?: boolean
 }
 
 async function optimizeImage(file: File, options: OptimizeOptions = {}) {
@@ -69,6 +71,10 @@ async function optimizeImage(file: File, options: OptimizeOptions = {}) {
 
   if (!allowedTypes.includes(file.type as AllowedImageType)) {
     throw new Error("Dozwolone formaty: JPEG, PNG, WebP i AVIF")
+  }
+
+  if (options.teamLogo && !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    throw new Error("Herb musi być plikiem JPG, PNG lub WebP")
   }
 
   const input = Buffer.from(await file.arrayBuffer())
@@ -91,17 +97,43 @@ async function optimizeImage(file: File, options: OptimizeOptions = {}) {
     throw new Error("Nie udało się odczytać wymiarów zdjęcia")
   }
 
-  const { data, info } = await image
-    .rotate()
-    .resize({
+  let prepared = image.rotate()
+
+  if (options.teamLogo) {
+    const transparent = { r: 0, g: 0, b: 0, alpha: 0 }
+    const trimOptions = detectedType === "image/jpeg"
+      ? { background: "#ffffff", threshold: 12 }
+      : { background: transparent, threshold: 8 }
+
+    prepared = prepared
+      .trim(trimOptions)
+      .resize({
+        width: MAX_TEAM_LOGO_DIMENSION - TEAM_LOGO_PADDING * 2,
+        height: MAX_TEAM_LOGO_DIMENSION - TEAM_LOGO_PADDING * 2,
+        fit: "contain",
+        background: transparent,
+        kernel: sharp.kernel.lanczos3,
+      })
+      .extend({
+        top: TEAM_LOGO_PADDING,
+        bottom: TEAM_LOGO_PADDING,
+        left: TEAM_LOGO_PADDING,
+        right: TEAM_LOGO_PADDING,
+        background: transparent,
+      })
+  } else {
+    prepared = prepared.resize({
       width: options.maxDimension ?? MAX_DIMENSION,
       height: options.maxDimension ?? MAX_DIMENSION,
       fit: "inside",
       withoutEnlargement: true,
       kernel: sharp.kernel.lanczos3,
     })
+  }
+
+  const { data, info } = await prepared
     .webp({
-      quality: 75,
+      quality: options.teamLogo ? 88 : 75,
       effort: 6,
       smartSubsample: true,
     })
@@ -127,6 +159,6 @@ export function optimizeTeamLogo(file: File) {
   return optimizeImage(file, {
     maxDimension: MAX_TEAM_LOGO_DIMENSION,
     pathnamePrefix: "admin/team-logos",
+    teamLogo: true,
   })
 }
-
