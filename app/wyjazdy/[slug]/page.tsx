@@ -136,7 +136,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
     "Czas na poznanie miasta",
     hasFlight ? "Lot powrotny do Polski" : "Powrót we własnym zakresie",
   ]
-  const navItems = [["Opis", "opis"], ["Zakres pakietu", "w-cenie"], ["Plan wyjazdu", "plan"], ...(hasHotel ? [["Hotel", "hotel"]] : []), ...(hasFlight ? [["Loty", "loty"]] : []), ...(gallery.length > 0 ? [["Zdjęcia", "zdjecia"]] : []), ["Opinie", "opinie"], ["FAQ", "faq"], ["Rezerwacja", "rezerwacja"]]
+  const navItems = [["Opis", "opis"], ["Zakres pakietu", "w-cenie"], ["Plan wyjazdu", "plan"], ...(hasHotel ? [["Hotel", "hotel"]] : []), ...(hasFlight ? [["Lot", "loty"]] : []), ...(gallery.length > 0 ? [["Zdjęcia", "zdjecia"]] : []), ["Opinie", "opinie"], ["FAQ", "faq"], ["Rezerwacja", "rezerwacja"]]
 
   return (
     <main className="bg-background">
