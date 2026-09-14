@@ -2967,7 +2967,7 @@ function TripDialog({
         }
       />
 
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>
             {trip
@@ -3034,6 +3034,34 @@ function TripDialog({
           </Field>
 
           <Field
+            label="Gospodarz"
+            hint="Pełna nazwa pierwszego zespołu widoczna przy herbie."
+          >
+            <Input name="homeTeam" defaultValue={trip?.homeTeam} required />
+          </Field>
+
+          <Field
+            label="Gość"
+            hint="Pełna nazwa drugiego zespołu widoczna przy herbie."
+          >
+            <Input name="awayTeam" defaultValue={trip?.awayTeam} required />
+          </Field>
+
+          <Field
+            label="Stadion"
+            hint="Nazwa stadionu, na którym odbędzie się mecz."
+          >
+            <Input name="stadium" defaultValue={trip?.stadium} required />
+          </Field>
+
+          <Field
+            label="Termin meczu"
+            hint="Data meczu. Może różnić się od pierwszego dnia całego wyjazdu."
+          >
+            <Input name="matchDate" type="date" defaultValue={trip?.matchDate || trip?.startDate} required />
+          </Field>
+
+          <Field
             label="Kraj"
             hint="Kraj, do którego organizowany jest wyjazd."
           >
@@ -3084,6 +3112,17 @@ function TripDialog({
           </Field>
 
           <Field
+            label="Dostępność miejsc"
+            hint="Status sprzedażowy widoczny w kalendarzu i na stronie wyjazdu."
+          >
+            <select name="availabilityStatus" defaultValue={trip?.availabilityStatus || "available"} className="h-9 rounded-lg border bg-background px-3">
+              <option value="available">Dostępne miejsca</option>
+              <option value="last_places">Ostatnie miejsca</option>
+              <option value="sold_out">Wyprzedane</option>
+            </select>
+          </Field>
+
+          <Field
             label="Data rozpoczęcia"
             hint="Pierwszy dzień wyjazdu."
           >
@@ -3108,6 +3147,20 @@ function TripDialog({
                 trip?.endDate
               }
             />
+          </Field>
+
+          <Field
+            label="Liczba dni"
+            hint="Łączna długość pobytu liczona w dniach."
+          >
+            <Input name="durationDays" type="number" min="1" max="30" defaultValue={trip?.durationDays || 1} required />
+          </Field>
+
+          <Field
+            label="Liczba nocy"
+            hint="Liczba noclegów w pakiecie."
+          >
+            <Input name="durationNights" type="number" min="0" max="29" defaultValue={trip?.durationNights ?? 0} required />
           </Field>
 
           <Field
@@ -3146,6 +3199,17 @@ function TripDialog({
             ) : null}
           </div>
 
+          <div className="grid gap-4 sm:col-span-2 sm:grid-cols-2">
+            <Field label="Herb gospodarza" hint="Najlepiej użyć pliku PNG lub WebP z przezroczystym tłem.">
+              <ImageDropzone name="homeLogoFile" accept="image/png,image/webp,image/jpeg,image/avif" required={!trip?.homeLogo} currentImage={trip?.homeLogo} />
+            </Field>
+            <Field label="Herb gościa" hint="Najlepiej użyć pliku PNG lub WebP z przezroczystym tłem.">
+              <ImageDropzone name="awayLogoFile" accept="image/png,image/webp,image/jpeg,image/avif" required={!trip?.awayLogo} currentImage={trip?.awayLogo} />
+            </Field>
+            {trip?.homeLogo ? <input type="hidden" name="homeLogo" value={trip.homeLogo} /> : null}
+            {trip?.awayLogo ? <input type="hidden" name="awayLogo" value={trip.awayLogo} /> : null}
+          </div>
+
           <div className="sm:col-span-2">
             <DescriptionEditor
               name="description"
@@ -3169,6 +3233,30 @@ function TripDialog({
                 }
                 rows={5}
               />
+            </Field>
+          </div>
+
+          <div className="sm:col-span-2">
+            <Field label="Plan wyjazdu" hint="Każdy etap wpisz w osobnej linii. Na stronie zostanie pokazany jako uporządkowany plan.">
+              <Textarea name="itinerary" defaultValue={trip?.itinerary?.join("\n")} rows={6} />
+            </Field>
+          </div>
+
+          <div className="sm:col-span-2">
+            <Field label="Hotel" hint="Nazwa lub standard hotelu, lokalizacja, wyżywienie i najważniejsze udogodnienia.">
+              <Textarea name="hotelInfo" defaultValue={trip?.hotelInfo} rows={5} />
+            </Field>
+          </div>
+
+          <div className="sm:col-span-2">
+            <Field label="Loty" hint="Lotniska, bagaż i informacje o godzinach lub sposobie ich potwierdzenia.">
+              <Textarea name="flightInfo" defaultValue={trip?.flightInfo} rows={5} />
+            </Field>
+          </div>
+
+          <div className="sm:col-span-2">
+            <Field label="FAQ" hint="Jedno pytanie i odpowiedź w wierszu, rozdzielone znakiem |. Przykład: Czy potrzebuję paszportu? | Wystarczy ważny dowód osobisty.">
+              <Textarea name="faq" defaultValue={trip?.faq?.join("\n")} rows={6} />
             </Field>
           </div>
 

@@ -1,8 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
-import { TripCard } from "@/components/trip-card"
-import { SectionHeading } from "@/components/section-heading"
+import { ArrowLeft, ArrowRight, CalendarDays, Search } from "lucide-react"
+import { TripCalendar } from "@/components/trip-calendar"
 import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
 import { getPublishedTrips } from "@/lib/trips"
@@ -26,16 +25,36 @@ export default async function TripsPage() {
           <Link href="/" className="font-sans text-xl font-black uppercase">Let&apos;s Gol <span className="text-primary">/ Wyjazdy</span></Link>
         </div>
       </header>
-      <section className="px-4 py-20 md:px-6 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading eyebrow="Kalendarz 2026" title="Wybierz swój następny stadion" intro="Gotowe pakiety z pewnym biletem, wygodną logistyką i polskojęzyczną opieką." />
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {trips.map((trip) => <TripCard key={trip.id} trip={trip} />)}
+      <section className="relative overflow-hidden bg-foreground px-4 py-16 text-background md:px-6 md:py-20">
+        <div className="absolute -right-24 -top-28 size-80 rounded-full border-[55px] border-primary/10" />
+        <div className="relative mx-auto max-w-7xl">
+          <div className="flex max-w-4xl items-start gap-5">
+            <span className="hidden size-14 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground sm:flex"><CalendarDays className="size-7" /></span>
+            <div>
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-primary">Kalendarz wyjazdów</p>
+              <h1 className="mt-3 text-balance font-sans text-5xl font-black uppercase leading-[0.95] tracking-tight md:text-7xl">Twój następny mecz zaczyna się tutaj</h1>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-background/65 md:text-lg">Wybierz miesiąc i gotowy pakiet. My zajmiemy się biletem, lotem, hotelem oraz opieką na miejscu.</p>
+            </div>
           </div>
-          <div className="mt-14 rounded-xl bg-secondary p-7 text-center md:p-10">
-            <h2 className="font-sans text-3xl font-black uppercase">Nie widzisz swojego meczu?</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">Przygotujemy indywidualny wyjazd na dowolny stadion i z wybranego lotniska.</p>
-            <Button className="mt-6" size="lg" nativeButton={false} render={<Link href="/#kontakt" />}>Poproś o wycenę</Button>
+        </div>
+      </section>
+
+      <section className="px-4 py-12 md:px-6 md:py-16">
+        <div className="mx-auto max-w-7xl">
+          <TripCalendar trips={trips} />
+
+          <div className="relative mt-14 overflow-hidden rounded-2xl bg-foreground p-7 text-background shadow-xl md:p-10">
+            <div className="absolute -bottom-16 -left-10 size-48 rounded-full bg-primary/10 blur-2xl" />
+            <div className="relative flex flex-col items-start justify-between gap-7 md:flex-row md:items-center">
+              <div className="flex max-w-2xl gap-4">
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"><Search className="size-5" /></span>
+                <div>
+                  <h2 className="font-sans text-3xl font-black uppercase md:text-4xl">Nie widzisz meczu, na który chcesz jechać?</h2>
+                  <p className="mt-2 leading-7 text-background/60">Napisz do nas. Przygotujemy indywidualny wyjazd i sprawdzimy dostępność biletów.</p>
+                </div>
+              </div>
+              <Button className="h-12 w-full shrink-0 px-6 md:w-auto" size="lg" nativeButton={false} render={<Link href="/#kontakt" />}>Wyceń indywidualnie swój wyjazd <ArrowRight data-icon="inline-end" /></Button>
+            </div>
           </div>
         </div>
       </section>
@@ -43,3 +62,4 @@ export default async function TripsPage() {
     </main>
   )
 }
+

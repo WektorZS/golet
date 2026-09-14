@@ -3,6 +3,7 @@ import { and, asc, desc, eq, gte } from "drizzle-orm"
 import { db } from "@/lib/db"
 
 import { tripGalleryItems, trips } from "@/lib/db/schema"
+import { ensureTripColumns } from "@/lib/db/ensure-trip-columns"
 
 export type Trip = typeof trips.$inferSelect
 
@@ -16,6 +17,7 @@ function getTodayPoland() {
 }
 
 export async function getPublishedTrips() {
+  await ensureTripColumns()
   const today = getTodayPoland()
 
   return db
@@ -35,6 +37,7 @@ export async function getPublishedTrips() {
 }
 
 export async function getTripBySlug(slug: string) {
+  await ensureTripColumns()
   const today = getTodayPoland()
 
   const [trip] = await db
@@ -64,3 +67,4 @@ export async function getTripGallery(tripId: number) {
     )
     .orderBy(asc(tripGalleryItems.sortOrder))
 }
+

@@ -8,6 +8,7 @@ import { adminActivity, galleryItems, inquiries, mediaAssets, siteSettings, test
 import { isAdminEmail } from "@/lib/auth/admin"
 import { getAuth, isAuthConfigured } from "@/lib/auth/server"
 import { getYouTubeVideos } from "@/lib/content"
+import { ensureTripColumns } from "@/lib/db/ensure-trip-columns"
 
 export const dynamic = "force-dynamic"
 
@@ -16,6 +17,8 @@ export default async function AdminPage() {
   const { data: session } = await getAuth().getSession()
   if (!session?.user) redirect("/auth/sign-in")
   if (!isAdminEmail(session.user.email)) redirect("/auth/sign-in?error=unauthorized")
+
+  await ensureTripColumns()
 
   const [allTrips, allInquiries, allTestimonials, media, gallery, tripGallery, rawSettings, activity] = await Promise.all([
     db.select().from(trips).orderBy(asc(trips.sortOrder), desc(trips.startDate)),
@@ -36,3 +39,4 @@ export default async function AdminPage() {
 function SetupRequired() {
   return <main className="flex min-h-screen items-center justify-center bg-muted px-4"><div className="w-full max-w-xl"><Alert><AlertTitle>Panel oczekuje na aktywację logowania</AlertTitle><AlertDescription>Dodaj NEON_AUTH_COOKIE_SECRET o długości co najmniej 32 losowych znaków, a następnie utwórz administratora w Neon Auth.</AlertDescription></Alert><Button className="mt-5" nativeButton={false} render={<a href="/" />}>Wróć na stronę</Button></div></main>
 }
+

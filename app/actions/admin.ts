@@ -1,11 +1,12 @@
 "use server"
 
 import { del, put } from "@vercel/blob"
-import { and, asc, eq, ne, sql } from "drizzle-orm"
+import { and, asc, eq, ne, or, sql } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import { db } from "@/lib/db"
+import { ensureTripColumns } from "@/lib/db/ensure-trip-columns"
 import {
   adminActivity,
   galleryItems,
@@ -21,6 +22,7 @@ import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
 import { syncYouTubeVideos } from "@/lib/youtube-sync"
 
 const statuses = ["draft", "published", "archived"] as const
+const availabilityStatuses = ["available", "last_places", "sold_out"] as const
 const clean = (value: FormDataEntryValue | null) => String(value ?? "").trim()
 const slugify = (value: string) => value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
 
@@ -48,6 +50,11 @@ const tripSchema = z.object({
   title: z.string().min(3).max(120), city: z.string().min(2).max(100),
   country: z.string().min(2).max(100), startDate: z.string().date(), endDate: z.string().optional(),
   price: z.coerce.number().int().nonnegative().max(1_000_000), status: z.enum(statuses),
+  homeTeam: z.string().min(2).max(100), awayTeam: z.string().min(2).max(100),
+  stadium: z.string().min(2).max(140), matchDate: z.string().date().optional(),
+  availabilityStatus: z.enum(availabilityStatuses),
+  durationDays: z.coerce.number().int().min(1).max(30),
+  durationNights: z.coerce.number().int().min(0).max(29),
   description: z.string().max(12000).refine((value) => stripHtml(value).length <= 8000, "Opis jest za długi"),
 })
 
@@ -55,6 +62,7 @@ export type SaveTripState = { success?: boolean; error?: string }
 
 export async function saveTrip(_: SaveTripState, formData: FormData): Promise<SaveTripState> {
   const user = await requireAdmin()
+  await ensureTripColumns()
   const id = Number(formData.get("id"))
   // The description field carries HTML produced by the restricted rich-text editor
   // (bold/italic/lists/links only); sanitize before validation so stored content is
@@ -64,6 +72,10 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
     title: clean(formData.get("title")), city: clean(formData.get("city")),
     country: clean(formData.get("country")), startDate: clean(formData.get("startDate")), endDate: clean(formData.get("endDate")) || undefined,
     price: clean(formData.get("price")), status: clean(formData.get("status")), description,
+    homeTeam: clean(formData.get("homeTeam")), awayTeam: clean(formData.get("awayTeam")),
+    stadium: clean(formData.get("stadium")), matchDate: clean(formData.get("matchDate")) || undefined,
+    availabilityStatus: clean(formData.get("availabilityStatus")),
+    durationDays: clean(formData.get("durationDays")), durationNights: clean(formData.get("durationNights")),
   })
   if (!parsed.success) return { error: "Sprawdź wymagane pola wyjazdu." }
   const slug = slugify(clean(formData.get("slug")) || parsed.data.title)
@@ -71,26 +83,47 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   if (duplicate.length) return { error: "Ten adres URL jest już używany." }
 
   const isEditing = Number.isInteger(id) && id > 0
-  let image = clean(formData.get("image"))
-  if (isEditing && !image) {
-    const [existingTrip] = await db.select({ image: trips.image }).from(trips).where(eq(trips.id, id)).limit(1)
-    image = existingTrip?.image || ""
+  const [existingTrip] = isEditing
+    ? await db.select({ image: trips.image, homeLogo: trips.homeLogo, awayLogo: trips.awayLogo }).from(trips).where(eq(trips.id, id)).limit(1)
+    : []
+  let image = clean(formData.get("image")) || existingTrip?.image || ""
+  let homeLogo = clean(formData.get("homeLogo")) || existingTrip?.homeLogo || ""
+  let awayLogo = clean(formData.get("awayLogo")) || existingTrip?.awayLogo || ""
+
+  async function uploadTripImage(file: FormDataEntryValue | null, alt: string) {
+    if (!(file instanceof File) || file.size === 0) return ""
+    const optimized = await optimizeUploadedImage(file)
+    const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
+    const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt, originalName: file.name, createdBy: user.id }).returning({ id: mediaAssets.id })
+    return `/api/media/${asset.id}`
   }
+
   const coverFile = formData.get("coverFile")
   if (coverFile instanceof File && coverFile.size > 0) {
     try {
-      const optimized = await optimizeUploadedImage(coverFile)
-      const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
-      const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt: parsed.data.title, originalName: coverFile.name, createdBy: user.id }).returning({ id: mediaAssets.id })
-      image = `/api/media/${asset.id}`
+      image = await uploadTripImage(coverFile, `Stadion - ${parsed.data.title}`)
+      homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${parsed.data.homeTeam}`)) || homeLogo
+      awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${parsed.data.awayTeam}`)) || awayLogo
     } catch (error) {
       return { error: error instanceof Error ? error.message : "Nie udało się zoptymalizować zdjęcia." }
     }
+  } else {
+    try {
+      homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${parsed.data.homeTeam}`)) || homeLogo
+      awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${parsed.data.awayTeam}`)) || awayLogo
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : "Nie udało się zapisać herbu zespołu." }
+    }
   }
 
+  if (!image || !homeLogo || !awayLogo) return { error: "Dodaj zdjęcie stadionu oraz herby obu zespołów." }
+
   const values = {
-    ...parsed.data, opponent: parsed.data.title, slug, endDate: parsed.data.endDate || null, image,
+    ...parsed.data, opponent: parsed.data.awayTeam, slug, endDate: parsed.data.endDate || null, matchDate: parsed.data.matchDate || null, image, homeLogo, awayLogo,
     featured: formData.get("featured") === "on", includes: clean(formData.get("includes")).split("\n").map((item) => item.trim()).filter(Boolean),
+    itinerary: clean(formData.get("itinerary")).split("\n").map((item) => item.trim()).filter(Boolean),
+    hotelInfo: clean(formData.get("hotelInfo")), flightInfo: clean(formData.get("flightInfo")),
+    faq: clean(formData.get("faq")).split("\n").map((item) => item.trim()).filter(Boolean),
     sortOrder: Number(formData.get("sortOrder")) || 0, seoTitle: clean(formData.get("seoTitle")), seoDescription: clean(formData.get("seoDescription")), updatedAt: new Date(),
   }
   if (Number.isInteger(id) && id > 0) {
@@ -115,6 +148,7 @@ export async function setTripStatus(formData: FormData) {
 
 export async function duplicateTrip(formData: FormData) {
   const user = await requireAdmin(); const id = Number(formData.get("id"))
+  await ensureTripColumns()
   const [trip] = await db.select().from(trips).where(eq(trips.id, id)).limit(1)
   if (!trip) return
   const [{ id: createdId }] = await db.insert(trips).values({ ...trip, id: undefined, slug: `${trip.slug}-kopia-${Date.now().toString().slice(-5)}`, title: `${trip.title} — kopia`, status: "draft", featured: false, createdAt: new Date(), updatedAt: new Date() }).returning({ id: trips.id })
@@ -124,6 +158,7 @@ export async function duplicateTrip(formData: FormData) {
 
 export async function deleteTrip(formData: FormData) {
   const user = await requireAdmin()
+  await ensureTripColumns()
   const id = Number(formData.get("id"))
 
   if (!Number.isInteger(id) || id <= 0) return
@@ -150,6 +185,11 @@ const coverMatch = trip.image?.match(/^\/api\/media\/(\d+)$/)
     mediaIds.add(Number(coverMatch[1]))
   }
 
+  for (const logo of [trip.homeLogo, trip.awayLogo]) {
+    const logoMatch = logo?.match(/^\/api\/media\/(\d+)$/)
+    if (logoMatch) mediaIds.add(Number(logoMatch[1]))
+  }
+
  
   for (const item of tripGallery) {
     if (item.mediaId) {
@@ -167,7 +207,7 @@ const coverMatch = trip.image?.match(/^\/api\/media\/(\d+)$/)
 
 
   for (const mediaId of mediaIds) {
-    const [globalUse, tripUse, coverUse] = await Promise.all([
+    const [globalUse, tripUse, coverUse, logoUse] = await Promise.all([
       db
         .select({ id: galleryItems.id })
         .from(galleryItems)
@@ -185,9 +225,15 @@ const coverMatch = trip.image?.match(/^\/api\/media\/(\d+)$/)
         .from(trips)
         .where(eq(trips.image, `/api/media/${mediaId}`))
         .limit(1),
+
+      db
+        .select({ id: trips.id })
+        .from(trips)
+        .where(or(eq(trips.homeLogo, `/api/media/${mediaId}`), eq(trips.awayLogo, `/api/media/${mediaId}`)))
+        .limit(1),
     ])
 
-    if (globalUse.length || tripUse.length || coverUse.length) {
+    if (globalUse.length || tripUse.length || coverUse.length || logoUse.length) {
       continue
     }
 
@@ -474,3 +520,4 @@ export async function reorderGalleryItems(formData: FormData) {
 
   refreshPublic()
 }
+
