@@ -2,6 +2,7 @@ import sharp from "sharp"
 
 const MAX_INPUT_SIZE = 15 * 1024 * 1024
 const MAX_DIMENSION = 1600
+const MAX_TEAM_LOGO_DIMENSION = 128
 const MAX_INPUT_PIXELS = 40_000_000
 
 const allowedTypes = [
@@ -52,7 +53,12 @@ function detectImageType(bytes: Uint8Array): AllowedImageType | null {
   return null
 }
 
-export async function optimizeUploadedImage(file: File) {
+type OptimizeOptions = {
+  maxDimension?: number
+  pathnamePrefix?: string
+}
+
+async function optimizeImage(file: File, options: OptimizeOptions = {}) {
   if (file.size === 0) {
     throw new Error("Wybierz plik")
   }
@@ -88,8 +94,8 @@ export async function optimizeUploadedImage(file: File) {
   const { data, info } = await image
     .rotate()
     .resize({
-      width: MAX_DIMENSION,
-      height: MAX_DIMENSION,
+      width: options.maxDimension ?? MAX_DIMENSION,
+      height: options.maxDimension ?? MAX_DIMENSION,
       fit: "inside",
       withoutEnlargement: true,
       kernel: sharp.kernel.lanczos3,
@@ -109,6 +115,18 @@ export async function optimizeUploadedImage(file: File) {
     size: data.byteLength,
     width: info.width,
     height: info.height,
-    pathname: `admin/${crypto.randomUUID()}.webp`,
+    pathname: `${options.pathnamePrefix ?? "admin"}/${crypto.randomUUID()}.webp`,
   }
 }
+
+export function optimizeUploadedImage(file: File) {
+  return optimizeImage(file)
+}
+
+export function optimizeTeamLogo(file: File) {
+  return optimizeImage(file, {
+    maxDimension: MAX_TEAM_LOGO_DIMENSION,
+    pathnamePrefix: "admin/team-logos",
+  })
+}
+

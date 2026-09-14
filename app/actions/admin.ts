@@ -17,7 +17,7 @@ import {
   tripGalleryItems,
   trips,
 } from "@/lib/db/schema"
-import { optimizeUploadedImage } from "@/lib/optimize-image"
+import { optimizeTeamLogo, optimizeUploadedImage } from "@/lib/optimize-image"
 import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
 import { syncYouTubeVideos } from "@/lib/youtube-sync"
 
@@ -90,9 +90,9 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   let homeLogo = clean(formData.get("homeLogo")) || existingTrip?.homeLogo || ""
   let awayLogo = clean(formData.get("awayLogo")) || existingTrip?.awayLogo || ""
 
-  async function uploadTripImage(file: FormDataEntryValue | null, alt: string) {
+  async function uploadTripImage(file: FormDataEntryValue | null, alt: string, kind: "cover" | "logo" = "cover") {
     if (!(file instanceof File) || file.size === 0) return ""
-    const optimized = await optimizeUploadedImage(file)
+    const optimized = kind === "logo" ? await optimizeTeamLogo(file) : await optimizeUploadedImage(file)
     const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
     const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt, originalName: file.name, createdBy: user.id }).returning({ id: mediaAssets.id })
     return `/api/media/${asset.id}`
@@ -102,15 +102,15 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   if (coverFile instanceof File && coverFile.size > 0) {
     try {
       image = await uploadTripImage(coverFile, `Stadion - ${parsed.data.title}`)
-      homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${parsed.data.homeTeam}`)) || homeLogo
-      awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${parsed.data.awayTeam}`)) || awayLogo
+      homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${parsed.data.homeTeam}`, "logo")) || homeLogo
+      awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${parsed.data.awayTeam}`, "logo")) || awayLogo
     } catch (error) {
       return { error: error instanceof Error ? error.message : "Nie udało się zoptymalizować zdjęcia." }
     }
   } else {
     try {
-      homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${parsed.data.homeTeam}`)) || homeLogo
-      awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${parsed.data.awayTeam}`)) || awayLogo
+      homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${parsed.data.homeTeam}`, "logo")) || homeLogo
+      awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${parsed.data.awayTeam}`, "logo")) || awayLogo
     } catch (error) {
       return { error: error instanceof Error ? error.message : "Nie udało się zapisać herbu zespołu." }
     }
