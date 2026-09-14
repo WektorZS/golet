@@ -29,7 +29,7 @@ export default function WarunkiUczestnictwaPage() {
     ewidencjaNumber: "42848",
     authority: "Marszałek Województwa Zachodniopomorskiego",
 
-    email: "kontakt@letsgol.pl",
+    email: "kontakt.letsgol@gmail.com",
     phone: "+48501465318",
   }
 
