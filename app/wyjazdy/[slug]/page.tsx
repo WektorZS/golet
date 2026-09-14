@@ -120,7 +120,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
     "Czas na poznanie miasta",
     hasFlight ? "Lot powrotny do Polski" : "Powrót we własnym zakresie",
   ]
-  const navItems = [["Opis", "opis"], ["Zakres pakietu", "w-cenie"], ["Plan wyjazdu", "plan"], ...(hasHotel ? [["Hotel", "hotel"]] : []), ...(hasFlight ? [["Loty", "loty"]] : []), ["Zdjęcia", "zdjecia"], ["Opinie", "opinie"], ["FAQ", "faq"]]
+  const navItems = [["Opis", "opis"], ["Zakres pakietu", "w-cenie"], ["Plan wyjazdu", "plan"], ...(hasHotel ? [["Hotel", "hotel"]] : []), ...(hasFlight ? [["Loty", "loty"]] : []), ...(gallery.length > 0 ? [["Zdjęcia", "zdjecia"]] : []), ["Opinie", "opinie"], ["FAQ", "faq"]]
 
   return (
     <main className="bg-background">
@@ -204,10 +204,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
               {hasFlight && <section id="loty" className="scroll-mt-24 rounded-2xl bg-primary p-6 text-primary-foreground md:p-7"><Plane className="size-7" /><p className="mt-5 font-mono text-xs font-bold uppercase tracking-[0.2em] opacity-60">{packageOptions.flight === "optional" ? "Opcja dodatkowa" : "W pakiecie"}</p><h2 className="mt-2 font-sans text-3xl font-black uppercase">Loty</h2><p className="mt-4 whitespace-pre-line leading-7 opacity-75">{trip.flightInfo || "Godziny i połączenie potwierdzamy po ustaleniu wariantu."}</p>{(trip.departureAirports || trip.flightType || trip.baggageInfo) && <div className="mt-5 space-y-2 text-sm"><p>{trip.departureAirports && <><strong>Lotniska: </strong>{trip.departureAirports}</>}</p><p>{trip.flightType && <><strong>Rodzaj lotu: </strong>{trip.flightType}</>}</p><p>{trip.baggageInfo && <><strong>Bagaż: </strong>{trip.baggageInfo}</>}</p></div>}</section>}
             </div>}
 
-            <section id="zdjecia" className="scroll-mt-24">
+            {gallery.length > 0 && <section id="zdjecia" className="scroll-mt-24">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Zobacz atmosferę</p><h2 className="mt-2 font-sans text-4xl font-black uppercase">Zdjęcia</h2>
-              {gallery.length > 0 ? <div className="mt-7 grid gap-4 sm:grid-cols-2">{gallery.map((item, index) => <figure key={item.id} className={`group overflow-hidden rounded-xl bg-secondary ${index === 0 ? "sm:col-span-2" : ""}`}><div className={`relative ${index === 0 ? "aspect-[2/1]" : "aspect-[4/3]"}`}><Image src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || `Zdjęcie z wyjazdu ${trip.title}`} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes={index === 0 ? "(max-width: 1024px) 100vw, 66vw" : "(max-width: 1024px) 50vw, 33vw"} /></div>{item.caption && <figcaption className="p-4 text-sm text-muted-foreground">{item.caption}</figcaption>}</figure>)}</div> : <div className="mt-6 rounded-xl border border-dashed p-8 text-center text-muted-foreground">Zdjęcia z tego wyjazdu pojawią się tutaj po dodaniu ich w panelu administratora.</div>}
-            </section>
+              <div className="mt-7 grid gap-4 sm:grid-cols-2">{gallery.map((item, index) => <figure key={item.id} className={`group overflow-hidden rounded-xl bg-secondary ${index === 0 ? "sm:col-span-2" : ""}`}><div className={`relative ${index === 0 ? "aspect-[2/1]" : "aspect-[4/3]"}`}><Image src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || `Zdjęcie z wyjazdu ${trip.title}`} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes={index === 0 ? "(max-width: 1024px) 100vw, 66vw" : "(max-width: 1024px) 50vw, 33vw"} /></div>{item.caption && <figcaption className="p-4 text-sm text-muted-foreground">{item.caption}</figcaption>}</figure>)}</div>
+            </section>}
 
             <section id="opinie" className="scroll-mt-24">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Sprawdzone emocje</p><h2 className="mt-2 font-sans text-4xl font-black uppercase">Opinie kibiców</h2>
