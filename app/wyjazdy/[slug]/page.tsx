@@ -120,7 +120,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
     "Czas na poznanie miasta",
     hasFlight ? "Lot powrotny do Polski" : "Powrót we własnym zakresie",
   ]
-  const navItems = [["Opis", "opis"], ["Zakres pakietu", "w-cenie"], ["Plan wyjazdu", "plan"], ...(hasHotel ? [["Hotel", "hotel"]] : []), ...(hasFlight ? [["Loty", "loty"]] : []), ...(gallery.length > 0 ? [["Zdjęcia", "zdjecia"]] : []), ["Opinie", "opinie"], ["FAQ", "faq"]]
+  const navItems = [["Opis", "opis"], ["Zakres pakietu", "w-cenie"], ["Plan wyjazdu", "plan"], ...(hasHotel ? [["Hotel", "hotel"]] : []), ...(hasFlight ? [["Loty", "loty"]] : []), ...(gallery.length > 0 ? [["Zdjęcia", "zdjecia"]] : []), ["Opinie", "opinie"], ["FAQ", "faq"], ["Rezerwacja", "rezerwacja"]]
 
   return (
     <main className="bg-background">
@@ -164,13 +164,14 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
       </nav>
 
       <section className="px-4 py-14 md:px-6 md:py-20">
-        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1fr_380px]">
-          <div className="min-w-0 space-y-16">
+        <div className="mx-auto max-w-7xl space-y-16">
             <section id="opis" className="scroll-mt-24">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">O wyjeździe</p>
               <h2 className="mt-2 font-sans text-4xl font-black uppercase md:text-5xl">Przeżyj ten mecz z bliska</h2>
-              <DescriptionHtml html={trip.description} className="mt-5 max-w-3xl text-base leading-8 text-muted-foreground md:text-lg [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-4 [&_strong]:font-semibold [&_strong]:text-foreground [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5" />
-              <div className="mt-7 flex gap-3 rounded-xl border-l-4 border-primary bg-secondary/60 p-5"><ShieldCheck className="mt-0.5 size-5 shrink-0 text-primary" /><p className="text-sm leading-6 text-muted-foreground"><strong className="text-foreground">Termin pod kontrolą.</strong> Dokładna godzina meczu może zostać potwierdzona bliżej wyjazdu. Program podróży dopasujemy do oficjalnego terminarza.</p></div>
+              <div className="mt-7 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+                <DescriptionHtml html={trip.description} className="text-base leading-8 text-muted-foreground md:text-lg [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-4 [&_strong]:font-semibold [&_strong]:text-foreground [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5" />
+                <div className="flex gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-5"><ShieldCheck className="mt-0.5 size-6 shrink-0 text-primary" /><p className="text-sm leading-6 text-muted-foreground"><strong className="block text-foreground">Termin pod kontrolą</strong>Dokładna godzina meczu może zostać potwierdzona bliżej wyjazdu. Program dopasujemy do oficjalnego terminarza.</p></div>
+              </div>
             </section>
 
             <section id="w-cenie" className="scroll-mt-24">
@@ -196,7 +197,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
             <section id="plan" className="scroll-mt-24">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Krok po kroku</p>
               <h2 className="mt-2 font-sans text-4xl font-black uppercase">Plan wyjazdu</h2>
-              <div className="mt-7">{(trip.itinerary.length > 0 ? trip.itinerary : defaultPlan).map((item, index, items) => <div key={`${item}-${index}`} className="grid grid-cols-[44px_1fr] gap-4"><div className="flex flex-col items-center"><span className="flex size-10 items-center justify-center rounded-full bg-foreground font-sans font-black text-primary">{index + 1}</span>{index < items.length - 1 && <span className="min-h-10 w-px flex-1 bg-border" />}</div><p className="pb-7 pt-2 text-base leading-7 text-muted-foreground">{item}</p></div>)}</div>
+              <div className="mt-7 grid gap-3 md:grid-cols-2 lg:grid-cols-3">{(trip.itinerary.length > 0 ? trip.itinerary : defaultPlan).map((item, index) => <div key={`${item}-${index}`} className="relative overflow-hidden rounded-2xl border bg-card p-5"><span className="absolute right-3 top-1 font-sans text-6xl font-black text-secondary">{String(index + 1).padStart(2, "0")}</span><span className="relative flex size-10 items-center justify-center rounded-full bg-foreground font-sans font-black text-primary">{index + 1}</span><p className="relative mt-5 max-w-xs text-base font-semibold leading-7">{item}</p></div>)}</div>
             </section>
 
             {(hasHotel || hasFlight) && <div className={`grid gap-5 ${hasHotel && hasFlight ? "md:grid-cols-2" : ""}`}>
@@ -218,15 +219,30 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
               <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Warto wiedzieć</p><h2 className="mt-2 font-sans text-4xl font-black uppercase">Najczęstsze pytania</h2>
               <div className="mt-7 divide-y rounded-2xl border bg-card px-5">{faq.map((item) => <details key={item.question} className="group py-5"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">{item.question}<ChevronDown className="size-5 shrink-0 text-primary transition-transform group-open:rotate-180" /></summary><p className="max-w-2xl pt-3 text-sm leading-7 text-muted-foreground">{item.answer}</p></details>)}</div>
             </section>
-          </div>
 
-          <aside id="rezerwacja" className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
-            <div className="overflow-hidden rounded-2xl bg-foreground text-background shadow-xl">
-              <div className="border-b border-background/10 px-6 py-6"><div className="flex items-center gap-3"><TicketCheck className="size-6 text-primary" /><p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Rezerwacja</p></div><h2 className="mt-3 font-sans text-3xl font-black uppercase">Zarezerwuj swoje miejsce</h2><p className="mt-2 text-sm leading-6 text-background/60">Wyślij zapytanie. Sprawdzimy dostępność i wrócimy z konkretnym wariantem.</p><div className="mt-4 rounded-lg border border-background/10 bg-background/5 px-4 py-3"><p className="text-[10px] font-bold uppercase tracking-wider text-background/40">Wybrany mecz</p><p className="mt-1 text-sm font-semibold">{homeTeam} - {awayTeam}</p><p className="mt-1 text-xs text-background/50">{date}</p></div></div>
-              <div className="px-6 py-6"><InquiryForm matchName={`${homeTeam} - ${awayTeam}`} /></div>
-            </div>
-            <a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" className="mt-3 flex items-center justify-center gap-2 rounded-xl border bg-card px-5 py-4 text-sm font-bold transition-colors hover:border-primary"><MessageCircle className="size-5 text-primary" />Wolisz WhatsApp? Napisz do nas</a>
-          </aside>
+            <section id="rezerwacja" className="scroll-mt-24 overflow-hidden rounded-3xl bg-foreground text-background shadow-2xl">
+              <div className="grid lg:grid-cols-[380px_minmax(0,1fr)]">
+                <div className="relative overflow-hidden border-b border-background/10 p-6 md:p-8 lg:border-b-0 lg:border-r">
+                  <div className="absolute -right-20 -top-20 size-64 rounded-full bg-primary/15 blur-3xl" />
+                  <div className="relative">
+                    <div className="flex items-center gap-3"><TicketCheck className="size-6 text-primary" /><p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Rezerwacja</p></div>
+                    <h2 className="mt-4 font-sans text-4xl font-black uppercase leading-none">Zarezerwuj miejsce</h2>
+                    <p className="mt-4 text-sm leading-6 text-background/60">Wyślij zapytanie. Sprawdzimy aktualną dostępność i przygotujemy konkretny wariant wyjazdu.</p>
+                    <div className="mt-7 flex items-center gap-3"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-lg font-black text-background/35">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
+                    <h3 className="mt-5 font-sans text-2xl font-black uppercase">{homeTeam} - {awayTeam}</h3>
+                    <div className="mt-5 space-y-2 text-sm text-background/65"><p className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" />{date}</p><p className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || trip.city}</p></div>
+                    <div className="mt-7 border-t border-background/10 pt-6"><p className="text-xs font-bold uppercase tracking-wider text-background/40">Cena od / osoba</p><p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p></div>
+                    <Button variant="outline" size="lg" className="mt-6 w-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white" nativeButton={false} render={<a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
+                  </div>
+                </div>
+                <div className="p-6 md:p-8 lg:p-10">
+                  <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Formularz zapytania</p>
+                  <h3 className="mt-2 font-sans text-3xl font-black uppercase">Podaj swoje dane</h3>
+                  <p className="mb-7 mt-2 text-sm text-background/55">Oddzwonimy lub odpiszemy z potwierdzeniem dostępności.</p>
+                  <InquiryForm matchName={`${homeTeam} - ${awayTeam}`} />
+                </div>
+              </div>
+            </section>
         </div>
       </section>
 
