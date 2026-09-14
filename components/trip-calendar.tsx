@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowRight, CalendarDays, Clock3, MapPin, Plane } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { packageSummary, parsePackageItems } from "@/lib/package-options"
 import type { Trip } from "@/lib/trips"
 
 const monthFormatter = new Intl.DateTimeFormat("pl-PL", {
@@ -146,6 +147,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                 const status = availability[trip.availabilityStatus as keyof typeof availability] || availability.available
                 const { homeTeam, awayTeam } = getTeams(trip)
                 const stay = getStay(trip)
+                const packageOptions = parsePackageItems(trip.packageItems)
 
                 return (
                   <article key={trip.id} className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:border-primary/60 hover:shadow-lg">
@@ -166,6 +168,11 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                           </div>
                           <p className="mt-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-primary">{trip.city}, {trip.country}</p>
                           <h3 className="mt-1 font-sans text-2xl font-black uppercase leading-tight md:text-3xl">{homeTeam} - {awayTeam}</h3>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <span className="rounded-md bg-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-background">{packageSummary(trip.packageItems)}</span>
+                            {packageOptions.flight === "excluded" && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">Bez przelotu</span>}
+                            {packageOptions.hotel === "excluded" && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">Bez hotelu</span>}
+                          </div>
                         </div>
 
                         <dl className="grid content-center gap-3 text-sm">

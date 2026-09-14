@@ -8,7 +8,21 @@ export function ensureTripColumns() {
   if (!schemaPromise) {
     schemaPromise = (async () => {
       await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS teams (
+          id serial PRIMARY KEY,
+          name text NOT NULL UNIQUE,
+          city text NOT NULL,
+          country text NOT NULL,
+          stadium text NOT NULL,
+          logo text NOT NULL,
+          created_at timestamp NOT NULL DEFAULT now(),
+          updated_at timestamp NOT NULL DEFAULT now()
+        )
+      `)
+      await db.execute(sql`
         ALTER TABLE trips
+          ADD COLUMN IF NOT EXISTS home_team_id integer,
+          ADD COLUMN IF NOT EXISTS away_team_id integer,
           ADD COLUMN IF NOT EXISTS home_team text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS away_team text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS home_logo text NOT NULL DEFAULT '',
@@ -21,7 +35,16 @@ export function ensureTripColumns() {
           ADD COLUMN IF NOT EXISTS itinerary text[] NOT NULL DEFAULT '{}',
           ADD COLUMN IF NOT EXISTS hotel_info text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS flight_info text NOT NULL DEFAULT '',
-          ADD COLUMN IF NOT EXISTS faq text[] NOT NULL DEFAULT '{}'
+          ADD COLUMN IF NOT EXISTS faq text[] NOT NULL DEFAULT '{}',
+          ADD COLUMN IF NOT EXISTS package_items text[] NOT NULL DEFAULT '{}',
+          ADD COLUMN IF NOT EXISTS hotel_stars integer NOT NULL DEFAULT 0,
+          ADD COLUMN IF NOT EXISTS hotel_board text NOT NULL DEFAULT '',
+          ADD COLUMN IF NOT EXISTS room_type text NOT NULL DEFAULT '',
+          ADD COLUMN IF NOT EXISTS departure_airports text NOT NULL DEFAULT '',
+          ADD COLUMN IF NOT EXISTS flight_type text NOT NULL DEFAULT '',
+          ADD COLUMN IF NOT EXISTS baggage_info text NOT NULL DEFAULT '',
+          ADD COLUMN IF NOT EXISTS ticket_category text NOT NULL DEFAULT '',
+          ADD COLUMN IF NOT EXISTS seating_info text NOT NULL DEFAULT ''
       `)
     })().catch((error) => {
       schemaPromise = null

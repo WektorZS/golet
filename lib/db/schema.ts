@@ -1,5 +1,16 @@
 import { boolean, date, integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core"
 
+export const teams = pgTable("teams", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  city: text("city").notNull(),
+  country: text("country").notNull(),
+  stadium: text("stadium").notNull(),
+  logo: text("logo").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+})
+
 export const trips = pgTable("trips", {
   id: serial("id").primaryKey(),
   slug: text("slug").notNull().unique(),
@@ -11,6 +22,8 @@ export const trips = pgTable("trips", {
   endDate: date("end_date"),
   price: integer("price").notNull(),
   image: text("image").notNull(),
+  homeTeamId: integer("home_team_id"),
+  awayTeamId: integer("away_team_id"),
   homeTeam: text("home_team").notNull().default(""),
   awayTeam: text("away_team").notNull().default(""),
   homeLogo: text("home_logo").notNull().default(""),
@@ -24,6 +37,15 @@ export const trips = pgTable("trips", {
   hotelInfo: text("hotel_info").notNull().default(""),
   flightInfo: text("flight_info").notNull().default(""),
   faq: text("faq").array().notNull().default([]),
+  packageItems: text("package_items").array().notNull().default([]),
+  hotelStars: integer("hotel_stars").notNull().default(0),
+  hotelBoard: text("hotel_board").notNull().default(""),
+  roomType: text("room_type").notNull().default(""),
+  departureAirports: text("departure_airports").notNull().default(""),
+  flightType: text("flight_type").notNull().default(""),
+  baggageInfo: text("baggage_info").notNull().default(""),
+  ticketCategory: text("ticket_category").notNull().default(""),
+  seatingInfo: text("seating_info").notNull().default(""),
   status: text("status").notNull().default("published"),
   featured: boolean("featured").notNull().default(false),
   description: text("description").notNull().default(""),

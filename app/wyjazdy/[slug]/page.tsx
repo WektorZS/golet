@@ -9,6 +9,7 @@ import { InquiryForm } from "@/components/inquiry-form"
 import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
 import { getPublishedTestimonials, getSiteContent } from "@/lib/content"
+import { packageFeatures, packageSummary, parsePackageItems } from "@/lib/package-options"
 import { stripHtml } from "@/lib/sanitize-html"
 import { absoluteUrl } from "@/lib/site"
 import { getTripBySlug, getTripGallery } from "@/lib/trips"
@@ -75,6 +76,12 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   const status = availability[trip.availabilityStatus as keyof typeof availability] || availability.available
   const soldOut = trip.availabilityStatus === "sold_out"
   const teams = getTeams(trip.title, trip.opponent, trip.homeTeam, trip.awayTeam)
+  const packageOptions = parsePackageItems(trip.packageItems)
+  const includedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "included")
+  const optionalFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "optional")
+  const excludedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "excluded")
+  const hasHotel = packageOptions.hotel !== "excluded"
+  const hasFlight = packageOptions.flight !== "excluded"
   const homeTeam = teams.home
   const awayTeam = teams.away
   const computedNights = trip.endDate && trip.endDate !== trip.startDate && trip.durationDays === 1 && trip.durationNights === 0
@@ -105,7 +112,14 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
     offers: { "@type": "Offer", url: absoluteUrl(`/wyjazdy/${trip.slug}`), price: trip.price, priceCurrency: "PLN", availability: `https://schema.org/${status.schema}`, seller: { "@id": absoluteUrl("/#organization") } },
   }
 
-  const navItems = [["Opis", "opis"], ["W cenie", "w-cenie"], ["Plan wyjazdu", "plan"], ["Hotel", "hotel"], ["Loty", "loty"], ["Zdjęcia", "zdjecia"], ["Opinie", "opinie"], ["FAQ", "faq"]]
+  const defaultPlan = [
+    hasFlight ? "Wylot z wybranego lotniska i przejazd do miasta" : "Dojazd do miasta we własnym zakresie",
+    ...(hasHotel ? ["Zakwaterowanie w hotelu i czas wolny"] : []),
+    "Dzień meczowy i wejście na stadion",
+    "Czas na poznanie miasta",
+    hasFlight ? "Lot powrotny do Polski" : "Powrót we własnym zakresie",
+  ]
+  const navItems = [["Opis", "opis"], ["Zakres pakietu", "w-cenie"], ["Plan wyjazdu", "plan"], ...(hasHotel ? [["Hotel", "hotel"]] : []), ...(hasFlight ? [["Loty", "loty"]] : []), ["Zdjęcia", "zdjecia"], ["Opinie", "opinie"], ["FAQ", "faq"]]
 
   return (
     <main className="bg-background">
@@ -129,6 +143,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
                 <span className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || `Stadion w ${trip.city}`}</span>
                 <span className="flex items-center gap-2"><Clock3 className="size-4 text-primary" />{formatStay(computedDays, computedNights)}</span>
               </div>
+              <span className="mt-5 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85 backdrop-blur">{packageSummary(trip.packageItems)}</span>
             </div>
 
             <div className="w-full rounded-2xl border border-white/15 bg-black/55 p-5 shadow-2xl backdrop-blur-md lg:w-80">
@@ -158,21 +173,26 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
             </section>
 
             <section id="w-cenie" className="scroll-mt-24">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Pełny pakiet</p>
-              <h2 className="mt-2 font-sans text-4xl font-black uppercase">W cenie</h2>
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">{(trip.includes.length > 0 ? trip.includes : ["Bilet na mecz", "Przelot i nocleg", "Opieka koordynatora", "Wsparcie przed wyjazdem"]).map((item) => <div key={item} className="flex items-center gap-3 rounded-xl border bg-card p-4 font-semibold"><span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/15"><Check className="size-4 text-primary" /></span>{item}</div>)}</div>
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">{packageSummary(trip.packageItems)}</p>
+              <h2 className="mt-2 font-sans text-4xl font-black uppercase">Zakres pakietu</h2>
+              <div className="mt-7 grid gap-6 lg:grid-cols-3">
+                <div><h3 className="font-sans text-lg font-black uppercase">W cenie</h3><div className="mt-3 space-y-2">{[...includedFeatures.map((item) => item.label), ...trip.includes].map((item) => <div key={item} className="flex items-center gap-3 rounded-xl border bg-card p-4 font-semibold"><span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/15"><Check className="size-4 text-emerald-600" /></span>{item}</div>)}</div></div>
+                <div><h3 className="font-sans text-lg font-black uppercase">Opcjonalnie</h3><div className="mt-3 space-y-2">{optionalFeatures.length > 0 ? optionalFeatures.map((item) => <div key={item.key} className="rounded-xl border border-primary/30 bg-primary/5 p-4 font-semibold">{item.label}</div>) : <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">Brak dodatkowych opcji.</p>}</div></div>
+                <div><h3 className="font-sans text-lg font-black uppercase">We własnym zakresie</h3><div className="mt-3 space-y-2">{excludedFeatures.length > 0 ? excludedFeatures.map((item) => <div key={item.key} className="rounded-xl border bg-secondary/50 p-4 font-semibold text-muted-foreground">{item.label}</div>) : <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">Pakiet obejmuje wszystkie główne elementy.</p>}</div></div>
+              </div>
+              {(trip.ticketCategory || trip.seatingInfo) && <div className="mt-5 rounded-2xl bg-foreground p-5 text-background"><div className="flex items-center gap-3"><TicketCheck className="size-6 text-primary" /><div><p className="font-bold">Bilet na mecz{trip.ticketCategory ? ` - ${trip.ticketCategory}` : ""}</p>{trip.seatingInfo && <p className="mt-1 text-sm text-background/65">{trip.seatingInfo}</p>}</div></div></div>}
             </section>
 
             <section id="plan" className="scroll-mt-24">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Krok po kroku</p>
               <h2 className="mt-2 font-sans text-4xl font-black uppercase">Plan wyjazdu</h2>
-              <div className="mt-7">{(trip.itinerary.length > 0 ? trip.itinerary : ["Wylot z wybranego lotniska i przejazd do hotelu", "Dzień meczowy i wejście na stadion", "Czas na zwiedzanie miasta", "Powrót do Polski"]).map((item, index, items) => <div key={`${item}-${index}`} className="grid grid-cols-[44px_1fr] gap-4"><div className="flex flex-col items-center"><span className="flex size-10 items-center justify-center rounded-full bg-foreground font-sans font-black text-primary">{index + 1}</span>{index < items.length - 1 && <span className="min-h-10 w-px flex-1 bg-border" />}</div><p className="pb-7 pt-2 text-base leading-7 text-muted-foreground">{item}</p></div>)}</div>
+              <div className="mt-7">{(trip.itinerary.length > 0 ? trip.itinerary : defaultPlan).map((item, index, items) => <div key={`${item}-${index}`} className="grid grid-cols-[44px_1fr] gap-4"><div className="flex flex-col items-center"><span className="flex size-10 items-center justify-center rounded-full bg-foreground font-sans font-black text-primary">{index + 1}</span>{index < items.length - 1 && <span className="min-h-10 w-px flex-1 bg-border" />}</div><p className="pb-7 pt-2 text-base leading-7 text-muted-foreground">{item}</p></div>)}</div>
             </section>
 
-            <div className="grid gap-5 md:grid-cols-2">
-              <section id="hotel" className="scroll-mt-24 rounded-2xl bg-foreground p-6 text-background md:p-7"><BedDouble className="size-7 text-primary" /><p className="mt-5 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Nocleg</p><h2 className="mt-2 font-sans text-3xl font-black uppercase">Hotel</h2><p className="mt-4 whitespace-pre-line leading-7 text-background/65">{trip.hotelInfo || "Wygodny hotel w dobrze skomunikowanej części miasta. Dokładny obiekt potwierdzimy przed rezerwacją."}</p></section>
-              <section id="loty" className="scroll-mt-24 rounded-2xl bg-primary p-6 text-primary-foreground md:p-7"><Plane className="size-7" /><p className="mt-5 font-mono text-xs font-bold uppercase tracking-[0.2em] opacity-60">Podróż</p><h2 className="mt-2 font-sans text-3xl font-black uppercase">Loty</h2><p className="mt-4 whitespace-pre-line leading-7 opacity-75">{trip.flightInfo || "Dobieramy najwygodniejsze połączenie z lotniska najbliżej uczestnika. Godziny potwierdzamy po ustaleniu wariantu."}</p></section>
-            </div>
+            {(hasHotel || hasFlight) && <div className={`grid gap-5 ${hasHotel && hasFlight ? "md:grid-cols-2" : ""}`}>
+              {hasHotel && <section id="hotel" className="scroll-mt-24 rounded-2xl bg-foreground p-6 text-background md:p-7"><BedDouble className="size-7 text-primary" /><p className="mt-5 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">{packageOptions.hotel === "optional" ? "Opcja dodatkowa" : "W pakiecie"}</p><h2 className="mt-2 font-sans text-3xl font-black uppercase">Hotel{trip.hotelStars > 0 ? ` ${trip.hotelStars}*` : ""}</h2><p className="mt-4 whitespace-pre-line leading-7 text-background/65">{trip.hotelInfo || "Dokładny obiekt potwierdzimy przed rezerwacją."}</p>{(trip.hotelBoard || trip.roomType) && <div className="mt-5 flex flex-wrap gap-2">{trip.hotelBoard && <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">{trip.hotelBoard}</span>}{trip.roomType && <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">{trip.roomType}</span>}</div>}</section>}
+              {hasFlight && <section id="loty" className="scroll-mt-24 rounded-2xl bg-primary p-6 text-primary-foreground md:p-7"><Plane className="size-7" /><p className="mt-5 font-mono text-xs font-bold uppercase tracking-[0.2em] opacity-60">{packageOptions.flight === "optional" ? "Opcja dodatkowa" : "W pakiecie"}</p><h2 className="mt-2 font-sans text-3xl font-black uppercase">Loty</h2><p className="mt-4 whitespace-pre-line leading-7 opacity-75">{trip.flightInfo || "Godziny i połączenie potwierdzamy po ustaleniu wariantu."}</p>{(trip.departureAirports || trip.flightType || trip.baggageInfo) && <div className="mt-5 space-y-2 text-sm"><p>{trip.departureAirports && <><strong>Lotniska: </strong>{trip.departureAirports}</>}</p><p>{trip.flightType && <><strong>Rodzaj lotu: </strong>{trip.flightType}</>}</p><p>{trip.baggageInfo && <><strong>Bagaż: </strong>{trip.baggageInfo}</>}</p></div>}</section>}
+            </div>}
 
             <section id="zdjecia" className="scroll-mt-24">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Zobacz atmosferę</p><h2 className="mt-2 font-sans text-4xl font-black uppercase">Zdjęcia</h2>

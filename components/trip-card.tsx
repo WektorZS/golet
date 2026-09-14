@@ -9,6 +9,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { packageSummary, parsePackageItems } from "@/lib/package-options"
 import type { Trip } from "@/lib/trips"
 
 const dateFormatter = new Intl.DateTimeFormat("pl-PL", {
@@ -30,6 +31,8 @@ function formatTripDates(startDate: string, endDate: string | null) {
 }
 
 export function TripCard({ trip }: { trip: Trip }) {
+  const packageOptions = parsePackageItems(trip.packageItems)
+
   return (
     <article
       className={`group relative flex h-full flex-col overflow-hidden rounded-xl border bg-card transition-all duration-300 hover:-translate-y-1 ${
@@ -60,7 +63,7 @@ export function TripCard({ trip }: { trip: Trip }) {
           </Badge>
         ) : (
           <Badge className="absolute left-4 top-4 rounded-md bg-primary text-primary-foreground">
-            Pełny pakiet
+            {packageSummary(trip.packageItems)}
           </Badge>
         )}
 
@@ -84,8 +87,13 @@ export function TripCard({ trip }: { trip: Trip }) {
 
           <span className="flex items-center gap-2">
             <MapPin aria-hidden="true" />
-            Wylot z dowolnego lotniska
+            {packageOptions.flight === "excluded" ? "Dojazd we własnym zakresie" : trip.departureAirports || "Lotnisko ustalane indywidualnie"}
           </span>
+          <div className="flex flex-wrap gap-2 pt-1">
+            {packageOptions.hotel === "excluded" && <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-foreground">Bez hotelu</span>}
+            {packageOptions.flight === "excluded" && <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-foreground">Bez przelotu</span>}
+            {trip.hotelStars > 0 && packageOptions.hotel !== "excluded" && <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-foreground">Hotel {trip.hotelStars}*</span>}
+          </div>
         </div>
 
         <div className="mt-auto flex items-end justify-between gap-3 border-t pt-4">
@@ -112,3 +120,4 @@ export function TripCard({ trip }: { trip: Trip }) {
     </article>
   )
 }
+

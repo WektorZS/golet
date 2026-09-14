@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 34696)
+Total output lines: 4618
+
 
 "use client"
 
@@ -34,6 +37,7 @@ import {
   Settings,
   ShieldCheck,
   Star,
+  Trophy,
   Upload,
   XCircle,
 } from "lucide-react"
@@ -49,6 +53,9 @@ import {
   removeGalleryItem,
   type SaveSettingsState,
   type SaveTripState,
+  type SaveTeamState,
+  deleteTeam,
+  saveTeam,
   saveSettings,
   deleteInquiry,
   saveTestimonial,
@@ -104,6 +111,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { DeleteTripDialog } from "@/components/delete-trip-dialog"
+import { packageFeatures, parsePackageItems } from "@/lib/package-options"
 
 import {
   DndContext,
@@ -124,6 +132,7 @@ import { CSS } from "@dnd-kit/utilities"
 
 export type AdminData = {
   trips: any[]
+  teams: any[]
   inquiries: any[]
   testimonials: any[]
   media: any[]
@@ -138,6 +147,7 @@ export type AdminData = {
 const sections = [
   ["dashboard", "Pulpit", LayoutDashboard],
   ["trips", "Wyjazdy", Plane],
+  ["teams", "Drużyny", Trophy],
   ["media", "Media i galerie", FileImage],
   ["content", "Treści strony", BookOpen],
   ["testimonials", "Opinie", Star],
@@ -489,6 +499,7 @@ const [tripSort, setTripSort] = useState("nearest")
 
               <CardContent className="grid gap-3 sm:grid-cols-3">
                 <TripDialog
+                  teams={data.teams}
                   trigger={
                     <Button>
                       <Plus />
@@ -880,6 +891,7 @@ const [tripSort, setTripSort] = useState("nearest")
     description="Twórz, edytuj, publikuj, duplikuj i archiwizuj oferty."
     action={
       <TripDialog
+        teams={data.teams}
         trigger={
           <Button>
             <Plus />
@@ -1029,6 +1041,7 @@ const [tripSort, setTripSort] = useState("nearest")
                       <div className="flex justify-end gap-2">
                         <TripDialog
                           trip={trip}
+                          teams={data.teams}
                           trigger={
                             <Button
                               size="icon-sm"
@@ -1111,6 +1124,39 @@ const [tripSort, setTripSort] = useState("nearest")
     </CardContent>
   </Card>
 </TabsContent>
+
+        <TabsContent value="teams">
+          <SectionHeader
+            eyebrow="Baza danych"
+            title="Drużyny"
+            description="Dodaj drużynę raz. Jej herb, stadion i lokalizacja będą automatycznie używane przy kolejnych wyjazdach."
+            action={<TeamDialog trigger={<Button><Plus />Nowa drużyna</Button>} />}
+          />
+
+          {data.teams.length === 0 ? (
+            <Card><CardContent className="flex min-h-56 flex-col items-center justify-center text-center"><Trophy className="mb-3 size-10 text-primary" /><h3 className="font-sans text-2xl font-black uppercase">Dodaj pierwszą drużynę</h3><p className="mt-2 max-w-lg text-sm text-muted-foreground">Po zapisaniu drużyny będzie można wybrać ją jako gospodarza lub gościa w formularzu wyjazdu.</p></CardContent></Card>
+          ) : (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader><TableRow><TableHead>Drużyna</TableHead><TableHead>Stadion</TableHead><TableHead>Lokalizacja</TableHead><TableHead className="text-right">Operacje</TableHead></TableRow></TableHeader>
+                    <TableBody>
+                      {data.teams.map((team) => (
+                        <TableRow key={team.id}>
+                          <TableCell><div className="flex items-center gap-3"><span className="relative block size-12 shrink-0 rounded-lg bg-secondary p-1"><Image src={team.logo} alt={`Herb ${team.name}`} fill className="object-contain p-1" sizes="48px" /></span><strong>{team.name}</strong></div></TableCell>
+                          <TableCell>{team.stadium}</TableCell>
+                          <TableCell>{team.city}, {team.country}</TableCell>
+                          <TableCell><div className="flex justify-end gap-2"><TeamDialog team={team} trigger={<Button size="icon-sm" variant="outline" title="Edytuj drużynę"><Pencil /><span className="sr-only">Edytuj</span></Button>} /><TeamDeleteButton team={team} /></div></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
 
         <TabsContent value="media">
           <SectionHeader
@@ -1806,677 +1852,7 @@ const [tripSort, setTripSort] = useState("nearest")
         >
           {formatInquiryDate(
             lead.createdAt
-          )}
-        </time>
-      </div>
-    )
-  })()
-) : null}
-            </div>
-          </CardHeader>
-
-          <CardContent className="pt-0">
-            <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
-
-              <div className="rounded-xl border bg-muted/30 p-4">
-                <div className="mb-3 flex items-center gap-2">
-                  <Plane className="size-4 text-primary" />
-
-                  <p className="text-sm font-semibold">
-                    Szczegóły wyjazdu
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Mecz
-                    </p>
-
-                    <p className="mt-0.5 font-semibold">
-                      {lead.matchName}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                        Skąd wylot
-                      </p>
-
-                      <p className="mt-0.5 text-sm font-medium">
-                        {lead.departureCity}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                        Liczba osób
-                      </p>
-
-                      <p className="mt-0.5 text-sm font-medium">
-                        {lead.travelers} os.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Wiadomość
-                    </p>
-
-                    <p className="mt-1 text-sm leading-6">
-                      {lead.message ||
-                        "Brak dodatkowej wiadomości."}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <form
-                action={updateInquiry}
-                className="rounded-xl border p-4"
-              >
-                <input
-                  type="hidden"
-                  name="id"
-                  value={lead.id}
-                />
-
-                <div className="mb-4 flex items-center gap-2">
-                  <Settings className="size-4 text-primary" />
-
-                  <div>
-                    <p className="text-sm font-semibold">
-                      Obsługa zapytania
-                    </p>
-
-                    <p className="text-xs text-muted-foreground">
-                      Ustaw status i dodaj prywatną notatkę.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid gap-4">
-                  <Field
-                    label="Status kontaktu"
-                    hint=""
-                  >
-                    <select
-                      name="status"
-                      defaultValue={
-                        lead.status
-                      }
-                      className="h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option value="new">
-                        Nowe
-                      </option>
-
-                      <option value="contacted">
-                        Skontaktowano
-                      </option>
-
-                      <option value="closed">
-                        Zamknięte
-                      </option>
-                    </select>
-                  </Field>
-
-                  <Field
-                    label="Notatka dla Ciebie"
-                    hint="Prywatna informacja widoczna tylko w panelu."
-                  >
-                    <Textarea
-                      name="adminNote"
-                      defaultValue={
-                        lead.adminNote
-                      }
-                      placeholder="Np. Klient czeka na potwierdzenie terminu..."
-                      rows={3}
-                    />
-                  </Field>
-
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-  <Button
-    type="submit"
-    size="sm"
-    className="w-full sm:w-auto"
-  >
-    Zapisz obsługę
-  </Button>
-
-  {lead.status === "closed" ? (
-  <Button
-    type="submit"
-    formAction={deleteInquiry}
-    size="sm"
-    variant="outline"
-    className="w-full border-red-500/40 text-red-600 hover:bg-red-500/10 hover:text-red-600 sm:w-auto"
-    onClick={(event) => {
-      if (
-        !window.confirm(
-          `Czy na pewno chcesz usunąć zapytanie klienta „${lead.name}”? Ta operacja jest nieodwracalna.`
-        )
-      ) {
-        event.preventDefault()
-      }
-    }}
-  >
-    <XCircle />
-    Usuń zapytanie
-  </Button>
-) : null}
-</div>
-                </div>
-              </form>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-
-    {data.inquiries.filter(
-      (lead) => lead.status === inquiryTab
-    ).length === 0 ? (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="flex size-14 items-center justify-center rounded-full bg-muted">
-            {inquiryTab === "new" ? (
-              <Inbox className="size-6 text-muted-foreground" />
-            ) : inquiryTab === "contacted" ? (
-              <MessageCircle className="size-6 text-muted-foreground" />
-            ) : (
-              <CheckCircle2 className="size-6 text-muted-foreground" />
-            )}
-          </div>
-
-          <h3 className="mt-4 font-semibold">
-            {inquiryTab === "new"
-              ? "Brak nowych zapytań"
-              : inquiryTab === "contacted"
-                ? "Brak zapytań w trakcie kontaktu"
-                : "Brak zamkniętych zapytań"}
-          </h3>
-
-          <p className="mt-1 max-w-md text-sm text-muted-foreground">
-            {inquiryTab === "new"
-              ? "Świetnie — wszystkie zapytania zostały obsłużone."
-              : inquiryTab === "contacted"
-                ? "Nie masz obecnie klientów oczekujących na dalszą obsługę."
-                : "Zamknięte zapytania pojawią się tutaj."}
-          </p>
-        </CardContent>
-      </Card>
-    ) : null}
-  </div>
-</TabsContent>
-
-      <TabsContent value="account">
-  <SectionHeader
-    eyebrow="Konto"
-    title="Bezpieczeństwo"
-    description="Zarządzaj dostępem do panelu administratora i zabezpiecz swoje konto."
-  />
-
-  <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-    <Card>
-      <CardHeader>
-        <div className="flex items-start gap-3">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <KeyRound className="size-5" />
-          </div>
-
-          <div>
-            <CardTitle>
-              Zmiana hasła
-            </CardTitle>
-
-            <CardDescription className="mt-1">
-              Regularna zmiana hasła pomaga
-              chronić dostęp do panelu.
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <ChangePasswordForm />
-      </CardContent>
-    </Card>
-
-    <div className="flex flex-col gap-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-start gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <ShieldCheck className="size-5" />
-            </div>
-
-            <div>
-              <CardTitle>
-                Administrator
-              </CardTitle>
-
-              <CardDescription className="mt-1">
-                Konto z pełnym dostępem do panelu.
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary font-black text-primary-foreground">
-              {data.email
-                ?.charAt(0)
-                .toUpperCase() || "A"}
-            </span>
-
-            <div className="min-w-0">
-              <p className="truncate font-medium">
-                {data.email}
-              </p>
-
-              <div className="mt-1 flex items-center gap-2">
-                <span className="size-1.5 rounded-full bg-primary" />
-
-                <span className="text-xs text-muted-foreground">
-                  Dostęp administratora
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-xl border bg-muted/30 p-3.5">
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Dostęp do panelu jest przyznawany
-              wyłącznie zatwierdzonemu adresowi
-              e-mail administratora.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            Dodatkowa ochrona
-          </CardTitle>
-
-          <CardDescription>
-            Ważne informacje dotyczące bezpieczeństwa
-            konta.
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="flex flex-col gap-3">
-          <div className="flex items-start gap-3">
-            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
-
-            <p className="text-sm text-muted-foreground">
-              Operacje administracyjne wymagają
-              aktywnej sesji administratora.
-            </p>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
-
-            <p className="text-sm text-muted-foreground">
-              Przy zmianie hasła możesz wylogować
-              wszystkie pozostałe urządzenia.
-            </p>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
-
-            <p className="text-sm text-muted-foreground">
-              Dostęp do panelu jest ograniczony do
-              konta administratora.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  </div>
-</TabsContent>
-      </main>
-    </Tabs>
-  )
-}
-
-function SectionHeader({
-  eyebrow,
-  title,
-  description,
-  action,
-}: {
-  eyebrow: string
-  title: string
-  description: string
-  action?: React.ReactNode
-}) {
-  return (
-    <header className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-      <div>
-        <p className="inline-block bg-black px-2.5 py-1 font-mono text-xs uppercase tracking-[0.18em] text-primary">
-          {eyebrow}
-        </p>
-
-        <h1 className="text-balance font-sans text-3xl font-black uppercase md:text-4xl">
-          {title}
-        </h1>
-
-        <p className="mt-1 text-muted-foreground">
-          {description}
-        </p>
-      </div>
-
-      {action}
-    </header>
-  )
-}
-
-function Metric({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Plane
-  label: string
-  value: number
-}) {
-  return (
-    <Card>
-      <CardContent className="flex items-center gap-4 py-1">
-        <span className="flex size-11 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <Icon />
-        </span>
-
-        <div>
-          <p className="text-3xl font-black">
-            {value}
-          </p>
-
-          <p className="text-sm text-muted-foreground">
-            {label}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function isTripExpired(trip: any) {
-  if (!trip?.startDate) return false
-
-  const today = new Date()
-  const todayString = today.toISOString().split("T")[0]
-
-  return trip.startDate < todayString
-}
-
-function StatusBadge({
-  status,
-  expired = false,
-}: {
-  status: string
-  expired?: boolean
-}) {
-  const labels: Record<string, string> = {
-    published: "Opublikowane",
-    draft: "Szkic",
-    archived: "Archiwum",
-    new: "Nowe",
-    contacted: "Kontakt",
-    closed: "Zamknięte",
-  }
-
- if (expired) {
-  return (
-    <Badge
-      variant="outline"
-      className="gap-1.5 border-red-500/50 bg-red-500/10 text-black dark:border-red-400/50 dark:bg-red-400/10 dark:text-red-400"
-    >
-      <AlertCircle className="size-3.5" />
-      Po terminie
-    </Badge>
-  )
-}
-  return (
-    <Badge
-      variant={
-        status === "published" ||
-        status === "new"
-          ? "default"
-          : "secondary"
-      }
-    >
-      {labels[status] || status}
-    </Badge>
-  )
-}
-function ImageDropzone({
-  name,
-  accept = "image/jpeg,image/png,image/webp,image/avif",
-  required = false,
-  currentImage,
-}: {
-  name: string
-  accept?: string
-  required?: boolean
-  currentImage?: string
-}) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [fileName, setFileName] = useState("")
-
-  const setFiles = (files: FileList | null) => {
-    if (!files || !files.length || !inputRef.current) return
-
-    const file = files[0]
-
-    // Ustawiamy plik również w prawdziwym input[type=file],
-    // dzięki czemu zostanie wysłany normalnie przez FormData.
-    const dataTransfer = new DataTransfer()
-    dataTransfer.items.add(file)
-    inputRef.current.files = dataTransfer.files
-
-    setFileName(file.name)
-  }
-
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
-
-    setIsDragging(false)
-    setFiles(event.dataTransfer.files)
-  }
-
-  return (
-    <div
-      onDragOver={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        setIsDragging(true)
-      }}
-      onDragEnter={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        setIsDragging(true)
-      }}
-      onDragLeave={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-
-        // Nie wyłączaj stanu przy przejściu między elementami wewnątrz dropzone.
-        if (event.currentTarget === event.target) {
-          setIsDragging(false)
-        }
-      }}
-      onDrop={handleDrop}
-      onClick={() => inputRef.current?.click()}
-      className={[
-        "relative flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-8 text-center transition-all",
-        isDragging
-          ? "border-primary bg-primary/10"
-          : "border-muted-foreground/25 bg-muted/20 hover:border-primary/50 hover:bg-muted/40",
-      ].join(" ")}
-    >
-      <input
-        ref={inputRef}
-        name={name}
-        type="file"
-        accept={accept}
-        required={required}
-        className="sr-only"
-        onChange={(event) => {
-          setFiles(event.target.files)
-        }}
-      />
-
-      {currentImage && !fileName ? (
-        <div className="relative mb-4 aspect-video w-full max-w-xs overflow-hidden rounded-lg border bg-muted">
-          <Image
-            src={currentImage}
-            alt="Aktualne zdjęcie główne wyjazdu"
-            fill
-            sizes="320px"
-            className="object-cover"
-          />
-        </div>
-      ) : (
-        <Upload
-          className={[
-            "mb-3 size-8 transition-transform",
-            isDragging ? "scale-110 text-primary" : "text-muted-foreground",
-          ].join(" ")}
-        />
-      )}
-
-      {fileName ? (
-        <>
-          <p className="font-medium">
-            {fileName}
-          </p>
-
-          <p className="mt-1 text-xs text-muted-foreground">
-            Kliknij lub upuść inne zdjęcie, aby je zmienić
-          </p>
-        </>
-      ) : (
-        <>
-          <p className="font-medium">
-            Przeciągnij i upuść zdjęcie tutaj
-          </p>
-
-          <p className="mt-1 text-sm text-muted-foreground">
-            lub kliknij, aby wybrać plik z komputera
-          </p>
-
-          <p className="mt-3 text-xs text-muted-foreground">
-            JPEG, PNG, WebP lub AVIF
-          </p>
-        </>
-      )}
-    </div>
-  )
-}
-
-function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string
-  hint?: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <Label className="flex items-center gap-2">
-        {label}
-
-        {hint ? (
-          <span
-            title={hint}
-            aria-label={hint}
-            className="cursor-help text-muted-foreground"
-          >
-            <HelpCircle className="size-4" />
-          </span>
-        ) : null}
-      </Label>
-
-      {children}
-
-      {hint ? (
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          {hint}
-        </p>
-      ) : null}
-    </div>
-  )
-}
-
-const initialSaveSettingsState: SaveSettingsState = {}
-
-function YouTubeSettingsForm({
-  settings,
-}: {
-  settings: Record<string, string>
-}) {
-  const [state, action, pending] = useActionState(
-    saveSettings,
-    initialSaveSettingsState
-  )
-
-  return (
-    <form action={action} className="flex flex-col gap-6">
-      <Field
-        label="Adres kanału YouTube"
-        hint="Wklej adres swojego kanału YouTube. Możesz skopiować go bezpośrednio z paska adresu przeglądarki."
-      >
-        <Input
-          name="setting.youtubeUrl"
-          type="url"
-          defaultValue={settings.youtubeUrl}
-          placeholder="https://www.youtube.com/@twojkanal"
-          className="h-10"
-        />
-      </Field>
-
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field
-          label="Liczba filmów"
-          hint="Wybierz, ile najnowszych filmów ma być wyświetlanych na stronie."
-        >
-          <Input
-            name="setting.youtubeLimit"
-            type="number"
-            min="1"
-            max="12"
-            defaultValue={settings.youtubeLimit || "6"}
-            className="h-10"
-          />
-        </Field>
-
-        <Field
-          label="Widoczność filmów"
-          hint="Możesz tymczasowo ukryć całą sekcję YouTube bez usuwania ustawień."
-        >
-          <select
-            name="setting.youtubeEnabled"
-            defaultValue={settings.youtubeEnabled || "true"}
-            className="h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="true">Sekcja włączona</option>
-            <option value="false">Sekcja wyłączona</option>
-          </select>
-        </Field>
-      </div>
-
+        …4696 tokens truncated…
       {state.error ? (
         <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
@@ -2923,13 +2299,56 @@ function ChangePasswordForm() {
   )
 }
 
+const initialTeamState: SaveTeamState = {}
+
+function TeamDialog({ team, trigger }: { team?: any; trigger: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const [state, action, pending] = useActionState(saveTeam, initialTeamState)
+
+  useEffect(() => {
+    if (!state.success) return
+    toast.success(team ? "Dane drużyny zostały zapisane." : "Drużyna została dodana.")
+    setOpen(false)
+  }, [state.success, team])
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger render={trigger as React.ReactElement} />
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+        <DialogHeader><DialogTitle>{team ? "Edytuj drużynę" : "Nowa drużyna"}</DialogTitle><DialogDescription>Te dane będą automatycznie podpowiadane podczas tworzenia wyjazdu.</DialogDescription></DialogHeader>
+        <form action={action} className="grid gap-4 sm:grid-cols-2">
+          {team && <input type="hidden" name="id" value={team.id} />}
+          <div className="sm:col-span-2"><Field label="Nazwa drużyny" hint="Pełna, oficjalna nazwa widoczna na stronie."><Input name="name" defaultValue={team?.name} required /></Field></div>
+          <Field label="Miasto" hint="Domyślne miasto rozgrywania meczów."><Input name="city" defaultValue={team?.city} required /></Field>
+          <Field label="Kraj" hint="Domyślny kraj drużyny."><Input name="country" defaultValue={team?.country} required /></Field>
+          <div className="sm:col-span-2"><Field label="Stadion" hint="Domyślny stadion gospodarza."><Input name="stadium" defaultValue={team?.stadium} required /></Field></div>
+          <div className="sm:col-span-2"><Field label="Herb" hint="Plik zostanie zmniejszony do maksymalnie 128 x 128 px i zapisany jako WebP."><ImageDropzone name="logoFile" accept="image/png,image/webp,image/jpeg,image/avif" required={!team?.logo} currentImage={team?.logo} /></Field></div>
+          {state.error && <p role="alert" className="text-sm text-destructive sm:col-span-2">{state.error}</p>}
+          <DialogFooter className="sm:col-span-2"><Button type="submit" disabled={pending}>{pending ? "Zapisuję..." : "Zapisz drużynę"}</Button></DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function TeamDeleteButton({ team }: { team: any }) {
+  const [state, action, pending] = useActionState(deleteTeam, initialTeamState)
+  useEffect(() => {
+    if (state.error) toast.error(state.error)
+    if (state.success) toast.success("Drużyna została usunięta.")
+  }, [state])
+  return <form action={action}><input type="hidden" name="id" value={team.id} /><Button type="submit" size="icon-sm" variant="outline" disabled={pending} title="Usuń drużynę"><XCircle /><span className="sr-only">Usuń</span></Button></form>
+}
+
 const initialTripState: SaveTripState = {}
 
 function TripDialog({
   trip,
+  teams,
   trigger,
 }: {
   trip?: any
+  teams: any[]
   trigger: React.ReactNode
 }) {
   const [open, setOpen] =
@@ -2943,6 +2362,35 @@ function TripDialog({
     saveTrip,
     initialTripState
   )
+  const [homeTeamId, setHomeTeamId] = useState(String(trip?.homeTeamId || ""))
+  const [awayTeamId, setAwayTeamId] = useState(String(trip?.awayTeamId || ""))
+  const [title, setTitle] = useState(trip?.title || "")
+  const [city, setCity] = useState(trip?.city || "")
+  const [country, setCountry] = useState(trip?.country || "")
+  const [stadium, setStadium] = useState(trip?.stadium || "")
+  const packageValues = parsePackageItems(trip?.packageItems)
+
+  const updateTitle = (homeId: string, awayId: string) => {
+    const home = teams.find((team) => String(team.id) === homeId)
+    const away = teams.find((team) => String(team.id) === awayId)
+    if (home && away) setTitle(`${home.name} vs ${away.name}`)
+  }
+
+  const selectHomeTeam = (value: string) => {
+    setHomeTeamId(value)
+    const team = teams.find((item) => String(item.id) === value)
+    if (team) {
+      setCity(team.city)
+      setCountry(team.country)
+      setStadium(team.stadium)
+    }
+    updateTitle(value, awayTeamId)
+  }
+
+  const selectAwayTeam = (value: string) => {
+    setAwayTeamId(value)
+    updateTitle(homeTeamId, value)
+  }
 
   useEffect(() => {
     if (!state.success) return
@@ -3000,9 +2448,8 @@ function TripDialog({
           >
             <Input
               name="title"
-              defaultValue={
-                trip?.title
-              }
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
               required
             />
           </Field>
@@ -3020,38 +2467,29 @@ function TripDialog({
             />
           </Field>
 
-          <Field
-            label="Miasto"
-            hint="Miasto, w którym odbywa się mecz."
-          >
-            <Input
-              name="city"
-              defaultValue={
-                trip?.city
-              }
-              required
-            />
+          <Field label="Gospodarz" hint="Po wyborze uzupełnimy stadion, miasto, kraj i herb.">
+            <select name="homeTeamId" value={homeTeamId} onChange={(event) => selectHomeTeam(event.target.value)} required className="h-9 rounded-lg border bg-background px-3">
+              <option value="">Wybierz drużynę</option>
+              {teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
+            </select>
           </Field>
 
-          <Field
-            label="Gospodarz"
-            hint="Pełna nazwa pierwszego zespołu widoczna przy herbie."
-          >
-            <Input name="homeTeam" defaultValue={trip?.homeTeam} required />
+          <Field label="Gość" hint="Herb i nazwa zostaną pobrane z katalogu drużyn.">
+            <select name="awayTeamId" value={awayTeamId} onChange={(event) => selectAwayTeam(event.target.value)} required className="h-9 rounded-lg border bg-background px-3">
+              <option value="">Wybierz drużynę</option>
+              {teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
+            </select>
           </Field>
 
-          <Field
-            label="Gość"
-            hint="Pełna nazwa drugiego zespołu widoczna przy herbie."
-          >
-            <Input name="awayTeam" defaultValue={trip?.awayTeam} required />
+          <Field label="Miasto" hint="Uzupełniane z drużyny gospodarza. Możesz zmienić dla tego meczu.">
+            <Input name="city" value={city} onChange={(event) => setCity(event.target.value)} required />
           </Field>
 
           <Field
             label="Stadion"
             hint="Nazwa stadionu, na którym odbędzie się mecz."
           >
-            <Input name="stadium" defaultValue={trip?.stadium} required />
+            <Input name="stadium" value={stadium} onChange={(event) => setStadium(event.target.value)} required />
           </Field>
 
           <Field
@@ -3067,9 +2505,8 @@ function TripDialog({
           >
             <Input
               name="country"
-              defaultValue={
-                trip?.country
-              }
+              value={country}
+              onChange={(event) => setCountry(event.target.value)}
               required
             />
           </Field>
@@ -3199,17 +2636,6 @@ function TripDialog({
             ) : null}
           </div>
 
-          <div className="grid gap-4 sm:col-span-2 sm:grid-cols-2">
-            <Field label="Herb gospodarza" hint="Najlepiej użyć pliku PNG lub WebP z przezroczystym tłem.">
-              <ImageDropzone name="homeLogoFile" accept="image/png,image/webp,image/jpeg,image/avif" required={!trip?.homeLogo} currentImage={trip?.homeLogo} />
-            </Field>
-            <Field label="Herb gościa" hint="Najlepiej użyć pliku PNG lub WebP z przezroczystym tłem.">
-              <ImageDropzone name="awayLogoFile" accept="image/png,image/webp,image/jpeg,image/avif" required={!trip?.awayLogo} currentImage={trip?.awayLogo} />
-            </Field>
-            {trip?.homeLogo ? <input type="hidden" name="homeLogo" value={trip.homeLogo} /> : null}
-            {trip?.awayLogo ? <input type="hidden" name="awayLogo" value={trip.awayLogo} /> : null}
-          </div>
-
           <div className="sm:col-span-2">
             <DescriptionEditor
               name="description"
@@ -3219,10 +2645,38 @@ function TripDialog({
             />
           </div>
 
+          <div className="rounded-xl border bg-muted/30 p-4 sm:col-span-2">
+            <h3 className="font-sans text-lg font-black uppercase">Skład pakietu</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Przy każdym elemencie określ, czy jest w cenie, dostępny opcjonalnie, czy pozostaje po stronie podróżnego.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {packageFeatures.map((feature) => (
+                <label key={feature.key} className="flex items-center justify-between gap-3 rounded-lg border bg-background p-3 text-sm font-medium">
+                  <span>{feature.label}</span>
+                  <select name={`package.${feature.key}`} defaultValue={packageValues[feature.key]} className="h-9 max-w-40 rounded-md border bg-background px-2 text-xs">
+                    <option value="included">W cenie</option>
+                    <option value="optional">Opcjonalnie</option>
+                    <option value="excluded">We własnym zakresie</option>
+                  </select>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <Field label="Kategoria biletu" hint="Np. trybuna boczna, sektor gospodarzy lub kategoria 2."><Input name="ticketCategory" defaultValue={trip?.ticketCategory} /></Field>
+          <Field label="Miejsca na stadionie" hint="Np. miejsca obok siebie lub zależnie od dostępności."><Input name="seatingInfo" defaultValue={trip?.seatingInfo} /></Field>
+          <Field label="Standard hotelu" hint="Wybierz 0, jeśli hotel nie jest częścią oferty.">
+            <select name="hotelStars" defaultValue={trip?.hotelStars || 0} className="h-9 rounded-lg border bg-background px-3"><option value="0">Nie określono</option>{[1, 2, 3, 4, 5].map((stars) => <option key={stars} value={stars}>{stars} {stars === 1 ? "gwiazdka" : stars < 5 ? "gwiazdki" : "gwiazdek"}</option>)}</select>
+          </Field>
+          <Field label="Wyżywienie" hint="Np. śniadania w cenie lub bez wyżywienia."><Input name="hotelBoard" defaultValue={trip?.hotelBoard} /></Field>
+          <Field label="Rodzaj pokoju" hint="Np. pokój dwuosobowy."><Input name="roomType" defaultValue={trip?.roomType} /></Field>
+          <Field label="Lotniska wylotu" hint="Możesz podać kilka miast, np. Warszawa, Berlin, Poznań."><Input name="departureAirports" defaultValue={trip?.departureAirports} /></Field>
+          <Field label="Rodzaj lotu" hint="Np. bezpośredni lub z jedną przesiadką."><Input name="flightType" defaultValue={trip?.flightType} /></Field>
+          <Field label="Bagaż" hint="Np. plecak w cenie, bagaż kabinowy opcjonalnie."><Input name="baggageInfo" defaultValue={trip?.baggageInfo} /></Field>
+
           <div className="sm:col-span-2">
             <Field
-              label="Pakiet zawiera"
-              hint="Wpisz każdy element pakietu w osobnej linii, np. Bilet na mecz, Przelot, Hotel, Opieka koordynatora."
+              label="Dodatkowe elementy pakietu"
+              hint="Wpisz tylko elementy, których nie ma w konfiguratorze powyżej. Każdy w osobnej linii."
             >
               <Textarea
                 name="includes"

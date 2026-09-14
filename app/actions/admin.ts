@@ -1,7 +1,7 @@
 "use server"
 
 import { del, put } from "@vercel/blob"
-import { and, asc, eq, ne, or, sql } from "drizzle-orm"
+import { and, asc, eq, inArray, ne, or, sql } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { requireAdmin } from "@/lib/auth/require-admin"
@@ -14,11 +14,13 @@ import {
   mediaAssets,
   siteSettings,
   testimonials,
+  teams,
   tripGalleryItems,
   trips,
 } from "@/lib/db/schema"
 import { optimizeTeamLogo, optimizeUploadedImage } from "@/lib/optimize-image"
 import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
+import { packageFeatures, type PackageFeatureStatus } from "@/lib/package-options"
 import { syncYouTubeVideos } from "@/lib/youtube-sync"
 
 const statuses = ["draft", "published", "archived"] as const
@@ -50,15 +52,95 @@ const tripSchema = z.object({
   title: z.string().min(3).max(120), city: z.string().min(2).max(100),
   country: z.string().min(2).max(100), startDate: z.string().date(), endDate: z.string().optional(),
   price: z.coerce.number().int().nonnegative().max(1_000_000), status: z.enum(statuses),
-  homeTeam: z.string().min(2).max(100), awayTeam: z.string().min(2).max(100),
   stadium: z.string().min(2).max(140), matchDate: z.string().date().optional(),
   availabilityStatus: z.enum(availabilityStatuses),
+  homeTeamId: z.coerce.number().int().positive(), awayTeamId: z.coerce.number().int().positive(),
   durationDays: z.coerce.number().int().min(1).max(30),
   durationNights: z.coerce.number().int().min(0).max(29),
+  hotelStars: z.coerce.number().int().min(0).max(5),
+  hotelBoard: z.string().max(120), roomType: z.string().max(120),
+  departureAirports: z.string().max(300), flightType: z.string().max(120),
+  baggageInfo: z.string().max(300), ticketCategory: z.string().max(200), seatingInfo: z.string().max(300),
   description: z.string().max(12000).refine((value) => stripHtml(value).length <= 8000, "Opis jest za długi"),
 })
 
 export type SaveTripState = { success?: boolean; error?: string }
+export type SaveTeamState = { success?: boolean; error?: string }
+
+const teamSchema = z.object({
+  name: z.string().min(2).max(100),
+  city: z.string().min(2).max(100),
+  country: z.string().min(2).max(100),
+  stadium: z.string().min(2).max(140),
+})
+
+export async function saveTeam(_: SaveTeamState, formData: FormData): Promise<SaveTeamState> {
+  const user = await requireAdmin()
+  await ensureTripColumns()
+  const id = Number(formData.get("id"))
+  const parsed = teamSchema.safeParse({
+    name: clean(formData.get("name")),
+    city: clean(formData.get("city")),
+    country: clean(formData.get("country")),
+    stadium: clean(formData.get("stadium")),
+  })
+  if (!parsed.success) return { error: "Uzupełnij nazwę drużyny, miasto, kraj i stadion." }
+
+  const duplicate = await db.select({ id: teams.id }).from(teams).where(id ? and(eq(teams.name, parsed.data.name), ne(teams.id, id)) : eq(teams.name, parsed.data.name)).limit(1)
+  if (duplicate.length) return { error: "Drużyna o tej nazwie już istnieje." }
+
+  const [existing] = Number.isInteger(id) && id > 0 ? await db.select().from(teams).where(eq(teams.id, id)).limit(1) : []
+  let logo = existing?.logo || ""
+  const logoFile = formData.get("logoFile")
+  if (logoFile instanceof File && logoFile.size > 0) {
+    try {
+      const optimized = await optimizeTeamLogo(logoFile)
+      const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
+      const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt: `Herb ${parsed.data.name}`, originalName: logoFile.name, createdBy: user.id }).returning({ id: mediaAssets.id })
+      logo = `/api/media/${asset.id}`
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : "Nie udało się zapisać herbu." }
+    }
+  }
+  if (!logo) return { error: "Dodaj herb drużyny." }
+
+  const values = { ...parsed.data, logo, updatedAt: new Date() }
+  if (existing) {
+    await db.update(teams).set(values).where(eq(teams.id, id))
+    await db.update(trips).set({
+      homeTeam: parsed.data.name,
+      homeLogo: logo,
+      updatedAt: new Date(),
+    }).where(eq(trips.homeTeamId, id))
+    await db.update(trips).set({
+      awayTeam: parsed.data.name,
+      awayLogo: logo,
+      opponent: parsed.data.name,
+      updatedAt: new Date(),
+    }).where(eq(trips.awayTeamId, id))
+    await logActivity(user.id, "updated", "team", String(id), parsed.data.name)
+  } else {
+    const [created] = await db.insert(teams).values(values).returning({ id: teams.id })
+    await logActivity(user.id, "created", "team", String(created.id), parsed.data.name)
+  }
+  refreshPublic()
+  return { success: true }
+}
+
+export async function deleteTeam(_: SaveTeamState, formData: FormData): Promise<SaveTeamState> {
+  const user = await requireAdmin()
+  await ensureTripColumns()
+  const id = Number(formData.get("id"))
+  if (!Number.isInteger(id) || id <= 0) return { error: "Nieprawidłowa drużyna." }
+  const used = await db.select({ id: trips.id }).from(trips).where(or(eq(trips.homeTeamId, id), eq(trips.awayTeamId, id))).limit(1)
+  if (used.length) return { error: "Nie można usunąć drużyny używanej przez wyjazd." }
+  const [team] = await db.select().from(teams).where(eq(teams.id, id)).limit(1)
+  if (!team) return { error: "Nie znaleziono drużyny." }
+  await db.delete(teams).where(eq(teams.id, id))
+  await logActivity(user.id, "deleted", "team", String(id), team.name)
+  revalidatePath("/admin")
+  return { success: true }
+}
 
 export async function saveTrip(_: SaveTripState, formData: FormData): Promise<SaveTripState> {
   const user = await requireAdmin()
@@ -72,23 +154,32 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
     title: clean(formData.get("title")), city: clean(formData.get("city")),
     country: clean(formData.get("country")), startDate: clean(formData.get("startDate")), endDate: clean(formData.get("endDate")) || undefined,
     price: clean(formData.get("price")), status: clean(formData.get("status")), description,
-    homeTeam: clean(formData.get("homeTeam")), awayTeam: clean(formData.get("awayTeam")),
     stadium: clean(formData.get("stadium")), matchDate: clean(formData.get("matchDate")) || undefined,
     availabilityStatus: clean(formData.get("availabilityStatus")),
     durationDays: clean(formData.get("durationDays")), durationNights: clean(formData.get("durationNights")),
+    homeTeamId: clean(formData.get("homeTeamId")), awayTeamId: clean(formData.get("awayTeamId")),
+    hotelStars: clean(formData.get("hotelStars")) || "0", hotelBoard: clean(formData.get("hotelBoard")), roomType: clean(formData.get("roomType")),
+    departureAirports: clean(formData.get("departureAirports")), flightType: clean(formData.get("flightType")),
+    baggageInfo: clean(formData.get("baggageInfo")), ticketCategory: clean(formData.get("ticketCategory")), seatingInfo: clean(formData.get("seatingInfo")),
   })
   if (!parsed.success) return { error: "Sprawdź wymagane pola wyjazdu." }
   const slug = slugify(clean(formData.get("slug")) || parsed.data.title)
   const duplicate = await db.select({ id: trips.id }).from(trips).where(id ? and(eq(trips.slug, slug), ne(trips.id, id)) : eq(trips.slug, slug)).limit(1)
   if (duplicate.length) return { error: "Ten adres URL jest już używany." }
 
+  if (parsed.data.homeTeamId === parsed.data.awayTeamId) return { error: "Wybierz dwie różne drużyny." }
+  const selectedTeams = await db.select().from(teams).where(inArray(teams.id, [parsed.data.homeTeamId, parsed.data.awayTeamId]))
+  const homeTeamRecord = selectedTeams.find((team) => team.id === parsed.data.homeTeamId)
+  const awayTeamRecord = selectedTeams.find((team) => team.id === parsed.data.awayTeamId)
+  if (!homeTeamRecord || !awayTeamRecord) return { error: "Nie znaleziono wybranej drużyny. Odśwież panel i spróbuj ponownie." }
+
   const isEditing = Number.isInteger(id) && id > 0
   const [existingTrip] = isEditing
     ? await db.select({ image: trips.image, homeLogo: trips.homeLogo, awayLogo: trips.awayLogo }).from(trips).where(eq(trips.id, id)).limit(1)
     : []
   let image = clean(formData.get("image")) || existingTrip?.image || ""
-  let homeLogo = clean(formData.get("homeLogo")) || existingTrip?.homeLogo || ""
-  let awayLogo = clean(formData.get("awayLogo")) || existingTrip?.awayLogo || ""
+  let homeLogo = homeTeamRecord.logo || clean(formData.get("homeLogo")) || existingTrip?.homeLogo || ""
+  let awayLogo = awayTeamRecord.logo || clean(formData.get("awayLogo")) || existingTrip?.awayLogo || ""
 
   async function uploadTripImage(file: FormDataEntryValue | null, alt: string, kind: "cover" | "logo" = "cover") {
     if (!(file instanceof File) || file.size === 0) return ""
@@ -102,15 +193,15 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   if (coverFile instanceof File && coverFile.size > 0) {
     try {
       image = await uploadTripImage(coverFile, `Stadion - ${parsed.data.title}`)
-      homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${parsed.data.homeTeam}`, "logo")) || homeLogo
-      awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${parsed.data.awayTeam}`, "logo")) || awayLogo
+      homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${homeTeamRecord.name}`, "logo")) || homeLogo
+      awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${awayTeamRecord.name}`, "logo")) || awayLogo
     } catch (error) {
       return { error: error instanceof Error ? error.message : "Nie udało się zoptymalizować zdjęcia." }
     }
   } else {
     try {
-      homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${parsed.data.homeTeam}`, "logo")) || homeLogo
-      awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${parsed.data.awayTeam}`, "logo")) || awayLogo
+      homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${homeTeamRecord.name}`, "logo")) || homeLogo
+      awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${awayTeamRecord.name}`, "logo")) || awayLogo
     } catch (error) {
       return { error: error instanceof Error ? error.message : "Nie udało się zapisać herbu zespołu." }
     }
@@ -119,8 +210,12 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   if (!image || !homeLogo || !awayLogo) return { error: "Dodaj zdjęcie stadionu oraz herby obu zespołów." }
 
   const values = {
-    ...parsed.data, opponent: parsed.data.awayTeam, slug, endDate: parsed.data.endDate || null, matchDate: parsed.data.matchDate || null, image, homeLogo, awayLogo,
+    ...parsed.data, homeTeam: homeTeamRecord.name, awayTeam: awayTeamRecord.name, opponent: awayTeamRecord.name, slug, endDate: parsed.data.endDate || null, matchDate: parsed.data.matchDate || null, image, homeLogo, awayLogo,
     featured: formData.get("featured") === "on", includes: clean(formData.get("includes")).split("\n").map((item) => item.trim()).filter(Boolean),
+    packageItems: packageFeatures.map(({ key }) => {
+      const value = clean(formData.get(`package.${key}`)) as PackageFeatureStatus
+      return `${key}|${["included", "optional", "excluded"].includes(value) ? value : "excluded"}`
+    }),
     itinerary: clean(formData.get("itinerary")).split("\n").map((item) => item.trim()).filter(Boolean),
     hotelInfo: clean(formData.get("hotelInfo")), flightInfo: clean(formData.get("flightInfo")),
     faq: clean(formData.get("faq")).split("\n").map((item) => item.trim()).filter(Boolean),
@@ -207,7 +302,7 @@ const coverMatch = trip.image?.match(/^\/api\/media\/(\d+)$/)
 
 
   for (const mediaId of mediaIds) {
-    const [globalUse, tripUse, coverUse, logoUse] = await Promise.all([
+    const [globalUse, tripUse, coverUse, logoUse, teamLogoUse] = await Promise.all([
       db
         .select({ id: galleryItems.id })
         .from(galleryItems)
@@ -231,9 +326,15 @@ const coverMatch = trip.image?.match(/^\/api\/media\/(\d+)$/)
         .from(trips)
         .where(or(eq(trips.homeLogo, `/api/media/${mediaId}`), eq(trips.awayLogo, `/api/media/${mediaId}`)))
         .limit(1),
+
+      db
+        .select({ id: teams.id })
+        .from(teams)
+        .where(eq(teams.logo, `/api/media/${mediaId}`))
+        .limit(1),
     ])
 
-    if (globalUse.length || tripUse.length || coverUse.length || logoUse.length) {
+    if (globalUse.length || tripUse.length || coverUse.length || logoUse.length || teamLogoUse.length) {
       continue
     }
 
