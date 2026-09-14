@@ -13,7 +13,7 @@ import {
   TicketCheck,
   Trophy,
   Users,
-  WalletCards,
+  Landmark,
 } from "lucide-react"
 
 import { SiteHeader } from "@/components/site-header"
@@ -477,7 +477,7 @@ OPIS W HERO PÓKI CO UKRYTY
               [MapPinned, "Transfery lokalne"],
               [ShieldCheck, "Ubezpieczenie"],
               [CalendarCheck, "Plan podróży"],
-              [WalletCards, "Przejrzyste płatności"],
+              [Landmark, "Wspólne zwiedzanie miasta"],
             ].map(([Icon, label]) => {
               const I = Icon as typeof Plane
 
