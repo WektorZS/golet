@@ -2,14 +2,14 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, ArrowRight, BedDouble, CalendarDays, Check, ChevronDown, Clock3, MapPin, MessageCircle, Plane, ShieldCheck, Star, TicketCheck } from "lucide-react"
+import { ArrowLeft, ArrowRight, BedDouble, Bus, CalendarDays, Check, ChevronDown, Clock3, Landmark, Luggage, MapPin, MessageCircle, Plane, ShieldCheck, Star, TicketCheck, TramFront, UserRoundCheck, UtensilsCrossed, type LucideIcon } from "lucide-react"
 
 import { DescriptionHtml } from "@/components/description-html"
 import { InquiryForm } from "@/components/inquiry-form"
 import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
 import { getPublishedTestimonials, getSiteContent } from "@/lib/content"
-import { packageFeatures, packageSummary, parsePackageItems } from "@/lib/package-options"
+import { packageFeatures, packageSummary, parsePackageItems, type PackageFeatureKey } from "@/lib/package-options"
 import { stripHtml } from "@/lib/sanitize-html"
 import { absoluteUrl } from "@/lib/site"
 import { getTripBySlug, getTripGallery } from "@/lib/trips"
@@ -21,6 +21,19 @@ const availability = {
   last_places: { label: "Ostatnie miejsca", className: "bg-primary text-primary-foreground", schema: "LimitedAvailability" },
   sold_out: { label: "Wyprzedane", className: "bg-red-600 text-white", schema: "SoldOut" },
 } as const
+
+const packageIcons: Record<PackageFeatureKey, LucideIcon> = {
+  ticket: TicketCheck,
+  flight: Plane,
+  hotel: BedDouble,
+  transfers: Bus,
+  baggage: Luggage,
+  breakfast: UtensilsCrossed,
+  insurance: ShieldCheck,
+  coordinator: UserRoundCheck,
+  sightseeing: Landmark,
+  local_transport: TramFront,
+}
 
 function asDate(value: string) {
   return new Date(`${value}T12:00:00`)
@@ -80,7 +93,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   const includedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "included")
   const optionalFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "optional")
   const excludedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "excluded")
-  const includedItems = Array.from(new Set([...includedFeatures.map((feature) => feature.label), ...trip.includes]))
+  const includedItems: { key: string; label: string }[] = [
+    ...includedFeatures.map((feature) => ({ key: feature.key, label: feature.label })),
+    ...trip.includes.map((label, index) => ({ key: `custom-${index}`, label })),
+  ].filter((item, index, items) => items.findIndex((candidate) => candidate.label === item.label) === index)
   const hasHotel = packageOptions.hotel !== "excluded"
   const hasFlight = packageOptions.flight !== "excluded"
   const homeTeam = teams.home
@@ -183,12 +199,12 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
                     <h3 className="font-sans text-lg font-black uppercase">W cenie</h3>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {includedItems.map((item) => <div key={item} className="flex items-center gap-2 rounded-full bg-secondary/65 py-2 pl-2 pr-3.5 text-sm font-semibold"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/15"><Check className="size-3.5 text-emerald-600" /></span>{item}</div>)}
+                    {includedItems.map((item) => { const Icon = item.key.startsWith("custom-") ? Check : packageIcons[item.key as PackageFeatureKey]; return <div key={item.key} className="flex items-center gap-2 rounded-full bg-secondary/65 py-2 pl-2 pr-3.5 text-sm font-semibold"><span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/15"><Icon className="size-4 text-emerald-600" /></span>{item.label}</div> })}
                   </div>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-xl border border-primary/25 bg-primary/5 p-4"><h3 className="font-sans text-base font-black uppercase">Opcjonalnie</h3><div className="mt-2 flex flex-wrap gap-2">{optionalFeatures.length > 0 ? optionalFeatures.map((item) => <span key={item.key} className="rounded-full border border-primary/30 bg-background px-3 py-1.5 text-sm font-semibold">{item.label}</span>) : <p className="text-sm text-muted-foreground">Brak dodatkowych opcji.</p>}</div></div>
-                  <div className="rounded-xl border bg-secondary/50 p-4"><h3 className="font-sans text-base font-black uppercase">We własnym zakresie</h3><div className="mt-2 flex flex-wrap gap-2">{excludedFeatures.length > 0 ? excludedFeatures.map((item) => <span key={item.key} className="rounded-full border bg-background/70 px-3 py-1.5 text-sm font-semibold text-muted-foreground">{item.label}</span>) : <p className="text-sm text-muted-foreground">Pakiet obejmuje wszystkie główne elementy.</p>}</div></div>
+                  <div className="rounded-xl border border-primary/25 bg-primary/5 p-4"><h3 className="font-sans text-base font-black uppercase">Opcjonalnie</h3><div className="mt-3 flex flex-wrap gap-2">{optionalFeatures.length > 0 ? optionalFeatures.map((item) => { const Icon = packageIcons[item.key]; return <span key={item.key} className="flex items-center gap-2 rounded-full border border-primary/30 bg-background py-1.5 pl-2 pr-3 text-sm font-semibold"><Icon className="size-4 text-primary" />{item.label}</span> }) : <p className="text-sm text-muted-foreground">Brak dodatkowych opcji.</p>}</div></div>
+                  <div className="rounded-xl border bg-secondary/50 p-4"><h3 className="font-sans text-base font-black uppercase">We własnym zakresie</h3><div className="mt-3 flex flex-wrap gap-2">{excludedFeatures.length > 0 ? excludedFeatures.map((item) => { const Icon = packageIcons[item.key]; return <span key={item.key} className="flex items-center gap-2 rounded-full border bg-background/70 py-1.5 pl-2 pr-3 text-sm font-semibold text-muted-foreground"><Icon className="size-4" />{item.label}</span> }) : <p className="text-sm text-muted-foreground">Pakiet obejmuje wszystkie główne elementy.</p>}</div></div>
                 </div>
               </div>
               {(trip.ticketCategory || trip.seatingInfo) && <div className="mt-5 rounded-2xl bg-foreground p-5 text-background"><div className="flex items-center gap-3"><TicketCheck className="size-6 text-primary" /><div><p className="font-bold">Bilet na mecz{trip.ticketCategory ? ` - ${trip.ticketCategory}` : ""}</p>{trip.seatingInfo && <p className="mt-1 text-sm text-background/65">{trip.seatingInfo}</p>}</div></div></div>}
