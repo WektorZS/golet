@@ -1,10 +1,11 @@
 import { get } from "@vercel/blob"
-import { and, eq } from "drizzle-orm"
+import { and, eq, or } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
 import { isAdminEmail } from "@/lib/auth/admin"
 import { getAuth } from "@/lib/auth/server"
 import { db } from "@/lib/db"
-import { galleryItems, mediaAssets, tripGalleryItems, trips } from "@/lib/db/schema"
+import { ensureTripColumns } from "@/lib/db/ensure-trip-columns"
+import { galleryItems, mediaAssets, teams, tripGalleryItems, trips } from "@/lib/db/schema"
 
 export async function GET(
   request: NextRequest,
@@ -16,6 +17,8 @@ export async function GET(
   if (!Number.isInteger(id)) {
     return new NextResponse("Not found", { status: 404 })
   }
+
+  await ensureTripColumns()
 
   const [asset] = await db
     .select()
@@ -38,7 +41,7 @@ export async function GET(
   }
 
   if (!isAdmin) {
-    const [globalReference, tripReference, coverReference] =
+    const [globalReference, tripReference, tripImageReference, teamLogoReference] =
       await Promise.all([
         db
           .select({ id: galleryItems.id })
@@ -69,17 +72,28 @@ export async function GET(
           .from(trips)
           .where(
             and(
-              eq(trips.image, `/api/media/${id}`),
+              or(
+                eq(trips.image, `/api/media/${id}`),
+                eq(trips.homeLogo, `/api/media/${id}`),
+                eq(trips.awayLogo, `/api/media/${id}`)
+              ),
               eq(trips.status, "published")
             )
           )
+          .limit(1),
+
+        db
+          .select({ id: teams.id })
+          .from(teams)
+          .where(eq(teams.logo, `/api/media/${id}`))
           .limit(1),
       ])
 
     if (
       !globalReference.length &&
       !tripReference.length &&
-      !coverReference.length
+      !tripImageReference.length &&
+      !teamLogoReference.length
     ) {
       return new NextResponse("Not found", { status: 404 })
     }
