@@ -5,6 +5,8 @@ const MAX_DIMENSION = 1600
 const MAX_TEAM_LOGO_DIMENSION = 128
 const TEAM_LOGO_PADDING = 8
 const TEAM_LOGO_PROCESSING_DIMENSION = 2048
+const TEAM_LOGO_TARGET_COVERAGE = 0.42
+const TEAM_LOGO_MIN_OPTICAL_SCALE = 0.78
 const MAX_INPUT_PIXELS = 40_000_000
 
 const allowedTypes = [
@@ -124,22 +126,43 @@ async function prepareTeamLogo(input: Buffer) {
 
   const transparent = { r: 0, g: 0, b: 0, alpha: 0 }
 
-  return sharp(data, {
+  const trimmed = await sharp(data, {
     raw: { width: info.width, height: info.height, channels: 4 },
   })
     .trim({ background: transparent, threshold: 8 })
+    .raw()
+    .toBuffer({ resolveWithObject: true })
+
+  let visibleArea = 0
+  for (let offset = 3; offset < trimmed.data.length; offset += 4) {
+    visibleArea += trimmed.data[offset] / 255
+  }
+  if (visibleArea < 10) throw new Error("Herb nie zawiera widocznej grafiki")
+
+  const contentDimension = MAX_TEAM_LOGO_DIMENSION - TEAM_LOGO_PADDING * 2
+  const maximumScale = Math.min(contentDimension / trimmed.info.width, contentDimension / trimmed.info.height)
+  const targetVisibleArea = contentDimension * contentDimension * TEAM_LOGO_TARGET_COVERAGE
+  const areaScale = Math.sqrt(targetVisibleArea / visibleArea)
+  const opticalScale = Math.min(maximumScale, Math.max(maximumScale * TEAM_LOGO_MIN_OPTICAL_SCALE, areaScale))
+  const width = Math.max(1, Math.round(trimmed.info.width * opticalScale))
+  const height = Math.max(1, Math.round(trimmed.info.height * opticalScale))
+  const horizontalSpace = MAX_TEAM_LOGO_DIMENSION - width
+  const verticalSpace = MAX_TEAM_LOGO_DIMENSION - height
+
+  return sharp(trimmed.data, {
+    raw: { width: trimmed.info.width, height: trimmed.info.height, channels: 4 },
+  })
     .resize({
-      width: MAX_TEAM_LOGO_DIMENSION - TEAM_LOGO_PADDING * 2,
-      height: MAX_TEAM_LOGO_DIMENSION - TEAM_LOGO_PADDING * 2,
-      fit: "contain",
-      background: transparent,
+      width,
+      height,
+      fit: "fill",
       kernel: sharp.kernel.lanczos3,
     })
     .extend({
-      top: TEAM_LOGO_PADDING,
-      bottom: TEAM_LOGO_PADDING,
-      left: TEAM_LOGO_PADDING,
-      right: TEAM_LOGO_PADDING,
+      top: Math.floor(verticalSpace / 2),
+      bottom: Math.ceil(verticalSpace / 2),
+      left: Math.floor(horizontalSpace / 2),
+      right: Math.ceil(horizontalSpace / 2),
       background: transparent,
     })
 }
