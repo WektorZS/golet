@@ -178,9 +178,8 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
               <h2 className="mt-2 font-sans text-4xl font-black uppercase">Zakres pakietu</h2>
               <div className="mt-7 space-y-4">
                 <div className="rounded-2xl border bg-card p-5">
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
                     <h3 className="font-sans text-lg font-black uppercase">W cenie</h3>
-                    <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700">{includedItems.length} elementów</span>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {includedItems.map((item) => <div key={item} className="flex items-center gap-2 rounded-full bg-secondary/65 py-2 pl-2 pr-3.5 text-sm font-semibold"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/15"><Check className="size-3.5 text-emerald-600" /></span>{item}</div>)}
