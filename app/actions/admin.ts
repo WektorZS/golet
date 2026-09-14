@@ -48,6 +48,19 @@ function refreshPublic() {
   revalidatePath("/sitemap.xml")
 }
 
+function mediaIdFromUrl(url: string) {
+  const match = url.match(/^\/api\/media\/(\d+)$/)
+  return match ? Number(match[1]) : null
+}
+
+async function deleteMediaAsset(mediaId: number) {
+  const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, mediaId)).limit(1)
+  if (!asset) return
+
+  await del(asset.pathname)
+  await db.delete(mediaAssets).where(eq(mediaAssets.id, mediaId))
+}
+
 const tripSchema = z.object({
   title: z.string().min(3).max(120), city: z.string().min(2).max(100),
   country: z.string().min(2).max(100), startDate: z.string().date(), endDate: z.string().optional(),
@@ -119,6 +132,10 @@ export async function saveTeam(_: SaveTeamState, formData: FormData): Promise<Sa
       updatedAt: new Date(),
     }).where(eq(trips.awayTeamId, id))
     await logActivity(user.id, "updated", "team", String(id), parsed.data.name)
+    if (existing.logo !== logo) {
+      const oldLogoId = mediaIdFromUrl(existing.logo)
+      if (oldLogoId) await deleteMediaAsset(oldLogoId).catch(() => undefined)
+    }
   } else {
     const [created] = await db.insert(teams).values(values).returning({ id: teams.id })
     await logActivity(user.id, "created", "team", String(created.id), parsed.data.name)
@@ -137,6 +154,8 @@ export async function deleteTeam(_: SaveTeamState, formData: FormData): Promise<
   const [team] = await db.select().from(teams).where(eq(teams.id, id)).limit(1)
   if (!team) return { error: "Nie znaleziono drużyny." }
   await db.delete(teams).where(eq(teams.id, id))
+  const logoId = mediaIdFromUrl(team.logo)
+  if (logoId) await deleteMediaAsset(logoId).catch(() => undefined)
   await logActivity(user.id, "deleted", "team", String(id), team.name)
   revalidatePath("/admin")
   return { success: true }
@@ -621,4 +640,3 @@ export async function reorderGalleryItems(formData: FormData) {
 
   refreshPublic()
 }
-
