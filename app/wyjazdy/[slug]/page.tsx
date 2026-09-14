@@ -80,6 +80,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   const includedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "included")
   const optionalFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "optional")
   const excludedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "excluded")
+  const includedItems = Array.from(new Set([...includedFeatures.map((feature) => feature.label), ...trip.includes]))
   const hasHotel = packageOptions.hotel !== "excluded"
   const hasFlight = packageOptions.flight !== "excluded"
   const homeTeam = teams.home
@@ -175,10 +176,20 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
             <section id="w-cenie" className="scroll-mt-24">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">{packageSummary(trip.packageItems)}</p>
               <h2 className="mt-2 font-sans text-4xl font-black uppercase">Zakres pakietu</h2>
-              <div className="mt-7 grid gap-6 lg:grid-cols-3">
-                <div><h3 className="font-sans text-lg font-black uppercase">W cenie</h3><div className="mt-3 space-y-2">{[...includedFeatures.map((item) => item.label), ...trip.includes].map((item) => <div key={item} className="flex items-center gap-3 rounded-xl border bg-card p-4 font-semibold"><span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/15"><Check className="size-4 text-emerald-600" /></span>{item}</div>)}</div></div>
-                <div><h3 className="font-sans text-lg font-black uppercase">Opcjonalnie</h3><div className="mt-3 space-y-2">{optionalFeatures.length > 0 ? optionalFeatures.map((item) => <div key={item.key} className="rounded-xl border border-primary/30 bg-primary/5 p-4 font-semibold">{item.label}</div>) : <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">Brak dodatkowych opcji.</p>}</div></div>
-                <div><h3 className="font-sans text-lg font-black uppercase">We własnym zakresie</h3><div className="mt-3 space-y-2">{excludedFeatures.length > 0 ? excludedFeatures.map((item) => <div key={item.key} className="rounded-xl border bg-secondary/50 p-4 font-semibold text-muted-foreground">{item.label}</div>) : <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">Pakiet obejmuje wszystkie główne elementy.</p>}</div></div>
+              <div className="mt-7 space-y-4">
+                <div className="rounded-2xl border bg-card p-5">
+                  <div className="flex items-center justify-between gap-4">
+                    <h3 className="font-sans text-lg font-black uppercase">W cenie</h3>
+                    <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700">{includedItems.length} elementów</span>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {includedItems.map((item) => <div key={item} className="flex items-center gap-2 rounded-full bg-secondary/65 py-2 pl-2 pr-3.5 text-sm font-semibold"><span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/15"><Check className="size-3.5 text-emerald-600" /></span>{item}</div>)}
+                  </div>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-xl border border-primary/25 bg-primary/5 p-4"><h3 className="font-sans text-base font-black uppercase">Opcjonalnie</h3><div className="mt-2 flex flex-wrap gap-2">{optionalFeatures.length > 0 ? optionalFeatures.map((item) => <span key={item.key} className="rounded-full border border-primary/30 bg-background px-3 py-1.5 text-sm font-semibold">{item.label}</span>) : <p className="text-sm text-muted-foreground">Brak dodatkowych opcji.</p>}</div></div>
+                  <div className="rounded-xl border bg-secondary/50 p-4"><h3 className="font-sans text-base font-black uppercase">We własnym zakresie</h3><div className="mt-2 flex flex-wrap gap-2">{excludedFeatures.length > 0 ? excludedFeatures.map((item) => <span key={item.key} className="rounded-full border bg-background/70 px-3 py-1.5 text-sm font-semibold text-muted-foreground">{item.label}</span>) : <p className="text-sm text-muted-foreground">Pakiet obejmuje wszystkie główne elementy.</p>}</div></div>
+                </div>
               </div>
               {(trip.ticketCategory || trip.seatingInfo) && <div className="mt-5 rounded-2xl bg-foreground p-5 text-background"><div className="flex items-center gap-3"><TicketCheck className="size-6 text-primary" /><div><p className="font-bold">Bilet na mecz{trip.ticketCategory ? ` - ${trip.ticketCategory}` : ""}</p>{trip.seatingInfo && <p className="mt-1 text-sm text-background/65">{trip.seatingInfo}</p>}</div></div></div>}
             </section>
@@ -224,4 +235,3 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
     </main>
   )
 }
-
