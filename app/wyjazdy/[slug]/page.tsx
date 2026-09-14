@@ -31,6 +31,14 @@ function formatStay(days: number, nights: number) {
   return `${days} ${dayLabel} / ${nights} ${nightLabel}`
 }
 
+function getTeams(title: string, opponent: string, homeTeam: string, awayTeam: string) {
+  const [titleHome, titleAway] = title.split(/\s+vs\.?\s+|\s+-\s+/i).map((item) => item.trim())
+  return {
+    home: homeTeam || titleHome || "Gospodarz",
+    away: awayTeam || titleAway || opponent || "Gość",
+  }
+}
+
 function TeamLogo({ src, name }: { src: string; name: string }) {
   if (!src) return <span className="flex size-16 items-center justify-center rounded-full border border-white/20 bg-white/10 font-sans text-lg font-black md:size-20">{name.slice(0, 2).toUpperCase()}</span>
   return <span className="relative block size-16 md:size-20"><Image src={src} alt={`Herb ${name}`} fill className="object-contain drop-shadow-xl" sizes="80px" /></span>
@@ -66,8 +74,13 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   const matchDate = trip.matchDate ? dateFormatter.format(asDate(trip.matchDate)) : startDate
   const status = availability[trip.availabilityStatus as keyof typeof availability] || availability.available
   const soldOut = trip.availabilityStatus === "sold_out"
-  const homeTeam = trip.homeTeam || trip.title.split(/\s+vs\.?\s+|\s+-\s+/i)[0] || "Gospodarz"
-  const awayTeam = trip.awayTeam || trip.opponent || "Gość"
+  const teams = getTeams(trip.title, trip.opponent, trip.homeTeam, trip.awayTeam)
+  const homeTeam = teams.home
+  const awayTeam = teams.away
+  const computedNights = trip.endDate && trip.endDate !== trip.startDate && trip.durationDays === 1 && trip.durationNights === 0
+    ? Math.max(1, Math.round((asDate(trip.endDate).getTime() - asDate(trip.startDate).getTime()) / 86_400_000))
+    : trip.durationNights
+  const computedDays = computedNights !== trip.durationNights ? computedNights + 1 : trip.durationDays
   const whatsappNumber = (content.contactPhone || "+48501465318").replace(/\D/g, "")
   const whatsappText = encodeURIComponent(`Dzień dobry, interesuje mnie wyjazd ${homeTeam} - ${awayTeam}, ${date}.`)
   const faq = trip.faq.length > 0
@@ -114,7 +127,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
               <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-white/85">
                 <span className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" />{matchDate}</span>
                 <span className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || `Stadion w ${trip.city}`}</span>
-                <span className="flex items-center gap-2"><Clock3 className="size-4 text-primary" />{formatStay(trip.durationDays, trip.durationNights)}</span>
+                <span className="flex items-center gap-2"><Clock3 className="size-4 text-primary" />{formatStay(computedDays, computedNights)}</span>
               </div>
             </div>
 

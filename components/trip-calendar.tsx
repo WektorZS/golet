@@ -62,6 +62,22 @@ function tripsCount(count: number) {
   return `${count} wyjazdów`
 }
 
+function getTeams(trip: Trip) {
+  const [titleHome, titleAway] = trip.title.split(/\s+vs\.?\s+|\s+-\s+/i).map((item) => item.trim())
+  return {
+    homeTeam: trip.homeTeam || titleHome || "Gospodarz",
+    awayTeam: trip.awayTeam || titleAway || trip.opponent || "Gość",
+  }
+}
+
+function getStay(trip: Trip) {
+  if (trip.endDate && trip.endDate !== trip.startDate && trip.durationDays === 1 && trip.durationNights === 0) {
+    const nights = Math.max(1, Math.round((asDate(trip.endDate).getTime() - asDate(trip.startDate).getTime()) / 86_400_000))
+    return { days: nights + 1, nights }
+  }
+  return { days: trip.durationDays, nights: trip.durationNights }
+}
+
 function TeamLogo({ src, name }: { src: string; name: string }) {
   if (!src) {
     return (
@@ -128,8 +144,8 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
             <div className="space-y-3">
               {group.trips.map((trip) => {
                 const status = availability[trip.availabilityStatus as keyof typeof availability] || availability.available
-                const homeTeam = trip.homeTeam || trip.title.split(/\s+vs\.?\s+|\s+-\s+/i)[0] || "Gospodarz"
-                const awayTeam = trip.awayTeam || trip.opponent || "Gość"
+                const { homeTeam, awayTeam } = getTeams(trip)
+                const stay = getStay(trip)
 
                 return (
                   <article key={trip.id} className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:border-primary/60 hover:shadow-lg">
@@ -155,7 +171,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                         <dl className="grid content-center gap-3 text-sm">
                           <div className="flex gap-3"><CalendarDays className="mt-0.5 size-4 shrink-0 text-primary" /><div><dt className="text-xs text-muted-foreground">Termin wyjazdu</dt><dd className="font-semibold">{formatDates(trip.startDate, trip.endDate)}</dd></div></div>
                           <div className="flex gap-3"><MapPin className="mt-0.5 size-4 shrink-0 text-primary" /><div><dt className="text-xs text-muted-foreground">Stadion</dt><dd className="font-semibold">{trip.stadium || "Stadion gospodarza"}</dd></div></div>
-                          <div className="flex gap-3"><Clock3 className="mt-0.5 size-4 shrink-0 text-primary" /><div><dt className="text-xs text-muted-foreground">Pobyt</dt><dd className="font-semibold">{formatStay(trip.durationDays, trip.durationNights)}</dd></div></div>
+                          <div className="flex gap-3"><Clock3 className="mt-0.5 size-4 shrink-0 text-primary" /><div><dt className="text-xs text-muted-foreground">Pobyt</dt><dd className="font-semibold">{formatStay(stay.days, stay.nights)}</dd></div></div>
                         </dl>
                       </div>
 
