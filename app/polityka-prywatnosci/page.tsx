@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
   const companyName = "LB Coaching Łukasz Borger"
   const companyAddress = "ul. Stefana Roweckiego 1/2, 72-010 Police"
   const companyNip = "8512915273"
-  const email = "kontakt@letsgol.pl"
+  const email = "kontakt.letsgol@gmail.com"
 
   return (
     <main className="min-h-screen bg-background text-foreground">
