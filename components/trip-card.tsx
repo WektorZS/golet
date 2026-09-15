@@ -31,6 +31,27 @@ function formatTripDates(startDate: string, endDate: string | null) {
   )}`
 }
 
+function formatStay(trip: Trip) {
+  let days = trip.durationDays
+  let nights = trip.durationNights
+
+  if (trip.endDate && trip.endDate !== trip.startDate && days === 1 && nights === 0) {
+    nights = Math.max(
+      1,
+      Math.round(
+        (new Date(`${trip.endDate}T12:00:00`).getTime() -
+          new Date(`${trip.startDate}T12:00:00`).getTime()) /
+          86_400_000
+      )
+    )
+    days = nights + 1
+  }
+
+  const dayLabel = days === 1 ? "dzień" : "dni"
+  const nightLabel = nights === 1 ? "noc" : nights > 1 && nights < 5 ? "noce" : "nocy"
+  return `${days} ${dayLabel} / ${nights} ${nightLabel}`
+}
+
 const availability = {
   available: { label: "Dostępne miejsca", className: "bg-emerald-500 text-white" },
   last_places: { label: "Ostatnie miejsca", className: "bg-primary text-primary-foreground" },
@@ -137,7 +158,7 @@ export function TripCard({ trip }: { trip: Trip }) {
           </span>
           <span className="flex items-center gap-2">
             <Clock3 aria-hidden="true" />
-            {trip.durationDays} dni / {trip.durationNights} nocy
+            {formatStay(trip)}
           </span>
           <div className="flex flex-wrap gap-2 pt-1">
             {packageOptions.hotel === "excluded" && <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-foreground">Bez hotelu</span>}
