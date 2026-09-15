@@ -2,15 +2,15 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, ArrowRight, BedDouble, Bus, CalendarDays, Check, ChevronDown, Clock3, Landmark, Luggage, MapPin, MessageCircle, Plane, ShieldCheck, Star, TicketCheck, TramFront, UserRoundCheck, UtensilsCrossed, type LucideIcon } from "lucide-react"
+import { ArrowLeft, ArrowRight, CalendarDays, Clock3, MapPin, MessageCircle, TicketCheck } from "lucide-react"
 
-import { DescriptionHtml } from "@/components/description-html"
 import { InquiryForm } from "@/components/inquiry-form"
 import { SiteFooter } from "@/components/site-footer"
+import { TripDetailsTabs } from "@/components/trip-details-tabs"
 import { Button } from "@/components/ui/button"
 import { getPublishedTestimonials, getSiteContent } from "@/lib/content"
-import { packageFeatures, packageSummary, parsePackageItems, type PackageFeatureKey } from "@/lib/package-options"
-import { stripHtml } from "@/lib/sanitize-html"
+import { packageFeatures, packageSummary, parsePackageItems } from "@/lib/package-options"
+import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
 import { absoluteUrl } from "@/lib/site"
 import { getTripBySlug, getTripGallery } from "@/lib/trips"
 
@@ -21,19 +21,6 @@ const availability = {
   last_places: { label: "Ostatnie miejsca", className: "bg-primary text-primary-foreground", schema: "LimitedAvailability" },
   sold_out: { label: "Wyprzedane", className: "bg-red-600 text-white", schema: "SoldOut" },
 } as const
-
-const packageIcons: Record<PackageFeatureKey, LucideIcon> = {
-  ticket: TicketCheck,
-  flight: Plane,
-  hotel: BedDouble,
-  transfers: Bus,
-  baggage: Luggage,
-  breakfast: UtensilsCrossed,
-  insurance: ShieldCheck,
-  coordinator: UserRoundCheck,
-  sightseeing: Landmark,
-  local_transport: TramFront,
-}
 
 function asDate(value: string) {
   return new Date(`${value}T12:00:00`)
@@ -136,8 +123,6 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
     "Czas na poznanie miasta",
     hasFlight ? "Lot powrotny do Polski" : "Powrót we własnym zakresie",
   ]
-  const navItems = [["Opis", "opis"], ["Zakres pakietu", "w-cenie"], ["Plan wyjazdu", "plan"], ...(hasHotel ? [["Hotel", "hotel"]] : []), ...(hasFlight ? [["Lot", "loty"]] : []), ...(gallery.length > 0 ? [["Zdjęcia", "zdjecia"]] : []), ["Opinie", "opinie"], ["FAQ", "faq"], ["Rezerwacja", "rezerwacja"]]
-
   return (
     <main className="bg-background">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
@@ -175,66 +160,35 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
         </div>
       </section>
 
-      <nav aria-label="Sekcje wyjazdu" className="sticky top-0 z-30 overflow-x-auto border-b bg-background/95 px-4 shadow-sm backdrop-blur md:px-6">
-        <div className="mx-auto flex min-w-max max-w-7xl">{navItems.map(([label, id]) => <a key={id} href={`#${id}`} className="border-b-2 border-transparent px-4 py-4 text-sm font-bold transition-colors hover:border-primary hover:text-foreground">{label}</a>)}</div>
-      </nav>
-
-      <section className="px-4 py-14 md:px-6 md:py-20">
-        <div className="mx-auto max-w-7xl space-y-16">
-            <section id="opis" className="scroll-mt-24">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">O wyjeździe</p>
-              <h2 className="mt-2 font-sans text-4xl font-black uppercase md:text-5xl">Przeżyj ten mecz z bliska</h2>
-              <div className="mt-7 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-                <DescriptionHtml html={trip.description} className="text-base leading-8 text-muted-foreground md:text-lg [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-4 [&_strong]:font-semibold [&_strong]:text-foreground [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5" />
-                <div className="flex gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-5"><ShieldCheck className="mt-0.5 size-6 shrink-0 text-primary" /><p className="text-sm leading-6 text-muted-foreground"><strong className="block text-foreground">Termin pod kontrolą</strong>Dokładna godzina meczu może zostać potwierdzona bliżej wyjazdu. Program dopasujemy do oficjalnego terminarza.</p></div>
-              </div>
-            </section>
-
-            <section id="w-cenie" className="scroll-mt-24">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">{packageSummary(trip.packageItems)}</p>
-              <h2 className="mt-2 font-sans text-4xl font-black uppercase">Zakres pakietu</h2>
-              <div className="mt-7 space-y-4">
-                <div className="rounded-2xl border bg-card p-5">
-                  <div className="flex items-center gap-4">
-                    <h3 className="font-sans text-lg font-black uppercase">W cenie</h3>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {includedItems.map((item) => { const Icon = item.key.startsWith("custom-") ? Check : packageIcons[item.key as PackageFeatureKey]; return <div key={item.key} className="flex items-center gap-2 rounded-full bg-secondary/65 py-2 pl-2 pr-3.5 text-sm font-semibold"><span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/15"><Icon className="size-4 text-emerald-600" /></span>{item.label}</div> })}
-                  </div>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-xl border border-primary/25 bg-primary/5 p-4"><h3 className="font-sans text-base font-black uppercase">Opcjonalnie</h3><div className="mt-3 flex flex-wrap gap-2">{optionalFeatures.length > 0 ? optionalFeatures.map((item) => { const Icon = packageIcons[item.key]; return <span key={item.key} className="flex items-center gap-2 rounded-full border border-primary/30 bg-background py-1.5 pl-2 pr-3 text-sm font-semibold"><Icon className="size-4 text-primary" />{item.label}</span> }) : <p className="text-sm text-muted-foreground">Brak dodatkowych opcji.</p>}</div></div>
-                  <div className="rounded-xl border bg-secondary/50 p-4"><h3 className="font-sans text-base font-black uppercase">We własnym zakresie</h3><div className="mt-3 flex flex-wrap gap-2">{excludedFeatures.length > 0 ? excludedFeatures.map((item) => { const Icon = packageIcons[item.key]; return <span key={item.key} className="flex items-center gap-2 rounded-full border bg-background/70 py-1.5 pl-2 pr-3 text-sm font-semibold text-muted-foreground"><Icon className="size-4" />{item.label}</span> }) : <p className="text-sm text-muted-foreground">Pakiet obejmuje wszystkie główne elementy.</p>}</div></div>
-                </div>
-              </div>
-              {(trip.ticketCategory || trip.seatingInfo) && <div className="mt-5 rounded-2xl bg-foreground p-5 text-background"><div className="flex items-center gap-3"><TicketCheck className="size-6 text-primary" /><div><p className="font-bold">Bilet na mecz{trip.ticketCategory ? ` - ${trip.ticketCategory}` : ""}</p>{trip.seatingInfo && <p className="mt-1 text-sm text-background/65">{trip.seatingInfo}</p>}</div></div></div>}
-            </section>
-
-            <section id="plan" className="scroll-mt-24">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Krok po kroku</p>
-              <h2 className="mt-2 font-sans text-4xl font-black uppercase">Plan wyjazdu</h2>
-              <div className="mt-7 grid gap-3 md:grid-cols-2 lg:grid-cols-3">{(trip.itinerary.length > 0 ? trip.itinerary : defaultPlan).map((item, index) => <div key={`${item}-${index}`} className="relative overflow-hidden rounded-2xl border bg-card p-5"><span className="absolute right-3 top-1 font-sans text-6xl font-black text-secondary">{String(index + 1).padStart(2, "0")}</span><span className="relative flex size-10 items-center justify-center rounded-full bg-foreground font-sans font-black text-primary">{index + 1}</span><p className="relative mt-5 max-w-xs text-base font-semibold leading-7">{item}</p></div>)}</div>
-            </section>
-
-            {(hasHotel || hasFlight) && <div className={`grid gap-5 ${hasHotel && hasFlight ? "md:grid-cols-2" : ""}`}>
-              {hasHotel && <section id="hotel" className="scroll-mt-24 rounded-2xl bg-foreground p-6 text-background md:p-7"><BedDouble className="size-7 text-primary" /><p className="mt-5 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">{packageOptions.hotel === "optional" ? "Opcja dodatkowa" : "W pakiecie"}</p><h2 className="mt-2 font-sans text-3xl font-black uppercase">Hotel{trip.hotelStars > 0 ? ` ${trip.hotelStars}*` : ""}</h2><p className="mt-4 whitespace-pre-line leading-7 text-background/65">{trip.hotelInfo || "Dokładny obiekt potwierdzimy przed rezerwacją."}</p>{(trip.hotelBoard || trip.roomType) && <div className="mt-5 flex flex-wrap gap-2">{trip.hotelBoard && <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">{trip.hotelBoard}</span>}{trip.roomType && <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">{trip.roomType}</span>}</div>}</section>}
-              {hasFlight && <section id="loty" className="scroll-mt-24 rounded-2xl bg-primary p-6 text-primary-foreground md:p-7"><Plane className="size-7" /><p className="mt-5 font-mono text-xs font-bold uppercase tracking-[0.2em] opacity-60">{packageOptions.flight === "optional" ? "Opcja dodatkowa" : "W pakiecie"}</p><h2 className="mt-2 font-sans text-3xl font-black uppercase">Lot</h2><p className="mt-4 whitespace-pre-line leading-7 opacity-75">{trip.flightInfo || "Godziny i połączenie potwierdzamy po ustaleniu wariantu."}</p>{(trip.departureAirports || trip.flightType || trip.baggageInfo) && <div className="mt-5 space-y-2 text-sm"><p>{trip.departureAirports && <><strong>Lotniska: </strong>{trip.departureAirports}</>}</p><p>{trip.flightType && <><strong>Rodzaj lotu: </strong>{trip.flightType}</>}</p><p>{trip.baggageInfo && <><strong>Bagaż: </strong>{trip.baggageInfo}</>}</p></div>}</section>}
-            </div>}
-
-            {gallery.length > 0 && <section id="zdjecia" className="scroll-mt-24">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Zobacz atmosferę</p><h2 className="mt-2 font-sans text-4xl font-black uppercase">Zdjęcia</h2>
-              <div className="mt-7 grid gap-4 sm:grid-cols-2">{gallery.map((item, index) => <figure key={item.id} className={`group overflow-hidden rounded-xl bg-secondary ${index === 0 ? "sm:col-span-2" : ""}`}><div className={`relative ${index === 0 ? "aspect-[2/1]" : "aspect-[4/3]"}`}><Image src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || `Zdjęcie z wyjazdu ${trip.title}`} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes={index === 0 ? "(max-width: 1024px) 100vw, 66vw" : "(max-width: 1024px) 50vw, 33vw"} /></div>{item.caption && <figcaption className="p-4 text-sm text-muted-foreground">{item.caption}</figcaption>}</figure>)}</div>
-            </section>}
-
-            <section id="opinie" className="scroll-mt-24">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Sprawdzone emocje</p><h2 className="mt-2 font-sans text-4xl font-black uppercase">Opinie kibiców</h2>
-              {testimonials.length > 0 ? <div className="mt-7 grid gap-4 md:grid-cols-2">{testimonials.slice(0, 4).map((item) => <blockquote key={item.id} className="rounded-2xl border bg-card p-6"><div className="flex gap-1 text-primary" aria-label={`${item.rating} na 5 gwiazdek`}>{Array.from({ length: item.rating }).map((_, index) => <Star key={index} className="size-4 fill-current" />)}</div><p className="mt-4 leading-7 text-muted-foreground">„{item.content}”</p><footer className="mt-5 font-bold">{item.author}<span className="block text-xs font-normal text-muted-foreground">{item.tripName}</span></footer></blockquote>)}</div> : <p className="mt-5 text-muted-foreground">Pierwsze opinie z tego sezonu pojawią się wkrótce.</p>}
-            </section>
-
-            <section id="faq" className="scroll-mt-24">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Warto wiedzieć</p><h2 className="mt-2 font-sans text-4xl font-black uppercase">Najczęstsze pytania</h2>
-              <div className="mt-7 divide-y rounded-2xl border bg-card px-5">{faq.map((item) => <details key={item.question} className="group py-5"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">{item.question}<ChevronDown className="size-5 shrink-0 text-primary transition-transform group-open:rotate-180" /></summary><p className="max-w-2xl pt-3 text-sm leading-7 text-muted-foreground">{item.answer}</p></details>)}</div>
-            </section>
+      <section className="px-4 py-10 md:px-6 md:py-14">
+        <div className="mx-auto max-w-7xl space-y-10">
+            <TripDetailsTabs
+              descriptionHtml={sanitizeDescriptionHtml(trip.description)}
+              includedItems={includedItems}
+              optionalItems={optionalFeatures.map(({ key, label }) => ({ key, label }))}
+              excludedItems={excludedFeatures.map(({ key, label }) => ({ key, label }))}
+              ticketCategory={trip.ticketCategory}
+              seatingInfo={trip.seatingInfo}
+              itinerary={trip.itinerary.length > 0 ? trip.itinerary : defaultPlan}
+              hotel={hasHotel ? {
+                stars: trip.hotelStars,
+                info: trip.hotelInfo || "Dokładny obiekt potwierdzimy przed rezerwacją.",
+                board: trip.hotelBoard,
+                roomType: trip.roomType,
+                optional: packageOptions.hotel === "optional",
+              } : undefined}
+              flight={hasFlight ? {
+                info: trip.flightInfo || "Godziny i połączenie potwierdzamy po ustaleniu wariantu.",
+                airports: trip.departureAirports,
+                type: trip.flightType,
+                baggage: trip.baggageInfo,
+                optional: packageOptions.flight === "optional",
+              } : undefined}
+              gallery={gallery.map(({ id, mediaId, alt, caption }) => ({ id, mediaId, alt, caption }))}
+              testimonials={testimonials.slice(0, 4).map(({ id, author, tripName, content: testimonialContent, rating }) => ({ id, author, tripName, content: testimonialContent, rating }))}
+              faq={faq}
+              tripTitle={trip.title}
+            />
 
             <section id="rezerwacja" className="scroll-mt-24 overflow-hidden rounded-3xl bg-foreground text-background shadow-2xl">
               <div className="grid lg:grid-cols-[380px_minmax(0,1fr)]">
