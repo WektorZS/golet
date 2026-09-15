@@ -203,7 +203,7 @@ export function InquiryForm({
             htmlFor="phone"
             className="text-sm font-semibold text-white"
           >
-            Telefon
+            Numer telefonu
           </FieldLabel>
 
           <Input
@@ -278,7 +278,7 @@ export function InquiryForm({
                     >
                       {trip.title}
                       {formattedDate
-                        ? ` — ${formattedDate}`
+                        ? ` - ${formattedDate}`
                         : ""}
                     </option>
                   )
