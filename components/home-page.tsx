@@ -19,7 +19,7 @@ import {
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { SocialLinks } from "@/components/social-links"
-import { TripCard } from "@/components/trip-card"
+import { HomeTripCalendar } from "@/components/home-trip-calendar"
 import { SectionHeading } from "@/components/section-heading"
 import { InquiryForm } from "@/components/inquiry-form"
 import { ImageLightbox } from "@/components/image-lightbox"
@@ -347,11 +347,7 @@ OPIS W HERO PÓKI CO UKRYTY
             }
           />
 
-          <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {trips.map((trip) => (
-              <TripCard key={trip.id} trip={trip} />
-            ))}
-          </div>
+          <HomeTripCalendar trips={trips} />
 
           <div className="mt-8 flex justify-center">
             <Button
@@ -1071,3 +1067,4 @@ OPIS W HERO PÓKI CO UKRYTY
     </main>
   )
 }
+
