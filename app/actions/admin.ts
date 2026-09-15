@@ -17,6 +17,7 @@ import {
   teams,
   tripGalleryItems,
   trips,
+  youtubeVideos,
 } from "@/lib/db/schema"
 import { optimizeTeamLogo, optimizeUploadedImage } from "@/lib/optimize-image"
 import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
@@ -442,7 +443,7 @@ const ALLOWED_SETTING_KEYS = new Set([
   "customTripTitle", "packageTitle", "benefitsTitle", "galleryTitle", "galleryHomeLimit",
   "testimonialsTitle", "processTitle", "aboutTitle", "aboutText", "faqTitle", "contactTitle",
   "contactEmail", "contactPhone", "footerText", "companyName", "companyAddress", "companyNip",
-  "youtubeTitle", "youtubeUrl", "youtubeLimit", "youtubeEnabled",
+  "youtubeTitle", "youtubeUrl", "youtubeEnabled",
 ])
 
 export type SaveSettingsState = { error?: string; success?: boolean }
@@ -604,7 +605,158 @@ export async function syncYouTubeNow(_: SyncYouTubeState, _formData: FormData): 
     
   }
 }
+export async function addYouTubeVideoToHomepage(formData: FormData) {
+  const user = await requireAdmin()
+  const id = Number(formData.get("id"))
 
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error("Nieprawidłowy film.")
+  }
+
+  const [video] = await db
+    .select()
+    .from(youtubeVideos)
+    .where(eq(youtubeVideos.id, id))
+    .limit(1)
+
+  if (!video) {
+    throw new Error("Nie znaleziono filmu.")
+  }
+
+  // Film jest już wybrany — nie zmieniamy jego kolejności.
+  if (video.featured) {
+    return
+  }
+
+  // Pobieramy ostatnią pozycję spośród filmów widocznych na stronie.
+  const [lastVideo] = await db
+    .select({ sortOrder: youtubeVideos.sortOrder })
+    .from(youtubeVideos)
+    .where(eq(youtubeVideos.featured, true))
+    .orderBy(sql`${youtubeVideos.sortOrder} DESC`)
+    .limit(1)
+
+  const nextSortOrder = (lastVideo?.sortOrder ?? -1) + 1
+
+  await db
+    .update(youtubeVideos)
+    .set({
+      featured: true,
+      sortOrder: nextSortOrder,
+    })
+    .where(eq(youtubeVideos.id, id))
+
+  await logActivity(
+    user.id,
+    "featured",
+    "youtube",
+    String(id),
+    video.title
+  )
+
+  refreshPublic()
+}
+
+export async function removeYouTubeVideoFromHomepage(formData: FormData) {
+  const user = await requireAdmin()
+  const id = Number(formData.get("id"))
+
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error("Nieprawidłowy film.")
+  }
+
+  const [video] = await db
+    .select()
+    .from(youtubeVideos)
+    .where(eq(youtubeVideos.id, id))
+    .limit(1)
+
+  if (!video) {
+    throw new Error("Nie znaleziono filmu.")
+  }
+
+  await db
+    .update(youtubeVideos)
+    .set({
+      featured: false,
+      sortOrder: 0,
+    })
+    .where(eq(youtubeVideos.id, id))
+
+  // Po usunięciu normalizujemy kolejność pozostałych filmów.
+  const remainingVideos = await db
+    .select({ id: youtubeVideos.id })
+    .from(youtubeVideos)
+    .where(eq(youtubeVideos.featured, true))
+    .orderBy(asc(youtubeVideos.sortOrder), asc(youtubeVideos.id))
+
+  for (const [index, item] of remainingVideos.entries()) {
+    await db
+      .update(youtubeVideos)
+      .set({ sortOrder: index })
+      .where(eq(youtubeVideos.id, item.id))
+  }
+
+  await logActivity(
+    user.id,
+    "unfeatured",
+    "youtube",
+    String(id),
+    video.title
+  )
+
+  refreshPublic()
+}
+
+export async function reorderYouTubeVideos(formData: FormData) {
+  const user = await requireAdmin()
+
+  let items: { id: number; sortOrder: number }[]
+
+  try {
+    items = JSON.parse(String(formData.get("items") || "[]"))
+  } catch {
+    throw new Error("Nieprawidłowa kolejność filmów.")
+  }
+
+  if (!Array.isArray(items)) {
+    throw new Error("Nieprawidłowa kolejność filmów.")
+  }
+
+  const normalizedItems = items
+    .map((item, index) => ({
+      id: Number(item.id),
+      sortOrder: index,
+    }))
+    .filter((item) => Number.isInteger(item.id) && item.id > 0)
+
+  if (normalizedItems.length !== items.length) {
+    throw new Error("Nieprawidłowe dane filmów.")
+  }
+
+  // Zmieniamy kolejność wyłącznie filmów wybranych na stronę.
+  for (const item of normalizedItems) {
+    await db
+      .update(youtubeVideos)
+      .set({ sortOrder: item.sortOrder })
+      .where(
+        and(
+          eq(youtubeVideos.id, item.id),
+          eq(youtubeVideos.featured, true)
+        )
+      )
+  }
+
+  await logActivity(
+    user.id,
+    "reordered",
+    "youtube",
+    undefined,
+    `Zmieniono kolejność ${normalizedItems.length} filmów`
+  )
+
+  refreshPublic()
+}
 export async function reorderGalleryItems(formData: FormData) {
   const user = await requireAdmin()
 

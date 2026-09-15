@@ -7,7 +7,7 @@ import { db } from "@/lib/db"
 import { adminActivity, galleryItems, inquiries, mediaAssets, siteSettings, teams, testimonials, tripGalleryItems, trips } from "@/lib/db/schema"
 import { isAdminEmail } from "@/lib/auth/admin"
 import { getAuth, isAuthConfigured } from "@/lib/auth/server"
-import { getYouTubeVideos } from "@/lib/content"
+import { getAdminYouTubeVideos } from "@/lib/content"
 import { ensureTripColumns } from "@/lib/db/ensure-trip-columns"
 
 export const dynamic = "force-dynamic"
@@ -32,7 +32,7 @@ export default async function AdminPage() {
     db.select().from(adminActivity).orderBy(desc(adminActivity.createdAt)).limit(10),
   ])
   const settings = Object.fromEntries(rawSettings.map((item) => [item.key, item.value]))
-  const videos = await getYouTubeVideos(settings)
+ const videos = await getAdminYouTubeVideos(settings)
   const serializable = JSON.parse(JSON.stringify({ trips: allTrips, teams: allTeams, inquiries: allInquiries, testimonials: allTestimonials, media, gallery, tripGallery, settings, activity, videos, email: session.user.email })) as AdminData
   return <AdminDashboard data={serializable} />
 }
