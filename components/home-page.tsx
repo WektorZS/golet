@@ -208,6 +208,21 @@ export function HomePage({
   testimonials: Testimonial[]
   videos: YouTubeVideo[]
 }) {
+  const parsedFacebookReviewsCount = Number.parseInt(
+    content.facebookReviewsCount ?? "",
+    10
+  )
+
+  const facebookReviewsCount = Number.isFinite(parsedFacebookReviewsCount)
+    ? Math.max(0, parsedFacebookReviewsCount)
+    : 172
+const parsedFacebookReviewsAverage = Number.parseFloat(
+  content.facebookReviewsAverage ?? ""
+)
+
+const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
+  ? Math.min(5, Math.max(0, parsedFacebookReviewsAverage)).toFixed(1)
+  : "5.0"
   return (
     <main>
       <SiteHeader />
@@ -288,7 +303,7 @@ export function HomePage({
             </div>
 
             <p className="mt-1 text-xs font-medium text-background/60">
-              160 opinii na Facebooku
+              {facebookReviewsCount} opinii na Facebooku
             </p>
 
             <div className="mt-3 border-t border-background/10 pt-3">
@@ -351,92 +366,235 @@ export function HomePage({
         </div>
       </section>
 
-      <section id="twoj-wyjazd" className="scroll-mt-20 bg-secondary px-4 py-20 md:px-6">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
-          <div className="relative min-h-[430px] overflow-hidden rounded-xl">
-            <Image
-              src="/images/about-us.webp"
-              alt="Trybuny stadionu Camp Nou Let's Gol"
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 to-transparent" />
-
-            <p className="absolute bottom-6 left-6 max-w-sm font-sans text-3xl font-black uppercase text-background">
-              Twój mecz. Twój termin. Nasza logistyka.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-7">
-            <SectionHeading
-              eyebrow="Zrób to po swojemu"
-              title={
-                content.customTripTitle ||
-                "Nie ma meczu na liście? Zorganizujemy go dla Ciebie"
-              }
-              intro="Powiedz, gdzie chcesz lecieć. Przygotujemy indywidualny pakiet z lotem, hotelem, biletem i opieką."
-              align="left"
-            />
-
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {[
-                "Dowolny klub i liga",
-                "Elastyczne lotniska",
-                "Wybrany standard hotelu",
-                "Bilety w kilku kategoriach",
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-2 text-sm font-semibold"
-                >
-                  <Check className="text-primary" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-
-            <Button
-  className="w-fit"
-  size="lg"
-  nativeButton={false}
-  render={
-    <button
-      type="button"
-      data-open-floating-contact
-    />
-  }
+<section
+  id="twoj-wyjazd"
+  className="scroll-mt-20 bg-secondary px-4 py-20 md:px-6 md:py-24"
 >
-  Poproś o wycenę
-  <ArrowRight data-icon="inline-end" />
-</Button>
+  <div className="mx-auto max-w-7xl">
+
+    {/* ====================================================== */}
+    {/* GÓRNA CZĘŚĆ */}
+    {/* ====================================================== */}
+
+    <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+
+      {/* ================================================== */}
+      {/* ZDJĘCIE */}
+      {/* ================================================== */}
+
+      <div className="relative min-h-[420px] overflow-hidden rounded-xl md:min-h-[500px]">
+        <Image
+          src="/images/about-us.webp"
+          alt="Trybuny stadionu Camp Nou Let's Gol"
+          fill
+          className="object-cover"
+          sizes="(max-width: 1024px) 100vw, 45vw"
+        />
+
+        {/* Gradient TYLKO na zdjęciu, nie na tle sekcji */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+
+        <div className="absolute bottom-7 left-7 right-7">
+          <p className="max-w-sm font-sans text-3xl font-black uppercase leading-[1.05] text-white md:text-4xl">
+            Twój mecz.
+            <br />
+            Twój termin.
+            <br />
+            Nasza logistyka.
+          </p>
+        </div>
+      </div>
+
+      {/* ================================================== */}
+      {/* GŁÓWNA TREŚĆ */}
+      {/* ================================================== */}
+
+      <div>
+        <p className="font-mono text-[11px] font-black uppercase tracking-[0.22em] text-primary">
+          Indywidualny wyjazd
+        </p>
+
+        <h2 className="mt-4 max-w-3xl text-balance font-sans text-4xl font-black uppercase leading-[0.96] tracking-[-0.025em] text-foreground sm:text-5xl lg:text-6xl">
+          Nie ma Twojego
+          <br />
+          meczu?
+          <br />
+          Zorganizujemy go
+          <br />
+          dla Ciebie.
+        </h2>
+
+        <p className="mt-6 max-w-xl text-[15px] leading-7 text-muted-foreground md:text-base">
+          Nie znalazłeś odpowiedniego wyjazdu w kalendarzu?
+          Wskaż mecz, termin i zakres, a przygotujemy ofertę
+          dopasowaną do Twoich potrzeb.
+        </p>
+
+        {/* SZCZEGÓŁY */}
+        <div className="mt-7 grid gap-x-10 gap-y-3 sm:grid-cols-2">
+          {[
+            "Dowolny klub i liga",
+            "Elastyczne lotnisko",
+            "Standard hotelu",
+            "Kategoria biletu",
+          ].map((item) => (
+            <div
+              key={item}
+              className="flex items-center gap-2.5"
+            >
+              <Check className="size-4 shrink-0 text-primary" />
+
+              <span className="text-sm font-semibold text-foreground/80">
+                {item}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <Button
+          className="mt-9"
+          size="lg"
+          nativeButton={false}
+          render={
+            <button
+              type="button"
+              data-open-floating-contact
+            />
+          }
+        >
+          Wyceń mój wyjazd
+          <ArrowRight data-icon="inline-end" />
+        </Button>
+      </div>
+    </div>
+
+    {/* ====================================================== */}
+    {/* DOLNA CZĘŚĆ */}
+    {/* ====================================================== */}
+
+    <div className="mt-16 border-t border-foreground/10 pt-12 md:mt-20 md:pt-14">
+      <div className="grid gap-14 lg:grid-cols-2 lg:gap-20">
+
+        {/* ================================================== */}
+        {/* ZAKRES WYJAZDU */}
+        {/* ================================================== */}
+
+        <div>
+          <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-primary">
+            Dopasuj wyjazd do siebie
+          </p>
+
+          <h3 className="mt-3 text-2xl font-black uppercase leading-tight text-foreground md:text-3xl">
+            Ty wybierasz zakres
+          </h3>
+
+          <div className="mt-8 grid grid-cols-2 gap-x-10 gap-y-7">
+            {[
+              [TicketCheck, "Bilet na mecz"],
+              [Plane, "Bilet + lot"],
+              [Building2, "Bilet + hotel"],
+              [CalendarCheck, "Pełny pakiet"],
+            ].map(([Icon, label]) => {
+              const I = Icon as typeof Plane
+
+              return (
+                <div
+                  key={label as string}
+                  className="flex items-center gap-4"
+                >
+                  <I className="size-6 shrink-0 text-primary" />
+
+                  <span className="text-sm font-bold leading-tight text-foreground">
+                    {label as string}
+                  </span>
+                </div>
+              )
+            })}
           </div>
         </div>
-      </section>
 
-      <section
-        id="bilety"
-        className="bg-background px-4 py-16 md:px-6 md:py-20"
-      >
-        <div id="grupy" className="relative mx-auto max-w-7xl overflow-hidden rounded-2xl bg-foreground text-background shadow-[0_24px_70px_rgba(0,0,0,0.18)]">
-          <Image src="/images/hero-stadium.webp" alt="Indywidualnie zaplanowany wyjazd na mecz" fill className="object-cover opacity-30" sizes="100vw" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/40" />
-          <div className="relative grid gap-10 p-7 md:p-10 lg:grid-cols-[1.05fr_.95fr] lg:p-14">
-            <div>
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Indywidualna wycena</p>
-              <h2 className="mt-3 max-w-2xl font-sans text-4xl font-black uppercase leading-none md:text-5xl">Twój wyjazd. Ty decydujesz.</h2>
-              <p className="mt-5 max-w-2xl text-sm leading-7 text-background/75 md:text-base">Nie znalazłeś meczu w kalendarzu albo chcesz zmienić zakres gotowej oferty? Przygotujemy wyjazd dopasowany do terminu, budżetu, lotniska i liczby uczestników. Organizujemy również podróże dla rodzin, grup znajomych, firm, szkół i klubów sportowych.</p>
-              <Button className="mt-7" size="lg" nativeButton={false} render={<Link href="#kontakt" />}>Wyceń mój wyjazd<ArrowRight data-icon="inline-end" /></Button>
+        {/* ================================================== */}
+        {/* DLA KOGO */}
+        {/* ================================================== */}
+
+        <div>
+          <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-primary">
+            Nie tylko wyjazdy indywidualne
+          </p>
+
+          <h3 className="mt-3 max-w-xl text-2xl font-black uppercase leading-[1.08] text-foreground md:text-3xl">
+            Organizujemy wyjazdy również dla grup i firm
+          </h3>
+
+          <div className="mt-8 grid gap-x-12 gap-y-7 sm:grid-cols-2">
+
+            {/* OSOBY INDYWIDUALNE */}
+            <div className="flex items-start gap-4">
+              <Users className="mt-0.5 size-6 shrink-0 text-primary" />
+
+              <div>
+                <p className="text-[15px] font-black uppercase leading-tight text-foreground">
+                  Osoby indywidualne
+                </p>
+
+                <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
+                  Wyjazd dopasowany do Ciebie
+                </p>
+              </div>
             </div>
 
-            <div className="grid content-end gap-7">
-              <div><p className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">Wybierz zakres</p><div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">{[[TicketCheck, "Bilet na mecz"], [Plane, "Bilet + lot"], [Building2, "Bilet + hotel"], [CalendarCheck, "Pełny pakiet"]].map(([Icon, label]) => { const I = Icon as typeof Plane; return <div key={label as string} className="flex items-center gap-3 border-l border-white/20 pl-3"><I className="size-5 shrink-0 text-primary" /><span className="text-xs font-semibold">{label as string}</span></div> })}</div></div>
-              <div><p className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">Dla kogo</p><div className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-background/80"><span>Osoby indywidualne</span><span>Rodziny i grupy</span><span>Firmy</span><span>Szkoły i kluby</span></div></div>
+            {/* RODZINY I GRUPY */}
+            <div className="flex items-start gap-4">
+              <Users className="mt-0.5 size-6 shrink-0 text-primary" />
+
+              <div>
+                <p className="text-[15px] font-black uppercase leading-tight text-foreground">
+                  Rodziny i grupy
+                </p>
+
+                <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
+                  Wspólna podróż na wybrany mecz
+                </p>
+              </div>
             </div>
+
+            {/* FIRMY */}
+            <div className="flex items-start gap-4">
+              <Building2 className="mt-0.5 size-6 shrink-0 text-primary" />
+
+              <div>
+                <p className="text-[15px] font-black uppercase leading-tight text-foreground">
+                  Firmy
+                </p>
+
+                <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
+                  Integracje i wyjazdy dla zespołów
+                </p>
+              </div>
+            </div>
+
+            {/* SZKOŁY I KLUBY */}
+            <div className="flex items-start gap-4">
+              <Trophy className="mt-0.5 size-6 shrink-0 text-primary" />
+
+              <div>
+                <p className="text-[15px] font-black uppercase leading-tight text-foreground">
+                  Szkoły i kluby
+                </p>
+
+                <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
+                  Wyjazdy dla zorganizowanych grup
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
-      </section>
+      </div>
+    </div>
+
+  </div>
+</section>
 
       <section className="bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
@@ -547,6 +705,7 @@ export function HomePage({
 </section>
 
 <section className="relative overflow-hidden bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
+  {/* subtelne tło */}
   <div
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
@@ -556,14 +715,18 @@ export function HomePage({
 
   <div className="relative mx-auto max-w-7xl">
     <SectionHeading
-  eyebrow="Opinie klientów"
-  title={
-    content.testimonialsTitle ||
-    "Emocje potwierdzone na trybunach"
-  }
-  intro="Najlepiej o naszych wyjazdach opowiadają osoby, które już poleciały z nami na mecz."
-  inverse
-/>
+      eyebrow="Opinie klientów"
+      title={
+        content.testimonialsTitle ||
+        "Emocje potwierdzone na trybunach"
+      }
+      intro="Najlepiej o naszych wyjazdach opowiadają osoby, które już poleciały z nami na mecz."
+      inverse
+    />
+
+    {/* ====================================================== */}
+    {/* KARTY OPINII */}
+    {/* ====================================================== */}
 
     <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
       {(
@@ -582,11 +745,21 @@ export function HomePage({
       ).map((item) => (
         <blockquote
           key={item.id}
-          className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-black/[0.08] bg-card p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_18px_45px_rgba(0,0,0,0.08)] md:p-7"
+          className="group relative flex min-h-[270px] flex-col overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.045] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-white/[0.065] md:p-7"
         >
-          <div className="absolute left-0 top-0 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full" />
+          {/* żółty akcent na górze */}
+          <div className="absolute left-0 top-0 h-[2px] w-12 bg-primary transition-all duration-500 group-hover:w-full" />
 
-          <div className="flex gap-1 text-primary">
+          {/* duży dekoracyjny cudzysłów */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-1 top-1 select-none font-serif text-[110px] font-black leading-none text-white/[0.035]"
+          >
+            “
+          </span>
+
+          {/* GWIAZDKI */}
+          <div className="relative flex gap-1 text-primary">
             <span className="sr-only">
               Ocena {item.rating} na 5
             </span>
@@ -603,61 +776,77 @@ export function HomePage({
             ))}
           </div>
 
-          <p className="mt-5 flex-1 text-[15px] leading-7 text-foreground/80">
+          {/* TREŚĆ OPINII */}
+          <p className="relative mt-6 flex-1 text-[15px] font-medium leading-7 text-background/78">
             „{item.content}”
           </p>
 
-          <footer className="mt-6 border-t border-black/[0.07] pt-4">
-            <p className="font-bold">
-              {item.author}
-            </p>
+          {/* DOLNA CZĘŚĆ */}
+          <footer className="relative mt-7 flex items-end justify-between gap-4 border-t border-white/[0.08] pt-5">
+            <div>
+              {item.author && (
+                <p className="text-sm font-bold text-background">
+                  {item.author}
+                </p>
+              )}
 
-            {item.tripName && (
-              <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                {item.tripName}
-              </p>
-            )}
+              {item.tripName && (
+                <p className="mt-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-background/45">
+                  {item.tripName}
+                </p>
+              )}
+            </div>
+
+            <div
+              aria-hidden="true"
+              className="size-1.5 shrink-0 rounded-full bg-primary"
+            />
           </footer>
         </blockquote>
       ))}
     </div>
 
+    {/* ====================================================== */}
+    {/* PODSUMOWANIE OPINII */}
+    {/* ====================================================== */}
+
     <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row">
-  <div className="flex items-center gap-3">
-    <Star
-      className="size-5 text-primary"
-      fill="currentColor"
-      aria-hidden="true"
-    />
+      <div className="flex items-center gap-3">
+        <Star
+          className="size-5 text-primary"
+          fill="currentColor"
+          aria-hidden="true"
+        />
 
-    <div>
-      <p className="font-bold">
-        5.0/5 · 160 opinii
-      </p>
+        <div>
+          <p className="text-sm font-bold text-background">
+            {facebookReviewsAverage}/5 · {facebookReviewsCount} opinii
+          </p>
 
-      <p className="text-xs text-muted-foreground">
-        100% poleca nas na Facebooku
-      </p>
+          <p className="mt-0.5 text-xs text-background/45">
+            100% poleca nas na Facebooku
+          </p>
+        </div>
+      </div>
+
+      <div className="hidden h-8 w-px bg-white/15 sm:block" />
+
+      <Button
+        variant="outline"
+        className="border-white/20 bg-transparent text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
+        nativeButton={false}
+        render={
+          <a
+            href="https://www.facebook.com/profile.php?id=61573517165441&sk=reviews"
+            target="_blank"
+            rel="noopener noreferrer"
+          />
+        }
+      >
+        Zobacz wszystkie opinie
+        <ArrowRight data-icon="inline-end" />
+      </Button>
     </div>
-  </div>
-
-  <div className="hidden h-8 w-px bg-border sm:block" />
-
-  <Button
-    variant="outline"
-    nativeButton={false}
-    render={
-      <a
-        href="https://www.facebook.com/profile.php?id=61573517165441&sk=reviews"
-        target="_blank"
-        rel="noopener noreferrer"
-      />
-    }
-  >
-    Zobacz wszystkie opinie
-    <ArrowRight data-icon="inline-end" />
-  </Button>
-</div>
   </div>
 </section>
 
@@ -830,12 +1019,12 @@ export function HomePage({
                   />
 
                   <strong className="text-3xl font-black">
-                    5.0/5
-                  </strong>
+  {facebookReviewsAverage}/5
+</strong>
                 </div>
 
                 <p className="text-sm text-muted-foreground">
-                  Facebook · 160 opinii
+                  Facebook · {facebookReviewsCount} opinii
                 </p>
 
                 <p className="mt-1 w-fit bg-foreground px-2 py-1 text-xs font-semibold text-background">
