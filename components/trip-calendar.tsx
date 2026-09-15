@@ -181,7 +181,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                             {trip.hotelStars > 0 && packageOptions.hotel !== "excluded" && <span className="inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"><Star className="size-3 fill-primary text-primary" />Hotel {trip.hotelStars}*</span>}
                             {trip.ticketCategory && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">{trip.ticketCategory}</span>}
                           </div>
-                          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1"><span className="text-[10px] font-bold uppercase text-muted-foreground">Dostępne warianty:</span>{variants.map((variant) => <Link key={variant.key} href={`/wyjazdy/${trip.slug}?pakiet=${variant.key}#rezerwacja`} className="border-b border-primary/50 text-xs font-semibold hover:text-primary">{variant.shortLabel}</Link>)}</div>
+                          <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1"><span className="text-[10px] font-bold uppercase text-muted-foreground">Dostępne warianty:</span>{variants.map((variant, index) => <span key={variant.key} className="text-xs font-semibold">{index > 0 && <span className="mr-2 text-primary">/</span>}{variant.shortLabel}</span>)}</div>
                         </div>
 
                         <dl className="grid content-center gap-3 text-sm">

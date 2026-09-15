@@ -12,10 +12,10 @@ export const packageFeatures = [
 ] as const
 
 export const packageVariantOptions = [
+  { key: "full", label: "Pełny pakiet: bilet + lot + hotel", shortLabel: "Pełny pakiet" },
   { key: "ticket", label: "Sam bilet na mecz", shortLabel: "Bilet" },
   { key: "ticket_flight", label: "Bilet + lot", shortLabel: "Bilet + lot" },
   { key: "ticket_hotel", label: "Bilet + hotel", shortLabel: "Bilet + hotel" },
-  { key: "full", label: "Pełny pakiet: bilet + lot + hotel", shortLabel: "Pełny pakiet" },
 ] as const
 
 export type PackageVariantKey = (typeof packageVariantOptions)[number]["key"]

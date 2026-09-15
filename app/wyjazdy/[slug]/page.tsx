@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, ArrowRight, CalendarDays, Clock3, MapPin, MessageCircle, TicketCheck } from "lucide-react"
+import { ArrowLeft, ArrowRight, BedDouble, CalendarDays, Check, Clock3, MapPin, MessageCircle, Plane, TicketCheck } from "lucide-react"
 
 import { InquiryForm } from "@/components/inquiry-form"
 import { JsonLd } from "@/components/json-ld"
@@ -86,7 +86,8 @@ export default async function TripDetailPage({ params, searchParams }: { params:
   const teams = getTeams(trip.title, trip.opponent, trip.homeTeam, trip.awayTeam)
   const packageOptions = parsePackageItems(trip.packageItems)
   const packageVariants = getPackageVariants(trip.packageVariants, trip.packageItems)
-  const selectedPackageVariant = packageVariants.find((variant) => variant.key === pakiet) || packageVariants[0]
+  const selectedPackageVariant = packageVariants.find((variant) => variant.key === pakiet) || packageVariants.find((variant) => variant.key === "full") || packageVariants[0]
+  const fullPackageSelected = selectedPackageVariant.key === "full"
   const includedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "included")
   const optionalFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "optional")
   const excludedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "excluded")
@@ -103,7 +104,7 @@ export default async function TripDetailPage({ params, searchParams }: { params:
     : trip.durationNights
   const computedDays = computedNights !== trip.durationNights ? computedNights + 1 : trip.durationDays
   const whatsappNumber = (content.contactPhone || "+48501465318").replace(/\D/g, "")
-  const whatsappText = encodeURIComponent(`Dzień dobry, interesuje mnie wyjazd ${homeTeam} - ${awayTeam}, ${date}.`)
+  const whatsappText = encodeURIComponent(`Dzień dobry, interesuje mnie wyjazd ${homeTeam} - ${awayTeam}, ${date}. Wariant: ${selectedPackageVariant.label}.`)
   const availableTripOptions = publishedTrips
     .filter((item) => item.id !== trip.id && item.availabilityStatus !== "sold_out")
     .map((item) => ({
@@ -194,18 +195,24 @@ export default async function TripDetailPage({ params, searchParams }: { params:
                 <span className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || `Stadion w ${trip.city}`}</span>
                 <span className="flex items-center gap-2"><Clock3 className="size-4 text-primary" />{formatStay(computedDays, computedNights)}</span>
               </div>
-              <div className="mt-5 flex flex-wrap items-center gap-2"><span className="text-[10px] font-bold uppercase tracking-wider text-white/55">Dostępne warianty</span>{packageVariants.map((variant) => <Link key={variant.key} href={`?pakiet=${variant.key}#rezerwacja`} className={`border-b px-1 py-1 text-xs font-bold transition-colors ${selectedPackageVariant.key === variant.key ? "border-primary text-primary" : "border-white/30 text-white/85 hover:border-primary hover:text-primary"}`}>{variant.shortLabel}</Link>)}</div>
             </div>
 
             <div className="w-full rounded-2xl border border-white/15 bg-black/55 p-5 shadow-2xl backdrop-blur-md lg:w-80">
-              <p className="text-xs font-bold uppercase tracking-wider text-white/50">Cena od / osoba</p>
-              <p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-white/50">{fullPackageSelected ? "Cena od / osoba" : "Cena wybranego wariantu"}</p>
+              {fullPackageSelected ? <p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p> : <p className="mt-2 font-sans text-2xl font-black uppercase leading-tight text-primary">Ustalana indywidualnie</p>}
               <div className="mt-5 grid gap-3">
                 {soldOut ? <Button disabled size="lg">Wyprzedane</Button> : <Button size="lg" nativeButton={false} render={<a href="#rezerwacja" />}>Rezerwuj miejsce<ArrowRight data-icon="inline-end" /></Button>}
                 <Button variant="outline" size="lg" className="border-white/25 bg-white/5 text-white hover:bg-white/15 hover:text-white" nativeButton={false} render={<a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="wariant-pakietu" className="border-b bg-secondary px-4 py-8 md:px-6 md:py-10">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between"><div><p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Dopasuj ofertę</p><h2 id="wariant-pakietu" className="mt-1 font-sans text-2xl font-black uppercase md:text-3xl">Wybierz wariant pakietu</h2></div><p className="max-w-xl text-sm leading-6 text-muted-foreground">Niepełne pakiety wyceniamy indywidualnie według Twoich potrzeb. Zazwyczaj kosztują mniej niż pełny pakiet.</p></div>
+          <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">{packageVariants.map((variant) => { const VariantIcon = variant.key === "ticket" ? TicketCheck : variant.key === "ticket_flight" ? Plane : variant.key === "ticket_hotel" ? BedDouble : Check; const selected = variant.key === selectedPackageVariant.key; return <Link key={variant.key} href={`?pakiet=${variant.key}#wariant-pakietu`} aria-current={selected ? "true" : undefined} className={`group flex min-h-20 items-center gap-4 border-l-2 px-4 py-3 transition-colors ${selected ? "border-primary bg-background text-foreground" : "border-border bg-transparent text-muted-foreground hover:border-primary/60 hover:bg-background/60 hover:text-foreground"}`}><span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${selected ? "bg-primary text-primary-foreground" : "bg-background text-foreground group-hover:text-primary"}`}><VariantIcon className="size-5" /></span><span><strong className="block text-sm uppercase">{variant.shortLabel}</strong><span className="mt-1 block text-xs">{variant.key === "full" ? `od ${trip.price.toLocaleString("pl-PL")} zł` : "Wycena indywidualna"}</span></span></Link> })}</div>
         </div>
       </section>
 
@@ -263,7 +270,7 @@ export default async function TripDetailPage({ params, searchParams }: { params:
               <div className="mt-7 flex items-center gap-3 opacity-90"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-lg font-black text-background/35">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
               <h3 className="mt-5 font-sans text-2xl font-black uppercase">{homeTeam} - {awayTeam}</h3>
               <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-background/65"><p className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" />{date}</p><p className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || trip.city}</p></div>
-              {!soldOut && <div className="mt-7 border-t border-background/10 pt-6"><p className="text-xs font-bold uppercase tracking-wider text-background/40">Cena od / osoba</p><p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p></div>}
+              {!soldOut && <div className="mt-7 border-t border-background/10 pt-6"><p className="text-xs font-bold uppercase tracking-wider text-background/40">{fullPackageSelected ? "Cena od / osoba" : "Cena wariantu"}</p>{fullPackageSelected ? <p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p> : <><p className="mt-1 font-sans text-2xl font-black uppercase text-primary">Ustalana indywidualnie</p><p className="mt-2 max-w-sm text-xs leading-5 text-background/50">Cena zależy od wybranego zakresu i zazwyczaj jest niższa niż cena pełnego pakietu.</p></>}</div>}
               <Button variant="outline" size="lg" className="mt-6 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white" nativeButton={false} render={<a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
             </div>
           </div>

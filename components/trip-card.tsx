@@ -152,7 +152,7 @@ export function TripCard({ trip }: { trip: Trip }) {
               {packageOptions.flight === "excluded" && <span className="rounded-md bg-secondary px-2 py-1 text-[10px] font-semibold">Bez przelotu</span>}
               {trip.hotelStars > 0 && packageOptions.hotel !== "excluded" && <span className="rounded-md bg-secondary px-2 py-1 text-[10px] font-semibold">Hotel {trip.hotelStars}*</span>}
             </div>
-            <div className="mt-3 flex flex-wrap items-center gap-1.5"><span className="mr-1 text-[10px] font-bold uppercase text-muted-foreground">Wybierz:</span>{variants.map((variant) => <Link key={variant.key} href={`/wyjazdy/${trip.slug}?pakiet=${variant.key}#rezerwacja`} className="border-b border-primary/50 text-[11px] font-semibold transition-colors hover:text-primary">{variant.shortLabel}</Link>)}</div>
+            <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1"><span className="mr-1 text-[10px] font-bold uppercase text-muted-foreground">Dostępne warianty:</span>{variants.map((variant, index) => <span key={variant.key} className="text-[11px] font-semibold">{index > 0 && <span className="mr-2 text-primary">/</span>}{variant.shortLabel}</span>)}</div>
           </div>
           <div className="flex flex-col justify-center gap-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-2"><CalendarDays className="size-4 shrink-0 text-primary" aria-hidden="true" />{formatTripDates(trip.startDate, trip.endDate)}</span>

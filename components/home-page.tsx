@@ -417,55 +417,24 @@ export function HomePage({
 
       <section
         id="bilety"
-        className="bg-background px-4 py-20 md:px-6"
+        className="bg-background px-4 py-16 md:px-6 md:py-20"
       >
-        <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-2">
-          <article className="flex flex-col gap-5 rounded-xl border bg-card p-7 md:p-10">
-            <TicketCheck className="text-primary" aria-hidden="true" />
+        <div id="grupy" className="relative mx-auto max-w-7xl overflow-hidden rounded-2xl bg-foreground text-background shadow-[0_24px_70px_rgba(0,0,0,0.18)]">
+          <Image src="/images/hero-stadium.webp" alt="Indywidualnie zaplanowany wyjazd na mecz" fill className="object-cover opacity-30" sizes="100vw" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/40" />
+          <div className="relative grid gap-10 p-7 md:p-10 lg:grid-cols-[1.05fr_.95fr] lg:p-14">
+            <div>
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Indywidualna wycena</p>
+              <h2 className="mt-3 max-w-2xl font-sans text-4xl font-black uppercase leading-none md:text-5xl">Twój wyjazd. Ty decydujesz.</h2>
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-background/75 md:text-base">Nie znalazłeś meczu w kalendarzu albo chcesz zmienić zakres gotowej oferty? Przygotujemy wyjazd dopasowany do terminu, budżetu, lotniska i liczby uczestników. Organizujemy również podróże dla rodzin, grup znajomych, firm, szkół i klubów sportowych.</p>
+              <Button className="mt-7" size="lg" nativeButton={false} render={<Link href="#kontakt" />}>Wyceń mój wyjazd<ArrowRight data-icon="inline-end" /></Button>
+            </div>
 
-            <h2 className="font-sans text-3xl font-black uppercase">
-              Kup same bilety
-            </h2>
-
-            <p className="leading-relaxed text-muted-foreground">
-              Masz już lot i hotel? Znajdziemy pewne miejsca na wybrany mecz
-              i jasno określimy kategorię oraz sposób dostawy.
-            </p>
-
-            <Button
-              variant="outline"
-              className="mt-auto w-fit"
-              nativeButton={false}
-              render={<Link href="#kontakt" />}
-            >
-              Zapytaj o bilety
-            </Button>
-          </article>
-
-          <article
-            id="grupy"
-            className="flex flex-col gap-5 rounded-xl bg-foreground p-7 text-background md:p-10"
-          >
-            <Users className="text-primary" aria-hidden="true" />
-
-            <h2 className="font-sans text-3xl font-black uppercase">
-              Wyjazdy dla grup i firm
-            </h2>
-
-            <p className="leading-relaxed text-background/65">
-              Integracja, wyjazd klientów, szkółka piłkarska lub ekipa
-              znajomych. Zapewniamy spójną logistykę, rezerwacje grupowe
-              i dedykowanego opiekuna.
-            </p>
-
-            <Button
-              className="mt-auto w-fit"
-              nativeButton={false}
-              render={<Link href="#kontakt" />}
-            >
-              Przygotuj wyjazd grupowy
-            </Button>
-          </article>
+            <div className="grid content-end gap-7">
+              <div><p className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">Wybierz zakres</p><div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">{[[TicketCheck, "Bilet na mecz"], [Plane, "Bilet + lot"], [Building2, "Bilet + hotel"], [CalendarCheck, "Pełny pakiet"]].map(([Icon, label]) => { const I = Icon as typeof Plane; return <div key={label as string} className="flex items-center gap-3 border-l border-white/20 pl-3"><I className="size-5 shrink-0 text-primary" /><span className="text-xs font-semibold">{label as string}</span></div> })}</div></div>
+              <div><p className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">Dla kogo</p><div className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-background/80"><span>Osoby indywidualne</span><span>Rodziny i grupy</span><span>Firmy</span><span>Szkoły i kluby</span></div></div>
+            </div>
+          </div>
         </div>
       </section>
 
