@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { TripDetailsTabs } from "@/components/trip-details-tabs"
 import { Button } from "@/components/ui/button"
 import { getPublishedTestimonials, getSiteContent } from "@/lib/content"
-import { packageFeatures, packageSummary, parsePackageItems } from "@/lib/package-options"
+import { getPackageVariants, packageFeatures, parsePackageItems } from "@/lib/package-options"
 import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
 import { breadcrumbSchema } from "@/lib/seo"
 import { absoluteUrl } from "@/lib/site"
@@ -65,8 +65,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
-export default async function TripDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function TripDetailPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ pakiet?: string }> }) {
   const { slug } = await params
+  const { pakiet } = await searchParams
   const trip = await getTripBySlug(slug)
   if (!trip) notFound()
 
@@ -84,6 +85,8 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   const soldOut = trip.availabilityStatus === "sold_out"
   const teams = getTeams(trip.title, trip.opponent, trip.homeTeam, trip.awayTeam)
   const packageOptions = parsePackageItems(trip.packageItems)
+  const packageVariants = getPackageVariants(trip.packageVariants, trip.packageItems)
+  const selectedPackageVariant = packageVariants.find((variant) => variant.key === pakiet) || packageVariants[0]
   const includedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "included")
   const optionalFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "optional")
   const excludedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "excluded")
@@ -181,7 +184,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
           <div className="mt-auto grid items-end gap-10 pb-6 lg:grid-cols-[1fr_auto]">
             <div className="max-w-4xl">
               <span className={`inline-flex rounded-md px-3 py-1.5 font-mono text-[11px] font-black uppercase tracking-wider shadow ${status.className}`}>{status.label}</span>
-              {(trip.leagueName || trip.leagueLogo) && <div className="mt-5 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/80">{trip.leagueLogo && <span className="relative size-6"><Image src={trip.leagueLogo} alt={`Logo ${trip.leagueName}`} fill className="object-contain" sizes="24px" /></span>}<span>{trip.leagueName}</span></div>}
+              {(trip.leagueName || trip.leagueLogo) && <div className="mt-5 flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-white/90">{trip.leagueLogo && <span className="relative size-8 shrink-0 overflow-hidden rounded-md border border-white/80 bg-white p-1 shadow-[0_5px_18px_rgba(0,0,0,0.35)]"><Image src={trip.leagueLogo} alt={`Logo ${trip.leagueName}`} fill className="object-contain p-1" sizes="32px" /></span>}<span>{trip.leagueName}</span></div>}
               <div className="mt-6 flex items-center gap-4"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-2xl font-black text-white/50">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
               <p className="mt-6 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">{trip.city}, {trip.country}</p>
               <h1 className="mt-2 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-tight md:text-7xl">{homeTeam} - {awayTeam}</h1>
@@ -190,7 +193,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
                 <span className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || `Stadion w ${trip.city}`}</span>
                 <span className="flex items-center gap-2"><Clock3 className="size-4 text-primary" />{formatStay(computedDays, computedNights)}</span>
               </div>
-              <span className="mt-5 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85 backdrop-blur">{packageSummary(trip.packageItems)}</span>
+              <div className="mt-5 flex flex-wrap items-center gap-2"><span className="text-[10px] font-bold uppercase tracking-wider text-white/55">Dostępne warianty</span>{packageVariants.map((variant) => <Link key={variant.key} href={`?pakiet=${variant.key}#rezerwacja`} className={`border-b px-1 py-1 text-xs font-bold transition-colors ${selectedPackageVariant.key === variant.key ? "border-primary text-primary" : "border-white/30 text-white/85 hover:border-primary hover:text-primary"}`}>{variant.shortLabel}</Link>)}</div>
             </div>
 
             <div className="w-full rounded-2xl border border-white/15 bg-black/55 p-5 shadow-2xl backdrop-blur-md lg:w-80">
@@ -277,7 +280,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
             {soldOut ? (
               <InquiryForm trips={availableTripOptions} />
             ) : (
-              <InquiryForm matchName={`${homeTeam} - ${awayTeam}`} />
+              <InquiryForm matchName={`${homeTeam} - ${awayTeam}`} packageVariants={packageVariants.map((variant) => variant.label)} defaultPackageVariant={selectedPackageVariant.label} />
             )}
           </div>
         </div>

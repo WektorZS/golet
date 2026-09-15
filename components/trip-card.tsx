@@ -10,7 +10,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { packageSummary, parsePackageItems } from "@/lib/package-options"
+import { getPackageVariants, packageSummary, parsePackageItems } from "@/lib/package-options"
 import type { Trip } from "@/lib/trips"
 
 const dateFormatter = new Intl.DateTimeFormat("pl-PL", {
@@ -89,6 +89,7 @@ export function TripCard({ trip }: { trip: Trip }) {
   const packageOptions = parsePackageItems(trip.packageItems)
   const teams = getTeams(trip)
   const status = availability[trip.availabilityStatus as keyof typeof availability] || availability.available
+  const variants = getPackageVariants(trip.packageVariants, trip.packageItems)
 
   return (
     <article
@@ -151,6 +152,7 @@ export function TripCard({ trip }: { trip: Trip }) {
               {packageOptions.flight === "excluded" && <span className="rounded-md bg-secondary px-2 py-1 text-[10px] font-semibold">Bez przelotu</span>}
               {trip.hotelStars > 0 && packageOptions.hotel !== "excluded" && <span className="rounded-md bg-secondary px-2 py-1 text-[10px] font-semibold">Hotel {trip.hotelStars}*</span>}
             </div>
+            <div className="mt-3 flex flex-wrap items-center gap-1.5"><span className="mr-1 text-[10px] font-bold uppercase text-muted-foreground">Wybierz:</span>{variants.map((variant) => <Link key={variant.key} href={`/wyjazdy/${trip.slug}?pakiet=${variant.key}#rezerwacja`} className="border-b border-primary/50 text-[11px] font-semibold transition-colors hover:text-primary">{variant.shortLabel}</Link>)}</div>
           </div>
           <div className="flex flex-col justify-center gap-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-2"><CalendarDays className="size-4 shrink-0 text-primary" aria-hidden="true" />{formatTripDates(trip.startDate, trip.endDate)}</span>

@@ -58,9 +58,13 @@ function formatTripDate(date: string | null) {
 export function InquiryForm({
   matchName = "",
   trips = [],
+  packageVariants = [],
+  defaultPackageVariant = "",
 }: {
   matchName?: string
   trips?: InquiryTrip[]
+  packageVariants?: string[]
+  defaultPackageVariant?: string
 }) {
   const [state, action, pending] = useActionState(
     createInquiry,
@@ -71,6 +75,7 @@ export function InquiryForm({
   const [messageLength, setMessageLength] = useState(0)
   const [privacyConsent, setPrivacyConsent] = useState(false)
   const [selectedMatch, setSelectedMatch] = useState("")
+  const [selectedPackageVariant, setSelectedPackageVariant] = useState(defaultPackageVariant || packageVariants[0] || "")
   const [matchDropdownOpen, setMatchDropdownOpen] = useState(false)
 const matchDropdownRef = useRef<HTMLDivElement>(null)
 
@@ -210,7 +215,7 @@ const selectedTripLabel = selectedTrip
         <input
           type="hidden"
           name="matchName"
-          value={matchName}
+          value={`${matchName}${selectedPackageVariant ? ` - Pakiet: ${selectedPackageVariant}` : ""}`.slice(0, 160)}
         />
       )}
 
@@ -401,6 +406,8 @@ const selectedTripLabel = selectedTrip
     </div>
   </Field>
 )}
+
+        {hasSelectedTrip && packageVariants.length > 0 && <Field><FieldLabel htmlFor="packageVariant" className="text-sm font-semibold text-white">Wariant pakietu</FieldLabel><select id="packageVariant" value={selectedPackageVariant} onChange={(event) => setSelectedPackageVariant(event.target.value)} required className={inputClassName}>{packageVariants.map((variant) => <option key={variant} value={variant} className="bg-[#151515] text-white">{variant}</option>)}</select></Field>}
 
         <Field>
           <FieldLabel

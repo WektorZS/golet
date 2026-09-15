@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ArrowRight, CalendarDays, Clock3, MapPin, Plane, Star } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { packageSummary, parsePackageItems } from "@/lib/package-options"
+import { getPackageVariants, packageSummary, parsePackageItems } from "@/lib/package-options"
 import type { Trip } from "@/lib/trips"
 
 const monthFormatter = new Intl.DateTimeFormat("pl-PL", {
@@ -151,6 +151,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                 const { homeTeam, awayTeam } = getTeams(trip)
                 const stay = getStay(trip)
                 const packageOptions = parsePackageItems(trip.packageItems)
+                const variants = getPackageVariants(trip.packageVariants, trip.packageItems)
 
                 return (
                   <article key={trip.id} className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:border-primary/60 hover:shadow-lg">
@@ -180,6 +181,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                             {trip.hotelStars > 0 && packageOptions.hotel !== "excluded" && <span className="inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"><Star className="size-3 fill-primary text-primary" />Hotel {trip.hotelStars}*</span>}
                             {trip.ticketCategory && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">{trip.ticketCategory}</span>}
                           </div>
+                          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1"><span className="text-[10px] font-bold uppercase text-muted-foreground">Dostępne warianty:</span>{variants.map((variant) => <Link key={variant.key} href={`/wyjazdy/${trip.slug}?pakiet=${variant.key}#rezerwacja`} className="border-b border-primary/50 text-xs font-semibold hover:text-primary">{variant.shortLabel}</Link>)}</div>
                         </div>
 
                         <dl className="grid content-center gap-3 text-sm">

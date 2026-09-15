@@ -63,6 +63,7 @@ export function ensureTripColumns() {
           ADD COLUMN IF NOT EXISTS flight_info text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS faq text[] NOT NULL DEFAULT '{}',
           ADD COLUMN IF NOT EXISTS package_items text[] NOT NULL DEFAULT '{}',
+          ADD COLUMN IF NOT EXISTS package_variants text[] NOT NULL DEFAULT '{}',
           ADD COLUMN IF NOT EXISTS hotel_stars integer NOT NULL DEFAULT 0,
           ADD COLUMN IF NOT EXISTS hotel_board text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS room_type text NOT NULL DEFAULT '',

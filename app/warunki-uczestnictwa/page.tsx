@@ -969,7 +969,35 @@ export default function WarunkiUczestnictwaPage() {
           {/* 25 */}
           <section>
             <h2 className="text-2xl font-black uppercase">
-              25. Postanowienia końcowe
+              25. Znaki towarowe i oznaczenia podmiotów trzecich
+            </h2>
+
+            <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
+              <p>
+                Let&apos;s Gol jest niezależnym organizatorem turystyki oferującym
+                wyjazdy na wydarzenia sportowe. O ile wyraźnie nie wskazano
+                inaczej, Let&apos;s Gol nie jest oficjalnym partnerem, sponsorem ani
+                przedstawicielem prezentowanych klubów, lig, federacji ani
+                organizatorów wydarzeń.
+              </p>
+
+              <p>
+                Nazwy, herby, logotypy oraz inne oznaczenia klubów, lig,
+                federacji i wydarzeń prezentowane w Serwisie należą do ich
+                odpowiednich właścicieli. Oznaczenia te są wykorzystywane w celu
+                identyfikacji i przekazania informacji o wydarzeniach, których
+                dotyczą prezentowane oferty. Ich wykorzystanie nie oznacza
+                istnienia partnerstwa, sponsoringu, autoryzacji ani innego
+                oficjalnego powiązania pomiędzy Let&apos;s Gol a właścicielami tych
+                oznaczeń.
+              </p>
+            </div>
+          </section>
+
+          {/* 26 */}
+          <section>
+            <h2 className="text-2xl font-black uppercase">
+              26. Postanowienia końcowe
             </h2>
 
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground md:text-base">
@@ -1065,4 +1093,3 @@ export default function WarunkiUczestnictwaPage() {
     </main>
   )
 }
-

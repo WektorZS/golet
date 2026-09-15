@@ -49,6 +49,7 @@ export const trips = pgTable("trips", {
   flightInfo: text("flight_info").notNull().default(""),
   faq: text("faq").array().notNull().default([]),
   packageItems: text("package_items").array().notNull().default([]),
+  packageVariants: text("package_variants").array().notNull().default([]),
   hotelStars: integer("hotel_stars").notNull().default(0),
   hotelBoard: text("hotel_board").notNull().default(""),
   roomType: text("room_type").notNull().default(""),
@@ -190,4 +191,3 @@ export const youtubeVideos = pgTable("youtube_videos", {
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
 })
-

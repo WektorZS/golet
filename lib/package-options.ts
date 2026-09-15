@@ -11,6 +11,15 @@ export const packageFeatures = [
   { key: "local_transport", label: "Transport lokalny" },
 ] as const
 
+export const packageVariantOptions = [
+  { key: "ticket", label: "Sam bilet na mecz", shortLabel: "Bilet" },
+  { key: "ticket_flight", label: "Bilet + lot", shortLabel: "Bilet + lot" },
+  { key: "ticket_hotel", label: "Bilet + hotel", shortLabel: "Bilet + hotel" },
+  { key: "full", label: "Pełny pakiet: bilet + lot + hotel", shortLabel: "Pełny pakiet" },
+] as const
+
+export type PackageVariantKey = (typeof packageVariantOptions)[number]["key"]
+
 export type PackageFeatureKey = (typeof packageFeatures)[number]["key"]
 export type PackageFeatureStatus = "included" | "optional" | "excluded"
 
@@ -47,3 +56,16 @@ export function packageSummary(items: string[] | null | undefined) {
   return "Pakiet dopasowany"
 }
 
+export function inferPackageVariantKey(items: string[] | null | undefined): PackageVariantKey {
+  const values = parsePackageItems(items)
+  if (values.flight !== "excluded" && values.hotel !== "excluded") return "full"
+  if (values.flight !== "excluded") return "ticket_flight"
+  if (values.hotel !== "excluded") return "ticket_hotel"
+  return "ticket"
+}
+
+export function getPackageVariants(variants: string[] | null | undefined, items?: string[] | null) {
+  const keys = variants?.filter((key): key is PackageVariantKey => packageVariantOptions.some((option) => option.key === key)) || []
+  const resolved = keys.length ? keys : [inferPackageVariantKey(items)]
+  return packageVariantOptions.filter((option) => resolved.includes(option.key))
+}

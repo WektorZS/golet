@@ -85,7 +85,7 @@ function PackageItemsList({
       {items.map((item) => (
         <li key={item.key} className="flex min-w-0 items-center gap-3 text-sm font-semibold md:text-base">
           <PackageIcon item={item} className={`size-5 shrink-0 ${iconClassName}`} />
-          <span>{item.label}</span>
+          <span>{item.label}{item.key === "baggage" ? "*" : ""}</span>
         </li>
       ))}
     </ul>
@@ -160,6 +160,7 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
               {props.optionalItems.length > 0 && <div className="grid gap-5 py-6 md:grid-cols-[180px_1fr]"><div><p className="font-sans text-lg font-black uppercase">Opcjonalnie</p><p className="mt-1 text-xs text-muted-foreground">Możemy dodać do oferty</p></div><PackageItemsList items={props.optionalItems} tone="optional" /></div>}
               {props.excludedItems.length > 0 && <div className="grid gap-5 py-6 md:grid-cols-[180px_1fr]"><div><p className="font-sans text-lg font-black uppercase">We własnym zakresie</p><p className="mt-1 text-xs text-muted-foreground">Nie znajduje się w pakiecie</p></div><PackageItemsList items={props.excludedItems} tone="excluded" /></div>}
             </div>
+            {[...props.includedItems, ...props.optionalItems].some((item) => item.key === "baggage") && <p className="mt-4 max-w-3xl text-xs leading-5 text-muted-foreground"><strong className="text-foreground">* Bagaż:</strong> mały bagaż podręczny mieszczący się pod siedzeniem samolotu. Nie oznacza walizki kabinowej ani bagażu rejestrowanego, chyba że opis konkretnej oferty wyraźnie stanowi inaczej.</p>}
             {(props.ticketCategory || props.seatingInfo) && <div className="mt-6 flex items-start gap-3 border-l-2 border-primary py-2 pl-5"><TicketCheck className="mt-0.5 size-6 shrink-0 text-primary" /><div><p className="font-bold">Bilet na mecz{props.ticketCategory ? ` - ${props.ticketCategory}` : ""}</p>{props.seatingInfo && <p className="mt-1 text-sm leading-6 text-muted-foreground">{props.seatingInfo}</p>}</div></div>}
           </div>
 

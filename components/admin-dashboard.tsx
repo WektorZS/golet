@@ -116,7 +116,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { DeleteTripDialog } from "@/components/delete-trip-dialog"
-import { packageFeatures, parsePackageItems } from "@/lib/package-options"
+import { getPackageVariants, packageFeatures, packageVariantOptions, parsePackageItems } from "@/lib/package-options"
 
 import {
   DndContext,
@@ -1274,10 +1274,10 @@ const handleYouTubeDragEnd = async (event: any) => {
           />
 
           <Tabs defaultValue="photos" className="mt-6">
-            <TabsList>
-              <TabsTrigger value="photos"><FileImage />Zdjęcia i galerie</TabsTrigger>
-              <TabsTrigger value="logos"><Trophy />Herby drużyn</TabsTrigger>
-              <TabsTrigger value="team-galleries"><FileImage />Galerie drużyn</TabsTrigger>
+            <TabsList className="flex h-auto w-full justify-start gap-1 overflow-x-auto rounded-xl border bg-card p-1.5 [scrollbar-width:thin]">
+              <TabsTrigger className="min-w-max flex-1" value="photos"><FileImage />Zdjęcia i galerie</TabsTrigger>
+              <TabsTrigger className="min-w-max flex-1" value="logos"><Trophy />Herby drużyn</TabsTrigger>
+              <TabsTrigger className="min-w-max flex-1" value="team-galleries"><FileImage />Galerie drużyn</TabsTrigger>
             </TabsList>
 
             <TabsContent value="photos" className="mt-6">
@@ -3503,6 +3503,7 @@ function TripDialog({
   const [country, setCountry] = useState(trip?.country || "")
   const [stadium, setStadium] = useState(trip?.stadium || "")
   const packageValues = parsePackageItems(trip?.packageItems)
+  const activePackageVariants = getPackageVariants(trip?.packageVariants, trip?.packageItems).map((variant) => variant.key)
 
   const updateTitle = (homeId: string, awayId: string) => {
     const home = teams.find((team) => String(team.id) === homeId)
@@ -3803,6 +3804,14 @@ function TripDialog({
             </div>
           </div>
 
+          <div className="border-y py-5 sm:col-span-2">
+            <h3 className="font-sans text-lg font-black uppercase">Warianty dostępne dla klienta</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Zaznacz wszystkie warianty, które klient może wybrać dla tego wyjazdu.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {packageVariantOptions.map((variant) => <label key={variant.key} className="flex items-center gap-3 text-sm font-semibold"><input type="checkbox" name={`packageVariant.${variant.key}`} defaultChecked={activePackageVariants.includes(variant.key)} className="size-4 accent-primary" />{variant.label}</label>)}
+            </div>
+          </div>
+
           <Field label="Kategoria biletu" hint="Np. trybuna boczna, sektor gospodarzy lub kategoria 2."><Input name="ticketCategory" defaultValue={trip?.ticketCategory} /></Field>
           <Field label="Miejsca na stadionie" hint="Np. miejsca obok siebie lub zależnie od dostępności."><Input name="seatingInfo" defaultValue={trip?.seatingInfo} /></Field>
           <Field label="Standard hotelu" hint="Wybierz 0, jeśli hotel nie jest częścią oferty.">
@@ -3812,7 +3821,7 @@ function TripDialog({
           <Field label="Rodzaj pokoju" hint="Np. pokój dwuosobowy."><Input name="roomType" defaultValue={trip?.roomType} /></Field>
           <Field label="Lotniska wylotu" hint="Możesz podać kilka miast, np. Warszawa, Berlin, Poznań."><Input name="departureAirports" defaultValue={trip?.departureAirports} /></Field>
           <Field label="Rodzaj lotu" hint="Np. bezpośredni lub z jedną przesiadką."><Input name="flightType" defaultValue={trip?.flightType} /></Field>
-          <Field label="Bagaż" hint="Np. plecak w cenie, bagaż kabinowy opcjonalnie."><Input name="baggageInfo" defaultValue={trip?.baggageInfo} /></Field>
+          <Field label="Bagaż" hint="Domyślnie chodzi o mały bagaż podręczny mieszczący się pod siedzeniem. Każdy większy wariant opisz wyraźnie."><Input name="baggageInfo" defaultValue={trip?.baggageInfo} placeholder="Mały bagaż podręczny pod siedzenie" /></Field>
 
           <div className="sm:col-span-2">
             <Field

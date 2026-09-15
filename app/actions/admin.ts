@@ -23,7 +23,7 @@ import {
 } from "@/lib/db/schema"
 import { optimizeTeamLogo, optimizeUploadedImage } from "@/lib/optimize-image"
 import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
-import { packageFeatures, type PackageFeatureStatus } from "@/lib/package-options"
+import { packageFeatures, packageVariantOptions, type PackageFeatureStatus } from "@/lib/package-options"
 import { syncYouTubeVideos } from "@/lib/youtube-sync"
 
 const statuses = ["draft", "published", "archived"] as const
@@ -294,6 +294,7 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
       const value = clean(formData.get(`package.${key}`)) as PackageFeatureStatus
       return `${key}|${["included", "optional", "excluded"].includes(value) ? value : "excluded"}`
     }),
+    packageVariants: packageVariantOptions.filter(({ key }) => formData.get(`packageVariant.${key}`) === "on").map(({ key }) => key),
     itinerary: clean(formData.get("itinerary")).split("\n").map((item) => item.trim()).filter(Boolean),
     hotelInfo: clean(formData.get("hotelInfo")), flightInfo: clean(formData.get("flightInfo")),
     faq: clean(formData.get("faq")).split("\n").map((item) => item.trim()).filter(Boolean),
