@@ -3,7 +3,12 @@
 import Link from "next/link"
 import { useActionState, useState } from "react"
 import type { FormEvent } from "react"
-import { ArrowRight, Check, CheckCircle2 } from "lucide-react"
+import {
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  ChevronDown,
+} from "lucide-react"
 
 import {
   createInquiry,
@@ -25,14 +30,37 @@ const initialState: InquiryState = {
 }
 
 const MESSAGE_MAX_LENGTH = 1000
+const OTHER_MATCH_VALUE = "__other__"
+
+type InquiryTrip = {
+  id: number
+  title: string
+  date: string | null
+}
 
 const inputClassName =
   "h-11 rounded-lg border-white/25 bg-white/[0.015] px-3.5 text-sm text-white transition-all duration-200 placeholder:text-white/25 hover:border-white/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15"
 
+function formatTripDate(date: string | null) {
+  if (!date) {
+    return ""
+  }
+
+  const [year, month, day] = date.split("-")
+
+  if (!year || !month || !day) {
+    return ""
+  }
+
+  return `${day}.${month}.${year}`
+}
+
 export function InquiryForm({
   matchName = "",
+  trips = [],
 }: {
   matchName?: string
+  trips?: InquiryTrip[]
 }) {
   const [state, action, pending] = useActionState(
     createInquiry,
@@ -42,8 +70,10 @@ export function InquiryForm({
   const [formLoadedAt] = useState(() => Date.now())
   const [messageLength, setMessageLength] = useState(0)
   const [privacyConsent, setPrivacyConsent] = useState(false)
+  const [selectedMatch, setSelectedMatch] = useState("")
 
   const hasSelectedTrip = Boolean(matchName.trim())
+  const isOtherMatch = selectedMatch === OTHER_MATCH_VALUE
 
   const handleNameInput = (
     event: FormEvent<HTMLInputElement>
@@ -69,7 +99,6 @@ export function InquiryForm({
     }
 
     const hasPlus = value.startsWith("+")
-
     const digits = value
       .replace(/\D/g, "")
       .slice(0, 15)
@@ -137,6 +166,7 @@ export function InquiryForm({
         value={formLoadedAt}
       />
 
+      {/* Mecz przekazany z konkretnego wyjazdu */}
       {hasSelectedTrip && (
         <input
           type="hidden"
@@ -145,7 +175,6 @@ export function InquiryForm({
         />
       )}
 
-      {/* GŁÓWNE POLA */}
       <FieldGroup className="grid gap-x-4 gap-y-4 md:grid-cols-2">
         <Field>
           <FieldLabel
@@ -219,21 +248,52 @@ export function InquiryForm({
         {!hasSelectedTrip && (
           <Field>
             <FieldLabel
-              htmlFor="matchName"
+              htmlFor="matchSelection"
               className="text-sm font-semibold text-white"
             >
               Na jaki mecz?
             </FieldLabel>
 
-            <Input
-              id="matchName"
-              name="matchName"
-              required
-              maxLength={160}
-              placeholder="np. Barcelona - Real"
-              onInput={handleMatchNameInput}
-              className={inputClassName}
-            />
+            <div className="relative">
+              <select
+                id="matchSelection"
+                value={selectedMatch}
+                onChange={(event) =>
+                  setSelectedMatch(event.target.value)
+                }
+                required
+                className="h-11 w-full appearance-none rounded-lg border border-white/25 bg-foreground px-3.5 pr-10 text-sm text-white outline-none transition-all duration-200 hover:border-white/40 focus:border-primary focus:ring-2 focus:ring-primary/15"
+              >
+                <option value="" disabled>
+                  Wybierz mecz
+                </option>
+
+                {trips.map((trip) => {
+                  const formattedDate = formatTripDate(trip.date)
+
+                  return (
+                    <option
+                      key={trip.id}
+                      value={trip.title}
+                    >
+                      {trip.title}
+                      {formattedDate
+                        ? ` — ${formattedDate}`
+                        : ""}
+                    </option>
+                  )
+                })}
+
+                <option value={OTHER_MATCH_VALUE}>
+                  Inny mecz
+                </option>
+              </select>
+
+              <ChevronDown
+                aria-hidden="true"
+                className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-white/50"
+              />
+            </div>
           </Field>
         )}
 
@@ -281,7 +341,39 @@ export function InquiryForm({
         </Field>
       </FieldGroup>
 
-      {/* WIADOMOŚĆ */}
+      {/* Wybrany gotowy wyjazd */}
+      {!hasSelectedTrip && selectedMatch && !isOtherMatch && (
+        <input
+          type="hidden"
+          name="matchName"
+          value={selectedMatch}
+        />
+      )}
+
+      {/* Ręczne wpisanie meczu */}
+      {!hasSelectedTrip && isOtherMatch && (
+        <Field>
+          <FieldLabel
+            htmlFor="matchName"
+            className="text-sm font-semibold text-white"
+          >
+            Jaki mecz?
+          </FieldLabel>
+
+          <Input
+            id="matchName"
+            name="matchName"
+            required
+            maxLength={160}
+            placeholder="np. Arsenal - Liverpool"
+            onInput={handleMatchNameInput}
+            className={inputClassName}
+            autoFocus
+          />
+        </Field>
+      )}
+
+      {/* DODATKOWE INFORMACJE */}
       <Field>
         <div className="flex items-center justify-between gap-3">
           <FieldLabel
@@ -388,7 +480,7 @@ export function InquiryForm({
         </div>
       )}
 
-      {/* CTA */}
+      {/* PRZYCISK */}
       <Button
         type="submit"
         size="lg"
