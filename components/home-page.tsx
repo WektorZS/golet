@@ -847,7 +847,13 @@ OPIS W HERO PÓKI CO UKRYTY
             </div>
           </div>
 
-          <InquiryForm />
+          <InquiryForm
+  trips={trips.map((trip) => ({
+    id: trip.id,
+    title: trip.title,
+    date: trip.matchDate || trip.startDate,
+  }))}
+/>
         </div>
       </section>
 
