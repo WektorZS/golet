@@ -443,7 +443,7 @@ const ALLOWED_SETTING_KEYS = new Set([
   "customTripTitle", "packageTitle", "benefitsTitle", "galleryTitle", "galleryHomeLimit",
   "testimonialsTitle", "processTitle", "aboutTitle", "aboutText", "faqTitle", "contactTitle",
   "contactEmail", "contactPhone", "footerText", "companyName", "companyAddress", "companyNip",
-  "youtubeTitle", "youtubeUrl", "youtubeLimit", "youtubeEnabled",
+  "youtubeTitle", "youtubeUrl", "youtubeEnabled",
 ])
 
 export type SaveSettingsState = { error?: string; success?: boolean }
