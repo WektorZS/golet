@@ -2,8 +2,9 @@ import type { MetadataRoute } from "next"
 import { absoluteUrl } from "@/lib/site"
 import { getPublishedTrips } from "@/lib/trips"
 
-export const dynamic = "force-dynamic"
-export const revalidate = 0
+// Keep the sitemap cached at the edge instead of opening a database connection
+// for every crawler request. Admin mutations also invalidate /sitemap.xml.
+export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let trips: Awaited<ReturnType<typeof getPublishedTrips>> = []
@@ -36,4 +37,3 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ]
 }
-
