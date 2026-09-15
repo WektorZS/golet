@@ -1,11 +1,10 @@
 import type { Metadata } from "next"
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
 import { ImageLightbox } from "@/components/image-lightbox"
 import { JsonLd } from "@/components/json-ld"
-import { Button } from "@/components/ui/button"
 import { getPublishedGallery, getSiteContent } from "@/lib/content"
+import type { SiteContent } from "@/lib/content"
 import { SiteFooter } from "@/components/site-footer"
+import { SiteHeader } from "@/components/site-header"
 import { breadcrumbSchema } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
@@ -24,10 +23,12 @@ export const metadata: Metadata = {
 }
 
 export default async function GalleryPage() {
-  const [gallery, content] = await Promise.all([
-    getPublishedGallery(),
-    getSiteContent(),
-  ])
+  const [gallery, content] = process.env.DATABASE_URL
+    ? await Promise.all([
+        getPublishedGallery().catch(() => []),
+        getSiteContent().catch(() => ({} as SiteContent)),
+      ])
+    : [[], {} as SiteContent]
 
   const lightboxImages = gallery.map((item) => ({
     src: item.mediaId ? `/api/media/${item.mediaId}` : item.image,
@@ -57,46 +58,22 @@ export default async function GalleryPage() {
             },
           ],
         }} />
-        {/* HEADER */}
-        <header className="sticky top-0 z-50 border-b bg-foreground text-background">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
-            <Button
-              variant="ghost"
-              className="text-background hover:bg-background/10 hover:text-background"
-              nativeButton={false}
-              render={<Link href="/" />}
-            >
-              <ArrowLeft data-icon="inline-start" />
-              Strona główna
-            </Button>
+        <SiteHeader />
 
-            <Link
-              href="/"
-              className="font-sans text-xl font-black uppercase"
-            >
-              Let&apos;s Gol{" "}
-              <span className="text-primary">/ Galeria</span>
-            </Link>
-          </div>
-        </header>
-
-        {/* GALERIA */}
-        <section className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 md:px-6 md:py-16">
-          <div className="flex max-w-3xl flex-col gap-3">
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-primary">
-              Wspomnienia z trybun
-            </p>
-
-            <h1 className="text-balance font-sans text-4xl font-black uppercase md:text-6xl">
+        <section className="bg-foreground pt-20 text-background">
+          <div className="site-container py-14 md:py-18">
+            <p className="eyebrow eyebrow-on-dark">Wspomnienia z trybun</p>
+            <h1 className="mt-5 text-balance font-sans text-5xl font-black uppercase leading-[0.95] tracking-tight md:text-7xl">
               {content.galleryTitle || "Galeria z wyjazdów"}
             </h1>
-
-            <p className="text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">
-              Wszystkie opublikowane zdjęcia z naszych piłkarskich podróży w
-              jednym miejscu.
+            <p className="mt-5 max-w-2xl text-base leading-7 text-background/65 md:text-lg">
+              Stadiony, miasta i emocje z naszych piłkarskich podróży.
             </p>
           </div>
+        </section>
 
+        {/* GALERIA */}
+        <section className="site-container section-space flex flex-col gap-8">
           {gallery.length ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {gallery.map((item, index) => (

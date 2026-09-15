@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { JsonLd } from "@/components/json-ld"
 import { breadcrumbSchema } from "@/lib/seo"
+import { companyDetails, defaultContact } from "@/lib/site-data"
 
 export const dynamic = "force-dynamic"
 
@@ -17,10 +18,10 @@ export const metadata: Metadata = {
 }
 
 export default function PrivacyPolicyPage() {
-  const companyName = "LB Coaching Łukasz Borger"
-  const companyAddress = "ul. Stefana Roweckiego 1/2, 72-010 Police"
-  const companyNip = "8512915273"
-  const email = "kontakt.letsgol@gmail.com"
+  const companyName = companyDetails.name
+  const companyAddress = companyDetails.address
+  const companyNip = companyDetails.nip
+  const email = defaultContact.email
 
   return (
     <main className="min-h-screen bg-background text-foreground">

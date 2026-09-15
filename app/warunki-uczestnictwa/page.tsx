@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import {
-  ArrowLeft,
   AlertTriangle,
   CheckCircle2,
   FileText,
@@ -10,9 +9,10 @@ import {
 } from "lucide-react"
 
 import { SiteFooter } from "@/components/site-footer"
+import { SiteHeader } from "@/components/site-header"
 import { JsonLd } from "@/components/json-ld"
-import { Button } from "@/components/ui/button"
 import { breadcrumbSchema } from "@/lib/seo"
+import { companyDetails, defaultContact } from "@/lib/site-data"
 
 export const metadata: Metadata = {
   title: "Warunki uczestnictwa",
@@ -23,16 +23,16 @@ export const metadata: Metadata = {
 
 export default function WarunkiUczestnictwaPage() {
   const organizer = {
-    name: "LB Coaching Łukasz Borger",
-    address: "ul. Stefana Roweckiego 1/2, 72-010 Police",
-    nip: "8512915273",
-    regon: "520474445",
+    name: companyDetails.name,
+    address: companyDetails.address,
+    nip: companyDetails.nip,
+    regon: companyDetails.regon,
     registerNumber: "34/25",
     ewidencjaNumber: "42848",
     authority: "Marszałek Województwa Zachodniopomorskiego",
 
-    email: "kontakt.letsgol@gmail.com",
-    phone: "+48501465318",
+    email: defaultContact.email,
+    phone: defaultContact.phone,
   }
 
   return (
@@ -44,31 +44,10 @@ export default function WarunkiUczestnictwaPage() {
           { name: "Warunki uczestnictwa", path: "/warunki-uczestnictwa" },
         ])],
       }} />
-      {/* HEADER */}
-      <header className="sticky top-0 z-50 border-b bg-foreground text-background">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
-          <Button
-            variant="ghost"
-            className="text-background hover:bg-background/10 hover:text-background"
-            nativeButton={false}
-            render={<Link href="/" />}
-          >
-            <ArrowLeft data-icon="inline-start" />
-            Strona główna
-          </Button>
-
-          <Link
-            href="/"
-            className="font-sans text-xl font-black uppercase"
-          >
-            Let&apos;s Gol{" "}
-            <span className="text-primary">/ Warunki uczestnictwa</span>
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* HERO */}
-      <section className="border-b">
+      <section className="border-b pt-20">
         <div className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-24">
           <div className="max-w-3xl">
             <p className="mb-3 text-sm font-bold uppercase tracking-wider text-primary">
@@ -1047,7 +1026,7 @@ export default function WarunkiUczestnictwaPage() {
                   <p>{organizer.address}</p>
 
                   <p>NIP: {organizer.nip}</p>
-                  <p>REGON: 520474445</p>
+                  <p>REGON: {organizer.regon}</p>
                   <p>
                     Numer wpisu do rejestru:{" "}
                     {organizer.registerNumber}

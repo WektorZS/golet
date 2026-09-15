@@ -1,11 +1,5 @@
 import Image from "next/image"
-
-export const socialProfiles = [
-  { name: "Facebook", href: "https://facebook.com/profile.php?id=61573517165441", icon: "/icons/social/facebook.svg" },
-  { name: "Instagram", href: "https://instagram.com/letsgol_wyjazdynamecze", icon: "/icons/social/instagram.svg" },
-  { name: "TikTok", href: "https://tiktok.com/@letsgol.wyjazdynamecze", icon: "/icons/social/tiktok.svg" },
-  { name: "YouTube", href: "https://youtube.com/@LetsGolWyjazdynamecze", icon: "/icons/social/youtube.webp" },
-] as const
+import { socialProfiles } from "@/lib/site-data"
 
 export function SocialLinks({
   showLabels = false,

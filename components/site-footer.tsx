@@ -3,25 +3,24 @@ import { Mail, Phone, ArrowUpRight } from "lucide-react"
 import { Brand } from "@/components/site-header"
 import { SocialLinks } from "@/components/social-links"
 import type { SiteContent } from "@/lib/content"
+import { companyDetails, getContactDetails } from "@/lib/site-data"
 
 const quickLinks = [
   { label: "Wyjazdy", href: "/wyjazdy" },
   { label: "Twój wyjazd", href: "/#twoj-wyjazd" },
   { label: "Galeria", href: "/galeria" },
-  { label: "O nas", href: "/#o-nas" },
-  { label: "FAQ", href: "/#faq" },
-  { label: "Kontakt", href: "/#kontakt" },
+  { label: "O nas", href: "/o-nas" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Kontakt", href: "/kontakt" },
 ] as const
 
 export function SiteFooter({ content = {} }: { content?: SiteContent }) {
-  const phone = content.contactPhone || "+48 501 465 318"
-  const phoneHref = `tel:${phone.replace(/[^+\d]/g, "")}`
-  const email = content.contactEmail || "kontakt.letsgol@gmail.com"
+  const { phone, phoneHref, email } = getContactDetails(content)
 
   return (
     <footer className="bg-foreground text-background">
       {/* GŁÓWNA CZĘŚĆ FOOTERA */}
-      <div className="mx-auto grid max-w-7xl gap-x-8 gap-y-10 px-4 py-10 sm:grid-cols-2 md:px-6 lg:grid-cols-[1.05fr_0.72fr_1.22fr_1.05fr_1.5fr]">
+      <div className="site-container grid gap-x-8 gap-y-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.05fr_0.72fr_1.22fr_1.05fr_1.5fr] lg:py-14">
         {/* MARKA */}
         <div className="flex flex-col items-start gap-4">
           <Brand />
@@ -67,20 +66,20 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
 
           <div className="flex flex-col gap-2.5">
             <p className="font-medium text-background">
-              {content.companyName || "LB Coaching Łukasz Borger"}
+              {content.companyName || companyDetails.name}
             </p>
 
             <p className="max-w-[230px] leading-relaxed text-background/65">
               {content.companyAddress ||
-                "ul. Stefana Roweckiego 1/2, 72-010 Police"}
+                companyDetails.address}
             </p>
 
            <p className="text-background/65">
-  NIP: {content.companyNip || "8512915273"}
+  NIP: {content.companyNip || companyDetails.nip}
 </p>
 
 <p className="text-background/65">
-  REGON: 520474445
+  REGON: {companyDetails.regon}
 </p>
           </div>
         </div>
@@ -140,7 +139,7 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
           </div>
 
           <a
-            href="https://share.google/kRvcJRnquoIaDz3YT"
+            href={companyDetails.googleProfile}
             target="_blank"
             rel="noopener noreferrer"
             className="group mt-1 inline-flex w-fit items-center gap-2 text-background/65 transition-colors duration-200 hover:text-background"
@@ -164,7 +163,7 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
 
       {/* DOLNY PASEK */}
       <div className="border-t border-background/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-xs text-background/50 md:flex-row md:items-center md:justify-between md:px-6">
+        <div className="site-container flex flex-col gap-3 py-5 text-xs text-background/50 md:flex-row md:items-center md:justify-between">
           <p>
             © 2026 Let&apos;s Gol. Wszystkie prawa zastrzeżone.
           </p>

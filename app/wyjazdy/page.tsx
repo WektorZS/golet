@@ -1,11 +1,13 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowLeft, ArrowRight, CalendarDays, Search } from "lucide-react"
+import { ArrowRight, CalendarDays, Search } from "lucide-react"
 import { TripCalendar } from "@/components/trip-calendar"
 import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
+import { SiteHeader } from "@/components/site-header"
 import { Button } from "@/components/ui/button"
 import { getPublishedTrips } from "@/lib/trips"
+import { getSiteContent } from "@/lib/content"
 import { breadcrumbSchema } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
@@ -23,7 +25,12 @@ export const metadata: Metadata = {
 }
 
 export default async function TripsPage() {
-  const trips = await getPublishedTrips()
+  const [trips, content] = process.env.DATABASE_URL
+    ? await Promise.all([
+        getPublishedTrips().catch(() => []),
+        getSiteContent().catch(() => ({})),
+      ])
+    : [[], {}]
 
   return (
     <main className="min-h-screen bg-background">
@@ -46,15 +53,10 @@ export default async function TripsPage() {
           },
         ],
       }} />
-      <header className="border-b bg-foreground text-background">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
-          <Button variant="ghost" className="text-background hover:bg-background/10 hover:text-background" nativeButton={false} render={<Link href="/" />}><ArrowLeft data-icon="inline-start" />Strona główna</Button>
-          <Link href="/" className="font-sans text-xl font-black uppercase">Let&apos;s Gol <span className="text-primary">/ Wyjazdy</span></Link>
-        </div>
-      </header>
-      <section className="relative overflow-hidden bg-foreground px-4 py-16 text-background md:px-6 md:py-20">
+      <SiteHeader />
+      <section className="relative overflow-hidden bg-foreground pt-20 text-background">
         <div className="absolute -right-24 -top-28 size-80 rounded-full border-[55px] border-primary/10" />
-        <div className="relative mx-auto max-w-7xl">
+        <div className="site-container relative py-16 md:py-20">
           <div className="flex max-w-4xl items-start gap-5">
             <span className="hidden size-14 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground sm:flex"><CalendarDays className="size-7" /></span>
             <div>
@@ -66,8 +68,8 @@ export default async function TripsPage() {
         </div>
       </section>
 
-      <section className="px-4 py-12 md:px-6 md:py-16">
-        <div className="mx-auto max-w-7xl">
+      <section className="section-space">
+        <div className="site-container">
           <TripCalendar trips={trips} />
 
           <div className="relative mt-14 overflow-hidden rounded-2xl bg-foreground p-7 text-background shadow-xl md:p-10">
@@ -80,12 +82,12 @@ export default async function TripsPage() {
                   <p className="mt-2 leading-7 text-background/60">Napisz do nas. Przygotujemy indywidualny wyjazd i sprawdzimy dostępność biletów.</p>
                 </div>
               </div>
-              <Button className="h-12 w-full shrink-0 px-6 md:w-auto" size="lg" nativeButton={false} render={<Link href="/#kontakt" />}>Wyceń indywidualnie swój wyjazd <ArrowRight data-icon="inline-end" /></Button>
+              <Button className="h-12 w-full shrink-0 px-6 md:w-auto" size="lg" nativeButton={false} render={<Link href="/kontakt#formularz" />}>Wyceń indywidualnie swój wyjazd <ArrowRight data-icon="inline-end" /></Button>
             </div>
           </div>
         </div>
       </section>
-      <SiteFooter />
+      <SiteFooter content={content} />
     </main>
   )
 }
