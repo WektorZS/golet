@@ -1250,9 +1250,16 @@ const handleYouTubeDragEnd = async (event: any) => {
           <SectionHeader
             eyebrow="Biblioteka"
             title="Media i galerie"
-            description="Wgrywaj zdjęcia raz i wykorzystuj je w wielu miejscach."
+            description="Zdjęcia galerii i herby drużyn są przechowywane osobno, aby łatwiej było nimi zarządzać."
           />
 
+          <Tabs defaultValue="photos" className="mt-6">
+            <TabsList>
+              <TabsTrigger value="photos"><FileImage />Zdjęcia i galerie</TabsTrigger>
+              <TabsTrigger value="logos"><Trophy />Herby drużyn</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="photos" className="mt-6">
           <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
             <Card>
               <CardHeader>
@@ -1299,7 +1306,9 @@ const handleYouTubeDragEnd = async (event: any) => {
             </Card>
 
             <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-              {data.media.map((asset) => (
+              {data.media
+                .filter((asset) => !data.teams.some((team) => team.logo === `/api/media/${asset.id}`))
+                .map((asset) => (
                 <Card
                   key={asset.id}
                   className="overflow-hidden"
@@ -1573,6 +1582,45 @@ const handleYouTubeDragEnd = async (event: any) => {
                 ))}
             </CardContent>
           </Card>
+            </TabsContent>
+
+            <TabsContent value="logos" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Biblioteka herbów</CardTitle>
+                  <CardDescription>
+                    Herby dodajesz i zmieniasz w danych drużyny. Nie są wyświetlane w bibliotece zdjęć ani proponowane jako zdjęcia galerii.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {data.teams.length === 0 ? (
+                    <div className="flex min-h-48 flex-col items-center justify-center text-center">
+                      <Trophy className="mb-3 size-10 text-primary" />
+                      <p className="font-bold">Nie dodano jeszcze żadnej drużyny.</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      {data.teams.map((team) => (
+                        <div key={team.id} className="flex items-center gap-4 rounded-xl border p-4">
+                          <span className="relative block size-20 shrink-0 rounded-xl bg-secondary p-2">
+                            <Image src={team.logo} alt={`Herb ${team.name}`} fill className="object-contain p-2" sizes="80px" />
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate font-bold">{team.name}</p>
+                            <p className="mt-1 text-xs text-muted-foreground">{team.city}, {team.country}</p>
+                            <TeamDialog
+                              team={team}
+                              trigger={<Button className="mt-3" size="sm" variant="outline"><Pencil />Zmień herb</Button>}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="content">
@@ -4992,3 +5040,4 @@ function SettingsForm({
     </div>
   )
 }
+
