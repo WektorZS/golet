@@ -1274,10 +1274,10 @@ const handleYouTubeDragEnd = async (event: any) => {
           />
 
           <Tabs defaultValue="photos" className="mt-6">
-            <TabsList className="flex h-auto w-full justify-start gap-1 overflow-x-auto rounded-xl border bg-card p-1.5 [scrollbar-width:thin]">
-              <TabsTrigger className="min-w-max flex-1" value="photos"><FileImage />Zdjęcia i galerie</TabsTrigger>
-              <TabsTrigger className="min-w-max flex-1" value="logos"><Trophy />Herby drużyn</TabsTrigger>
-              <TabsTrigger className="min-w-max flex-1" value="team-galleries"><FileImage />Galerie drużyn</TabsTrigger>
+            <TabsList className="grid! h-auto! min-h-14 w-full grid-cols-3 gap-1 rounded-xl border bg-card p-1.5 shadow-sm">
+              <TabsTrigger className="h-full min-w-0 whitespace-normal px-2 py-3 text-center text-xs sm:text-sm" value="photos"><FileImage />Zdjęcia i galerie</TabsTrigger>
+              <TabsTrigger className="h-full min-w-0 whitespace-normal px-2 py-3 text-center text-xs sm:text-sm" value="logos"><Trophy />Herby drużyn</TabsTrigger>
+              <TabsTrigger className="h-full min-w-0 whitespace-normal px-2 py-3 text-center text-xs sm:text-sm" value="team-galleries"><FileImage />Galerie drużyn</TabsTrigger>
             </TabsList>
 
             <TabsContent value="photos" className="mt-6">
