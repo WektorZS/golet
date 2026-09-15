@@ -12,7 +12,7 @@ import { getPublishedTestimonials, getSiteContent } from "@/lib/content"
 import { packageFeatures, packageSummary, parsePackageItems } from "@/lib/package-options"
 import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
 import { absoluteUrl } from "@/lib/site"
-import { getTripBySlug, getTripGallery } from "@/lib/trips"
+import { getPublishedTrips, getTripBySlug, getTripGallery } from "@/lib/trips"
 
 export const dynamic = "force-dynamic"
 
@@ -68,7 +68,12 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   const trip = await getTripBySlug(slug)
   if (!trip) notFound()
 
-  const [gallery, testimonials, content] = await Promise.all([getTripGallery(trip.id), getPublishedTestimonials(), getSiteContent()])
+  const [gallery, testimonials, content, publishedTrips] = await Promise.all([
+    getTripGallery(trip.id),
+    getPublishedTestimonials(),
+    getSiteContent(),
+    getPublishedTrips(),
+  ])
   const dateFormatter = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric" })
   const startDate = dateFormatter.format(asDate(trip.startDate))
   const date = trip.endDate && trip.endDate !== trip.startDate ? `${startDate} - ${dateFormatter.format(asDate(trip.endDate))}` : startDate
@@ -94,6 +99,13 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   const computedDays = computedNights !== trip.durationNights ? computedNights + 1 : trip.durationDays
   const whatsappNumber = (content.contactPhone || "+48501465318").replace(/\D/g, "")
   const whatsappText = encodeURIComponent(`Dzień dobry, interesuje mnie wyjazd ${homeTeam} - ${awayTeam}, ${date}.`)
+  const availableTripOptions = publishedTrips
+    .filter((item) => item.id !== trip.id && item.availabilityStatus !== "sold_out")
+    .map((item) => ({
+      id: item.id,
+      title: item.title,
+      date: item.matchDate || item.startDate,
+    }))
   const faq = trip.faq.length > 0
     ? trip.faq.map((item) => { const [question, ...answer] = item.split("|"); return { question: question.trim(), answer: answer.join("|").trim() } }).filter((item) => item.question && item.answer)
     : [
@@ -161,58 +173,80 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
       </section>
 
       <section className="px-4 py-10 md:px-6 md:py-14">
-        <div className="mx-auto max-w-7xl space-y-10">
-            <TripDetailsTabs
-              descriptionHtml={sanitizeDescriptionHtml(trip.description)}
-              includedItems={includedItems}
-              optionalItems={optionalFeatures.map(({ key, label }) => ({ key, label }))}
-              excludedItems={excludedFeatures.map(({ key, label }) => ({ key, label }))}
-              ticketCategory={trip.ticketCategory}
-              seatingInfo={trip.seatingInfo}
-              itinerary={trip.itinerary.length > 0 ? trip.itinerary : defaultPlan}
-              hotel={hasHotel ? {
-                stars: trip.hotelStars,
-                info: trip.hotelInfo || "Dokładny obiekt potwierdzimy przed rezerwacją.",
-                board: trip.hotelBoard,
-                roomType: trip.roomType,
-                optional: packageOptions.hotel === "optional",
-              } : undefined}
-              flight={hasFlight ? {
-                info: trip.flightInfo || "Godziny i połączenie potwierdzamy po ustaleniu wariantu.",
-                airports: trip.departureAirports,
-                type: trip.flightType,
-                baggage: trip.baggageInfo,
-                optional: packageOptions.flight === "optional",
-              } : undefined}
-              gallery={gallery.map(({ id, mediaId, alt, caption }) => ({ id, mediaId, alt, caption }))}
-              testimonials={testimonials.slice(0, 4).map(({ id, author, tripName, content: testimonialContent, rating }) => ({ id, author, tripName, content: testimonialContent, rating }))}
-              faq={faq}
-              tripTitle={trip.title}
-            />
+        <div className="mx-auto max-w-7xl">
+          <TripDetailsTabs
+            descriptionHtml={sanitizeDescriptionHtml(trip.description)}
+            includedItems={includedItems}
+            optionalItems={optionalFeatures.map(({ key, label }) => ({ key, label }))}
+            excludedItems={excludedFeatures.map(({ key, label }) => ({ key, label }))}
+            ticketCategory={trip.ticketCategory}
+            seatingInfo={trip.seatingInfo}
+            itinerary={trip.itinerary.length > 0 ? trip.itinerary : defaultPlan}
+            hotel={hasHotel ? {
+              stars: trip.hotelStars,
+              info: trip.hotelInfo || "Dokładny obiekt potwierdzimy przed rezerwacją.",
+              board: trip.hotelBoard,
+              roomType: trip.roomType,
+              optional: packageOptions.hotel === "optional",
+            } : undefined}
+            flight={hasFlight ? {
+              info: trip.flightInfo || "Godziny i połączenie potwierdzamy po ustaleniu wariantu.",
+              airports: trip.departureAirports,
+              type: trip.flightType,
+              baggage: trip.baggageInfo,
+              optional: packageOptions.flight === "optional",
+            } : undefined}
+            gallery={gallery.map(({ id, mediaId, alt, caption }) => ({ id, mediaId, alt, caption }))}
+            testimonials={testimonials.slice(0, 4).map(({ id, author, tripName, content: testimonialContent, rating }) => ({ id, author, tripName, content: testimonialContent, rating }))}
+            faq={faq}
+            tripTitle={trip.title}
+          />
+        </div>
+      </section>
 
-            <section id="rezerwacja" className="scroll-mt-24 overflow-hidden rounded-3xl bg-foreground text-background shadow-2xl">
-              <div className="grid lg:grid-cols-[380px_minmax(0,1fr)]">
-                <div className="relative overflow-hidden border-b border-background/10 p-6 md:p-8 lg:border-b-0 lg:border-r">
-                  <div className="absolute -right-20 -top-20 size-64 rounded-full bg-primary/15 blur-3xl" />
-                  <div className="relative">
-                    <div className="flex items-center gap-3"><TicketCheck className="size-6 text-primary" /><p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Rezerwacja</p></div>
-                    <h2 className="mt-4 font-sans text-4xl font-black uppercase leading-none">Zarezerwuj miejsce</h2>
-                    <p className="mt-4 text-sm leading-6 text-background/60">Wyślij zapytanie. Sprawdzimy aktualną dostępność i przygotujemy konkretny wariant wyjazdu.</p>
-                    <div className="mt-7 flex items-center gap-3"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-lg font-black text-background/35">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
-                    <h3 className="mt-5 font-sans text-2xl font-black uppercase">{homeTeam} - {awayTeam}</h3>
-                    <div className="mt-5 space-y-2 text-sm text-background/65"><p className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" />{date}</p><p className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || trip.city}</p></div>
-                    <div className="mt-7 border-t border-background/10 pt-6"><p className="text-xs font-bold uppercase tracking-wider text-background/40">Cena od / osoba</p><p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p></div>
-                    <Button variant="outline" size="lg" className="mt-6 w-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white" nativeButton={false} render={<a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
-                  </div>
-                </div>
-                <div className="p-6 md:p-8 lg:p-10">
-                  <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Formularz zapytania</p>
-                  <h3 className="mt-2 font-sans text-3xl font-black uppercase">Podaj swoje dane</h3>
-                  <p className="mb-7 mt-2 text-sm text-background/55">Oddzwonimy lub odpiszemy z potwierdzeniem dostępności.</p>
-                  <InquiryForm matchName={`${homeTeam} - ${awayTeam}`} />
-                </div>
+      <section id="rezerwacja" className="scroll-mt-24 border-y border-white/10 bg-foreground px-4 text-background md:px-6">
+        <div className="mx-auto grid max-w-7xl lg:grid-cols-[0.8fr_1.2fr]">
+          <div className="relative overflow-hidden border-b border-background/10 py-10 md:py-14 lg:border-b-0 lg:border-r lg:pr-12">
+            <div className={`absolute -right-20 -top-20 size-72 rounded-full blur-3xl ${soldOut ? "bg-red-500/10" : "bg-primary/15"}`} />
+            <div className="relative">
+              <div className="flex items-center gap-3">
+                <TicketCheck className={`size-6 ${soldOut ? "text-red-400" : "text-primary"}`} />
+                <p className={`font-mono text-xs font-bold uppercase tracking-[0.2em] ${soldOut ? "text-red-400" : "text-primary"}`}>
+                  {soldOut ? "Brak miejsc" : "Rezerwacja"}
+                </p>
               </div>
-            </section>
+              <h2 className="mt-4 max-w-lg font-sans text-4xl font-black uppercase leading-none md:text-5xl">
+                {soldOut ? "Ten wyjazd jest już wyprzedany" : "Zarezerwuj miejsce"}
+              </h2>
+              <p className="mt-4 max-w-lg text-sm leading-6 text-background/60">
+                {soldOut
+                  ? "Na ten wyjazd nie przyjmujemy już rezerwacji. Wybierz inny dostępny mecz lub opisz wydarzenie, które mamy dla Ciebie wycenić."
+                  : "Wyślij zapytanie. Sprawdzimy aktualną dostępność i przygotujemy konkretny wariant wyjazdu."}
+              </p>
+              <div className="mt-7 flex items-center gap-3 opacity-90"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-lg font-black text-background/35">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
+              <h3 className="mt-5 font-sans text-2xl font-black uppercase">{homeTeam} - {awayTeam}</h3>
+              <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-background/65"><p className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" />{date}</p><p className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || trip.city}</p></div>
+              {!soldOut && <div className="mt-7 border-t border-background/10 pt-6"><p className="text-xs font-bold uppercase tracking-wider text-background/40">Cena od / osoba</p><p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p></div>}
+              <Button variant="outline" size="lg" className="mt-6 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white" nativeButton={false} render={<a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
+            </div>
+          </div>
+
+          <div className="py-10 md:py-14 lg:pl-12">
+            <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Formularz zapytania</p>
+            <h3 className="mt-2 font-sans text-3xl font-black uppercase">
+              {soldOut ? "Wybierz inny mecz" : "Podaj swoje dane"}
+            </h3>
+            <p className="mb-7 mt-2 text-sm text-background/55">
+              {soldOut
+                ? "Pokażemy dostępne wyjazdy, a jeśli nie ma Twojego meczu, przygotujemy ofertę indywidualną."
+                : "Oddzwonimy lub odpiszemy z potwierdzeniem dostępności."}
+            </p>
+            {soldOut ? (
+              <InquiryForm trips={availableTripOptions} />
+            ) : (
+              <InquiryForm matchName={`${homeTeam} - ${awayTeam}`} />
+            )}
+          </div>
         </div>
       </section>
 
@@ -220,3 +254,4 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
     </main>
   )
 }
+
