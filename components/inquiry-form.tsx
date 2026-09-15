@@ -367,7 +367,7 @@ const selectedTripLabel = selectedTrip
                   </span>
 
                   {formattedDate && (
-                    <span className="shrink-0 font-mono text-xs text-white/40">
+                    <span className="shrink-0 font-mono text-[13px] text-white/40">
   {formattedDate}
 </span>
                   )}
