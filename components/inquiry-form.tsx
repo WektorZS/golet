@@ -36,6 +36,7 @@ type InquiryTrip = {
   id: number
   title: string
   date: string | null
+  packageVariants: string[]
 }
 
 const inputClassName =
@@ -77,7 +78,9 @@ export function InquiryForm({
   const [selectedMatch, setSelectedMatch] = useState("")
   const [selectedPackageVariant, setSelectedPackageVariant] = useState(defaultPackageVariant || packageVariants[0] || "")
   const [matchDropdownOpen, setMatchDropdownOpen] = useState(false)
+  const [packageDropdownOpen, setPackageDropdownOpen] = useState(false)
 const matchDropdownRef = useRef<HTMLDivElement>(null)
+const packageDropdownRef = useRef<HTMLDivElement>(null)
 
   const hasSelectedTrip = Boolean(matchName.trim())
   const isOtherMatch = selectedMatch === OTHER_MATCH_VALUE
@@ -89,11 +92,13 @@ useEffect(() => {
     ) {
       setMatchDropdownOpen(false)
     }
+    if (packageDropdownRef.current && !packageDropdownRef.current.contains(event.target as Node)) setPackageDropdownOpen(false)
   }
 
   const handleEscape = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
       setMatchDropdownOpen(false)
+      setPackageDropdownOpen(false)
     }
   }
 
@@ -109,6 +114,7 @@ useEffect(() => {
 const selectedTrip = trips.find(
   (trip) => trip.title === selectedMatch
 )
+const availablePackageVariants = hasSelectedTrip ? packageVariants : selectedTrip?.packageVariants || []
 
 const selectedTripLabel = selectedTrip
   ? `${selectedTrip.title}${
@@ -359,6 +365,7 @@ const selectedTripLabel = selectedTrip
                   aria-selected={active}
                   onClick={() => {
                     setSelectedMatch(trip.title)
+                    setSelectedPackageVariant(trip.packageVariants[0] || "")
                     setMatchDropdownOpen(false)
                   }}
                   className={`flex w-full items-center justify-between gap-4 rounded-md px-3 py-2.5 text-left text-sm transition-colors ${
@@ -390,6 +397,7 @@ const selectedTripLabel = selectedTrip
               aria-selected={isOtherMatch}
               onClick={() => {
                 setSelectedMatch(OTHER_MATCH_VALUE)
+                setSelectedPackageVariant("")
                 setMatchDropdownOpen(false)
               }}
               className={`w-full rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors ${
@@ -407,7 +415,7 @@ const selectedTripLabel = selectedTrip
   </Field>
 )}
 
-        {hasSelectedTrip && packageVariants.length > 0 && <Field><FieldLabel htmlFor="packageVariant" className="text-sm font-semibold text-white">Wariant pakietu</FieldLabel><select id="packageVariant" value={selectedPackageVariant} onChange={(event) => setSelectedPackageVariant(event.target.value)} required className={inputClassName}>{packageVariants.map((variant) => <option key={variant} value={variant} className="bg-[#151515] text-white">{variant}</option>)}</select></Field>}
+        {availablePackageVariants.length > 0 && <Field><FieldLabel id="packageVariantLabel" className="text-sm font-semibold text-white">Wariant pakietu</FieldLabel><div ref={packageDropdownRef} className="relative"><button id="packageVariant" type="button" aria-haspopup="listbox" aria-expanded={packageDropdownOpen} aria-labelledby="packageVariantLabel packageVariant" onClick={() => setPackageDropdownOpen((open) => !open)} className={`flex h-11 w-full items-center justify-between gap-3 rounded-lg border bg-white/[0.015] px-3.5 text-left text-sm outline-none transition-all duration-200 ${packageDropdownOpen ? "border-primary ring-2 ring-primary/15" : "border-white/25 hover:border-white/40"}`}><span className={selectedPackageVariant ? "min-w-0 truncate text-white" : "min-w-0 truncate text-white/40"}>{selectedPackageVariant || "Wybierz wariant"}</span><ChevronDown aria-hidden="true" className={`size-4 shrink-0 text-white/50 transition-transform duration-200 ${packageDropdownOpen ? "rotate-180 text-primary" : ""}`} /></button>{packageDropdownOpen && <div role="listbox" aria-labelledby="packageVariantLabel" className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-lg border border-white/15 bg-[#151515] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55)]"><div className="max-h-64 overflow-y-auto">{availablePackageVariants.map((variant) => { const active = selectedPackageVariant === variant; return <button key={variant} type="button" role="option" aria-selected={active} onClick={() => { setSelectedPackageVariant(variant); setPackageDropdownOpen(false) }} className={`w-full rounded-md px-3 py-2.5 text-left text-sm transition-colors ${active ? "bg-primary/20 text-primary" : "text-white/80 hover:bg-primary/15 hover:text-primary"}`}>{variant}</button> })}</div></div>}</div></Field>}
 
         <Field>
           <FieldLabel
@@ -458,7 +466,7 @@ const selectedTripLabel = selectedTrip
         <input
           type="hidden"
           name="matchName"
-          value={selectedMatch}
+          value={`${selectedMatch}${selectedPackageVariant ? ` - Pakiet: ${selectedPackageVariant}` : ""}`.slice(0, 160)}
         />
       )}
 

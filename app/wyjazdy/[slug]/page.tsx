@@ -110,6 +110,7 @@ export default async function TripDetailPage({ params, searchParams }: { params:
       id: item.id,
       title: item.title,
       date: item.matchDate || item.startDate,
+      packageVariants: getPackageVariants(item.packageVariants, item.packageItems).map((variant) => variant.label),
     }))
   const faq = trip.faq.length > 0
     ? trip.faq.map((item) => { const [question, ...answer] = item.split("|"); return { question: question.trim(), answer: answer.join("|").trim() } }).filter((item) => item.question && item.answer)

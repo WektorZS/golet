@@ -37,6 +37,7 @@ import {
 
 import type { SiteContent, YouTubeVideo } from "@/lib/content"
 import type { Trip } from "@/lib/trips"
+import { getPackageVariants } from "@/lib/package-options"
 
 const trust = [
   [Users, "Setki zadowolonych klientów"],
@@ -1117,6 +1118,7 @@ export function HomePage({
       id: trip.id,
       title: trip.title,
       date: trip.matchDate || trip.startDate,
+      packageVariants: getPackageVariants(trip.packageVariants, trip.packageItems).map((variant) => variant.label),
     }))}
 />
         </div>
