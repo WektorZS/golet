@@ -239,7 +239,7 @@ OPIS W HERO PÓKI CO UKRYTY
                 size="lg"
                 className="h-13 rounded-md px-6 font-bold uppercase"
                 nativeButton={false}
-                render={<Link href="#wyjazdy" />}
+                render={<Link href="/wyjazdy" />}
               >
                 <span className="inline-flex items-center gap-2">
                   {content.heroCta || "Zobacz wyjazdy"}
@@ -248,14 +248,19 @@ OPIS W HERO PÓKI CO UKRYTY
               </Button>
 
               <Button
-                size="lg"
-                variant="outline"
-                className="h-13 rounded-md border-background/35 bg-foreground/20 px-6 font-bold uppercase text-background hover:bg-background hover:text-foreground"
-                nativeButton={false}
-                render={<Link href="#kontakt" />}
-              >
-                Wyceń mój wyjazd
-              </Button>
+  size="lg"
+  variant="outline"
+  className="h-13 rounded-md border-background/35 bg-foreground/20 px-6 font-bold uppercase text-background hover:bg-background hover:text-foreground"
+  nativeButton={false}
+  render={
+    <button
+      type="button"
+      data-open-floating-contact
+    />
+  }
+>
+  Wyceń mój wyjazd
+</Button>
             </div>
 
             <div className="hidden items-center gap-4 border-t border-background/20 pt-5 md:flex">
@@ -399,14 +404,19 @@ OPIS W HERO PÓKI CO UKRYTY
             </ul>
 
             <Button
-              className="w-fit"
-              size="lg"
-              nativeButton={false}
-              render={<Link href="#kontakt" />}
-            >
-              Poproś o wycenę
-              <ArrowRight data-icon="inline-end" />
-            </Button>
+  className="w-fit"
+  size="lg"
+  nativeButton={false}
+  render={
+    <button
+      type="button"
+      data-open-floating-contact
+    />
+  }
+>
+  Poproś o wycenę
+  <ArrowRight data-icon="inline-end" />
+</Button>
           </div>
         </div>
       </section>
