@@ -20,7 +20,7 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
 
   return (
     <footer className="bg-foreground text-background">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 md:px-6 lg:grid-cols-5">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 md:px-6 lg:grid-cols-[1.05fr_0.8fr_1fr_1fr_1.45fr] lg:gap-8">
         {/* MARKA */}
         <div className="flex flex-col gap-4">
           <Brand />
