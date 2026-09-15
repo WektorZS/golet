@@ -152,39 +152,50 @@ type Testimonial = {
 }
 
 function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
-  const items = gallery.slice(0, 5)
-  const featureFirst = items.length >= 3
+  const items = gallery.slice(0, 7)
 
   return (
-    <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 md:grid-rows-2">
       {items.map((item, index) => {
-        const isFeatured = featureFirst && index === 0
+        const isFeatured = index === 0
 
         return (
           <div
             key={item.id}
-            className={`relative aspect-square overflow-hidden rounded-xl ${
+            className={`group relative overflow-hidden rounded-xl ${
               isFeatured
-                ? "col-span-2 sm:col-span-2 sm:aspect-[2/1]"
-                : ""
+                ? "col-span-2 row-span-2 aspect-square md:aspect-auto"
+                : "aspect-square"
             }`}
           >
             <ImageLightbox
-              src={item.mediaId ? `/api/media/${item.mediaId}` : item.image}
+              src={
+                item.mediaId
+                  ? `/api/media/${item.mediaId}`
+                  : item.image
+              }
               alt={item.alt || item.title}
-              caption={[item.title, item.city].filter(Boolean).join(" · ")}
+              caption={[item.title, item.city]
+                .filter(Boolean)
+                .join(" · ")}
             >
               <Image
-                src={item.mediaId ? `/api/media/${item.mediaId}` : item.image}
+                src={
+                  item.mediaId
+                    ? `/api/media/${item.mediaId}`
+                    : item.image
+                }
                 alt={item.alt || item.title}
                 fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 sizes={
                   isFeatured
-                    ? "(max-width: 640px) 100vw, 66vw"
-                    : "(max-width: 640px) 50vw, 33vw"
+                    ? "(max-width: 768px) 100vw, 50vw"
+                    : "(max-width: 768px) 50vw, 25vw"
                 }
               />
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
             </ImageLightbox>
           </div>
         )
@@ -551,87 +562,157 @@ OPIS W HERO PÓKI CO UKRYTY
         </div>
       </section>
 
-      {/* GALERIA / OPINIE */}
-      <section className="bg-secondary px-4 py-20 md:px-6">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.25fr_0.75fr]">
-          <div>
-            <SectionHeading
-              eyebrow="Z pierwszego rzędu"
-              title={
-                content.galleryTitle ||
-                "Galeria z wyjazdów"
-              }
-              align="left"
-            />
+      {/* GALERIA */}
+<section className="relative overflow-hidden bg-secondary px-4 py-20 md:px-6 md:py-24">
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0"
+  >
+    <div className="absolute -right-40 top-[-120px] size-[420px] rounded-full bg-primary/[0.05] blur-[120px]" />
+  </div>
 
-            <HomeGallery gallery={gallery} />
+  <div className="relative mx-auto max-w-7xl">
+    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <SectionHeading
+        eyebrow="Z pierwszego rzędu"
+        title={
+          content.galleryTitle ||
+          "Galeria z wyjazdów"
+        }
+        intro="Stadiony, miasta i emocje, których nie da się oddać samym opisem."
+        align="left"
+      />
 
-            <Button
-              className="mt-6"
-              variant="outline"
-              nativeButton={false}
-              render={<Link href="/galeria" />}
-            >
-              Zobacz całą galerię
-              <ArrowRight data-icon="inline-end" />
-            </Button>
-          </div>
+      <Button
+        className="w-fit shrink-0"
+        variant="outline"
+        nativeButton={false}
+        render={<Link href="/galeria" />}
+      >
+        Zobacz całą galerię
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    </div>
 
-          <div className="flex flex-col justify-center">
-            <SectionHeading
-              eyebrow="Opinie klientów"
-              title={
-                content.testimonialsTitle ||
-                "Emocje potwierdzone na trybunach"
-              }
-              align="left"
-            />
+    <HomeGallery gallery={gallery} />
+  </div>
+</section>
 
-            {(
-              testimonials.length
-                ? testimonials.slice(0, 2)
-                : [
-                    {
-                      id: -1,
-                      author: "Kamil",
-                      tripName: "Barcelona",
-                      content:
-                        "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!",
-                      rating: 5,
-                    },
-                  ]
-            ).map((item) => (
-              <blockquote
-                key={item.id}
-                className="mt-4 rounded-xl bg-card p-7 shadow-sm"
-              >
-                <div className="flex gap-1 text-primary">
-                  <span className="sr-only">
-                    Ocena {item.rating} na 5
-                  </span>
+{/* OPINIE */}
+<section className="relative overflow-hidden bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0"
+  >
+    <div className="absolute -left-40 top-1/2 size-[420px] -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
+  </div>
 
-                  {Array.from({ length: item.rating }).map((_, i) => (
-                    <Star
-                      key={i}
-                      fill="currentColor"
-                      aria-hidden="true"
-                    />
-                  ))}
-                </div>
+  <div className="relative mx-auto max-w-7xl">
+    <SectionHeading
+  eyebrow="Opinie klientów"
+  title={
+    content.testimonialsTitle ||
+    "Emocje potwierdzone na trybunach"
+  }
+  intro="Najlepiej o naszych wyjazdach opowiadają osoby, które już poleciały z nami na mecz."
+  inverse
+/>
 
-                <p className="mt-5 text-lg leading-relaxed">
-                  „{item.content}”
-                </p>
+    <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {(
+        testimonials.length
+          ? testimonials.slice(0, 6)
+          : [
+              {
+                id: -1,
+                author: "Kamil",
+                tripName: "Barcelona",
+                content:
+                  "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!",
+                rating: 5,
+              },
+            ]
+      ).map((item) => (
+        <blockquote
+          key={item.id}
+          className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-black/[0.08] bg-card p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_18px_45px_rgba(0,0,0,0.08)] md:p-7"
+        >
+          <div className="absolute left-0 top-0 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full" />
 
-                <footer className="mt-5 font-semibold">
-                  {item.author}
-                  {item.tripName ? ` · ${item.tripName}` : ""}
-                </footer>
-              </blockquote>
+          <div className="flex gap-1 text-primary">
+            <span className="sr-only">
+              Ocena {item.rating} na 5
+            </span>
+
+            {Array.from({
+              length: item.rating,
+            }).map((_, i) => (
+              <Star
+                key={i}
+                className="size-4"
+                fill="currentColor"
+                aria-hidden="true"
+              />
             ))}
           </div>
-        </div>
-      </section>
+
+          <p className="mt-5 flex-1 text-[15px] leading-7 text-foreground/80">
+            „{item.content}”
+          </p>
+
+          <footer className="mt-6 border-t border-black/[0.07] pt-4">
+            <p className="font-bold">
+              {item.author}
+            </p>
+
+            {item.tripName && (
+              <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                {item.tripName}
+              </p>
+            )}
+          </footer>
+        </blockquote>
+      ))}
+    </div>
+
+    <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row">
+  <div className="flex items-center gap-3">
+    <Star
+      className="size-5 text-primary"
+      fill="currentColor"
+      aria-hidden="true"
+    />
+
+    <div>
+      <p className="font-bold">
+        5.0/5 · 160 opinii
+      </p>
+
+      <p className="text-xs text-muted-foreground">
+        100% poleca nas na Facebooku
+      </p>
+    </div>
+  </div>
+
+  <div className="hidden h-8 w-px bg-border sm:block" />
+
+  <Button
+    variant="outline"
+    nativeButton={false}
+    render={
+      <a
+        href="https://www.facebook.com/profile.php?id=61573517165441&sk=reviews"
+        target="_blank"
+        rel="noopener noreferrer"
+      />
+    }
+  >
+    Zobacz wszystkie opinie
+    <ArrowRight data-icon="inline-end" />
+  </Button>
+</div>
+  </div>
+</section>
 
       {/* PROCES */}
       <section className="bg-background px-4 py-20 md:px-6">
