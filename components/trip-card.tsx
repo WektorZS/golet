@@ -92,96 +92,71 @@ export function TripCard({ trip }: { trip: Trip }) {
 
   return (
     <article
-      className={`group relative flex h-full flex-col overflow-hidden rounded-xl border bg-card transition-all duration-300 hover:-translate-y-1 ${
+      className={`group relative overflow-hidden rounded-xl border bg-card transition-all duration-300 hover:border-primary/60 hover:shadow-lg ${
         trip.featured
-          ? "border-primary/50 shadow-lg shadow-primary/5 hover:border-primary/70 hover:shadow-xl hover:shadow-primary/10"
-          : "border-border shadow-sm hover:shadow-md"
+          ? "border-primary/50 shadow-md shadow-primary/5"
+          : "border-border shadow-sm"
       }`}
     >
-
-      <div className="relative aspect-[16/10] overflow-hidden bg-foreground">
-        <Image
-          src={trip.image}
-          alt={`Stadion w mieście ${trip.city}`}
-          fill
-          className="scale-[1.04] object-cover blur-[1.5px] transition-all duration-500 group-hover:scale-[1.09] group-hover:blur-[0.5px]"
-          sizes="(max-width: 768px) 100vw, 33vw"
-        />
-
-        <div className="absolute inset-0 bg-black/45" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/25" />
-
-        <Badge className={`absolute left-3 top-3 rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${status.className}`}>
-          {status.label}
-        </Badge>
-
-        {trip.featured && (
-          <Badge className="absolute right-3 top-3 gap-1.5 rounded-md border-0 bg-background/95 px-2.5 py-1 text-foreground shadow-sm backdrop-blur-sm">
-            <Star
-              className="size-3.5 fill-primary text-primary"
-              aria-hidden="true"
-            />
-            <span>Polecany</span>
+      <div className="grid md:grid-cols-[230px_minmax(0,1fr)] lg:grid-cols-[230px_minmax(0,1fr)_190px]">
+        <div className="relative min-h-44 overflow-hidden bg-foreground md:min-h-full">
+          <Image
+            src={trip.image}
+            alt={`Stadion w mieście ${trip.city}`}
+            fill
+            className="scale-[1.04] object-cover blur-[1.5px] transition-all duration-500 group-hover:scale-[1.09] group-hover:blur-[0.5px]"
+            sizes="(max-width: 768px) 100vw, 230px"
+          />
+          <div className="absolute inset-0 bg-black/45" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/25" />
+          <Badge className={`absolute left-3 top-3 rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${status.className}`}>
+            {status.label}
           </Badge>
-        )}
-
-        <div className="absolute inset-0 flex items-center justify-center gap-4 pt-3">
-          <TeamLogo src={trip.homeLogo} name={teams.home} />
-          <span className="font-sans text-xl font-black text-white/75">VS</span>
-          <TeamLogo src={trip.awayLogo} name={teams.away} />
-        </div>
-
-        <div className="absolute inset-x-4 bottom-3 text-center text-background">
-          <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-white/75">
+          {trip.featured && (
+            <Badge className="absolute right-3 top-3 gap-1 rounded-md border-0 bg-background/95 px-2.5 py-1 text-foreground shadow-sm backdrop-blur-sm">
+              <Star className="size-3 fill-primary text-primary" aria-hidden="true" />
+              <span>Polecany</span>
+            </Badge>
+          )}
+          <div className="absolute inset-0 flex items-center justify-center gap-3 pt-3">
+            <TeamLogo src={trip.homeLogo} name={teams.home} />
+            <span className="font-sans text-lg font-black text-white/75">VS</span>
+            <TeamLogo src={trip.awayLogo} name={teams.away} />
+          </div>
+          <p className="absolute inset-x-3 bottom-3 text-center font-mono text-[10px] font-semibold uppercase tracking-widest text-white/75">
             {trip.city} - {trip.country}
           </p>
         </div>
-      </div>
 
-      <div className="flex flex-1 flex-col gap-4 p-4">
-        <div>
-          <p className="text-xs font-bold uppercase text-primary">{packageSummary(trip.packageItems)}</p>
-          <h3 className="mt-1 font-sans text-2xl font-black uppercase leading-none tracking-tight">
-            {teams.home} - {teams.away}
-          </h3>
-        </div>
-
-        <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-          <span className="flex items-center gap-2">
-            <CalendarDays aria-hidden="true" />
-            {formatTripDates(trip.startDate, trip.endDate)}
-          </span>
-
-          <span className="flex items-center gap-2">
-            <MapPin aria-hidden="true" />
-            {trip.stadium || trip.city}
-          </span>
-          <span className="flex items-center gap-2">
-            <Clock3 aria-hidden="true" />
-            {formatStay(trip)}
-          </span>
-          <div className="flex flex-wrap gap-2 pt-1">
-            {packageOptions.hotel === "excluded" && <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-foreground">Bez hotelu</span>}
-            {packageOptions.flight === "excluded" && <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-foreground">Bez przelotu</span>}
-            {trip.hotelStars > 0 && packageOptions.hotel !== "excluded" && <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-foreground">Hotel {trip.hotelStars}*</span>}
-          </div>
-        </div>
-
-        <div className="mt-auto flex items-end justify-between gap-3 border-t pt-4">
+        <div className="grid gap-5 p-5 sm:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <p className="text-xs uppercase text-muted-foreground">
-              od osoby
-            </p>
-
-            <p className="text-2xl font-black">
-              {trip.price.toLocaleString("pl-PL")} zł
-            </p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-primary">{packageSummary(trip.packageItems)}</p>
+            <h3 className="mt-1 font-sans text-2xl font-black uppercase leading-tight tracking-tight">
+              {teams.home} - {teams.away}
+            </h3>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {packageOptions.hotel === "excluded" && <span className="rounded-md bg-secondary px-2 py-1 text-[10px] font-semibold">Bez hotelu</span>}
+              {packageOptions.flight === "excluded" && <span className="rounded-md bg-secondary px-2 py-1 text-[10px] font-semibold">Bez przelotu</span>}
+              {trip.hotelStars > 0 && packageOptions.hotel !== "excluded" && <span className="rounded-md bg-secondary px-2 py-1 text-[10px] font-semibold">Hotel {trip.hotelStars}*</span>}
+            </div>
           </div>
+          <div className="flex flex-col justify-center gap-2 text-sm text-muted-foreground">
+            <span className="flex items-center gap-2"><CalendarDays className="size-4 shrink-0 text-primary" aria-hidden="true" />{formatTripDates(trip.startDate, trip.endDate)}</span>
+            <span className="flex items-center gap-2"><MapPin className="size-4 shrink-0 text-primary" aria-hidden="true" />{trip.stadium || trip.city}</span>
+            <span className="flex items-center gap-2"><Clock3 className="size-4 shrink-0 text-primary" aria-hidden="true" />{formatStay(trip)}</span>
+          </div>
+        </div>
 
+        <div className="flex items-center justify-between gap-4 border-t bg-secondary/45 p-5 lg:flex-col lg:items-stretch lg:justify-center lg:border-l lg:border-t-0">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Cena od / osoba</p>
+            <p className="font-sans text-3xl font-black">{trip.price.toLocaleString("pl-PL")} zł</p>
+          </div>
           <Button
             nativeButton={false}
             render={<Link href={`/wyjazdy/${trip.slug}`} />}
             aria-label={`Szczegóły wyjazdu ${trip.title}`}
+            className="shrink-0"
           >
             Szczegóły
             <ArrowUpRight data-icon="inline-end" />

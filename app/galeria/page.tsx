@@ -2,17 +2,25 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { ImageLightbox } from "@/components/image-lightbox"
+import { JsonLd } from "@/components/json-ld"
 import { Button } from "@/components/ui/button"
 import { getPublishedGallery, getSiteContent } from "@/lib/content"
 import { SiteFooter } from "@/components/site-footer"
+import { breadcrumbSchema } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
-  title: "Galeria z wyjazdów | Let's Gol",
+  title: "Galeria z wyjazdów",
   description:
     "Zobacz zdjęcia z piłkarskich wyjazdów organizowanych przez Let's Gol.",
   alternates: { canonical: "/galeria" },
+  openGraph: {
+    title: "Galeria z wyjazdów Let’s Gol",
+    description: "Zobacz stadiony, miasta i emocje z piłkarskich podróży Let’s Gol.",
+    url: "/galeria",
+    images: [{ url: "/images/og-image.webp", width: 1200, height: 630, alt: "Galeria wyjazdów Let’s Gol" }],
+  },
 }
 
 export default async function GalleryPage() {
@@ -30,6 +38,25 @@ export default async function GalleryPage() {
   return (
     <>
       <main className="min-h-screen bg-background text-foreground">
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            breadcrumbSchema([
+              { name: "Strona główna", path: "/" },
+              { name: "Galeria", path: "/galeria" },
+            ]),
+            {
+              "@type": "ImageGallery",
+              name: content.galleryTitle || "Galeria z wyjazdów",
+              url: "https://letsgol.eu/galeria",
+              image: lightboxImages.map((item) => ({
+                "@type": "ImageObject",
+                contentUrl: new URL(item.src, "https://letsgol.eu").toString(),
+                caption: item.caption,
+              })),
+            },
+          ],
+        }} />
         {/* HEADER */}
         <header className="sticky top-0 z-50 border-b bg-foreground text-background">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
@@ -124,3 +151,4 @@ export default async function GalleryPage() {
     </>
   )
 }
+

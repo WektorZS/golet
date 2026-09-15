@@ -2,9 +2,11 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft, ArrowRight, CalendarDays, Search } from "lucide-react"
 import { TripCalendar } from "@/components/trip-calendar"
+import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
 import { getPublishedTrips } from "@/lib/trips"
+import { breadcrumbSchema } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
 
@@ -12,6 +14,12 @@ export const metadata: Metadata = {
   title: "Wyjazdy na mecze",
   description: "Aktualne pakiety na największe mecze piłkarskie w Europie: bilet, lot, hotel i opieka koordynatora.",
   alternates: { canonical: "/wyjazdy" },
+  openGraph: {
+    title: "Wyjazdy na mecze piłkarskie",
+    description: "Sprawdź aktualne terminy i pakiety wyjazdów na największe mecze w Europie.",
+    url: "/wyjazdy",
+    images: [{ url: "/images/og-image.webp", width: 1200, height: 630, alt: "Wyjazdy na mecze Let’s Gol" }],
+  },
 }
 
 export default async function TripsPage() {
@@ -19,6 +27,25 @@ export default async function TripsPage() {
 
   return (
     <main className="min-h-screen bg-background">
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@graph": [
+          breadcrumbSchema([
+            { name: "Strona główna", path: "/" },
+            { name: "Wyjazdy", path: "/wyjazdy" },
+          ]),
+          {
+            "@type": "ItemList",
+            name: "Aktualne wyjazdy na mecze",
+            itemListElement: trips.map((trip, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: `https://letsgol.eu/wyjazdy/${trip.slug}`,
+              name: trip.title,
+            })),
+          },
+        ],
+      }} />
       <header className="border-b bg-foreground text-background">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
           <Button variant="ghost" className="text-background hover:bg-background/10 hover:text-background" nativeButton={false} render={<Link href="/" />}><ArrowLeft data-icon="inline-start" />Strona główna</Button>

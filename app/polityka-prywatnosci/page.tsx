@@ -4,6 +4,8 @@ import { Cookie, FileText, ShieldCheck } from "lucide-react"
 
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
+import { JsonLd } from "@/components/json-ld"
+import { breadcrumbSchema } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
 
@@ -22,6 +24,13 @@ export default function PrivacyPolicyPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@graph": [breadcrumbSchema([
+          { name: "Strona główna", path: "/" },
+          { name: "Polityka prywatności i cookies", path: "/polityka-prywatnosci" },
+        ])],
+      }} />
       {/* HEADER */}
       <div className="relative bg-foreground pb-16 pt-28 text-background">
         <SiteHeader />
@@ -595,3 +604,4 @@ export default function PrivacyPolicyPage() {
     </main>
   )
 }
+

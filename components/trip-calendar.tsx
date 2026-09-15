@@ -82,15 +82,15 @@ function getStay(trip: Trip) {
 function TeamLogo({ src, name }: { src: string; name: string }) {
   if (!src) {
     return (
-      <span className="flex size-12 items-center justify-center rounded-full border bg-secondary font-sans text-sm font-black">
+      <span className="flex size-14 items-center justify-center rounded-full border border-white/25 bg-black/35 font-sans text-sm font-black text-white backdrop-blur-sm">
         {name.slice(0, 2).toUpperCase()}
       </span>
     )
   }
 
   return (
-    <span className="relative block size-12 shrink-0">
-      <Image src={src} alt={`Herb ${name}`} fill className="object-contain" sizes="48px" />
+    <span className="relative block size-14 shrink-0 drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)]">
+      <Image src={src} alt={`Herb ${name}`} fill className="object-contain" sizes="56px" />
     </span>
   )
 }
@@ -151,23 +151,24 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
 
                 return (
                   <article key={trip.id} className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:border-primary/60 hover:shadow-lg">
-                    <div className="grid lg:grid-cols-[230px_1fr_auto]">
-                      <div className="relative min-h-44 overflow-hidden lg:min-h-full">
-                        <Image src={trip.image} alt={`Stadion ${trip.stadium || trip.city}`} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 1024px) 100vw, 230px" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent lg:bg-gradient-to-r" />
+                    <div className="grid lg:grid-cols-[210px_1fr_auto]">
+                      <div className="relative min-h-40 overflow-hidden bg-foreground lg:min-h-full">
+                        <Image src={trip.image} alt={`Stadion ${trip.stadium || trip.city}`} fill className="scale-[1.04] object-cover blur-[1.5px] transition-all duration-500 group-hover:scale-[1.09] group-hover:blur-[0.5px]" sizes="(max-width: 1024px) 100vw, 210px" />
+                        <div className="absolute inset-0 bg-black/45" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/25" />
                         <span className={`absolute left-3 top-3 rounded-md px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-wider shadow ${status.className}`}>{status.label}</span>
-                        <p className="absolute bottom-3 left-3 text-xs font-bold uppercase tracking-wider text-white lg:hidden">{trip.city}, {trip.country}</p>
+                        <div className="absolute inset-0 flex items-center justify-center gap-3 pt-3">
+                          <TeamLogo src={trip.homeLogo} name={homeTeam} />
+                          <span className="font-sans text-lg font-black text-white/75">VS</span>
+                          <TeamLogo src={trip.awayLogo} name={awayTeam} />
+                        </div>
+                        <p className="absolute inset-x-3 bottom-3 text-center font-mono text-[10px] font-bold uppercase tracking-wider text-white/75">{trip.city}, {trip.country}</p>
                       </div>
 
-                      <div className="grid gap-6 p-5 md:grid-cols-[1.2fr_1fr] md:p-6">
+                      <div className="grid gap-5 p-5 md:grid-cols-[1.2fr_1fr]">
                         <div>
-                          <div className="flex items-center gap-3">
-                            <TeamLogo src={trip.homeLogo} name={homeTeam} />
-                            <span className="font-sans text-xl font-black text-muted-foreground">VS</span>
-                            <TeamLogo src={trip.awayLogo} name={awayTeam} />
-                          </div>
-                          <p className="mt-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-primary">{trip.city}, {trip.country}</p>
-                          <h3 className="mt-1 font-sans text-2xl font-black uppercase leading-tight md:text-3xl">{homeTeam} - {awayTeam}</h3>
+                          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-primary">{trip.city}, {trip.country}</p>
+                          <h3 className="mt-1 font-sans text-2xl font-black uppercase leading-tight">{homeTeam} - {awayTeam}</h3>
                           <div className="mt-3 flex flex-wrap gap-2">
                             <span className="rounded-md bg-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-background">{packageSummary(trip.packageItems)}</span>
                             {packageOptions.flight === "excluded" && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">Bez przelotu</span>}
@@ -182,7 +183,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                         </dl>
                       </div>
 
-                      <div className="flex items-center justify-between gap-5 border-t bg-secondary/45 p-5 lg:w-52 lg:flex-col lg:items-stretch lg:justify-center lg:border-l lg:border-t-0">
+                      <div className="flex items-center justify-between gap-5 border-t bg-secondary/45 p-5 lg:w-48 lg:flex-col lg:items-stretch lg:justify-center lg:border-l lg:border-t-0">
                         <div>
                           <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Cena od / osoba</p>
                           <p className="font-sans text-3xl font-black">{trip.price.toLocaleString("pl-PL")} zł</p>

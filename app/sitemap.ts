@@ -6,7 +6,13 @@ export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const trips = await getPublishedTrips()
+  let trips: Awaited<ReturnType<typeof getPublishedTrips>> = []
+
+  try {
+    trips = await getPublishedTrips()
+  } catch (error) {
+    console.error("Sitemap: nie udało się pobrać wyjazdów", error)
+  }
 
   return [
     { url: absoluteUrl(), changeFrequency: "weekly", priority: 1 },
@@ -30,3 +36,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ]
 }
+

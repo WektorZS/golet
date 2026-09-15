@@ -5,12 +5,14 @@ import { notFound } from "next/navigation"
 import { ArrowLeft, ArrowRight, CalendarDays, Clock3, MapPin, MessageCircle, TicketCheck } from "lucide-react"
 
 import { InquiryForm } from "@/components/inquiry-form"
+import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { TripDetailsTabs } from "@/components/trip-details-tabs"
 import { Button } from "@/components/ui/button"
 import { getPublishedTestimonials, getSiteContent } from "@/lib/content"
 import { packageFeatures, packageSummary, parsePackageItems } from "@/lib/package-options"
 import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
+import { breadcrumbSchema } from "@/lib/seo"
 import { absoluteUrl } from "@/lib/site"
 import { getPublishedTrips, getTripBySlug, getTripGallery } from "@/lib/trips"
 
@@ -114,8 +116,15 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
         { question: "Czy mogę wyjechać z innego lotniska?", answer: "Tak, sprawdzamy połączenia z lotniska najwygodniejszego dla uczestnika." },
       ]
 
-  const jsonLd = {
-    "@context": "https://schema.org",
+  const offerSchema = {
+    "@type": "Offer",
+    url: absoluteUrl(`/wyjazdy/${trip.slug}`),
+    price: trip.price,
+    priceCurrency: "PLN",
+    availability: `https://schema.org/${status.schema}`,
+    seller: { "@id": absoluteUrl("/#organization") },
+  }
+  const tripSchema = {
     "@type": "TouristTrip",
     "@id": absoluteUrl(`/wyjazdy/${trip.slug}#trip`),
     url: absoluteUrl(`/wyjazdy/${trip.slug}`),
@@ -125,7 +134,30 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
     touristType: "Kibice piłkarscy",
     startDate: trip.startDate,
     ...(trip.endDate && { endDate: trip.endDate }),
-    offers: { "@type": "Offer", url: absoluteUrl(`/wyjazdy/${trip.slug}`), price: trip.price, priceCurrency: "PLN", availability: `https://schema.org/${status.schema}`, seller: { "@id": absoluteUrl("/#organization") } },
+    provider: { "@id": absoluteUrl("/#organization") },
+    offers: offerSchema,
+  }
+  const productSchema = {
+    "@type": "Product",
+    "@id": absoluteUrl(`/wyjazdy/${trip.slug}#package`),
+    name: `Wyjazd na mecz ${homeTeam} - ${awayTeam}`,
+    description: stripHtml(trip.description),
+    image: absoluteUrl(trip.image),
+    category: "Pakiet turystyczny na mecz piłkarski",
+    brand: { "@type": "Brand", name: "Let’s Gol" },
+    offers: offerSchema,
+  }
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      tripSchema,
+      productSchema,
+      breadcrumbSchema([
+        { name: "Strona główna", path: "/" },
+        { name: "Wyjazdy", path: "/wyjazdy" },
+        { name: `${homeTeam} - ${awayTeam}`, path: `/wyjazdy/${trip.slug}` },
+      ]),
+    ],
   }
 
   const defaultPlan = [
@@ -137,30 +169,33 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   ]
   return (
     <main className="bg-background">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <JsonLd data={jsonLd} />
 
-      <section className="relative isolate min-h-[620px] overflow-hidden bg-foreground text-background">
+      <section className="relative isolate min-h-[540px] overflow-hidden bg-foreground text-background">
         <Image src={trip.image} alt={`Stadion ${trip.stadium || trip.city}`} fill preload className="object-cover" sizes="100vw" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/50" />
-        <div className="relative mx-auto flex min-h-[620px] max-w-7xl flex-col px-4 py-6 md:px-6 md:py-8">
-          <Button variant="ghost" className="w-fit text-background hover:bg-background/10 hover:text-background" nativeButton={false} render={<Link href="/wyjazdy" />}><ArrowLeft data-icon="inline-start" />Kalendarz wyjazdów</Button>
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-black/35" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-black/55" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-primary/70" />
+        <div className="relative mx-auto flex min-h-[540px] max-w-7xl flex-col px-4 py-5 md:px-6 md:py-6">
+          <Button variant="ghost" className="w-fit rounded-full border border-white/15 bg-black/25 px-4 text-background backdrop-blur-sm hover:bg-background/10 hover:text-background" nativeButton={false} render={<Link href="/wyjazdy" />}><ArrowLeft data-icon="inline-start" />Kalendarz wyjazdów</Button>
 
-          <div className="mt-auto grid items-end gap-10 pb-6 lg:grid-cols-[1fr_auto]">
+          <div className="mt-auto grid items-end gap-8 pb-4 lg:grid-cols-[minmax(0,1fr)_310px]">
             <div className="max-w-4xl">
-              <span className={`inline-flex rounded-md px-3 py-1.5 font-mono text-[11px] font-black uppercase tracking-wider shadow ${status.className}`}>{status.label}</span>
-              <div className="mt-6 flex items-center gap-4"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-2xl font-black text-white/50">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
-              <p className="mt-6 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">{trip.city}, {trip.country}</p>
-              <h1 className="mt-2 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-tight md:text-7xl">{homeTeam} - {awayTeam}</h1>
-              <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-white/85">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className={`inline-flex rounded-md px-3 py-1.5 font-mono text-[11px] font-black uppercase tracking-wider shadow ${status.className}`}>{status.label}</span>
+                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-primary">{trip.city}, {trip.country}</span>
+              </div>
+              <div className="mt-5 flex items-center gap-4"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-xl font-black text-white/45">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
+              <h1 className="mt-5 max-w-4xl text-balance font-sans text-4xl font-black uppercase leading-[0.94] tracking-tight sm:text-5xl md:text-6xl">{homeTeam} - {awayTeam}</h1>
+              <div className="mt-6 flex w-fit max-w-full flex-wrap gap-x-5 gap-y-3 border-y border-white/15 bg-black/20 px-4 py-3 text-sm font-semibold text-white/85 backdrop-blur-sm">
                 <span className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" />{matchDate}</span>
                 <span className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || `Stadion w ${trip.city}`}</span>
                 <span className="flex items-center gap-2"><Clock3 className="size-4 text-primary" />{formatStay(computedDays, computedNights)}</span>
               </div>
-              <span className="mt-5 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85 backdrop-blur">{packageSummary(trip.packageItems)}</span>
+              <span className="mt-4 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85 backdrop-blur">{packageSummary(trip.packageItems)}</span>
             </div>
 
-            <div className="w-full rounded-2xl border border-white/15 bg-black/55 p-5 shadow-2xl backdrop-blur-md lg:w-80">
+            <div className="w-full border-l-2 border-primary bg-black/65 p-6 shadow-2xl backdrop-blur-md">
               <p className="text-xs font-bold uppercase tracking-wider text-white/50">Cena od / osoba</p>
               <p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p>
               <div className="mt-5 grid gap-3">

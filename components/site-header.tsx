@@ -11,11 +11,11 @@ import { SocialLinks } from "@/components/social-links"
 
 const links = [
   ["WYJAZDY", "/wyjazdy"],
-  ["TWÓJ WYJAZD", "/wycena-indywidualna"],
+  ["TWÓJ WYJAZD", "/#twoj-wyjazd"],
   ["GALERIA", "/galeria"],
-  ["O NAS", "/o-nas"],
-  ["FAQ", "/faq"],
-  ["KONTAKT", "/kontakt"],
+  ["O NAS", "/#o-nas"],
+  ["FAQ", "/#faq"],
+  ["KONTAKT", "/#kontakt"],
 ] as const
 
 export function Brand() {
@@ -112,7 +112,7 @@ export function SiteHeader() {
         <Button
           variant="outline"
           size="icon-lg"
-          className="border-background/30 bg-transparent text-background md:hidden"
+          className="border-background/30 bg-transparent text-background lg:hidden"
           aria-label={open ? "Zamknij menu" : "Otwórz menu"}
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
@@ -124,7 +124,7 @@ export function SiteHeader() {
 
 {open ? (
   <nav
-    className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 md:hidden"
+    className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 lg:hidden"
     aria-label="Menu mobilne"
   >
     {links.map(([label, href]) => (
@@ -165,3 +165,4 @@ export function SiteHeader() {
     </header>
   )
 }
+

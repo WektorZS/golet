@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { CookieConsent } from "@/components/cookie-consent"
 import { FloatingContact } from "@/components/floating-contact"
+import { JsonLd } from "@/components/json-ld"
 import { absoluteUrl, siteUrl } from "@/lib/site"
 import "./globals.css"
 
@@ -18,20 +19,52 @@ const oswald = Oswald({
 })
 
 const organizationSchema = {
-  "@context": "https://schema.org",
   "@type": "TravelAgency",
   "@id": absoluteUrl("/#organization"),
   name: "Let’s Gol",
+  alternateName: "Let's Gol",
+  legalName: "LB Coaching Łukasz Borger",
   url: absoluteUrl(),
-  logo: absoluteUrl("/logo.webp"),
+  logo: {
+    "@type": "ImageObject",
+    url: absoluteUrl("/icon.svg"),
+    contentUrl: absoluteUrl("/icon.svg"),
+    width: 916,
+    height: 888,
+  },
   email: "kontakt.letsgol@gmail.com",
   telephone: "+48501465318",
+  taxID: "8512915273",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "ul. Stefana Roweckiego 1/2",
+    postalCode: "72-010",
+    addressLocality: "Police",
+    addressCountry: "PL",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+48501465318",
+    email: "kontakt.letsgol@gmail.com",
+    contactType: "customer service",
+    availableLanguage: ["pl"],
+  },
   sameAs: [
     "https://facebook.com/profile.php?id=61573517165441",
     "https://instagram.com/letsgol_wyjazdynamecze",
     "https://youtube.com/@LetsGolWyjazdynamecze",
     "https://tiktok.com/@letsgol.wyjazdynamecze",
   ],
+}
+
+const websiteSchema = {
+  "@type": "WebSite",
+  "@id": absoluteUrl("/#website"),
+  url: absoluteUrl(),
+  name: "Let’s Gol",
+  alternateName: "Let's Gol",
+  publisher: { "@id": absoluteUrl("/#organization") },
+  inLanguage: "pl-PL",
 }
 
 export const metadata: Metadata = {
@@ -105,15 +138,7 @@ export default function RootLayout({
       className={`light bg-background ${geist.variable} ${oswald.variable}`}
     >
       <body>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema).replace(
-              /</g,
-              "\\u003c"
-            ),
-          }}
-        />
+        <JsonLd data={{ "@context": "https://schema.org", "@graph": [organizationSchema, websiteSchema] }} />
 
         <TooltipProvider>
           {children}
@@ -126,3 +151,4 @@ export default function RootLayout({
     </html>
   )
 }
+

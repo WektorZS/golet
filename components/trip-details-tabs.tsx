@@ -84,7 +84,7 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
   return (
     <section aria-label="Szczegóły wyjazdu" className="scroll-mt-24">
       <div className="border-b pb-6">
-        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Wszystko w jednym miejscu</p>
+        <p className="inline-block bg-black px-2 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Wszystko w jednym miejscu</p>
         <h2 className="mt-1 font-sans text-3xl font-black uppercase md:text-4xl">Szczegóły wyjazdu</h2>
       </div>
 
@@ -112,7 +112,7 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
 
         <div className="min-h-[430px] pt-7 lg:pt-0">
           <div id="panel-opis" role="tabpanel" hidden={activeTab !== "opis"}>
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">O wyjeździe</p>
+            <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">O wyjeździe</p>
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">Najważniejsze informacje</h3>
             <div dangerouslySetInnerHTML={{ __html: props.descriptionHtml }} className="mt-6 max-w-4xl text-base leading-8 text-muted-foreground md:text-lg [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-4 [&_strong]:font-semibold [&_strong]:text-foreground [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5" />
             <div className="mt-7 flex max-w-4xl gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-5">
@@ -122,7 +122,7 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
           </div>
 
           <div id="panel-pakiet" role="tabpanel" hidden={activeTab !== "pakiet"}>
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Zakres oferty</p>
+            <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Zakres oferty</p>
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">Co obejmuje cena</h3>
             <div className="mt-6 divide-y rounded-2xl border">
               <div className="grid gap-4 p-5 md:grid-cols-[180px_1fr]">
@@ -136,13 +136,13 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
           </div>
 
           <div id="panel-plan" role="tabpanel" hidden={activeTab !== "plan"}>
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Krok po kroku</p>
+            <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Krok po kroku</p>
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">Plan wyjazdu</h3>
             <ol className="mt-7 grid gap-x-10 gap-y-0 md:grid-cols-2">{props.itinerary.map((item, index) => <li key={`${item}-${index}`} className="flex gap-4 border-b py-4 first:pt-0"><span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground font-sans font-black text-primary">{index + 1}</span><p className="pt-1 text-sm font-semibold leading-6 md:text-base">{item}</p></li>)}</ol>
           </div>
 
           {hasLogistics && <div id="panel-logistyka" role="tabpanel" hidden={activeTab !== "logistyka"}>
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Organizacja podróży</p>
+            <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Organizacja podróży</p>
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">Hotel i transport</h3>
             <div className="mt-7 divide-y rounded-2xl border">
               {props.hotel && <div className="grid gap-5 p-5 md:grid-cols-[190px_1fr]"><div><BedDouble className="size-6 text-primary" /><p className="mt-3 font-sans text-xl font-black uppercase">Hotel{props.hotel.stars ? ` ${props.hotel.stars}*` : ""}</p><p className="mt-1 text-xs font-bold uppercase text-muted-foreground">{props.hotel.optional ? "Opcjonalnie" : "W pakiecie"}</p></div><div><p className="whitespace-pre-line leading-7 text-muted-foreground">{props.hotel.info}</p><div className="mt-4 flex flex-wrap gap-2">{props.hotel.board && <span className="rounded-full bg-secondary px-3 py-1.5 text-xs font-bold">{props.hotel.board}</span>}{props.hotel.roomType && <span className="rounded-full bg-secondary px-3 py-1.5 text-xs font-bold">{props.hotel.roomType}</span>}</div></div></div>}
@@ -151,19 +151,19 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
           </div>}
 
           {props.gallery.length > 0 && <div id="panel-zdjecia" role="tabpanel" hidden={activeTab !== "zdjecia"}>
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Galeria wyjazdu</p>
+            <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Galeria wyjazdu</p>
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">Zdjęcia</h3>
             <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{props.gallery.map((item) => <figure key={item.id} className="group overflow-hidden rounded-xl bg-secondary"><div className="relative aspect-[4/3]"><Image src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || `Zdjęcie z wyjazdu ${props.tripTitle}`} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, 33vw" /></div>{item.caption && <figcaption className="p-3 text-xs text-muted-foreground">{item.caption}</figcaption>}</figure>)}</div>
           </div>}
 
           {props.testimonials.length > 0 && <div id="panel-opinie" role="tabpanel" hidden={activeTab !== "opinie"}>
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Sprawdzone emocje</p>
+            <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Sprawdzone emocje</p>
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">Opinie kibiców</h3>
             <div className="mt-7 grid gap-4 md:grid-cols-2">{props.testimonials.map((item) => <blockquote key={item.id} className="rounded-2xl border bg-secondary/35 p-5"><div className="flex gap-1 text-primary" aria-label={`${item.rating} na 5 gwiazdek`}>{Array.from({ length: item.rating }).map((_, index) => <span key={index}>★</span>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">„{item.content}”</p><footer className="mt-4 text-sm font-bold">{item.author}<span className="block text-xs font-normal text-muted-foreground">{item.tripName}</span></footer></blockquote>)}</div>
           </div>}
 
           <div id="panel-faq" role="tabpanel" hidden={activeTab !== "faq"}>
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Warto wiedzieć</p>
+            <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Warto wiedzieć</p>
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">Najczęstsze pytania</h3>
             <div className="mt-7 divide-y rounded-2xl border px-5">{props.faq.map((item) => <details key={item.question} className="group py-5"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">{item.question}<ChevronDown className="size-5 shrink-0 text-primary transition-transform group-open:rotate-180" /></summary><p className="max-w-3xl pt-3 text-sm leading-7 text-muted-foreground">{item.answer}</p></details>)}</div>
           </div>

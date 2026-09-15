@@ -364,7 +364,7 @@ OPIS W HERO PÓKI CO UKRYTY
       </section>
 
       {/* INDYWIDUALNY WYJAZD */}
-      <section className="bg-secondary px-4 py-20 md:px-6">
+      <section id="twoj-wyjazd" className="scroll-mt-20 bg-secondary px-4 py-20 md:px-6">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
           <div className="relative min-h-[430px] overflow-hidden rounded-xl">
             <Image
@@ -1054,11 +1054,13 @@ OPIS W HERO PÓKI CO UKRYTY
           </div>
 
           <InquiryForm
-  trips={trips.map((trip) => ({
-    id: trip.id,
-    title: trip.title,
-    date: trip.matchDate || trip.startDate,
-  }))}
+  trips={trips
+    .filter((trip) => trip.availabilityStatus !== "sold_out")
+    .map((trip) => ({
+      id: trip.id,
+      title: trip.title,
+      date: trip.matchDate || trip.startDate,
+    }))}
 />
         </div>
       </section>

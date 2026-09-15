@@ -82,7 +82,7 @@ export function HomeTripCalendar({ trips }: { trips: Trip[] }) {
 
       <div
         role="tabpanel"
-        className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3"
+        className="mt-6 space-y-3"
       >
         {visibleTrips.map((trip) => (
           <TripCard key={trip.id} trip={trip} />

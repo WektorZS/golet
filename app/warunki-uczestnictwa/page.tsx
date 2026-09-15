@@ -10,7 +10,9 @@ import {
 } from "lucide-react"
 
 import { SiteFooter } from "@/components/site-footer"
+import { JsonLd } from "@/components/json-ld"
 import { Button } from "@/components/ui/button"
+import { breadcrumbSchema } from "@/lib/seo"
 
 export const metadata: Metadata = {
   title: "Warunki uczestnictwa",
@@ -35,6 +37,13 @@ export default function WarunkiUczestnictwaPage() {
 
   return (
     <main className="min-h-screen bg-background">
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@graph": [breadcrumbSchema([
+          { name: "Strona główna", path: "/" },
+          { name: "Warunki uczestnictwa", path: "/warunki-uczestnictwa" },
+        ])],
+      }} />
       {/* HEADER */}
       <header className="sticky top-0 z-50 border-b bg-foreground text-background">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
@@ -1056,3 +1065,4 @@ export default function WarunkiUczestnictwaPage() {
     </main>
   )
 }
+
