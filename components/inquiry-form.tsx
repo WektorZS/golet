@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState, useState } from "react"
+import { useActionState, useEffect, useRef, useState } from "react"
 import type { FormEvent } from "react"
 import {
   ArrowRight,
@@ -71,10 +71,49 @@ export function InquiryForm({
   const [messageLength, setMessageLength] = useState(0)
   const [privacyConsent, setPrivacyConsent] = useState(false)
   const [selectedMatch, setSelectedMatch] = useState("")
+  const [matchDropdownOpen, setMatchDropdownOpen] = useState(false)
+const matchDropdownRef = useRef<HTMLDivElement>(null)
 
   const hasSelectedTrip = Boolean(matchName.trim())
   const isOtherMatch = selectedMatch === OTHER_MATCH_VALUE
+useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      matchDropdownRef.current &&
+      !matchDropdownRef.current.contains(event.target as Node)
+    ) {
+      setMatchDropdownOpen(false)
+    }
+  }
 
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setMatchDropdownOpen(false)
+    }
+  }
+
+  document.addEventListener("mousedown", handleClickOutside)
+  document.addEventListener("keydown", handleEscape)
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside)
+    document.removeEventListener("keydown", handleEscape)
+  }
+}, [])
+
+const selectedTrip = trips.find(
+  (trip) => trip.title === selectedMatch
+)
+
+const selectedTripLabel = selectedTrip
+  ? `${selectedTrip.title}${
+      formatTripDate(selectedTrip.date)
+        ? ` - ${formatTripDate(selectedTrip.date)}`
+        : ""
+    }`
+  : isOtherMatch
+    ? "Inny mecz"
+    : "Wybierz mecz"
   const handleNameInput = (
     event: FormEvent<HTMLInputElement>
   ) => {
@@ -246,56 +285,122 @@ export function InquiryForm({
         </Field>
 
         {!hasSelectedTrip && (
-          <Field>
-            <FieldLabel
-              htmlFor="matchSelection"
-              className="text-sm font-semibold text-white"
+  <Field>
+    <FieldLabel
+      htmlFor="matchSelection"
+      className="text-sm font-semibold text-white"
+    >
+      Na jaki mecz?
+    </FieldLabel>
+
+    <div
+      ref={matchDropdownRef}
+      className="relative"
+    >
+      <button
+        id="matchSelection"
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={matchDropdownOpen}
+        onClick={() =>
+          setMatchDropdownOpen((open) => !open)
+        }
+        className={`flex h-11 w-full items-center justify-between gap-3 rounded-lg border bg-white/[0.015] px-3.5 text-left text-sm outline-none transition-all duration-200 ${
+          matchDropdownOpen
+            ? "border-primary ring-2 ring-primary/15"
+            : "border-white/25 hover:border-white/40"
+        }`}
+      >
+        <span
+          className={`min-w-0 truncate ${
+            selectedMatch
+              ? "text-white"
+              : "text-white/40"
+          }`}
+        >
+          {selectedTripLabel}
+        </span>
+
+        <ChevronDown
+          aria-hidden="true"
+          className={`size-4 shrink-0 text-white/50 transition-transform duration-200 ${
+            matchDropdownOpen
+              ? "rotate-180 text-primary"
+              : ""
+          }`}
+        />
+      </button>
+
+      {matchDropdownOpen && (
+        <div
+          role="listbox"
+          aria-labelledby="matchSelection"
+          className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-lg border border-white/15 bg-[#151515] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55)]"
+        >
+          <div className="max-h-64 overflow-y-auto">
+            {trips.map((trip) => {
+              const formattedDate = formatTripDate(
+                trip.date
+              )
+
+              const active =
+                selectedMatch === trip.title
+
+              return (
+                <button
+                  key={trip.id}
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  onClick={() => {
+                    setSelectedMatch(trip.title)
+                    setMatchDropdownOpen(false)
+                  }}
+                  className={`flex w-full items-center justify-between gap-4 rounded-md px-3 py-2.5 text-left text-sm transition-colors ${
+                    active
+                      ? "bg-primary/20 text-primary"
+                      : "text-white/80 hover:bg-primary/15 hover:text-primary"
+                  }`}
+                >
+                  <span className="min-w-0 truncate">
+                    {trip.title}
+                  </span>
+
+                  {formattedDate && (
+                    <span className="shrink-0 font-mono text-xs text-white/40">
+  {formattedDate}
+</span>
+                  )}
+                </button>
+              )
+            })}
+
+            {trips.length > 0 && (
+              <div className="my-1.5 border-t border-white/10" />
+            )}
+
+            <button
+              type="button"
+              role="option"
+              aria-selected={isOtherMatch}
+              onClick={() => {
+                setSelectedMatch(OTHER_MATCH_VALUE)
+                setMatchDropdownOpen(false)
+              }}
+              className={`w-full rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors ${
+                isOtherMatch
+                  ? "bg-primary/20 text-primary"
+                  : "text-white/80 hover:bg-primary/15 hover:text-primary"
+              }`}
             >
-              Na jaki mecz?
-            </FieldLabel>
-
-            <div className="relative">
-              <select
-                id="matchSelection"
-                value={selectedMatch}
-                onChange={(event) =>
-                  setSelectedMatch(event.target.value)
-                }
-                required
-                className="h-11 w-full appearance-none rounded-lg border border-white/25 bg-foreground px-3.5 pr-10 text-sm text-white outline-none transition-all duration-200 hover:border-white/40 focus:border-primary focus:ring-2 focus:ring-primary/15"
-              >
-                <option value="" disabled>
-                  Wybierz mecz
-                </option>
-
-                {trips.map((trip) => {
-                  const formattedDate = formatTripDate(trip.date)
-
-                  return (
-                    <option
-                      key={trip.id}
-                      value={trip.title}
-                    >
-                      {trip.title}
-                      {formattedDate
-                        ? ` - ${formattedDate}`
-                        : ""}
-                    </option>
-                  )
-                })}
-
-                <option value={OTHER_MATCH_VALUE}>
-                  Inny mecz
-                </option>
-              </select>
-
-              <ChevronDown
-                aria-hidden="true"
-                className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-white/50"
-              />
-            </div>
-          </Field>
-        )}
+              Inny mecz
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  </Field>
+)}
 
         <Field>
           <FieldLabel
