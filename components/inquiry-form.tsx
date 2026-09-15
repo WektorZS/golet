@@ -1,10 +1,9 @@
-
 "use client"
 
 import Link from "next/link"
 import { useActionState, useState } from "react"
 import type { FormEvent } from "react"
-import { ArrowRight, CheckCircle2 } from "lucide-react"
+import { ArrowRight, Check, CheckCircle2 } from "lucide-react"
 
 import {
   createInquiry,
@@ -14,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-
 import {
   Field,
   FieldGroup,
@@ -28,6 +26,9 @@ const initialState: InquiryState = {
 
 const MESSAGE_MAX_LENGTH = 1000
 
+const inputClassName =
+  "h-11 rounded-lg border-white/25 bg-white/[0.015] px-3.5 text-sm text-white transition-all duration-200 placeholder:text-white/25 hover:border-white/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15"
+
 export function InquiryForm({
   matchName = "",
 }: {
@@ -40,6 +41,7 @@ export function InquiryForm({
 
   const [formLoadedAt] = useState(() => Date.now())
   const [messageLength, setMessageLength] = useState(0)
+  const [privacyConsent, setPrivacyConsent] = useState(false)
 
   const hasSelectedTrip = Boolean(matchName.trim())
 
@@ -58,10 +60,7 @@ export function InquiryForm({
   ) => {
     const input = event.currentTarget
 
-    let value = input.value.replace(
-      /[^\d+]/g,
-      ""
-    )
+    let value = input.value.replace(/[^\d+]/g, "")
 
     if (value.includes("+")) {
       value =
@@ -70,6 +69,7 @@ export function InquiryForm({
     }
 
     const hasPlus = value.startsWith("+")
+
     const digits = value
       .replace(/\D/g, "")
       .slice(0, 15)
@@ -121,6 +121,7 @@ export function InquiryForm({
       action={action}
       className="flex flex-col gap-5"
     >
+      {/* HONEYPOT */}
       <input
         type="text"
         name="website"
@@ -144,9 +145,13 @@ export function InquiryForm({
         />
       )}
 
-      <FieldGroup className="grid gap-4 md:grid-cols-2">
+      {/* GŁÓWNE POLA */}
+      <FieldGroup className="grid gap-x-4 gap-y-4 md:grid-cols-2">
         <Field>
-          <FieldLabel htmlFor="name">
+          <FieldLabel
+            htmlFor="name"
+            className="text-sm font-semibold text-white"
+          >
             Imię i nazwisko
           </FieldLabel>
 
@@ -160,11 +165,15 @@ export function InquiryForm({
             pattern="[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]+"
             title="Wpisz imię i nazwisko używając liter, spacji, myślnika lub apostrofu."
             onInput={handleNameInput}
+            className={inputClassName}
           />
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="phone">
+          <FieldLabel
+            htmlFor="phone"
+            className="text-sm font-semibold text-white"
+          >
             Telefon
           </FieldLabel>
 
@@ -181,11 +190,15 @@ export function InquiryForm({
             pattern="\+?[0-9]{7,15}"
             title="Numer telefonu powinien zawierać od 7 do 15 cyfr. Możesz użyć +48 lub innego kierunkowego."
             onInput={handlePhoneInput}
+            className={inputClassName}
           />
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="email">
+          <FieldLabel
+            htmlFor="email"
+            className="text-sm font-semibold text-white"
+          >
             E-mail
           </FieldLabel>
 
@@ -199,12 +212,16 @@ export function InquiryForm({
             placeholder="jan@example.com"
             pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+"
             title="Wpisz poprawny adres e-mail, np. jan@example.com."
+            className={inputClassName}
           />
         </Field>
 
         {!hasSelectedTrip && (
           <Field>
-            <FieldLabel htmlFor="matchName">
+            <FieldLabel
+              htmlFor="matchName"
+              className="text-sm font-semibold text-white"
+            >
               Na jaki mecz?
             </FieldLabel>
 
@@ -215,12 +232,16 @@ export function InquiryForm({
               maxLength={160}
               placeholder="np. Barcelona - Real"
               onInput={handleMatchNameInput}
+              className={inputClassName}
             />
           </Field>
         )}
 
         <Field>
-          <FieldLabel htmlFor="departureCity">
+          <FieldLabel
+            htmlFor="departureCity"
+            className="text-sm font-semibold text-white"
+          >
             Skąd wylot?
           </FieldLabel>
 
@@ -234,11 +255,15 @@ export function InquiryForm({
             pattern="[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]+"
             title="Wpisz nazwę miasta używając liter, spacji, myślnika lub apostrofu."
             onInput={handleDepartureCityInput}
+            className={inputClassName}
           />
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="travelers">
+          <FieldLabel
+            htmlFor="travelers"
+            className="text-sm font-semibold text-white"
+          >
             Liczba osób
           </FieldLabel>
 
@@ -251,21 +276,26 @@ export function InquiryForm({
             max="99"
             defaultValue="2"
             required
+            className={inputClassName}
           />
         </Field>
       </FieldGroup>
 
+      {/* WIADOMOŚĆ */}
       <Field>
         <div className="flex items-center justify-between gap-3">
-          <FieldLabel htmlFor="message">
+          <FieldLabel
+            htmlFor="message"
+            className="text-sm font-semibold text-white"
+          >
             Dodatkowe informacje
           </FieldLabel>
 
           <span
-            className={`text-xs ${
+            className={`font-mono text-[11px] ${
               messageLength >= MESSAGE_MAX_LENGTH
                 ? "text-red-400"
-                : "text-background/60"
+                : "text-white/40"
             }`}
             aria-live="polite"
           >
@@ -280,51 +310,71 @@ export function InquiryForm({
           maxLength={MESSAGE_MAX_LENGTH}
           placeholder="Termin, preferowany standard hotelu, specjalne potrzeby…"
           onInput={handleMessageInput}
+          className="min-h-[112px] resize-none rounded-lg border-white/25 bg-white/[0.015] px-3.5 py-3 text-sm text-white transition-all duration-200 placeholder:text-white/25 hover:border-white/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15"
         />
       </Field>
 
+      {/* ZGODA */}
       <Field>
         <label
           htmlFor="privacyConsent"
-          className="flex items-start gap-3 text-sm leading-relaxed"
+          className="group flex cursor-pointer items-start gap-3.5"
         >
-          <input
-            id="privacyConsent"
-            name="privacyConsent"
-            type="checkbox"
-            required
-            className="mt-1 size-4 shrink-0"
-          />
+          <span className="relative mt-0.5 flex size-[18px] shrink-0">
+            <input
+              id="privacyConsent"
+              name="privacyConsent"
+              type="checkbox"
+              required
+              checked={privacyConsent}
+              onChange={(event) =>
+                setPrivacyConsent(event.target.checked)
+              }
+              className="peer absolute inset-0 cursor-pointer opacity-0"
+            />
 
-          <span>
+            <span className="flex size-[18px] items-center justify-center rounded-[4px] border border-white/40 bg-transparent transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30">
+              <Check
+                className={`size-3.5 stroke-[3] text-black transition-opacity ${
+                  privacyConsent
+                    ? "opacity-100"
+                    : "opacity-0"
+                }`}
+                aria-hidden="true"
+              />
+            </span>
+          </span>
+
+          <span className="text-[13px] leading-relaxed text-white/70 transition-colors group-hover:text-white/80">
             Wyrażam zgodę na przetwarzanie podanych danych w celu
             przygotowania oferty i kontaktu w sprawie zapytania.
             Zapoznałem/am się z{" "}
             <Link
               href="/polityka-prywatnosci"
-              className="font-medium underline underline-offset-4 hover:text-primary"
+              className="font-medium text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
             >
               polityką prywatności i cookies
             </Link>{" "}
             oraz{" "}
             <Link
               href="/warunki-uczestnictwa"
-              className="font-medium underline underline-offset-4 hover:text-primary"
+              className="font-medium text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
             >
               warunkami uczestnictwa
             </Link>
-            . *
+            . <span className="text-primary">*</span>
           </span>
         </label>
       </Field>
 
+      {/* KOMUNIKAT */}
       {state.message && (
         <div
           role="status"
           className={
             state.status === "success"
-              ? "flex items-center gap-2 rounded-md border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary"
-              : "rounded-md border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm leading-relaxed text-white"
+              ? "flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-4 py-3 text-sm text-primary"
+              : "rounded-lg border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm leading-relaxed text-white"
           }
         >
           {state.status === "success" && (
@@ -338,17 +388,21 @@ export function InquiryForm({
         </div>
       )}
 
+      {/* CTA */}
       <Button
         type="submit"
         size="lg"
-        className="h-12 w-full rounded-md font-bold uppercase"
+        className="group h-12 w-full rounded-lg font-bold uppercase tracking-[0.02em] shadow-none transition-all duration-200 hover:-translate-y-px hover:shadow-[0_8px_30px_rgba(250,190,20,0.12)] active:translate-y-0"
         disabled={pending}
       >
         {pending
           ? "Wysyłanie…"
           : "Wyślij zapytanie"}
 
-        <ArrowRight data-icon="inline-end" />
+        <ArrowRight
+          className="transition-transform duration-200 group-hover:translate-x-1"
+          data-icon="inline-end"
+        />
       </Button>
     </form>
   )

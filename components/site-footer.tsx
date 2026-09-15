@@ -14,18 +14,19 @@ const quickLinks = [
 ] as const
 
 export function SiteFooter({ content = {} }: { content?: SiteContent }) {
-  const phone = content.contactPhone || "+48 123 456 789"
+  const phone = content.contactPhone || "+48 501 465 318"
   const phoneHref = `tel:${phone.replace(/[^+\d]/g, "")}`
-  const email = content.contactEmail || "kontakt@letsgol.pl"
+  const email = content.contactEmail || "kontakt.letsgol@gmail.com"
 
   return (
     <footer className="bg-foreground text-background">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 md:px-6 lg:grid-cols-[1.05fr_0.8fr_1fr_1fr_1.45fr] lg:gap-8">
+      {/* GŁÓWNA CZĘŚĆ FOOTERA */}
+      <div className="mx-auto grid max-w-7xl gap-x-8 gap-y-10 px-4 py-10 sm:grid-cols-2 md:px-6 lg:grid-cols-[1.05fr_0.72fr_1.22fr_1.05fr_1.5fr]">
         {/* MARKA */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col items-start gap-4">
           <Brand />
 
-          <p className="text-sm leading-relaxed text-background/60">
+          <p className="max-w-[230px] text-sm leading-relaxed text-background/60">
             {content.footerText ||
               "Piłkarskie podróże, które pamięta się dłużej niż wynik."}
           </p>
@@ -33,7 +34,7 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
 
         {/* SZYBKIE LINKI */}
         <nav
-          className="flex flex-col gap-3 text-sm"
+          className="flex flex-col gap-4 text-sm"
           aria-label="Szybkie linki"
         >
           <h2 className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
@@ -45,7 +46,7 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="group inline-flex items-center gap-1.5 text-background/65 transition-colors hover:text-background"
+                className="group inline-flex items-center gap-1.5 text-background/65 transition-colors duration-200 hover:text-background"
               >
                 <span>{link.label}</span>
 
@@ -59,76 +60,90 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
         </nav>
 
         {/* DANE FIRMY */}
-        <div className="flex flex-col gap-3 text-sm">
+        <div className="flex flex-col gap-4 text-sm">
           <h2 className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
             Dane firmy
           </h2>
 
-          <p>{content.companyName || "LB Coaching Łukasz Borger"}</p>
+          <div className="flex flex-col gap-2.5">
+            <p className="font-medium text-background">
+              {content.companyName || "LB Coaching Łukasz Borger"}
+            </p>
 
-          <p>
-            {content.companyAddress ||
-              "ul. Stefana Roweckiego 1/2, 72-010 Police"}
-          </p>
+            <p className="max-w-[230px] leading-relaxed text-background/65">
+              {content.companyAddress ||
+                "ul. Stefana Roweckiego 1/2, 72-010 Police"}
+            </p>
 
-          <p>NIP: {content.companyNip || "8512915273"}</p>
+           <p className="text-background/65">
+  NIP: {content.companyNip || "8512915273"}
+</p>
 
-          <p>REGON: 520474445</p>
+<p className="text-background/65">
+  REGON: 520474445
+</p>
+          </div>
         </div>
 
         {/* GWARANCJA */}
-        <div className="flex flex-col gap-3 text-sm">
+        <div className="flex flex-col gap-4 text-sm">
           <h2 className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
             Gwarancja turystyczna
           </h2>
 
-          <p className="text-background/65">COMPENSA TU S.A</p>
+          <div className="flex flex-col gap-2.5 text-background/65">
+            <p>COMPENSA TU S.A</p>
 
-          <p className="text-background/65">Wpis ROT: 34/25</p>
+            <p>Wpis ROT: 34/25</p>
 
-          <p className="text-background/65">Nr ewidencyjny UFG: 42848</p>
+            <p>Nr ewidencyjny UFG: 42848</p>
 
-          <Link
-            href="/warunki-uczestnictwa"
-            className="underline underline-offset-4 transition-colors hover:text-primary"
-          >
-            Warunki uczestnictwa
-          </Link>
+            <Link
+              href="/warunki-uczestnictwa"
+              className="w-fit text-background underline decoration-background/40 underline-offset-4 transition-colors duration-200 hover:text-primary"
+            >
+              Warunki uczestnictwa
+            </Link>
+          </div>
         </div>
 
-        {/* KONTAKT */}
-        <div className="flex flex-col gap-4 text-sm">
+        {/* KONTAKT I SOCIAL MEDIA */}
+        <div className="flex min-w-0 flex-col gap-4 text-sm">
           <h2 className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
             Kontakt i social media
           </h2>
 
-          <a
-            className="flex items-center gap-2 transition-colors hover:text-primary"
-            href={phoneHref}
-          >
-            <Phone
-              className="size-4"
-              aria-hidden="true"
-            />
-            {phone}
-          </a>
+          <div className="flex flex-col gap-3">
+            <a
+              className="group flex w-fit items-center gap-2.5 transition-colors duration-200 hover:text-primary"
+              href={phoneHref}
+            >
+              <Phone
+                className="size-4 shrink-0 text-background/70 transition-colors group-hover:text-primary"
+                aria-hidden="true"
+              />
 
-          <a
-            className="flex items-center gap-2 transition-colors hover:text-primary"
-            href={`mailto:${email}`}
-          >
-            <Mail
-              className="size-4"
-              aria-hidden="true"
-            />
-            {email}
-          </a>
+              <span>{phone}</span>
+            </a>
+
+            <a
+              className="group flex w-fit items-center gap-2.5 transition-colors duration-200 hover:text-primary"
+              href={`mailto:${email}`}
+            >
+              <Mail
+                className="size-4 shrink-0 text-background/70 transition-colors group-hover:text-primary"
+                aria-hidden="true"
+              />
+
+              <span>{email}</span>
+            </a>
+          </div>
 
           <a
             href="https://share.google/kRvcJRnquoIaDz3YT"
             target="_blank"
             rel="noopener noreferrer"
-            className="group mt-1 inline-flex w-fit items-center gap-2 text-background/65 transition-colors hover:text-background"
+            className="group mt-1 inline-flex w-fit items-center gap-2 text-background/65 transition-colors duration-200 hover:text-background"
             aria-label="Profil naszej firmy w Google"
           >
             <span className="font-medium">
@@ -136,31 +151,35 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
             </span>
 
             <ArrowUpRight
-              className="size-4 text-primary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              className="size-4 shrink-0 text-primary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
               aria-hidden="true"
             />
           </a>
 
-          <SocialLinks />
+          <div className="pt-0.5">
+            <SocialLinks />
+          </div>
         </div>
       </div>
 
       {/* DOLNY PASEK */}
       <div className="border-t border-background/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-xs text-background/50 md:flex-row md:items-center md:justify-between md:px-6">
-          <p>© 2026 Let&apos;s Gol. Wszystkie prawa zastrzeżone.</p>
+          <p>
+            © 2026 Let&apos;s Gol. Wszystkie prawa zastrzeżone.
+          </p>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
             <Link
               href="/polityka-prywatnosci"
-              className="transition-colors hover:text-background"
+              className="transition-colors duration-200 hover:text-background"
             >
               Polityka prywatności i cookies
             </Link>
 
             <Link
               href="/warunki-uczestnictwa"
-              className="transition-colors hover:text-background"
+              className="transition-colors duration-200 hover:text-background"
             >
               Warunki uczestnictwa
             </Link>
