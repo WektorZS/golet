@@ -80,23 +80,33 @@ const reasons = [
 
 const process = [
   [
-    "01",
+    "1",
     "Wybierasz mecz",
     "Z gotowej oferty albo wskazujesz wydarzenie spoza kalendarza.",
   ],
   [
-    "02",
-    "Dopasowujemy pakiet",
-    "Ustalamy lotnisko, hotel, kategorię biletu i liczbę noclegów.",
+    "2",
+    "Ustalamy szczegóły",
+    "Wybieramy lotnisko, hotel, kategorię biletu i liczbę noclegów.",
+  ],
+   [
+    "3",
+    "Otrzymujesz ofertę",
+    "Prezentujemy Ci kompleksową ofertę podróży dopasowaną do twoich potrzeb.",
   ],
   [
-    "03",
-    "Potwierdzasz rezerwację",
-    "Dostajesz przejrzystą umowę, harmonogram płatności i dokumenty.",
+    "4",
+    "Podpisujemy umowę online",
+    "Dostajesz przejrzystą umowę, komplet dokumentów",
   ],
   [
-    "04",
-    "Lecisz po emocje",
+    "5",
+    "Wpłacasz zaliczkę",
+    "Zaliczka pokrywa koszta biletów na mecz i podróży",
+  ],
+  [
+    "6",
+    "Lecimy na mecz",
     "Koordynator czuwa nad logistyką, a Ty skupiasz się na meczu.",
   ],
 ] as const
