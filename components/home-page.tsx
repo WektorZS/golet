@@ -769,50 +769,119 @@ OPIS W HERO PÓKI CO UKRYTY
       </section>
 
       {/* YOUTUBE */}
-      {videos.length > 0 && (
-        <section className="bg-secondary px-4 py-20 md:px-6">
-          <div className="mx-auto max-w-7xl">
-            <SectionHeading
-              eyebrow="Zobacz atmosferę"
-              title={
-                content.youtubeTitle ||
-                "Zobacz, jak wyglądaja nasze wyjazdy"
-              }
-              intro="Relacje, stadiony i emocje z naszych piłkarskich podróży."
-            />
+{videos.length > 0 && (
+  <section className="relative overflow-hidden bg-secondary px-4 py-20 md:px-6 md:py-24">
+    {/* DELIKATNE TŁO */}
+    {/* SUBTELNE TŁO SEKCJI */}
+<div
+  aria-hidden="true"
+  className="pointer-events-none absolute inset-0"
+>
+  {/* złota poświata na środku u góry */}
+  <div className="absolute left-1/2 top-[-180px] h-[420px] w-[750px] -translate-x-1/2 rounded-full bg-primary/[0.07] blur-[120px]" />
 
-            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {videos.map((video) => (
-                <a
-                  key={video.id}
-                  href={video.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group overflow-hidden rounded-xl border bg-card"
-                >
-                  <div className="relative aspect-video overflow-hidden">
-                    <Image
-                      src={video.thumbnail}
-                      alt={`Miniatura filmu: ${video.title}`}
-                      fill
-                      className="object-cover transition-transform group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
+  {/* bardzo delikatne światło z lewej */}
+  <div className="absolute -left-40 bottom-[-180px] h-[420px] w-[420px] rounded-full bg-white/60 blur-[110px]" />
+
+  {/* delikatne przyciemnienie przy prawej krawędzi */}
+  <div className="absolute -right-48 top-1/3 h-[420px] w-[420px] rounded-full bg-black/[0.025] blur-[120px]" />
+</div>
+
+    <div className="relative mx-auto max-w-7xl">
+      <SectionHeading
+        eyebrow="Zobacz atmosferę"
+        title={
+          content.youtubeTitle ||
+          "Zobacz, jak wyglądają nasze wyjazdy"
+        }
+        intro="Relacje, stadiony i emocje z naszych piłkarskich podróży."
+      />
+
+
+      {/* FILMY */}
+      <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {videos.map((video) => (
+          <a
+            key={video.id}
+            href={video.url}
+            target="_blank"
+            rel="noreferrer"
+            className="group relative block"
+          >
+            <article className="relative h-full overflow-hidden rounded-xl border border-black/[0.08] bg-gradient-to-br from-white via-[#fdfcf9] to-[#f5f1e8] shadow-[0_8px_30px_rgba(0,0,0,0.045)] transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:border-primary/50 group-hover:shadow-[0_22px_55px_rgba(0,0,0,0.13)]">
+
+              {/* MINIATURA */}
+              <div className="relative aspect-[16/9] overflow-hidden bg-black">
+                <Image
+                  src={video.thumbnail}
+                  alt={`Miniatura filmu: ${video.title}`}
+                  fill
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+
+                {/* CINEMATIC OVERLAY */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-black/10 transition-opacity duration-500 group-hover:opacity-80" />
+
+
+                {/* PLAY */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative flex size-[62px] items-center justify-center">
+                    {/* delikatny ring */}
+                    <div className="absolute inset-0 rounded-full border border-white/35 transition-all duration-500 group-hover:scale-[1.18] group-hover:border-primary/40" />
+
+                    {/* przycisk */}
+                    <div className="relative flex size-[50px] items-center justify-center rounded-full bg-white shadow-[0_8px_30px_rgba(0,0,0,0.25)] transition-all duration-300 group-hover:scale-105 group-hover:bg-primary">
+                      <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        className="ml-0.5 size-[18px] fill-black"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
                   </div>
+                </div>
+              </div>
 
-                  <div className="flex items-start justify-between gap-4 p-4">
-                    <h3 className="font-bold leading-snug">
-                      {video.title}
-                    </h3>
+              {/* TREŚĆ */}
+              <div className="relative flex min-h-[126px] items-start justify-between gap-5 bg-gradient-to-br from-transparent to-primary/[0.025] p-5 md:p-6">
+                {/* złota linia na hover */}
+                <div className="absolute left-0 top-0 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full" />
 
-                    <ArrowRight className="shrink-0 text-primary" />
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+                <div className="min-w-0">
+                  <p className="mb-2.5 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-primary">
+                    Zobacz relację
+                  </p>
+
+                  <h3 className="line-clamp-2 text-[16px] font-bold leading-[1.45] text-foreground transition-colors duration-300 group-hover:text-black">
+                    {video.title}
+                  </h3>
+                </div>
+
+                {/* STRZAŁKA */}
+                <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center border border-black/10 bg-transparent transition-all duration-300 group-hover:border-primary group-hover:bg-primary">
+                  <ArrowRight className="size-4 text-black transition-transform duration-300 group-hover:translate-x-0.5" />
+                </div>
+              </div>
+            </article>
+          </a>
+        ))}
+      </div>
+
+      {/* DOLNY PODPIS */}
+      <div className="mt-9 flex items-center justify-center gap-3">
+        <div className="h-px w-8 bg-black/15" />
+
+        <span className="font-mono text-[12px] font-bold uppercase tracking-[0.18em] text-black/40">
+          Poczuj atmosferę przed swoim wyjazdem
+        </span>
+
+        <div className="h-px w-8 bg-black/15" />
+      </div>
+    </div>
+  </section>
+)}
 
       {/* KONTAKT */}
       <section
