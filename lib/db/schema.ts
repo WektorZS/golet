@@ -158,7 +158,13 @@ export const youtubeVideos = pgTable("youtube_videos", {
   title: text("title").notNull(),
   thumbnailUrl: text("thumbnail_url").notNull(),
   publishedAt: timestamp("published_at").notNull(),
+
+  // Czy film został ręcznie wybrany do wyświetlania na stronie głównej.
+  featured: boolean("featured").notNull().default(false),
+
+  // Kolejność ręcznie wybranych filmów na stronie głównej.
   sortOrder: integer("sort_order").notNull().default(0),
+
   createdAt: timestamp("created_at").notNull().defaultNow(),
 })
 
