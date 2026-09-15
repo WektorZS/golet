@@ -278,7 +278,7 @@ export function InquiryForm({
                     >
                       {trip.title}
                       {formattedDate
-                        ? ` — ${formattedDate}`
+                        ? ` - ${formattedDate}`
                         : ""}
                     </option>
                   )
