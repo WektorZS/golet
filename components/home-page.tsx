@@ -243,12 +243,6 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                 "Leć z nami na największe mecze w Europie"}
             </h1>
 
-            {/*
-            <p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">
-              {content.heroDescription || ""}
-            </p>
-            */}
-
             <div className="mt-6 flex flex-wrap gap-3">
               <Button
                 size="lg"
@@ -372,15 +366,9 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 >
   <div className="mx-auto max-w-7xl">
 
-    {/* ====================================================== */}
-    {/* GŁÓWNA CZĘŚĆ */}
-    {/* ====================================================== */}
-
     <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
 
-      {/* ==================================================== */}
-      {/* ZDJĘCIE */}
-      {/* ==================================================== */}
+      
 
       <div className="relative overflow-hidden rounded-xl">
         <div className="relative aspect-[16/11] lg:aspect-[4/3]">
@@ -392,14 +380,14 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             sizes="(max-width: 1024px) 100vw, 42vw"
           />
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
 
           <div className="absolute bottom-5 left-5 right-5 md:bottom-6 md:left-6">
-            <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white/75">
+            <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white/65">
               Let's Gol
             </p>
 
-            <p className="mt-1.5 max-w-sm text-xl font-black uppercase leading-[1.05] tracking-[-0.02em] text-white md:text-2xl">
+            <p className="mt-1.5 max-w-md text-xl font-black uppercase leading-[1.05] tracking-[-0.02em] text-white md:text-2xl">
               Ty wybierasz mecz.
               <br />
               My organizujemy wyjazd.
@@ -408,39 +396,26 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
       </div>
 
-      {/* ==================================================== */}
-      {/* TREŚĆ */}
-      {/* ==================================================== */}
+      
 
       <div className="max-w-2xl">
 
-        {/* EYEBROW */}
-        <div className="flex items-center gap-3">
-          <span className="h-[2px] w-7 bg-[#a86f00]" />
+        <span className="inline-block bg-foreground px-2.5 py-1.5 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary">
+          Indywidualny wyjazd
+        </span>
 
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#a86f00]">
-            Indywidualny wyjazd
-          </p>
-        </div>
-
-        {/* TYTUŁ */}
         <h2 className="mt-4 max-w-2xl text-balance font-sans text-[38px] font-black uppercase leading-[0.97] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-[52px]">
           Nie ma Twojego meczu
           <br className="hidden sm:block" />
           w kalendarzu?
         </h2>
 
-        {/* OPIS */}
         <p className="mt-5 max-w-xl text-[15px] leading-7 text-muted-foreground">
           To żaden problem. Wskaż mecz, termin i zakres wyjazdu,
           a przygotujemy ofertę dopasowaną do Ciebie.
         </p>
 
-        {/* ================================================== */}
-        {/* 4 KORZYŚCI */}
-        {/* ================================================== */}
-
-        <div className="mt-6 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+        <div className="mt-7 grid gap-x-10 gap-y-3.5 sm:grid-cols-2">
           {[
             "Dowolny klub i liga",
             "Wylot z dogodnego lotniska",
@@ -451,11 +426,13 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               key={item}
               className="flex items-center gap-2.5"
             >
-              <Check
-                className="size-4 shrink-0 text-[#a86f00]"
-                strokeWidth={3}
-                aria-hidden="true"
-              />
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-foreground">
+                <Check
+                  className="size-3 text-primary"
+                  strokeWidth={3}
+                  aria-hidden="true"
+                />
+              </span>
 
               <span className="text-[13px] font-semibold text-foreground/85">
                 {item}
@@ -464,148 +441,137 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           ))}
         </div>
 
-        {/* ================================================== */}
-        {/* ZAKRES */}
-        {/* ================================================== */}
+        <p className="mt-7 max-w-lg text-xs leading-5 text-muted-foreground">
+          Nie widzisz interesującego Cię wyjazdu? Nie ograniczamy się
+          wyłącznie do terminów dostępnych w kalendarzu.
+        </p>
 
-        <div className="mt-7 border-t border-foreground/10 pt-6">
-          <p className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-foreground/55">
-            Wybierz zakres
-          </p>
-
-          <div className="mt-4 flex flex-wrap gap-x-7 gap-y-4">
-            {[
-              [TicketCheck, "Bilet"],
-              [Plane, "Bilet + lot"],
-              [Building2, "Bilet + hotel"],
-              [CalendarCheck, "Pełny pakiet"],
-            ].map(([Icon, label]) => {
-              const I = Icon as typeof Plane
-
-              return (
-                <div
-                  key={label as string}
-                  className="flex items-center gap-2"
-                >
-                  <I
-                    className="size-[18px] shrink-0 text-[#a86f00]"
-                    strokeWidth={2.4}
-                    aria-hidden="true"
-                  />
-
-                  <span className="text-[13px] font-bold text-foreground">
-                    {label as string}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* ================================================== */}
-        {/* CTA */}
-        {/* ================================================== */}
-
-        <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-          <Button
-            size="lg"
-            className="h-12 px-6 font-bold"
-            nativeButton={false}
-            render={
-              <button
-                type="button"
-                data-open-floating-contact
-              />
-            }
-          >
-            Wyceń mój wyjazd
-            <ArrowRight data-icon="inline-end" />
-          </Button>
-
-          <p className="text-xs leading-5 text-muted-foreground">
-            Bez zobowiązań · odpowiadamy zwykle w ciągu 24h
-          </p>
-        </div>
-      </div>
-    </div>
-
-    {/* ====================================================== */}
-    {/* DLA KOGO */}
-    {/* ====================================================== */}
-
-    <div className="mt-12 border-t border-foreground/10 pt-8 md:mt-14">
-      <div className="grid gap-6 lg:grid-cols-[0.65fr_2fr] lg:items-center lg:gap-12">
-
-        {/* TYTUŁ */}
-        <div>
-          <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#a86f00]">
-            Organizujemy również
-          </p>
-
-          <h3 className="mt-2 text-xl font-black uppercase leading-tight tracking-[-0.02em] text-foreground md:text-2xl">
-            Wyjazdy dla grup
-            <br className="hidden lg:block" />
-            i firm
-          </h3>
-        </div>
-
-        {/* ODBIORCY */}
-        <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
-          {[
-            [
-              Users,
-              "Indywidualnie",
-              "Wyjazd dopasowany do Ciebie",
-            ],
-            [
-              Users,
-              "Rodziny i grupy",
-              "Wspólna podróż na mecz",
-            ],
-            [
-              Building2,
-              "Firmy",
-              "Integracje i wyjazdy zespołów",
-            ],
-            [
-              Trophy,
-              "Szkoły i kluby",
-              "Wyjazdy grup zorganizowanych",
-            ],
-          ].map(([Icon, title, description]) => {
-            const I = Icon as typeof Users
-
-            return (
-              <div
-                key={title as string}
-                className="flex items-start gap-3"
-              >
-                <I
-                  className="mt-0.5 size-5 shrink-0 text-[#a86f00]"
-                  strokeWidth={2.4}
-                  aria-hidden="true"
-                />
-
-                <div>
-                  <p className="text-[12px] font-black uppercase leading-tight text-foreground">
-                    {title as string}
-                  </p>
-
-                  <p className="mt-1 text-[11px] leading-[1.55] text-muted-foreground">
-                    {description as string}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
-        </div>
       </div>
     </div>
 
   </div>
 </section>
 
-      <section className="bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
+<section className="bg-foreground px-4 md:px-6">
+  <div className="mx-auto max-w-7xl">
+
+    <div className="grid lg:grid-cols-[0.8fr_1.2fr]">
+
+      
+
+      <div className="flex flex-col justify-between py-10 pr-0 sm:py-12 lg:py-14 lg:pr-14">
+
+        <div>
+          <span className="inline-block bg-primary px-2.5 py-1.5 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary-foreground">
+            Wyjazd szyty na miarę
+          </span>
+
+          <h2 className="mt-5 max-w-md text-2xl font-black uppercase leading-[1.02] tracking-[-0.03em] text-white sm:text-3xl lg:text-[36px]">
+            Powiedz nam,
+            <br />
+            czego potrzebujesz.
+          </h2>
+
+          <p className="mt-4 max-w-sm text-[13px] leading-6 text-white/55">
+            Nie musisz wybierać gotowego wyjazdu z kalendarza.
+            Możemy zorganizować pojedynczy element albo całą podróż
+            od biletu aż po lot i hotel.
+          </p>
+        </div>
+
+      </div>
+
+      
+
+      <div className="relative py-10 sm:py-12 lg:py-14 lg:pl-14">
+
+        <div
+          className="absolute bottom-10 left-0 top-10 hidden w-px bg-white/10 lg:block"
+          aria-hidden="true"
+        />
+
+        
+
+        <div>
+          <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary">
+            Czego potrzebujesz?
+          </p>
+
+          <h3 className="mt-2 text-lg font-black uppercase tracking-[-0.02em] text-white sm:text-xl">
+            Dopasuj zakres wyjazdu
+          </h3>
+
+          <p className="mt-2 max-w-lg text-[12px] leading-5 text-white/45">
+            Możesz zacząć od samego biletu albo powierzyć nam
+            organizację całego wyjazdu.
+          </p>
+
+          <div className="mt-5 flex flex-wrap gap-2.5">
+            {[
+              "Tylko bilet",
+              "Bilet + lot",
+              "Bilet + hotel",
+              "Pełny pakiet",
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-full bg-white/[0.09] px-4 py-2.5 text-[12px] font-bold text-white"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        
+
+        <div className="mt-9">
+          <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary">
+            Dla kogo?
+          </p>
+
+          <h3 className="mt-2 text-lg font-black uppercase tracking-[-0.02em] text-white sm:text-xl">
+            Od jednej osoby po całą grupę
+          </h3>
+
+          <div className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+            {[
+              [
+                "Indywidualnie",
+                "Wyjazd przygotowany dokładnie pod Twoje potrzeby.",
+              ],
+              [
+                "Rodziny i grupy",
+                "Wspólna podróż na wybrany mecz.",
+              ],
+              [
+                "Firmy",
+                "Wyjazdy integracyjne i sportowe dla zespołów.",
+              ],
+              [
+                "Szkoły i kluby",
+                "Kompleksowa obsługa zorganizowanych grup.",
+              ],
+            ].map(([title, description]) => (
+              <div key={title}>
+                <p className="text-[12px] font-black uppercase text-white">
+                  {title}
+                </p>
+
+                <p className="mt-1 text-[11px] leading-5 text-white/45">
+                  {description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+      <section className="bg-background px-4 py-20 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
             eyebrow="Wszystko w jednym"
@@ -613,7 +579,6 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               content.packageTitle ||
               "Co zawiera pełny pakiet?"
             }
-            inverse
           />
 
           <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -632,7 +597,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               return (
                 <div
                   key={label as string}
-                  className="flex items-center gap-3 rounded-lg border border-background/15 p-4"
+                  className="flex items-center gap-3 rounded-lg border border-foreground/10 bg-secondary/45 p-4"
                 >
                   <I className="text-primary" aria-hidden="true" />
 
@@ -646,7 +611,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
       </section>
 
-      <section className="bg-background px-4 py-20 md:px-6 md:py-24">
+      <section className="bg-secondary px-4 py-20 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
             eyebrow="Dlaczego my"
@@ -678,7 +643,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
       </section>
 
-<section className="relative overflow-hidden bg-secondary px-4 py-20 md:px-6 md:py-24">
+<section className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24">
   <div
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
@@ -714,7 +679,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 </section>
 
 <section className="relative overflow-hidden bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
-  {/* subtelne tło */}
+  
   <div
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
@@ -733,9 +698,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       inverse
     />
 
-    {/* ====================================================== */}
-    {/* KARTY OPINII */}
-    {/* ====================================================== */}
+    
 
     <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
       {(
@@ -756,10 +719,9 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           key={item.id}
           className="group relative flex min-h-[270px] flex-col overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.045] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-white/[0.065] md:p-7"
         >
-          {/* żółty akcent na górze */}
+          
           <div className="absolute left-0 top-0 h-[2px] w-12 bg-primary transition-all duration-500 group-hover:w-full" />
 
-          {/* duży dekoracyjny cudzysłów */}
           <span
             aria-hidden="true"
             className="pointer-events-none absolute -right-1 top-1 select-none font-serif text-[110px] font-black leading-none text-white/[0.035]"
@@ -767,7 +729,6 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             “
           </span>
 
-          {/* GWIAZDKI */}
           <div className="relative flex gap-1 text-primary">
             <span className="sr-only">
               Ocena {item.rating} na 5
@@ -785,12 +746,10 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             ))}
           </div>
 
-          {/* TREŚĆ OPINII */}
           <p className="relative mt-6 flex-1 text-[15px] font-medium leading-7 text-background/78">
             „{item.content}”
           </p>
 
-          {/* DOLNA CZĘŚĆ */}
           <footer className="relative mt-7 flex items-end justify-between gap-4 border-t border-white/[0.08] pt-5">
             <div>
               {item.author && (
@@ -815,9 +774,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       ))}
     </div>
 
-    {/* ====================================================== */}
-    {/* PODSUMOWANIE OPINII */}
-    {/* ====================================================== */}
+    
 
     <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row">
       <div className="flex items-center gap-3">
