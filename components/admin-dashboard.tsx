@@ -44,6 +44,9 @@ import {
   archiveTestimonial,
   addGalleryItem,
   reorderGalleryItems,
+    addYouTubeVideoToHomepage,
+  removeYouTubeVideoFromHomepage,
+  reorderYouTubeVideos,
   type AddGalleryItemState,
   deleteMedia,
   duplicateTrip,
@@ -253,6 +256,7 @@ const [tripSort, setTripSort] = useState("nearest")
 >("new")
   const [activeSection, setActiveSection] = useState<(typeof sections)[number][0]>("dashboard")
   const [galleryItems, setGalleryItems] = useState(data.gallery)
+  const [youtubeItems, setYoutubeItems] = useState(data.videos)
 
   useEffect(() => {
     const savedSection = window.sessionStorage.getItem("admin-active-section")
@@ -264,6 +268,28 @@ const [tripSort, setTripSort] = useState("nearest")
   useEffect(() => {
     setGalleryItems(data.gallery)
   }, [data.gallery])
+
+  useEffect(() => {
+  setYoutubeItems(data.videos)
+}, [data.videos])
+
+const featuredYouTubeItems = useMemo(
+  () =>
+    youtubeItems
+      .filter((video) => video.featured)
+      .sort((a, b) => a.sortOrder - b.sortOrder),
+  [youtubeItems]
+)
+
+const youtubeLibraryItems = useMemo(
+  () =>
+    [...youtubeItems].sort(
+      (a, b) =>
+        new Date(b.publishedAt).getTime() -
+        new Date(a.publishedAt).getTime()
+    ),
+  [youtubeItems]
+)
 
   const handleSectionChange = (value: string) => {
     const section = value as (typeof sections)[number][0]
@@ -372,6 +398,71 @@ const [tripSort, setTripSort] = useState("nearest")
 
     toast.success("Kolejność galerii została zapisana")
   }
+
+const handleYouTubeDragEnd = async (event: any) => {
+  const { active, over } = event
+
+  if (!over || active.id === over.id) return
+
+  const currentFeatured = youtubeItems
+    .filter((video) => video.featured)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+
+  const oldIndex = currentFeatured.findIndex(
+    (video) => video.id === active.id
+  )
+
+  const newIndex = currentFeatured.findIndex(
+    (video) => video.id === over.id
+  )
+
+  if (oldIndex === -1 || newIndex === -1) return
+
+  const reordered = arrayMove(
+    currentFeatured,
+    oldIndex,
+    newIndex
+  ).map((video, index) => ({
+    ...video,
+    sortOrder: index,
+  }))
+
+  const orderMap = new Map(
+    reordered.map((video) => [video.id, video.sortOrder])
+  )
+
+  setYoutubeItems((current: any[]) =>
+    current.map((video) =>
+      orderMap.has(video.id)
+        ? {
+            ...video,
+            sortOrder: orderMap.get(video.id),
+          }
+        : video
+    )
+  )
+
+  const formData = new FormData()
+
+  formData.append(
+    "items",
+    JSON.stringify(
+      reordered.map((video) => ({
+        id: video.id,
+        sortOrder: video.sortOrder,
+      }))
+    )
+  )
+
+  try {
+    await reorderYouTubeVideos(formData)
+    router.refresh()
+    toast.success("Kolejność filmów została zapisana")
+  } catch {
+    setYoutubeItems(data.videos)
+    toast.error("Nie udało się zapisać kolejności filmów")
+  }
+}
 
   return (
     <Tabs
@@ -1561,87 +1652,370 @@ const [tripSort, setTripSort] = useState("nearest")
 </TabsContent>
 
         <TabsContent value="youtube">
-          <SectionHeader
-            eyebrow="Kanał wideo"
-            title="YouTube"
-            description="Dodaj swój kanał, aby najnowsze filmy pojawiały się automatycznie na stronie."
-          />
+  <SectionHeader
+    eyebrow="Kanał wideo"
+    title="YouTube"
+    description="Synchronizuj filmy z kanału i wybieraj, które materiały mają być widoczne na stronie głównej."
+  />
 
-          <div className="grid gap-6 xl:grid-cols-[.8fr_1.2fr]">
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  Ustawienia kanału YouTube
-                </CardTitle>
+  <div className="grid gap-6 xl:grid-cols-[.8fr_1.2fr]">
+    <Card>
+      <CardHeader>
+        <CardTitle>Ustawienia kanału YouTube</CardTitle>
 
-                <CardDescription>
-                  Wklej adres swojego kanału YouTube.
-                  Nie musisz znać żadnych technicznych
-                  ustawień.
-                </CardDescription>
-              </CardHeader>
+        <CardDescription>
+          Połącz kanał i zarządzaj synchronizacją filmów.
+        </CardDescription>
+      </CardHeader>
 
-              <CardContent>
-                <YouTubeSettingsForm
-                  settings={data.settings}
-                />
-              </CardContent>
+      <CardContent>
+        <YouTubeSettingsForm settings={data.settings} />
+      </CardContent>
 
-              <CardFooter className="flex flex-col items-start gap-3 border-t pt-5">
-                <YouTubeSyncStatus
-                  lastSyncedAt={
-                    data.settings
-                      .youtubeLastSyncedAt
-                  }
-                  lastSyncStatus={
-                    data.settings
-                      .youtubeLastSyncStatus
-                  }
-                />
-              </CardFooter>
-            </Card>
+      <CardFooter className="flex flex-col items-start gap-3 border-t pt-5">
+        <YouTubeSyncStatus
+          lastSyncedAt={data.settings.youtubeLastSyncedAt}
+          lastSyncStatus={data.settings.youtubeLastSyncStatus}
+        />
+      </CardFooter>
+    </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  Najnowsze filmy
-                </CardTitle>
+    <Card>
+      <CardHeader>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle>Filmy na stronie głównej</CardTitle>
 
-                <CardDescription>
-                  {data.videos.length
-                    ? `Pobrano ${data.videos.length} filmów z kanału.`
-                    : "Po zapisaniu poprawnego kanału zobaczysz tutaj podgląd filmów."}
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="grid gap-4 sm:grid-cols-2">
-                {data.videos.map((video) => (
-                  <a
-                    key={video.id}
-                    href={video.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group overflow-hidden rounded-xl border"
-                  >
-                    <img
-                      src={video.thumbnail}
-                      alt={video.title}
-                      className="aspect-video w-full object-cover"
-                    />
-
-                    <div className="flex gap-3 p-3">
-                      <p className="line-clamp-2 flex-1 text-sm font-medium">
-                        {video.title}
-                      </p>
-
-                      <ExternalLink className="shrink-0 text-primary" />
-                    </div>
-                  </a>
-                ))}
-              </CardContent>
-            </Card>
+            <CardDescription className="mt-1">
+              Wybierz filmy i przeciągnij je, aby ustawić kolejność.
+            </CardDescription>
           </div>
-        </TabsContent>
+
+          <Badge variant="secondary">
+            {featuredYouTubeItems.length}
+          </Badge>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        {featuredYouTubeItems.length === 0 ? (
+          <div className="flex min-h-52 flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center">
+            <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Clapperboard className="size-5" />
+            </div>
+
+            <p className="font-semibold">
+              Nie wybrano jeszcze żadnych filmów
+            </p>
+
+            <p className="mt-1 max-w-md text-sm text-muted-foreground">
+              Dodaj filmy z biblioteki poniżej. Tylko wybrane tutaj
+              materiały będą widoczne na stronie głównej.
+            </p>
+          </div>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleYouTubeDragEnd}
+          >
+            <SortableContext
+              items={featuredYouTubeItems.map(
+                (video) => video.id
+              )}
+              strategy={rectSortingStrategy}
+            >
+              <div className="grid gap-4 sm:grid-cols-2">
+                {featuredYouTubeItems.map((video, index) => (
+                  <SortableGalleryItem
+                    key={video.id}
+                    item={video}
+                  >
+                    <div className="group overflow-hidden rounded-xl border border-primary/20 bg-card transition-colors hover:border-primary/40">
+                      <div className="relative">
+                        <img
+                          src={video.thumbnail}
+                          alt={video.title}
+                          className="aspect-video w-full object-cover"
+                        />
+
+                        <div className="absolute left-3 top-3">
+                          <Badge className="shadow-sm">
+                            NA STRONIE
+                          </Badge>
+                        </div>
+
+                        <div className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-md bg-background/90 text-sm font-bold shadow-sm backdrop-blur">
+                          {index + 1}
+                        </div>
+                      </div>
+
+                      <div className="p-4">
+                        <p className="line-clamp-2 min-h-10 text-sm font-semibold">
+                          {video.title}
+                        </p>
+
+                        {video.publishedAt ? (
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            {new Intl.DateTimeFormat("pl-PL", {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            }).format(new Date(video.publishedAt))}
+                          </p>
+                        ) : null}
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            nativeButton={false}
+                            render={
+                              <a
+                                href={video.url}
+                                target="_blank"
+                                rel="noreferrer"
+                              />
+                            }
+                          >
+                            <ExternalLink />
+                            YouTube
+                          </Button>
+
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={async (event) => {
+                              event.stopPropagation()
+
+                              const formData = new FormData()
+                              formData.append(
+                                "id",
+                                String(video.id)
+                              )
+
+                              try {
+                                await removeYouTubeVideoFromHomepage(
+                                  formData
+                                )
+
+                                setYoutubeItems((current: any[]) =>
+                                  current.map((item) =>
+                                    item.id === video.id
+                                      ? {
+                                          ...item,
+                                          featured: false,
+                                          sortOrder: 0,
+                                        }
+                                      : item
+                                  )
+                                )
+
+                                router.refresh()
+
+                                toast.success(
+                                  "Film został usunięty ze strony głównej"
+                                )
+                              } catch {
+                                toast.error(
+                                  "Nie udało się usunąć filmu ze strony"
+                                )
+                              }
+                            }}
+                          >
+                            <XCircle />
+                            Usuń ze strony
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </SortableGalleryItem>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+
+  <Card className="mt-6">
+    <CardHeader>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <CardTitle>Biblioteka filmów</CardTitle>
+
+          <CardDescription className="mt-1">
+            Wszystkie filmy zsynchronizowane z Twojego kanału YouTube.
+            Wybierz materiały, które chcesz pokazać na stronie głównej.
+          </CardDescription>
+        </div>
+
+        <Badge variant="secondary">
+          {youtubeLibraryItems.length} filmów
+        </Badge>
+      </div>
+    </CardHeader>
+
+    <CardContent>
+      {youtubeLibraryItems.length === 0 ? (
+        <div className="flex min-h-52 flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center">
+          <RefreshCw className="mb-3 size-8 text-muted-foreground" />
+
+          <p className="font-semibold">
+            Biblioteka jest pusta
+          </p>
+
+          <p className="mt-1 max-w-md text-sm text-muted-foreground">
+            Skonfiguruj kanał YouTube i użyj przycisku
+            „Odśwież teraz”, aby pobrać filmy.
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {youtubeLibraryItems.map((video) => (
+            <div
+              key={video.id}
+              className={`overflow-hidden rounded-xl border bg-card transition-colors ${
+                video.featured
+                  ? "border-primary/40"
+                  : "hover:border-primary/30"
+              }`}
+            >
+              <div className="relative">
+                <img
+                  src={video.thumbnail}
+                  alt={video.title}
+                  className="aspect-video w-full object-cover"
+                />
+
+                {video.featured ? (
+                  <div className="absolute left-3 top-3">
+                    <Badge>NA STRONIE</Badge>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="flex h-full flex-col p-4">
+                <p className="line-clamp-2 text-sm font-semibold">
+                  {video.title}
+                </p>
+
+                {video.publishedAt ? (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {new Intl.DateTimeFormat("pl-PL", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    }).format(new Date(video.publishedAt))}
+                  </p>
+                ) : null}
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    nativeButton={false}
+                    render={
+                      <a
+                        href={video.url}
+                        target="_blank"
+                        rel="noreferrer"
+                      />
+                    }
+                  >
+                    <ExternalLink />
+                    YouTube
+                  </Button>
+
+                  {video.featured ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={async () => {
+                        const formData = new FormData()
+
+                        formData.append(
+                          "id",
+                          String(video.id)
+                        )
+
+                        try {
+                          await removeYouTubeVideoFromHomepage(
+                            formData
+                          )
+
+                          setYoutubeItems((current: any[]) =>
+                            current.map((item) =>
+                              item.id === video.id
+                                ? {
+                                    ...item,
+                                    featured: false,
+                                    sortOrder: 0,
+                                  }
+                                : item
+                            )
+                          )
+
+                          router.refresh()
+
+                          toast.success(
+                            "Film został usunięty ze strony głównej"
+                          )
+                        } catch {
+                          toast.error(
+                            "Nie udało się usunąć filmu ze strony"
+                          )
+                        }
+                      }}
+                    >
+                      <XCircle />
+                      Usuń ze strony
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={async () => {
+                        const formData = new FormData()
+
+                        formData.append(
+                          "id",
+                          String(video.id)
+                        )
+
+                        try {
+                          await addYouTubeVideoToHomepage(
+                            formData
+                          )
+
+                          router.refresh()
+
+                          toast.success(
+                            "Film został dodany na stronę główną"
+                          )
+                        } catch {
+                          toast.error(
+                            "Nie udało się dodać filmu na stronę"
+                          )
+                        }
+                      }}
+                    >
+                      <Plus />
+                      Dodaj na stronę
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </CardContent>
+  </Card>
+</TabsContent>
 
 <TabsContent value="inquiries">
   <SectionHeader
