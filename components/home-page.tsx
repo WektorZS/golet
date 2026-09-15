@@ -766,7 +766,7 @@ OPIS W HERO PÓKI CO UKRYTY
               eyebrow="Zobacz atmosferę"
               title={
                 content.youtubeTitle ||
-                "Najnowsze na YouTube"
+                "Zobacz, jak wyglądaja nasze wyjazdy"
               }
               intro="Relacje, stadiony i emocje z naszych piłkarskich podróży."
             />

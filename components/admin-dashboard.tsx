@@ -1987,20 +1987,39 @@ const handleYouTubeDragEnd = async (event: any) => {
                         )
 
                         try {
-                          await addYouTubeVideoToHomepage(
-                            formData
-                          )
+  await addYouTubeVideoToHomepage(formData)
 
-                          router.refresh()
+  const nextSortOrder =
+    featuredYouTubeItems.length > 0
+      ? Math.max(
+          ...featuredYouTubeItems.map(
+            (item) => item.sortOrder
+          )
+        ) + 1
+      : 0
 
-                          toast.success(
-                            "Film został dodany na stronę główną"
-                          )
-                        } catch {
-                          toast.error(
-                            "Nie udało się dodać filmu na stronę"
-                          )
-                        }
+  setYoutubeItems((current: any[]) =>
+    current.map((item) =>
+      item.id === video.id
+        ? {
+            ...item,
+            featured: true,
+            sortOrder: nextSortOrder,
+          }
+        : item
+    )
+  )
+
+  router.refresh()
+
+  toast.success(
+    "Film został dodany na stronę główną"
+  )
+} catch {
+  toast.error(
+    "Nie udało się dodać filmu na stronę"
+  )
+}
                       }}
                     >
                       <Plus />
@@ -2864,35 +2883,19 @@ function YouTubeSettingsForm({
         />
       </Field>
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field
-          label="Liczba filmów"
-          hint="Wybierz, ile najnowszych filmów ma być wyświetlanych na stronie."
-        >
-          <Input
-            name="setting.youtubeLimit"
-            type="number"
-            min="1"
-            max="12"
-            defaultValue={settings.youtubeLimit || "6"}
-            className="h-10"
-          />
-        </Field>
-
-        <Field
-          label="Widoczność filmów"
-          hint="Możesz tymczasowo ukryć całą sekcję YouTube bez usuwania ustawień."
-        >
-          <select
-            name="setting.youtubeEnabled"
-            defaultValue={settings.youtubeEnabled || "true"}
-            className="h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="true">Sekcja włączona</option>
-            <option value="false">Sekcja wyłączona</option>
-          </select>
-        </Field>
-      </div>
+      <Field
+  label="Widoczność sekcji"
+  hint="Możesz tymczasowo ukryć całą sekcję YouTube na stronie głównej bez usuwania wybranych filmów."
+>
+  <select
+    name="setting.youtubeEnabled"
+    defaultValue={settings.youtubeEnabled || "true"}
+    className="h-10 w-full rounded-lg border bg-background px-3 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+  >
+    <option value="true">Sekcja włączona</option>
+    <option value="false">Sekcja wyłączona</option>
+  </select>
+</Field>
 
       {state.error ? (
         <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
