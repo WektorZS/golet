@@ -121,24 +121,50 @@ export function FloatingContact() {
    * Pozwala otworzyć FloatingContact
    * z poziomu głównego menu.
    */
-  useEffect(() => {
-    const openContact = () => {
-      setOpen(true)
+useEffect(() => {
+  const openContact = () => {
+    setOpen(true)
+  }
+
+  const handleContactClick = (event: MouseEvent) => {
+    const target = event.target
+
+    if (!(target instanceof Element)) {
+      return
     }
 
-    window.addEventListener(
+    const trigger = target.closest(
+      "[data-open-floating-contact]"
+    )
+
+    if (!trigger) return
+
+    event.preventDefault()
+    setOpen(true)
+  }
+
+  window.addEventListener(
+    "open-floating-contact",
+    openContact
+  )
+
+  document.addEventListener(
+    "click",
+    handleContactClick
+  )
+
+  return () => {
+    window.removeEventListener(
       "open-floating-contact",
       openContact
     )
 
-    return () => {
-      window.removeEventListener(
-        "open-floating-contact",
-        openContact
-      )
-    }
-  }, [])
-
+    document.removeEventListener(
+      "click",
+      handleContactClick
+    )
+  }
+}, [])
   /*
    * Nie pokazujemy kontaktu w panelu admina
    * ani na stronie logowania.
@@ -188,76 +214,72 @@ export function FloatingContact() {
       </DialogTrigger>
 
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            Jak chcesz się skontaktować?
-          </DialogTitle>
+  <DialogHeader>
+    <DialogTitle>
+      Jak chcesz się skontaktować?
+    </DialogTitle>
 
-          <DialogDescription>
-            Wybierz najwygodniejszą formę kontaktu
-            z zespołem Let&apos;s Gol.
-          </DialogDescription>
-        </DialogHeader>
+    <DialogDescription>
+      Wybierz najwygodniejszą formę kontaktu
+      z zespołem Let&apos;s Gol.
+    </DialogDescription>
+  </DialogHeader>
 
-   
-          {/* FORMULARZ */}
-          <Button
-            nativeButton={false}
-            render={
-              <Link
-                href="/#kontakt"
-                onClick={() => setOpen(false)}
-              />
-            }
-            variant="outline"
-            size="lg"
-          >
-            <MessageCircle className="size-5 shrink-0" />
-            Przejdź do formularza
-          </Button>
+  <div className="flex flex-col gap-3">
+    {/* FORMULARZ */}
+    <Button
+      nativeButton={false}
+      render={
+        <Link
+          href="/#kontakt"
+          onClick={() => setOpen(false)}
+        />
+      }
+      variant="outline"
+      size="lg"
+    >
+      <MessageCircle className="size-5 shrink-0" />
+      Przejdź do formularza
+    </Button>
 
-          {/* E-MAIL */}
-          <Button
-            nativeButton={false}
-            render={
-              <a href={`mailto:${EMAIL}`} />
-            }
-            variant="outline"
-            size="lg"
-          >
-            <Mail className="size-5 shrink-0" />
-            Napisz e-mail
-          </Button>
-               <div className="flex flex-col gap-3">
-          {/* TELEFON */}
-          <Button
-            nativeButton={false}
-            render={
-              <a href={PHONE_HREF} />
-            }
-            size="lg"
-          >
-            <Phone className="size-5 shrink-0" />
-            Zadzwoń: {PHONE_DISPLAY}
-          </Button>
+    {/* E-MAIL */}
+    <Button
+      nativeButton={false}
+      render={<a href={`mailto:${EMAIL}`} />}
+      variant="outline"
+      size="lg"
+    >
+      <Mail className="size-5 shrink-0" />
+      Napisz e-mail
+    </Button>
 
-          {/* WHATSAPP */}
-          <Button
-            nativeButton={false}
-            render={
-              <a
-                href={WHATSAPP_HREF}
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-            }
-            size="lg"
-          >
-            <WhatsappIcon />
-            Napisz na WhatsApp
-          </Button>
-        </div>
-      </DialogContent>
+    {/* TELEFON */}
+    <Button
+      nativeButton={false}
+      render={<a href={PHONE_HREF} />}
+      size="lg"
+    >
+      <Phone className="size-5 shrink-0" />
+      Zadzwoń: {PHONE_DISPLAY}
+    </Button>
+
+    {/* WHATSAPP */}
+    <Button
+      nativeButton={false}
+      render={
+        <a
+          href={WHATSAPP_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+        />
+      }
+      size="lg"
+    >
+      <WhatsappIcon />
+      Napisz na WhatsApp
+    </Button>
+  </div>
+</DialogContent>
     </Dialog>
   )
 }

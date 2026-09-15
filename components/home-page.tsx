@@ -736,37 +736,87 @@ OPIS W HERO PÓKI CO UKRYTY
         </div>
       </section>
 
-      {/* FAQ */}
-      <section
-        id="faq"
-        className="bg-background px-4 py-20 md:px-6"
-      >
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.65fr_1fr]">
-          <SectionHeading
-            eyebrow="FAQ"
-            title={
-              content.faqTitle ||
-              "Najczęstsze pytania"
-            }
-            intro="Jeśli nie ma tu odpowiedzi, napisz lub zadzwoń. Odpowiadamy konkretnie."
-            align="left"
-          />
+     {/* FAQ */}
+<section
+  id="faq"
+  className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24"
+>
+  {/* subtelne tło */}
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0"
+  >
+    <div className="absolute -left-40 top-1/2 size-[420px] -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
+    <div className="absolute -right-48 -top-40 size-[420px] rounded-full bg-black/[0.018] blur-[120px]" />
+  </div>
 
-          <Accordion className="rounded-xl border px-5">
-            {faqs.map(([q, a]) => (
-              <AccordionItem key={q}>
-                <AccordionTrigger className="py-5 text-base">
-                  {q}
-                </AccordionTrigger>
+  <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.65fr_1fr] lg:gap-16">
+    {/* LEWA STRONA */}
+    <div className="flex flex-col items-start lg:pt-1">
+      <SectionHeading
+        eyebrow="FAQ"
+        title={
+          content.faqTitle ||
+          "Najczęstsze pytania"
+        }
+        intro="Jeśli nie ma tu odpowiedzi, napisz lub zadzwoń. Odpowiadamy konkretnie."
+        align="left"
+      />
 
-                <AccordionContent className="pb-5 leading-relaxed text-muted-foreground">
+   {/* szybki kontakt */}
+<div className="mt-7 flex items-center gap-4 border-l-2 border-primary pl-4">
+  <div>
+    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+      Nie znalazłeś odpowiedzi?
+    </p>
+
+    <button
+      type="button"
+      data-open-floating-contact
+      className="group mt-1.5 inline-flex items-center gap-2 text-sm font-bold text-foreground transition-colors hover:text-primary"
+    >
+      Zapytaj nas bezpośrednio
+
+      <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+    </button>
+  </div>
+</div>
+    </div>
+
+    {/* PYTANIA */}
+    <div className="overflow-hidden rounded-xl border border-black/[0.09] bg-white/70 shadow-[0_12px_40px_rgba(0,0,0,0.045)] backdrop-blur-sm">
+      <Accordion>
+        {faqs.map(([q, a], index) => (
+          <AccordionItem
+            key={q}
+            className="group/faq border-b border-black/[0.08] last:border-b-0"
+          >
+            <AccordionTrigger className="group flex w-full items-center gap-4 px-5 py-5 text-left text-[15px] font-bold leading-snug transition-colors hover:no-underline sm:px-6 sm:py-6">
+              {/* numer */}
+              <span className="hidden w-7 shrink-0 font-mono text-[10px] font-bold tracking-[0.12em] text-black/30 sm:block">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+
+              <span className="flex-1 transition-colors duration-200 group-hover:text-primary">
+                {q}
+              </span>
+            </AccordionTrigger>
+
+            <AccordionContent className="px-5 pb-6 sm:px-6">
+              <div className="sm:ml-11">
+                <div className="mb-4 h-[2px] w-8 bg-primary" />
+
+                <p className="max-w-2xl text-[14px] leading-7 text-muted-foreground">
                   {a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </section>
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </div>
+  </div>
+</section>
 
       {/* YOUTUBE */}
 {videos.length > 0 && (
