@@ -82,14 +82,14 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
   ]
 
   return (
-    <section aria-label="Szczegóły wyjazdu" className="overflow-hidden rounded-3xl border bg-card shadow-sm">
-      <div className="border-b bg-foreground px-5 py-5 text-background md:px-7">
+    <section aria-label="Szczegóły wyjazdu" className="scroll-mt-24">
+      <div className="border-b pb-6">
         <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Wszystko w jednym miejscu</p>
         <h2 className="mt-1 font-sans text-3xl font-black uppercase md:text-4xl">Szczegóły wyjazdu</h2>
       </div>
 
-      <div className="lg:grid lg:grid-cols-[250px_minmax(0,1fr)]">
-        <div role="tablist" aria-label="Informacje o wyjeździe" className="flex gap-2 overflow-x-auto border-b bg-secondary/45 p-3 lg:flex-col lg:border-b-0 lg:border-r lg:p-4">
+      <div className="pt-5 lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-10 lg:pt-8">
+        <div role="tablist" aria-label="Informacje o wyjeździe" className="flex gap-2 overflow-x-auto border-b pb-4 lg:flex-col lg:border-b-0 lg:border-r lg:pb-0 lg:pr-6">
           {tabs.map((tab) => {
             const TabIcon = tab.icon
             const selected = activeTab === tab.id
@@ -110,7 +110,7 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
           })}
         </div>
 
-        <div className="min-h-[430px] p-5 md:p-8 lg:p-10">
+        <div className="min-h-[430px] pt-7 lg:pt-0">
           <div id="panel-opis" role="tabpanel" hidden={activeTab !== "opis"}>
             <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">O wyjeździe</p>
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">Najważniejsze informacje</h3>
@@ -172,3 +172,4 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
     </section>
   )
 }
+
