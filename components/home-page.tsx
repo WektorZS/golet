@@ -221,7 +221,6 @@ export function HomePage({
     <main>
       <SiteHeader />
 
-      {/* HERO */}
       <section className="relative isolate flex flex-col overflow-hidden bg-foreground text-background md:h-dvh md:min-h-[700px]">
         <HeroBackgroundSlider />
 
@@ -239,11 +238,10 @@ export function HomePage({
             </h1>
 
             {/*
-OPIS W HERO PÓKI CO UKRYTY
-<p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">
-  {content.heroDescription || ""}
-</p>
-*/}
+            <p className="max-w-xl text-pretty text-lg leading-relaxed text-background/75">
+              {content.heroDescription || ""}
+            </p>
+            */}
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Button
@@ -332,7 +330,6 @@ OPIS W HERO PÓKI CO UKRYTY
         </div>
       </section>
 
-      {/* WYJAZDY */}
       <section
         id="wyjazdy"
         className="scroll-mt-8 bg-background px-4 py-20 md:px-6 md:py-28"
@@ -363,7 +360,6 @@ OPIS W HERO PÓKI CO UKRYTY
         </div>
       </section>
 
-      {/* INDYWIDUALNY WYJAZD */}
       <section id="twoj-wyjazd" className="scroll-mt-20 bg-secondary px-4 py-20 md:px-6">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
           <div className="relative min-h-[430px] overflow-hidden rounded-xl">
@@ -428,7 +424,6 @@ OPIS W HERO PÓKI CO UKRYTY
         </div>
       </section>
 
-      {/* BILETY / GRUPY */}
       <section
         id="bilety"
         className="bg-background px-4 py-20 md:px-6"
@@ -483,7 +478,6 @@ OPIS W HERO PÓKI CO UKRYTY
         </div>
       </section>
 
-      {/* PAKIET */}
       <section className="bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
@@ -525,7 +519,6 @@ OPIS W HERO PÓKI CO UKRYTY
         </div>
       </section>
 
-      {/* DLACZEGO MY */}
       <section className="bg-background px-4 py-20 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
@@ -558,7 +551,6 @@ OPIS W HERO PÓKI CO UKRYTY
         </div>
       </section>
 
-      {/* GALERIA */}
 <section className="relative overflow-hidden bg-secondary px-4 py-20 md:px-6 md:py-24">
   <div
     aria-hidden="true"
@@ -594,7 +586,6 @@ OPIS W HERO PÓKI CO UKRYTY
   </div>
 </section>
 
-{/* OPINIE */}
 <section className="relative overflow-hidden bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
   <div
     aria-hidden="true"
@@ -710,41 +701,136 @@ OPIS W HERO PÓKI CO UKRYTY
   </div>
 </section>
 
-      {/* PROCES */}
-      <section className="bg-background px-4 py-20 md:px-6">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            eyebrow="Prosty plan"
-            title={
-              content.processTitle ||
-              "Jak wygląda rezerwacja?"
-            }
-          />
+<section className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24">
 
-          <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {process.map(([number, title, copy]) => (
-              <article
-                key={number}
-                className="rounded-xl border p-6"
-              >
-                <span className="font-mono text-3xl font-black text-primary [-webkit-text-stroke:1px_rgba(0,0,0,0.5)]">
-                  {number}
-                </span>
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0"
+  >
+    <div className="absolute left-1/2 top-[-220px] h-[440px] w-[800px] -translate-x-1/2 rounded-full bg-primary/[0.06] blur-[130px]" />
+  </div>
 
-                <h3 className="mt-8 font-bold uppercase">
+  <div className="relative mx-auto max-w-7xl">
+    <SectionHeading
+      eyebrow="Prosty plan"
+      title={
+        content.processTitle ||
+        "Jak wygląda rezerwacja?"
+      }
+      intro="Od wyboru meczu do miejsca na trybunach. Całą organizację bierzemy na siebie."
+    />
+
+    <div className="relative mt-16">
+
+      <div className="relative hidden lg:block">
+
+<div
+  aria-hidden="true"
+  className="absolute left-[8.333%] right-[8.333%] top-7 h-px bg-foreground/30"
+>
+  <div className="process-flow absolute top-1/2 h-[3px] w-24 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-primary to-transparent opacity-100" />
+</div>
+
+        <div className="relative grid grid-cols-6">
+          {process.map(([number, title, copy], index) => (
+            <article
+              key={number}
+              className="group relative min-w-0 px-4 xl:px-6"
+            >
+
+<div
+  className={`process-step process-step-${index + 1} relative z-10 mx-auto flex size-14 items-center justify-center rounded-full border bg-background`}
+>
+  <span className="relative z-10 font-mono text-[13px] font-black text-foreground">
+    {number}
+  </span>
+</div>
+
+              <div className="mt-4 text-center">
+
+                <div className="relative inline-flex">
+
+                  <span
+                    aria-hidden="true"
+                    className={`absolute -inset-x-2.5 -inset-y-1 bg-foreground ${
+                      index % 2 === 0
+                        ? "-rotate-[1.5deg] [clip-path:polygon(2%_16%,98%_4%,100%_82%,94%_94%,5%_88%,0_72%)]"
+                        : "rotate-[1deg] [clip-path:polygon(0_8%,96%_15%,100%_75%,97%_92%,3%_100%,1%_68%)]"
+                    }`}
+                  />
+
+                  <span
+                    aria-hidden="true"
+                    className="absolute -inset-x-1.5 -inset-y-0.5 rotate-[0.7deg] bg-foreground/70 [clip-path:polygon(0_25%,96%_8%,100%_74%,92%_100%,3%_84%)]"
+                  />
+
+                  <span className="relative z-10 px-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-primary">
+                    Krok {number}
+                  </span>
+                </div>
+
+                <h3 className="mt-4 font-sans text-[18px] font-black uppercase leading-[1.1] tracking-tight text-foreground xl:text-[19px]">
                   {title}
                 </h3>
 
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                <p className="mx-auto mt-4 max-w-[195px] text-[14px] leading-[1.75] text-muted-foreground xl:text-[15px]">
                   {copy}
                 </p>
-              </article>
-            ))}
-          </div>
+              </div>
+            </article>
+          ))}
         </div>
-      </section>
+      </div>
 
-      {/* O NAS */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:hidden">
+        {process.map(([number, title, copy], index) => (
+          <article
+            key={number}
+            className="group relative rounded-xl border border-foreground/[0.08] bg-secondary/40 p-6 transition-all duration-300 hover:border-primary/40"
+          >
+            <div className="flex items-center gap-4">
+
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-full border border-foreground/30 bg-background transition-all duration-300 group-hover:border-primary group-hover:bg-primary">
+                <span className="font-mono text-[13px] font-black text-foreground transition-colors duration-300 group-hover:text-primary-foreground">
+                  {number}
+                </span>
+              </div>
+
+              <div className="relative inline-flex">
+                <span
+                  aria-hidden="true"
+                  className={`absolute -inset-x-2.5 -inset-y-1 bg-foreground ${
+                    index % 2 === 0
+                      ? "-rotate-[1.5deg] [clip-path:polygon(2%_16%,98%_4%,100%_82%,94%_94%,5%_88%,0_72%)]"
+                      : "rotate-[1deg] [clip-path:polygon(0_8%,96%_15%,100%_75%,97%_92%,3%_100%,1%_68%)]"
+                  }`}
+                />
+
+                <span
+                  aria-hidden="true"
+                  className="absolute -inset-x-1.5 -inset-y-0.5 rotate-[0.7deg] bg-foreground/70 [clip-path:polygon(0_25%,96%_8%,100%_74%,92%_100%,3%_84%)]"
+                />
+
+                <span className="relative z-10 px-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-primary">
+                  Krok {number}
+                </span>
+              </div>
+            </div>
+
+            <h3 className="mt-6 font-sans text-xl font-black uppercase leading-tight tracking-tight text-foreground">
+              {title}
+            </h3>
+
+            <p className="mt-3 text-[15px] leading-7 text-muted-foreground">
+              {copy}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
       <section
         id="o-nas"
         className="bg-secondary px-4 py-20 md:px-6"
@@ -796,7 +882,6 @@ OPIS W HERO PÓKI CO UKRYTY
                   100% poleca
                 </p>
 
-            
               </div>
 
               <div>
@@ -823,12 +908,11 @@ OPIS W HERO PÓKI CO UKRYTY
         </div>
       </section>
 
-     {/* FAQ */}
 <section
   id="faq"
   className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24"
 >
-  {/* subtelne tło */}
+
   <div
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
@@ -838,7 +922,7 @@ OPIS W HERO PÓKI CO UKRYTY
   </div>
 
   <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.65fr_1fr] lg:gap-16">
-    {/* LEWA STRONA */}
+
     <div className="flex flex-col items-start lg:pt-1">
       <SectionHeading
         eyebrow="FAQ"
@@ -850,7 +934,6 @@ OPIS W HERO PÓKI CO UKRYTY
         align="left"
       />
 
-   {/* szybki kontakt */}
 <div className="mt-7 flex items-center gap-4 border-l-2 border-primary pl-4">
   <div>
     <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
@@ -870,7 +953,6 @@ OPIS W HERO PÓKI CO UKRYTY
 </div>
     </div>
 
-    {/* PYTANIA */}
     <div className="overflow-hidden rounded-xl border border-black/[0.09] bg-white/70 shadow-[0_12px_40px_rgba(0,0,0,0.045)] backdrop-blur-sm">
       <Accordion>
         {faqs.map(([q, a], index) => (
@@ -879,7 +961,7 @@ OPIS W HERO PÓKI CO UKRYTY
             className="group/faq border-b border-black/[0.08] last:border-b-0"
           >
             <AccordionTrigger className="group flex w-full items-center gap-4 px-5 py-5 text-left text-[15px] font-bold leading-snug transition-colors hover:no-underline sm:px-6 sm:py-6">
-              {/* numer */}
+
               <span className="hidden w-7 shrink-0 font-mono text-[10px] font-bold tracking-[0.12em] text-black/30 sm:block">
                 {String(index + 1).padStart(2, "0")}
               </span>
@@ -905,22 +987,18 @@ OPIS W HERO PÓKI CO UKRYTY
   </div>
 </section>
 
-      {/* YOUTUBE */}
 {videos.length > 0 && (
   <section className="relative overflow-hidden bg-secondary px-4 py-20 md:px-6 md:py-24">
-    {/* DELIKATNE TŁO */}
-    {/* SUBTELNE TŁO SEKCJI */}
+
 <div
   aria-hidden="true"
   className="pointer-events-none absolute inset-0"
 >
-  {/* złota poświata na środku u góry */}
+
   <div className="absolute left-1/2 top-[-180px] h-[420px] w-[750px] -translate-x-1/2 rounded-full bg-primary/[0.07] blur-[120px]" />
 
-  {/* bardzo delikatne światło z lewej */}
   <div className="absolute -left-40 bottom-[-180px] h-[420px] w-[420px] rounded-full bg-white/60 blur-[110px]" />
 
-  {/* delikatne przyciemnienie przy prawej krawędzi */}
   <div className="absolute -right-48 top-1/3 h-[420px] w-[420px] rounded-full bg-black/[0.025] blur-[120px]" />
 </div>
 
@@ -934,8 +1012,6 @@ OPIS W HERO PÓKI CO UKRYTY
         intro="Relacje, stadiony i emocje z naszych piłkarskich podróży."
       />
 
-
-      {/* FILMY */}
       <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {videos.map((video) => (
           <a
@@ -947,7 +1023,6 @@ OPIS W HERO PÓKI CO UKRYTY
           >
             <article className="relative h-full overflow-hidden rounded-xl border border-black/[0.08] bg-gradient-to-br from-white via-[#fdfcf9] to-[#f5f1e8] shadow-[0_8px_30px_rgba(0,0,0,0.045)] transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:border-primary/50 group-hover:shadow-[0_22px_55px_rgba(0,0,0,0.13)]">
 
-              {/* MINIATURA */}
               <div className="relative aspect-[16/9] overflow-hidden bg-black">
                 <Image
                   src={video.thumbnail}
@@ -957,17 +1032,13 @@ OPIS W HERO PÓKI CO UKRYTY
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
 
-                {/* CINEMATIC OVERLAY */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-black/10 transition-opacity duration-500 group-hover:opacity-80" />
 
-
-                {/* PLAY */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative flex size-[62px] items-center justify-center">
-                    {/* delikatny ring */}
+
                     <div className="absolute inset-0 rounded-full border border-white/35 transition-all duration-500 group-hover:scale-[1.18] group-hover:border-primary/40" />
 
-                    {/* przycisk */}
                     <div className="relative flex size-[50px] items-center justify-center rounded-full bg-white shadow-[0_8px_30px_rgba(0,0,0,0.25)] transition-all duration-300 group-hover:scale-105 group-hover:bg-primary">
                       <svg
                         viewBox="0 0 24 24"
@@ -981,9 +1052,8 @@ OPIS W HERO PÓKI CO UKRYTY
                 </div>
               </div>
 
-              {/* TREŚĆ */}
               <div className="relative flex min-h-[126px] items-start justify-between gap-5 bg-gradient-to-br from-transparent to-primary/[0.025] p-5 md:p-6">
-                {/* złota linia na hover */}
+
                 <div className="absolute left-0 top-0 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full" />
 
                 <div className="min-w-0">
@@ -996,7 +1066,6 @@ OPIS W HERO PÓKI CO UKRYTY
                   </h3>
                 </div>
 
-                {/* STRZAŁKA */}
                 <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center border border-black/10 bg-transparent transition-all duration-300 group-hover:border-primary group-hover:bg-primary">
                   <ArrowRight className="size-4 text-black transition-transform duration-300 group-hover:translate-x-0.5" />
                 </div>
@@ -1006,7 +1075,6 @@ OPIS W HERO PÓKI CO UKRYTY
         ))}
       </div>
 
-      {/* DOLNY PODPIS */}
       <div className="mt-9 flex items-center justify-center gap-3">
         <div className="h-px w-8 bg-black/15" />
 
@@ -1020,7 +1088,6 @@ OPIS W HERO PÓKI CO UKRYTY
   </section>
 )}
 
-      {/* KONTAKT */}
       <section
         id="kontakt"
         className="bg-foreground px-4 py-20 text-background md:px-6 md:py-24"

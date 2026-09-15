@@ -92,12 +92,28 @@ export function TripCard({ trip }: { trip: Trip }) {
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-xl border bg-card transition-all duration-300 hover:border-primary/60 hover:shadow-lg ${
-        trip.featured
-          ? "border-primary/50 shadow-md shadow-primary/5"
-          : "border-border shadow-sm"
-      }`}
-    >
+  className={`group relative rounded-xl border bg-card transition-all duration-300 hover:border-primary/60 hover:shadow-lg ${
+    trip.featured
+      ? "border-primary/60 shadow-md shadow-primary/5"
+      : "border-border shadow-sm"
+  }`}
+>
+  {trip.featured && (
+    <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2 -translate-y-1/2">
+      <div className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/50 bg-card px-4 py-1.5 shadow-sm">
+        <Star
+          className="size-3.5 fill-primary text-primary"
+          aria-hidden="true"
+        />
+
+        <span className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-foreground">
+          Polecany
+        </span>
+      </div>
+    </div>
+  )}
+
+  <div className="overflow-hidden rounded-[inherit]">
       <div className="grid md:grid-cols-[230px_minmax(0,1fr)] lg:grid-cols-[230px_minmax(0,1fr)_190px]">
         <div className="relative min-h-44 overflow-hidden bg-foreground md:min-h-full">
           <Image
@@ -112,12 +128,7 @@ export function TripCard({ trip }: { trip: Trip }) {
           <Badge className={`absolute left-3 top-3 rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${status.className}`}>
             {status.label}
           </Badge>
-          {trip.featured && (
-            <Badge className="absolute right-3 top-3 gap-1 rounded-md border-0 bg-background/95 px-2.5 py-1 text-foreground shadow-sm backdrop-blur-sm">
-              <Star className="size-3 fill-primary text-primary" aria-hidden="true" />
-              <span>Polecany</span>
-            </Badge>
-          )}
+          
           <div className="absolute inset-0 flex items-center justify-center gap-3 pt-3">
             <TeamLogo src={trip.homeLogo} name={teams.home} />
             <span className="font-sans text-lg font-black text-white/75">VS</span>
@@ -162,8 +173,10 @@ export function TripCard({ trip }: { trip: Trip }) {
             <ArrowUpRight data-icon="inline-end" />
           </Button>
         </div>
-      </div>
-    </article>
+         </div>
+    </div>
+  </article>
   )
 }
+
 
