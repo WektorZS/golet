@@ -71,7 +71,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
   if (!trip) notFound()
 
   const [gallery, testimonials, content, publishedTrips] = await Promise.all([
-    getTripGallery(trip.id),
+    getTripGallery(trip.id, trip.homeTeamId, trip.awayTeamId),
     getPublishedTestimonials(),
     getSiteContent(),
     getPublishedTrips(),
@@ -181,6 +181,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
           <div className="mt-auto grid items-end gap-10 pb-6 lg:grid-cols-[1fr_auto]">
             <div className="max-w-4xl">
               <span className={`inline-flex rounded-md px-3 py-1.5 font-mono text-[11px] font-black uppercase tracking-wider shadow ${status.className}`}>{status.label}</span>
+              {(trip.leagueName || trip.leagueLogo) && <div className="mt-5 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/80">{trip.leagueLogo && <span className="relative size-6"><Image src={trip.leagueLogo} alt={`Logo ${trip.leagueName}`} fill className="object-contain" sizes="24px" /></span>}<span>{trip.leagueName}</span></div>}
               <div className="mt-6 flex items-center gap-4"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-2xl font-black text-white/50">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
               <p className="mt-6 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">{trip.city}, {trip.country}</p>
               <h1 className="mt-2 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-tight md:text-7xl">{homeTeam} - {awayTeam}</h1>
@@ -286,4 +287,3 @@ export default async function TripDetailPage({ params }: { params: Promise<{ slu
     </main>
   )
 }
-

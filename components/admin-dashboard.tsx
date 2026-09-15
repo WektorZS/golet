@@ -40,6 +40,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
+
 import {
   archiveTestimonial,
   addGalleryItem,
@@ -54,7 +55,10 @@ import {
   type SaveSettingsState,
   type SaveTripState,
   type SaveTeamState,
+  type SaveLeagueState,
+  deleteLeague,
   deleteTeam,
+  saveLeague,
   saveTeam,
   saveSettings,
   deleteInquiry,
@@ -67,6 +71,7 @@ import {
   type UpdateGalleryItemState,
   updateGalleryItem,
   updateTripGalleryItem,
+  updateTeamGalleryItem as updateTeamGalleryItemState,
   updateInquiry,
   updateMedia,
   uploadMedia,
@@ -133,11 +138,13 @@ import { CSS } from "@dnd-kit/utilities"
 export type AdminData = {
   trips: any[]
   teams: any[]
+  leagues: any[]
   inquiries: any[]
   testimonials: any[]
   media: any[]
   gallery: any[]
   tripGallery: any[]
+  teamGallery: any[]
   settings: Record<string, string>
   activity: any[]
   videos: any[]
@@ -148,6 +155,7 @@ const sections = [
   ["dashboard", "Pulpit", LayoutDashboard],
   ["trips", "Wyjazdy", Plane],
   ["teams", "Drużyny", Trophy],
+  ["leagues", "Ligi", Star],
   ["media", "Media i galerie", FileImage],
   ["content", "Treści strony", BookOpen],
   ["testimonials", "Opinie", Star],
@@ -588,6 +596,7 @@ const handleYouTubeDragEnd = async (event: any) => {
               <CardContent className="grid gap-3 sm:grid-cols-3">
                 <TripDialog
                   teams={data.teams}
+                  leagues={data.leagues}
                   trigger={
                     <Button>
                       <Plus />
@@ -980,6 +989,7 @@ const handleYouTubeDragEnd = async (event: any) => {
     action={
       <TripDialog
         teams={data.teams}
+        leagues={data.leagues}
         trigger={
           <Button>
             <Plus />
@@ -1130,6 +1140,7 @@ const handleYouTubeDragEnd = async (event: any) => {
                         <TripDialog
                           trip={trip}
                           teams={data.teams}
+                          leagues={data.leagues}
                           trigger={
                             <Button
                               size="icon-sm"
@@ -1246,6 +1257,15 @@ const handleYouTubeDragEnd = async (event: any) => {
           )}
         </TabsContent>
 
+        <TabsContent value="leagues">
+          <SectionHeader eyebrow="Baza rozgrywek" title="Ligi" description="Dodaj ligę raz, a jej nazwa i logo będą dostępne przy każdym wyjeździe." action={<LeagueDialog trigger={<Button><Plus />Nowa liga</Button>} />} />
+          <Card>
+            <CardContent className="pt-6">
+              {data.leagues.length === 0 ? <p className="py-12 text-center text-sm text-muted-foreground">Nie dodano jeszcze żadnej ligi.</p> : <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{data.leagues.map((league) => <div key={league.id} className="flex items-center gap-4 border-b py-4"><span className="relative size-14 shrink-0"><Image src={league.logo} alt={`Logo ${league.name}`} fill className="object-contain" sizes="56px" /></span><strong className="min-w-0 flex-1 truncate">{league.name}</strong><LeagueDialog league={league} trigger={<Button size="icon-sm" variant="outline"><Pencil /><span className="sr-only">Edytuj</span></Button>} /><LeagueDeleteButton league={league} /></div>)}</div>}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="media">
           <SectionHeader
             eyebrow="Biblioteka"
@@ -1257,6 +1277,7 @@ const handleYouTubeDragEnd = async (event: any) => {
             <TabsList>
               <TabsTrigger value="photos"><FileImage />Zdjęcia i galerie</TabsTrigger>
               <TabsTrigger value="logos"><Trophy />Herby drużyn</TabsTrigger>
+              <TabsTrigger value="team-galleries"><FileImage />Galerie drużyn</TabsTrigger>
             </TabsList>
 
             <TabsContent value="photos" className="mt-6">
@@ -1307,7 +1328,7 @@ const handleYouTubeDragEnd = async (event: any) => {
 
             <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               {data.media
-                .filter((asset) => !data.teams.some((team) => team.logo === `/api/media/${asset.id}`))
+                .filter((asset) => !data.teams.some((team) => team.logo === `/api/media/${asset.id}`) && !data.leagues.some((league) => league.logo === `/api/media/${asset.id}`))
                 .map((asset) => (
                 <Card
                   key={asset.id}
@@ -1367,6 +1388,7 @@ const handleYouTubeDragEnd = async (event: any) => {
                       <GalleryDialog
                         asset={asset}
                         trips={data.trips}
+                        teams={data.teams}
                       />
 
                       <form action={deleteMedia}>
@@ -1619,6 +1641,9 @@ const handleYouTubeDragEnd = async (event: any) => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+            <TabsContent value="team-galleries" className="mt-6">
+              <Card><CardHeader><CardTitle>Galerie drużyn</CardTitle><CardDescription>Te zdjęcia będą automatycznie widoczne przy każdym wyjeździe danej drużyny.</CardDescription></CardHeader><CardContent className="space-y-8">{data.teams.map((team) => { const items = data.teamGallery.filter((item) => item.teamId === team.id); return <section key={team.id}><div className="mb-3 flex items-center gap-3"><span className="relative size-8"><Image src={team.logo} alt="" fill className="object-contain" sizes="32px" /></span><h3 className="font-bold">{team.name}</h3><span className="text-xs text-muted-foreground">{items.length} zdjęć</span></div>{items.length ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{items.map((item) => <div key={item.id} className="border-b pb-3"><img src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || team.name} className="aspect-video w-full object-cover" /><form action={updateTeamGalleryItem} className="mt-3 grid gap-2"><input type="hidden" name="id" value={item.id} /><Input name="caption" defaultValue={item.caption} placeholder="Podpis zdjęcia" /><Input name="alt" defaultValue={item.alt} placeholder="Opis alternatywny" /><Input name="sortOrder" type="number" defaultValue={item.sortOrder} aria-label="Kolejność zdjęcia" /><Button type="submit" size="sm" variant="outline">Zapisz</Button></form><form action={removeGalleryItem} className="mt-2"><input type="hidden" name="id" value={item.id} /><input type="hidden" name="scope" value="team" /><Button type="submit" size="sm" variant="ghost">Usuń przypisanie</Button></form></div>)}</div> : <p className="border-y py-5 text-sm text-muted-foreground">Brak zdjęć. Przypisz je z biblioteki przez przycisk Użyj.</p>}</section>})}</CardContent></Card>
             </TabsContent>
           </Tabs>
         </TabsContent>
@@ -3432,15 +3457,32 @@ function TeamDeleteButton({ team }: { team: any }) {
   return <form action={action}><input type="hidden" name="id" value={team.id} /><Button type="submit" size="icon-sm" variant="outline" disabled={pending} title="Usuń drużynę"><XCircle /><span className="sr-only">Usuń</span></Button></form>
 }
 
+const initialLeagueState: SaveLeagueState = {}
+
+function LeagueDialog({ league, trigger }: { league?: any; trigger: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const [state, action, pending] = useActionState(saveLeague, initialLeagueState)
+  useEffect(() => { if (state.success) { toast.success(league ? "Liga została zaktualizowana." : "Liga została dodana."); setOpen(false) } }, [state.success, league])
+  return <Dialog open={open} onOpenChange={setOpen}><DialogTrigger render={trigger as React.ReactElement} /><DialogContent><DialogHeader><DialogTitle>{league ? "Edytuj ligę" : "Nowa liga"}</DialogTitle><DialogDescription>Nazwa i logo będą widoczne przy przypisanych wyjazdach.</DialogDescription></DialogHeader><form action={action} className="grid gap-4">{league && <input type="hidden" name="id" value={league.id} />}<Field label="Nazwa ligi" hint="Np. LaLiga lub Premier League."><Input name="name" defaultValue={league?.name} required /></Field><Field label="Logo ligi" hint="Plik zostanie zoptymalizowany do niewielkiego formatu WebP."><ImageDropzone name="logoFile" accept="image/png,image/webp,image/jpeg" required={!league?.logo} currentImage={league?.logo} /></Field>{state.error && <p role="alert" className="text-sm text-destructive">{state.error}</p>}<DialogFooter><Button disabled={pending}>{pending ? "Zapisuję..." : "Zapisz ligę"}</Button></DialogFooter></form></DialogContent></Dialog>
+}
+
+function LeagueDeleteButton({ league }: { league: any }) {
+  const [state, action, pending] = useActionState(deleteLeague, initialLeagueState)
+  useEffect(() => { if (state.error) toast.error(state.error); if (state.success) toast.success("Liga została usunięta.") }, [state])
+  return <form action={action}><input type="hidden" name="id" value={league.id} /><Button type="submit" size="icon-sm" variant="outline" disabled={pending}><XCircle /><span className="sr-only">Usuń ligę</span></Button></form>
+}
+
 const initialTripState: SaveTripState = {}
 
 function TripDialog({
   trip,
   teams,
+  leagues,
   trigger,
 }: {
   trip?: any
   teams: any[]
+  leagues: any[]
   trigger: React.ReactNode
 }) {
   const [open, setOpen] =
@@ -3570,6 +3612,13 @@ function TripDialog({
             <select name="awayTeamId" value={awayTeamId} onChange={(event) => selectAwayTeam(event.target.value)} required className="h-9 rounded-lg border bg-background px-3">
               <option value="">Wybierz drużynę</option>
               {teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
+            </select>
+          </Field>
+
+          <Field label="Liga" hint="Logo i nazwa ligi pojawią się przy wyjeździe.">
+            <select name="leagueId" defaultValue={trip?.leagueId || ""} className="h-9 rounded-lg border bg-background px-3">
+              <option value="">Bez przypisanej ligi</option>
+              {leagues.map((league) => <option key={league.id} value={league.id}>{league.name}</option>)}
             </select>
           </Field>
 
@@ -4139,12 +4188,18 @@ function LegacyTripDialog({
 
 const initialGalleryState: AddGalleryItemState = {}
 
+async function updateTeamGalleryItem(formData: FormData) {
+  await updateTeamGalleryItemState({}, formData)
+}
+
 function GalleryDialog({
   asset,
   trips,
+  teams,
 }: {
   asset: any
   trips: any[]
+  teams: any[]
 }) {
   const [
     state,
@@ -4195,21 +4250,22 @@ function GalleryDialog({
             hint="Wybierz, czy zdjęcie ma trafić do galerii strony głównej, czy do galerii konkretnego wyjazdu."
           >
             <select
-              name="tripId"
+              name="destination"
               className="h-9 rounded-lg border bg-background px-3"
             >
-              <option value="0">
+              <option value="global">
                 Galeria strony głównej
               </option>
 
               {trips.map((trip) => (
                 <option
                   key={trip.id}
-                  value={trip.id}
+                  value={`trip:${trip.id}`}
                 >
-                  {trip.title}
+                  Wyjazd: {trip.title}
                 </option>
               ))}
+              {teams.map((team) => <option key={`team-${team.id}`} value={`team:${team.id}`}>Drużyna: {team.name}</option>)}
             </select>
           </Field>
 
@@ -5040,4 +5096,3 @@ function SettingsForm({
     </div>
   )
 }
-

@@ -141,6 +141,7 @@ export function TripCard({ trip }: { trip: Trip }) {
 
         <div className="grid gap-5 p-5 sm:grid-cols-[1.1fr_0.9fr]">
           <div>
+            {(trip.leagueName || trip.leagueLogo) && <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{trip.leagueLogo && <span className="relative size-5"><Image src={trip.leagueLogo} alt={`Logo ${trip.leagueName}`} fill className="object-contain" sizes="20px" /></span>}<span>{trip.leagueName}</span></div>}
             <p className="text-[10px] font-bold uppercase tracking-wider text-primary">{packageSummary(trip.packageItems)}</p>
             <h3 className="mt-1 font-sans text-2xl font-black uppercase leading-tight tracking-tight">
               {teams.home} - {teams.away}
@@ -178,5 +179,3 @@ export function TripCard({ trip }: { trip: Trip }) {
   </article>
   )
 }
-
-

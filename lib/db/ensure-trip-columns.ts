@@ -20,6 +20,29 @@ export function ensureTripColumns() {
         )
       `)
       await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS leagues (
+          id serial PRIMARY KEY,
+          name text NOT NULL UNIQUE,
+          logo text NOT NULL,
+          created_at timestamp NOT NULL DEFAULT now(),
+          updated_at timestamp NOT NULL DEFAULT now()
+        )
+      `)
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS team_gallery_items (
+          id serial PRIMARY KEY,
+          team_id integer NOT NULL,
+          media_id integer NOT NULL,
+          caption text NOT NULL DEFAULT '',
+          alt text NOT NULL DEFAULT '',
+          sort_order integer NOT NULL DEFAULT 0,
+          status text NOT NULL DEFAULT 'published',
+          created_at timestamp NOT NULL DEFAULT now(),
+          updated_at timestamp NOT NULL DEFAULT now(),
+          UNIQUE (team_id, media_id)
+        )
+      `)
+      await db.execute(sql`
         ALTER TABLE trips
           ADD COLUMN IF NOT EXISTS home_team_id integer,
           ADD COLUMN IF NOT EXISTS away_team_id integer,
@@ -27,6 +50,9 @@ export function ensureTripColumns() {
           ADD COLUMN IF NOT EXISTS away_team text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS home_logo text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS away_logo text NOT NULL DEFAULT '',
+          ADD COLUMN IF NOT EXISTS league_id integer,
+          ADD COLUMN IF NOT EXISTS league_name text NOT NULL DEFAULT '',
+          ADD COLUMN IF NOT EXISTS league_logo text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS stadium text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS match_date date,
           ADD COLUMN IF NOT EXISTS availability_status text NOT NULL DEFAULT 'available',
@@ -54,4 +80,3 @@ export function ensureTripColumns() {
 
   return schemaPromise
 }
-

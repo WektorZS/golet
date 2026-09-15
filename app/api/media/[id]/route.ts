@@ -5,7 +5,7 @@ import { isAdminEmail } from "@/lib/auth/admin"
 import { getAuth } from "@/lib/auth/server"
 import { db } from "@/lib/db"
 import { ensureTripColumns } from "@/lib/db/ensure-trip-columns"
-import { galleryItems, mediaAssets, teams, tripGalleryItems, trips } from "@/lib/db/schema"
+import { galleryItems, leagues, mediaAssets, teamGalleryItems, teams, tripGalleryItems, trips } from "@/lib/db/schema"
 
 export async function GET(
   request: NextRequest,
@@ -41,7 +41,7 @@ export async function GET(
   }
 
   if (!isAdmin) {
-    const [globalReference, tripReference, tripImageReference, teamLogoReference] =
+    const [globalReference, tripReference, teamGalleryReference, tripImageReference, teamLogoReference, leagueLogoReference] =
       await Promise.all([
         db
           .select({ id: galleryItems.id })
@@ -67,6 +67,8 @@ export async function GET(
           )
           .limit(1),
 
+        db.select({ id: teamGalleryItems.id }).from(teamGalleryItems).where(and(eq(teamGalleryItems.mediaId, id), eq(teamGalleryItems.status, "published"))).limit(1),
+
         db
           .select({ id: trips.id })
           .from(trips)
@@ -87,13 +89,16 @@ export async function GET(
           .from(teams)
           .where(eq(teams.logo, `/api/media/${id}`))
           .limit(1),
+        db.select({ id: leagues.id }).from(leagues).where(eq(leagues.logo, `/api/media/${id}`)).limit(1),
       ])
 
     if (
       !globalReference.length &&
       !tripReference.length &&
+      !teamGalleryReference.length &&
       !tripImageReference.length &&
-      !teamLogoReference.length
+      !teamLogoReference.length &&
+      !leagueLogoReference.length
     ) {
       return new NextResponse("Not found", { status: 404 })
     }

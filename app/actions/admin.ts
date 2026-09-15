@@ -11,10 +11,12 @@ import {
   adminActivity,
   galleryItems,
   inquiries,
+  leagues,
   mediaAssets,
   siteSettings,
   testimonials,
   teams,
+  teamGalleryItems,
   tripGalleryItems,
   trips,
   youtubeVideos,
@@ -80,6 +82,7 @@ const tripSchema = z.object({
 
 export type SaveTripState = { success?: boolean; error?: string }
 export type SaveTeamState = { success?: boolean; error?: string }
+export type SaveLeagueState = { success?: boolean; error?: string }
 
 const teamSchema = z.object({
   name: z.string().min(2).max(100),
@@ -162,6 +165,57 @@ export async function deleteTeam(_: SaveTeamState, formData: FormData): Promise<
   return { success: true }
 }
 
+export async function saveLeague(_: SaveLeagueState, formData: FormData): Promise<SaveLeagueState> {
+  const user = await requireAdmin()
+  await ensureTripColumns()
+  const id = Number(formData.get("id"))
+  const name = clean(formData.get("name"))
+  if (name.length < 2 || name.length > 100) return { error: "Podaj poprawną nazwę ligi." }
+  const [existing] = id > 0 ? await db.select().from(leagues).where(eq(leagues.id, id)).limit(1) : []
+  let logo = existing?.logo || ""
+  const file = formData.get("logoFile")
+  if (file instanceof File && file.size > 0) {
+    try {
+      const optimized = await optimizeTeamLogo(file)
+      const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
+      const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt: `Logo ${name}`, originalName: file.name, createdBy: user.id }).returning({ id: mediaAssets.id })
+      logo = `/api/media/${asset.id}`
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : "Nie udało się zapisać logo ligi." }
+    }
+  }
+  if (!logo) return { error: "Dodaj logo ligi." }
+  if (existing) {
+    await db.update(leagues).set({ name, logo, updatedAt: new Date() }).where(eq(leagues.id, id))
+    await db.update(trips).set({ leagueName: name, leagueLogo: logo, updatedAt: new Date() }).where(eq(trips.leagueId, id))
+    if (existing.logo !== logo) {
+      const oldId = mediaIdFromUrl(existing.logo)
+      if (oldId) await deleteMediaAsset(oldId).catch(() => undefined)
+    }
+    await logActivity(user.id, "updated", "league", String(id), name)
+  } else {
+    const [created] = await db.insert(leagues).values({ name, logo }).returning({ id: leagues.id })
+    await logActivity(user.id, "created", "league", String(created.id), name)
+  }
+  refreshPublic()
+  return { success: true }
+}
+
+export async function deleteLeague(_: SaveLeagueState, formData: FormData): Promise<SaveLeagueState> {
+  const user = await requireAdmin()
+  const id = Number(formData.get("id"))
+  const [league] = await db.select().from(leagues).where(eq(leagues.id, id)).limit(1)
+  if (!league) return { error: "Nie znaleziono ligi." }
+  const used = await db.select({ id: trips.id }).from(trips).where(eq(trips.leagueId, id)).limit(1)
+  if (used.length) return { error: "Najpierw usuń ligę z przypisanych wyjazdów." }
+  await db.delete(leagues).where(eq(leagues.id, id))
+  const logoId = mediaIdFromUrl(league.logo)
+  if (logoId) await deleteMediaAsset(logoId).catch(() => undefined)
+  await logActivity(user.id, "deleted", "league", String(id), league.name)
+  refreshPublic()
+  return { success: true }
+}
+
 export async function saveTrip(_: SaveTripState, formData: FormData): Promise<SaveTripState> {
   const user = await requireAdmin()
   await ensureTripColumns()
@@ -192,6 +246,9 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   const homeTeamRecord = selectedTeams.find((team) => team.id === parsed.data.homeTeamId)
   const awayTeamRecord = selectedTeams.find((team) => team.id === parsed.data.awayTeamId)
   if (!homeTeamRecord || !awayTeamRecord) return { error: "Nie znaleziono wybranej drużyny. Odśwież panel i spróbuj ponownie." }
+  const leagueId = Number(formData.get("leagueId")) || null
+  const [league] = leagueId ? await db.select().from(leagues).where(eq(leagues.id, leagueId)).limit(1) : []
+  if (leagueId && !league) return { error: "Nie znaleziono wybranej ligi." }
 
   const isEditing = Number.isInteger(id) && id > 0
   const [existingTrip] = isEditing
@@ -231,6 +288,7 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
 
   const values = {
     ...parsed.data, homeTeam: homeTeamRecord.name, awayTeam: awayTeamRecord.name, opponent: awayTeamRecord.name, slug, endDate: parsed.data.endDate || null, matchDate: parsed.data.matchDate || null, image, homeLogo, awayLogo,
+    leagueId, leagueName: league?.name || "", leagueLogo: league?.logo || "",
     featured: formData.get("featured") === "on", includes: clean(formData.get("includes")).split("\n").map((item) => item.trim()).filter(Boolean),
     packageItems: packageFeatures.map(({ key }) => {
       const value = clean(formData.get(`package.${key}`)) as PackageFeatureStatus
@@ -500,6 +558,19 @@ export async function deleteMedia(formData: FormData) {
     throw new Error("Nie znaleziono zdjęcia")
   }
 
+  const mediaUrl = `/api/media/${id}`
+  const [globalUse, tripUse, teamGalleryUse, tripAssetUse, teamLogoUse, leagueLogoUse] = await Promise.all([
+    db.select({ id: galleryItems.id }).from(galleryItems).where(eq(galleryItems.mediaId, id)).limit(1),
+    db.select({ id: tripGalleryItems.id }).from(tripGalleryItems).where(eq(tripGalleryItems.mediaId, id)).limit(1),
+    db.select({ id: teamGalleryItems.id }).from(teamGalleryItems).where(eq(teamGalleryItems.mediaId, id)).limit(1),
+    db.select({ id: trips.id }).from(trips).where(or(eq(trips.image, mediaUrl), eq(trips.homeLogo, mediaUrl), eq(trips.awayLogo, mediaUrl), eq(trips.leagueLogo, mediaUrl))).limit(1),
+    db.select({ id: teams.id }).from(teams).where(eq(teams.logo, mediaUrl)).limit(1),
+    db.select({ id: leagues.id }).from(leagues).where(eq(leagues.logo, mediaUrl)).limit(1),
+  ])
+  if (globalUse.length || tripUse.length || teamGalleryUse.length || tripAssetUse.length || teamLogoUse.length || leagueLogoUse.length) {
+    throw new Error("Najpierw usuń wszystkie przypisania tego zdjęcia.")
+  }
+
   // Usuń plik z Vercel Blob
   await del(asset.pathname)
 
@@ -523,13 +594,17 @@ export type AddGalleryItemState = { error?: string; success?: boolean; message?:
 
 export async function addGalleryItem(_: AddGalleryItemState, formData: FormData): Promise<AddGalleryItemState> {
   try {
-    const user = await requireAdmin(); const mediaId = Number(formData.get("mediaId")); const tripId = Number(formData.get("tripId"))
+    const user = await requireAdmin(); const mediaId = Number(formData.get("mediaId")); const destination = clean(formData.get("destination"));
+    const [scope, rawId] = destination.split(":"); const targetId = Number(rawId)
     const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, mediaId)).limit(1)
     if (!asset) return { error: "Nie znaleziono zdjęcia" }
-    if (tripId > 0) await db.insert(tripGalleryItems).values({ tripId, mediaId, caption: clean(formData.get("caption")), alt: clean(formData.get("alt")) || asset.alt, sortOrder: Number(formData.get("sortOrder")) || 0 })
-    else await db.insert(galleryItems).values({ title: clean(formData.get("caption")) || asset.originalName, city: clean(formData.get("city")), image: `/api/media/${mediaId}`, mediaId, alt: clean(formData.get("alt")) || asset.alt, sortOrder: Number(formData.get("sortOrder")) || 0 })
-    await logActivity(user.id, "added", tripId > 0 ? "trip_gallery" : "gallery", String(mediaId)); refreshPublic()
-    return { success: true, message: tripId > 0 ? "Zdjęcie dodano do galerii wyjazdu." : "Zdjęcie dodano do galerii głównej." }
+    const common = { mediaId, caption: clean(formData.get("caption")), alt: clean(formData.get("alt")) || asset.alt, sortOrder: Number(formData.get("sortOrder")) || 0 }
+    if (scope === "trip" && targetId > 0) await db.insert(tripGalleryItems).values({ tripId: targetId, ...common })
+    else if (scope === "team" && targetId > 0) await db.insert(teamGalleryItems).values({ teamId: targetId, ...common })
+    else await db.insert(galleryItems).values({ title: common.caption || asset.originalName, city: clean(formData.get("city")), image: `/api/media/${mediaId}`, mediaId, alt: common.alt, sortOrder: common.sortOrder })
+    const entity = scope === "trip" ? "trip_gallery" : scope === "team" ? "team_gallery" : "gallery"
+    await logActivity(user.id, "added", entity, String(mediaId)); refreshPublic()
+    return { success: true, message: scope === "trip" ? "Zdjęcie dodano do galerii wyjazdu." : scope === "team" ? "Zdjęcie dodano do galerii drużyny." : "Zdjęcie dodano do galerii głównej." }
   } catch {
     return { error: "Nie udało się dodać zdjęcia do galerii." }
   }
@@ -584,9 +659,17 @@ export async function updateTripGalleryItem(_: UpdateGalleryItemState, formData:
   }
 }
 
+export async function updateTeamGalleryItem(_: UpdateGalleryItemState, formData: FormData): Promise<UpdateGalleryItemState> {
+  try {
+    const user = await requireAdmin(); const id = Number(formData.get("id"))
+    await db.update(teamGalleryItems).set({ caption: clean(formData.get("caption")).slice(0, 160), alt: clean(formData.get("alt")).slice(0, 240), sortOrder: Number(formData.get("sortOrder")) || 0, updatedAt: new Date() }).where(eq(teamGalleryItems.id, id))
+    await logActivity(user.id, "updated", "team_gallery", String(id)); refreshPublic(); return { success: true }
+  } catch { return { error: "Nie udało się zapisać zdjęcia drużyny." } }
+}
+
 export async function removeGalleryItem(formData: FormData) {
   const user = await requireAdmin(); const id = Number(formData.get("id")); const scope = clean(formData.get("scope"))
-  if (scope === "trip") await db.delete(tripGalleryItems).where(eq(tripGalleryItems.id, id)); else await db.delete(galleryItems).where(eq(galleryItems.id, id))
+  if (scope === "trip") await db.delete(tripGalleryItems).where(eq(tripGalleryItems.id, id)); else if (scope === "team") await db.delete(teamGalleryItems).where(eq(teamGalleryItems.id, id)); else await db.delete(galleryItems).where(eq(galleryItems.id, id))
   await logActivity(user.id, "removed", `${scope}_gallery`, String(id)); refreshPublic()
 }
 
@@ -775,6 +858,8 @@ export async function reorderGalleryItems(formData: FormData) {
         .set({ sortOrder: item.sortOrder, updatedAt: new Date() })
         .where(eq(tripGalleryItems.id, item.id))
     }
+  } else if (scope === "team") {
+    for (const item of items) await db.update(teamGalleryItems).set({ sortOrder: item.sortOrder, updatedAt: new Date() }).where(eq(teamGalleryItems.id, item.id))
   } else {
     for (const item of items) {
       await db

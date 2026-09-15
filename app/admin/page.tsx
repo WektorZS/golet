@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { AdminDashboard, type AdminData } from "@/components/admin-dashboard"
 import { db } from "@/lib/db"
-import { adminActivity, galleryItems, inquiries, mediaAssets, siteSettings, teams, testimonials, tripGalleryItems, trips } from "@/lib/db/schema"
+import { adminActivity, galleryItems, inquiries, leagues, mediaAssets, siteSettings, teamGalleryItems, teams, testimonials, tripGalleryItems, trips } from "@/lib/db/schema"
 import { isAdminEmail } from "@/lib/auth/admin"
 import { getAuth, isAuthConfigured } from "@/lib/auth/server"
 import { getAdminYouTubeVideos } from "@/lib/content"
@@ -20,20 +20,22 @@ export default async function AdminPage() {
 
   await ensureTripColumns()
 
-  const [allTrips, allTeams, allInquiries, allTestimonials, media, gallery, tripGallery, rawSettings, activity] = await Promise.all([
+  const [allTrips, allTeams, allLeagues, allInquiries, allTestimonials, media, gallery, tripGallery, teamGallery, rawSettings, activity] = await Promise.all([
     db.select().from(trips).orderBy(asc(trips.sortOrder), desc(trips.startDate)),
     db.select().from(teams).orderBy(asc(teams.name)),
+    db.select().from(leagues).orderBy(asc(leagues.name)),
     db.select().from(inquiries).orderBy(desc(inquiries.createdAt)).limit(100),
     db.select().from(testimonials).orderBy(asc(testimonials.sortOrder), desc(testimonials.createdAt)),
     db.select().from(mediaAssets).orderBy(desc(mediaAssets.createdAt)),
     db.select().from(galleryItems).orderBy(asc(galleryItems.sortOrder)),
     db.select().from(tripGalleryItems).orderBy(asc(tripGalleryItems.sortOrder)),
+    db.select().from(teamGalleryItems).orderBy(asc(teamGalleryItems.sortOrder), asc(teamGalleryItems.id)),
     db.select().from(siteSettings),
     db.select().from(adminActivity).orderBy(desc(adminActivity.createdAt)).limit(10),
   ])
   const settings = Object.fromEntries(rawSettings.map((item) => [item.key, item.value]))
  const videos = await getAdminYouTubeVideos(settings)
-  const serializable = JSON.parse(JSON.stringify({ trips: allTrips, teams: allTeams, inquiries: allInquiries, testimonials: allTestimonials, media, gallery, tripGallery, settings, activity, videos, email: session.user.email })) as AdminData
+  const serializable = JSON.parse(JSON.stringify({ trips: allTrips, teams: allTeams, leagues: allLeagues, inquiries: allInquiries, testimonials: allTestimonials, media, gallery, tripGallery, teamGallery, settings, activity, videos, email: session.user.email })) as AdminData
   return <AdminDashboard data={serializable} />
 }
 

@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, CalendarDays, Clock3, MapPin, Plane } from "lucide-react"
+import { ArrowRight, CalendarDays, Clock3, MapPin, Plane, Star } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { packageSummary, parsePackageItems } from "@/lib/package-options"
@@ -116,13 +116,14 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
 
   return (
     <div>
-      <nav aria-label="Miesiące wyjazdów" className="sticky top-0 z-20 -mx-4 overflow-x-auto border-y bg-background/95 px-4 py-3 backdrop-blur md:static md:mx-0 md:rounded-xl md:border md:px-3">
-        <div className="flex min-w-max gap-2">
+      <div className="relative -mx-4 md:mx-0">
+      <nav aria-label="Miesiące wyjazdów" className="sticky top-0 z-20 overflow-x-auto border-y bg-background/95 px-4 py-3 pr-16 backdrop-blur [scrollbar-width:thin] md:static md:rounded-xl md:border md:px-3">
+        <div className="flex min-w-max snap-x gap-2">
           {groups.map((group, index) => (
             <a
               key={group.key}
               href={`#miesiac-${group.key}`}
-              className={`rounded-lg px-5 py-3 font-sans text-sm font-black uppercase tracking-wide transition-colors hover:bg-primary hover:text-primary-foreground ${index === 0 ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"}`}
+              className={`min-w-[160px] snap-start rounded-lg px-5 py-3 text-center font-sans text-sm font-black uppercase tracking-wide transition-colors hover:bg-primary hover:text-primary-foreground md:min-w-0 ${index === 0 ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"}`}
             >
               {group.label}
               <span className="ml-2 font-mono text-[10px] opacity-60">{group.trips.length}</span>
@@ -130,6 +131,8 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
           ))}
         </div>
       </nav>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 z-30 flex w-14 items-center justify-end bg-gradient-to-l from-background via-background/90 to-transparent pr-2 md:hidden"><ArrowRight className="size-4 text-primary" /></div>
+      </div>
 
       <div className="mt-8 space-y-12">
         {groups.map((group) => (
@@ -167,12 +170,15 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
 
                       <div className="grid gap-5 p-5 md:grid-cols-[1.2fr_1fr]">
                         <div>
+                          {(trip.leagueName || trip.leagueLogo) && <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{trip.leagueLogo && <span className="relative size-5"><Image src={trip.leagueLogo} alt={`Logo ${trip.leagueName}`} fill className="object-contain" sizes="20px" /></span>}<span>{trip.leagueName}</span></div>}
                           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-primary">{trip.city}, {trip.country}</p>
                           <h3 className="mt-1 font-sans text-2xl font-black uppercase leading-tight">{homeTeam} - {awayTeam}</h3>
                           <div className="mt-3 flex flex-wrap gap-2">
                             <span className="rounded-md bg-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-background">{packageSummary(trip.packageItems)}</span>
                             {packageOptions.flight === "excluded" && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">Bez przelotu</span>}
                             {packageOptions.hotel === "excluded" && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">Bez hotelu</span>}
+                            {trip.hotelStars > 0 && packageOptions.hotel !== "excluded" && <span className="inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"><Star className="size-3 fill-primary text-primary" />Hotel {trip.hotelStars}*</span>}
+                            {trip.ticketCategory && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">{trip.ticketCategory}</span>}
                           </div>
                         </div>
 
@@ -204,4 +210,3 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
     </div>
   )
 }
-

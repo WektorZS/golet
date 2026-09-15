@@ -11,6 +11,14 @@ export const teams = pgTable("teams", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 })
 
+export const leagues = pgTable("leagues", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  logo: text("logo").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+})
+
 export const trips = pgTable("trips", {
   id: serial("id").primaryKey(),
   slug: text("slug").notNull().unique(),
@@ -28,6 +36,9 @@ export const trips = pgTable("trips", {
   awayTeam: text("away_team").notNull().default(""),
   homeLogo: text("home_logo").notNull().default(""),
   awayLogo: text("away_logo").notNull().default(""),
+  leagueId: integer("league_id"),
+  leagueName: text("league_name").notNull().default(""),
+  leagueLogo: text("league_logo").notNull().default(""),
   stadium: text("stadium").notNull().default(""),
   matchDate: date("match_date"),
   availabilityStatus: text("availability_status").notNull().default("available"),
@@ -115,6 +126,18 @@ export const galleryItems = pgTable("gallery_items", {
 export const tripGalleryItems = pgTable("trip_gallery_items", {
   id: serial("id").primaryKey(),
   tripId: integer("trip_id").notNull(),
+  mediaId: integer("media_id").notNull(),
+  caption: text("caption").notNull().default(""),
+  alt: text("alt").notNull().default(""),
+  sortOrder: integer("sort_order").notNull().default(0),
+  status: text("status").notNull().default("published"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+})
+
+export const teamGalleryItems = pgTable("team_gallery_items", {
+  id: serial("id").primaryKey(),
+  teamId: integer("team_id").notNull(),
   mediaId: integer("media_id").notNull(),
   caption: text("caption").notNull().default(""),
   alt: text("alt").notNull().default(""),

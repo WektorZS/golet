@@ -152,21 +152,15 @@ type Testimonial = {
 }
 
 function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
-  const items = gallery.slice(0, 7)
+  const items = gallery.slice(0, 8)
 
   return (
-    <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 md:grid-rows-2">
-      {items.map((item, index) => {
-        const isFeatured = index === 0
-
+    <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
+      {items.map((item) => {
         return (
           <div
             key={item.id}
-            className={`group relative overflow-hidden rounded-xl ${
-              isFeatured
-                ? "col-span-2 row-span-2 aspect-square md:aspect-auto"
-                : "aspect-square"
-            }`}
+            className="group relative aspect-[4/3] overflow-hidden rounded-xl"
           >
             <ImageLightbox
               src={
@@ -188,11 +182,7 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
                 alt={item.alt || item.title}
                 fill
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                sizes={
-                  isFeatured
-                    ? "(max-width: 768px) 100vw, 50vw"
-                    : "(max-width: 768px) 50vw, 25vw"
-                }
+                sizes="(max-width: 768px) 50vw, 25vw"
               />
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
@@ -332,12 +322,12 @@ export function HomePage({
 
       <section
         id="wyjazdy"
-        className="scroll-mt-8 bg-background px-4 py-20 md:px-6 md:py-28"
+        className="scroll-mt-8 bg-background px-4 py-16 md:px-6 md:py-20"
       >
         <div className="mx-auto max-w-7xl">
           <SectionHeading
-            eyebrow="Kalendarz emocji"
-            title={content.tripsTitle || "Najbliższe wyjazdy"}
+            eyebrow="Terminarz meczowych podróży"
+            title="Kalendarz wyjazdów"
             intro={
               content.tripsDescription ||
               "Wybierz gotowy pakiet i zajmij miejsce na trybunach największych stadionów Europy."
@@ -1136,4 +1126,3 @@ export function HomePage({
     </main>
   )
 }
-

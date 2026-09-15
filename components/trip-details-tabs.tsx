@@ -40,7 +40,7 @@ const packageIcons: Record<PackageFeatureKey, Icon> = {
 }
 
 type PackageItem = { key: string; label: string }
-type GalleryItem = { id: number; mediaId: number; alt: string; caption: string }
+type GalleryItem = { id: number | string; mediaId: number; alt: string; caption: string }
 type TestimonialItem = { id: number; author: string; tripName: string; content: string; rating: number }
 type FaqItem = { question: string; answer: string }
 
@@ -112,7 +112,8 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
       </div>
 
       <div className="pt-5 lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-10 lg:pt-8">
-        <div role="tablist" aria-label="Informacje o wyjeździe" className="flex gap-2 overflow-x-auto border-b pb-4 lg:flex-col lg:border-b-0 lg:border-r lg:pb-0 lg:pr-6">
+        <div className="relative min-w-0">
+        <div role="tablist" aria-label="Informacje o wyjeździe" className="flex snap-x gap-2 overflow-x-auto border-b pb-4 pr-12 [scrollbar-width:thin] lg:flex-col lg:border-b-0 lg:border-r lg:pb-0 lg:pr-6">
           {tabs.map((tab) => {
             const TabIcon = tab.icon
             const selected = activeTab === tab.id
@@ -124,13 +125,15 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
                 aria-selected={selected}
                 aria-controls={`panel-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex shrink-0 items-center gap-3 border-b-2 px-3 py-3 text-left text-sm font-bold transition-colors lg:border-b-0 lg:border-l-2 ${selected ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                className={`flex shrink-0 snap-start items-center gap-3 border-b-2 px-3 py-3 text-left text-sm font-bold transition-colors lg:border-b-0 lg:border-l-2 ${selected ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
               >
                 <TabIcon className={`size-4 shrink-0 ${selected ? "text-primary" : ""}`} />
                 {tab.label}
               </button>
             )
           })}
+        </div>
+        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background via-background/90 to-transparent lg:hidden" />
         </div>
 
         <div className="min-h-[430px] pt-7 lg:pt-0">
@@ -202,4 +205,3 @@ export function TripDetailsTabs(props: TripDetailsTabsProps) {
     </section>
   )
 }
-
