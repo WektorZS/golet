@@ -368,129 +368,114 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
 <section
   id="twoj-wyjazd"
-  className="scroll-mt-20 bg-secondary px-4 py-20 md:px-6 md:py-24"
+  className="scroll-mt-20 bg-secondary px-4 py-14 md:px-6 md:py-16"
 >
   <div className="mx-auto max-w-7xl">
 
     {/* ====================================================== */}
-    {/* GÓRNA CZĘŚĆ */}
+    {/* GŁÓWNA CZĘŚĆ */}
     {/* ====================================================== */}
 
-    <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+    <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
 
-      {/* ================================================== */}
+      {/* ==================================================== */}
       {/* ZDJĘCIE */}
-      {/* ================================================== */}
+      {/* ==================================================== */}
 
-      <div className="relative min-h-[420px] overflow-hidden rounded-xl md:min-h-[500px]">
-        <Image
-          src="/images/about-us.webp"
-          alt="Trybuny stadionu Camp Nou Let's Gol"
-          fill
-          className="object-cover"
-          sizes="(max-width: 1024px) 100vw, 45vw"
-        />
+      <div className="relative overflow-hidden rounded-xl">
+        <div className="relative aspect-[16/11] lg:aspect-[4/3]">
+          <Image
+            src="/images/about-us.webp"
+            alt="Wyjazd na mecz z Let's Gol"
+            fill
+            className="object-cover"
+            sizes="(max-width: 1024px) 100vw, 42vw"
+          />
 
-        {/* Gradient TYLKO na zdjęciu, nie na tle sekcji */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
 
-        <div className="absolute bottom-7 left-7 right-7">
-          <p className="max-w-sm font-sans text-3xl font-black uppercase leading-[1.05] text-white md:text-4xl">
-            Twój mecz.
-            <br />
-            Twój termin.
-            <br />
-            Nasza logistyka.
-          </p>
+          <div className="absolute bottom-5 left-5 right-5 md:bottom-6 md:left-6">
+            <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white/75">
+              Let's Gol
+            </p>
+
+            <p className="mt-1.5 max-w-sm text-xl font-black uppercase leading-[1.05] tracking-[-0.02em] text-white md:text-2xl">
+              Ty wybierasz mecz.
+              <br />
+              My organizujemy wyjazd.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* ================================================== */}
-      {/* GŁÓWNA TREŚĆ */}
-      {/* ================================================== */}
+      {/* ==================================================== */}
+      {/* TREŚĆ */}
+      {/* ==================================================== */}
 
-      <div>
-        <p className="font-mono text-[11px] font-black uppercase tracking-[0.22em] text-primary">
-          Indywidualny wyjazd
-        </p>
+      <div className="max-w-2xl">
 
-        <h2 className="mt-4 max-w-3xl text-balance font-sans text-4xl font-black uppercase leading-[0.96] tracking-[-0.025em] text-foreground sm:text-5xl lg:text-6xl">
-          Nie ma Twojego
-          <br />
-          meczu?
-          <br />
-          Zorganizujemy go
-          <br />
-          dla Ciebie.
+        {/* EYEBROW */}
+        <div className="flex items-center gap-3">
+          <span className="h-[2px] w-7 bg-[#a86f00]" />
+
+          <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#a86f00]">
+            Indywidualny wyjazd
+          </p>
+        </div>
+
+        {/* TYTUŁ */}
+        <h2 className="mt-4 max-w-2xl text-balance font-sans text-[38px] font-black uppercase leading-[0.97] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-[52px]">
+          Nie ma Twojego meczu
+          <br className="hidden sm:block" />
+          w kalendarzu?
         </h2>
 
-        <p className="mt-6 max-w-xl text-[15px] leading-7 text-muted-foreground md:text-base">
-          Nie znalazłeś odpowiedniego wyjazdu w kalendarzu?
-          Wskaż mecz, termin i zakres, a przygotujemy ofertę
-          dopasowaną do Twoich potrzeb.
+        {/* OPIS */}
+        <p className="mt-5 max-w-xl text-[15px] leading-7 text-muted-foreground">
+          To żaden problem. Wskaż mecz, termin i zakres wyjazdu,
+          a przygotujemy ofertę dopasowaną do Ciebie.
         </p>
 
-        {/* SZCZEGÓŁY */}
-        <div className="mt-7 grid gap-x-10 gap-y-3 sm:grid-cols-2">
+        {/* ================================================== */}
+        {/* 4 KORZYŚCI */}
+        {/* ================================================== */}
+
+        <div className="mt-6 grid gap-x-8 gap-y-3 sm:grid-cols-2">
           {[
             "Dowolny klub i liga",
-            "Elastyczne lotnisko",
-            "Standard hotelu",
-            "Kategoria biletu",
+            "Wylot z dogodnego lotniska",
+            "Standard hotelu do wyboru",
+            "Wybrana kategoria biletu",
           ].map((item) => (
             <div
               key={item}
               className="flex items-center gap-2.5"
             >
-              <Check className="size-4 shrink-0 text-primary" />
+              <Check
+                className="size-4 shrink-0 text-[#a86f00]"
+                strokeWidth={3}
+                aria-hidden="true"
+              />
 
-              <span className="text-sm font-semibold text-foreground/80">
+              <span className="text-[13px] font-semibold text-foreground/85">
                 {item}
               </span>
             </div>
           ))}
         </div>
 
-        <Button
-          className="mt-9"
-          size="lg"
-          nativeButton={false}
-          render={
-            <button
-              type="button"
-              data-open-floating-contact
-            />
-          }
-        >
-          Wyceń mój wyjazd
-          <ArrowRight data-icon="inline-end" />
-        </Button>
-      </div>
-    </div>
-
-    {/* ====================================================== */}
-    {/* DOLNA CZĘŚĆ */}
-    {/* ====================================================== */}
-
-    <div className="mt-16 border-t border-foreground/10 pt-12 md:mt-20 md:pt-14">
-      <div className="grid gap-14 lg:grid-cols-2 lg:gap-20">
-
         {/* ================================================== */}
-        {/* ZAKRES WYJAZDU */}
+        {/* ZAKRES */}
         {/* ================================================== */}
 
-        <div>
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-primary">
-            Dopasuj wyjazd do siebie
+        <div className="mt-7 border-t border-foreground/10 pt-6">
+          <p className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-foreground/55">
+            Wybierz zakres
           </p>
 
-          <h3 className="mt-3 text-2xl font-black uppercase leading-tight text-foreground md:text-3xl">
-            Ty wybierasz zakres
-          </h3>
-
-          <div className="mt-8 grid grid-cols-2 gap-x-10 gap-y-7">
+          <div className="mt-4 flex flex-wrap gap-x-7 gap-y-4">
             {[
-              [TicketCheck, "Bilet na mecz"],
+              [TicketCheck, "Bilet"],
               [Plane, "Bilet + lot"],
               [Building2, "Bilet + hotel"],
               [CalendarCheck, "Pełny pakiet"],
@@ -500,11 +485,15 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               return (
                 <div
                   key={label as string}
-                  className="flex items-center gap-4"
+                  className="flex items-center gap-2"
                 >
-                  <I className="size-6 shrink-0 text-primary" />
+                  <I
+                    className="size-[18px] shrink-0 text-[#a86f00]"
+                    strokeWidth={2.4}
+                    aria-hidden="true"
+                  />
 
-                  <span className="text-sm font-bold leading-tight text-foreground">
+                  <span className="text-[13px] font-bold text-foreground">
                     {label as string}
                   </span>
                 </div>
@@ -514,81 +503,101 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
 
         {/* ================================================== */}
-        {/* DLA KOGO */}
+        {/* CTA */}
         {/* ================================================== */}
 
+        <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+          <Button
+            size="lg"
+            className="h-12 px-6 font-bold"
+            nativeButton={false}
+            render={
+              <button
+                type="button"
+                data-open-floating-contact
+              />
+            }
+          >
+            Wyceń mój wyjazd
+            <ArrowRight data-icon="inline-end" />
+          </Button>
+
+          <p className="text-xs leading-5 text-muted-foreground">
+            Bez zobowiązań · odpowiadamy zwykle w ciągu 24h
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* ====================================================== */}
+    {/* DLA KOGO */}
+    {/* ====================================================== */}
+
+    <div className="mt-12 border-t border-foreground/10 pt-8 md:mt-14">
+      <div className="grid gap-6 lg:grid-cols-[0.65fr_2fr] lg:items-center lg:gap-12">
+
+        {/* TYTUŁ */}
         <div>
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-primary">
-            Nie tylko wyjazdy indywidualne
+          <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#a86f00]">
+            Organizujemy również
           </p>
 
-          <h3 className="mt-3 max-w-xl text-2xl font-black uppercase leading-[1.08] text-foreground md:text-3xl">
-            Organizujemy wyjazdy również dla grup i firm
+          <h3 className="mt-2 text-xl font-black uppercase leading-tight tracking-[-0.02em] text-foreground md:text-2xl">
+            Wyjazdy dla grup
+            <br className="hidden lg:block" />
+            i firm
           </h3>
+        </div>
 
-          <div className="mt-8 grid gap-x-12 gap-y-7 sm:grid-cols-2">
+        {/* ODBIORCY */}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
+          {[
+            [
+              Users,
+              "Indywidualnie",
+              "Wyjazd dopasowany do Ciebie",
+            ],
+            [
+              Users,
+              "Rodziny i grupy",
+              "Wspólna podróż na mecz",
+            ],
+            [
+              Building2,
+              "Firmy",
+              "Integracje i wyjazdy zespołów",
+            ],
+            [
+              Trophy,
+              "Szkoły i kluby",
+              "Wyjazdy grup zorganizowanych",
+            ],
+          ].map(([Icon, title, description]) => {
+            const I = Icon as typeof Users
 
-            {/* OSOBY INDYWIDUALNE */}
-            <div className="flex items-start gap-4">
-              <Users className="mt-0.5 size-6 shrink-0 text-primary" />
+            return (
+              <div
+                key={title as string}
+                className="flex items-start gap-3"
+              >
+                <I
+                  className="mt-0.5 size-5 shrink-0 text-[#a86f00]"
+                  strokeWidth={2.4}
+                  aria-hidden="true"
+                />
 
-              <div>
-                <p className="text-[15px] font-black uppercase leading-tight text-foreground">
-                  Osoby indywidualne
-                </p>
+                <div>
+                  <p className="text-[12px] font-black uppercase leading-tight text-foreground">
+                    {title as string}
+                  </p>
 
-                <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
-                  Wyjazd dopasowany do Ciebie
-                </p>
+                  <p className="mt-1 text-[11px] leading-[1.55] text-muted-foreground">
+                    {description as string}
+                  </p>
+                </div>
               </div>
-            </div>
-
-            {/* RODZINY I GRUPY */}
-            <div className="flex items-start gap-4">
-              <Users className="mt-0.5 size-6 shrink-0 text-primary" />
-
-              <div>
-                <p className="text-[15px] font-black uppercase leading-tight text-foreground">
-                  Rodziny i grupy
-                </p>
-
-                <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
-                  Wspólna podróż na wybrany mecz
-                </p>
-              </div>
-            </div>
-
-            {/* FIRMY */}
-            <div className="flex items-start gap-4">
-              <Building2 className="mt-0.5 size-6 shrink-0 text-primary" />
-
-              <div>
-                <p className="text-[15px] font-black uppercase leading-tight text-foreground">
-                  Firmy
-                </p>
-
-                <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
-                  Integracje i wyjazdy dla zespołów
-                </p>
-              </div>
-            </div>
-
-            {/* SZKOŁY I KLUBY */}
-            <div className="flex items-start gap-4">
-              <Trophy className="mt-0.5 size-6 shrink-0 text-primary" />
-
-              <div>
-                <p className="text-[15px] font-black uppercase leading-tight text-foreground">
-                  Szkoły i kluby
-                </p>
-
-                <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
-                  Wyjazdy dla zorganizowanych grup
-                </p>
-              </div>
-            </div>
-
-          </div>
+            )
+          })}
         </div>
       </div>
     </div>
