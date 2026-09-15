@@ -3,6 +3,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Menu, Plane, X } from "lucide-react"
 import { useEffect, useState } from "react"
 
@@ -13,9 +14,9 @@ const links = [
   ["WYJAZDY", "/wyjazdy"],
   ["TWÓJ WYJAZD", "/#twoj-wyjazd"],
   ["GALERIA", "/galeria"],
-  ["O NAS", "/#o-nas"],
-  ["FAQ", "/#faq"],
-  ["KONTAKT", "/#kontakt"],
+  ["O NAS", "/o-nas"],
+  ["FAQ", "/faq"],
+  ["KONTAKT", "/kontakt"],
 ] as const
 
 export function Brand() {
@@ -48,6 +49,7 @@ export function Brand() {
 }
 
 export function SiteHeader() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -65,15 +67,27 @@ export function SiteHeader() {
     }
   }, [])
 
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : ""
+
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [open])
+
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-[99999] isolate transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 isolate border-b transition-all duration-300 ${
         scrolled
-          ? "bg-black"
-          : "bg-foreground/70 backdrop-blur-md"
+          ? "border-white/10 bg-foreground/95 shadow-lg backdrop-blur-md"
+          : "border-transparent bg-foreground/78 backdrop-blur-md"
       }`}
     >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 md:px-6">
+      <div className="site-container flex h-20 items-center justify-between gap-5">
         {/* LOGO */}
         <Brand />
 
@@ -81,15 +95,25 @@ export function SiteHeader() {
   className="hidden items-center justify-center gap-7 lg:flex"
   aria-label="Główna nawigacja"
 >
-  {links.map(([label, href]) => (
-    <Link
-      key={href}
-      href={href}
-      className="font-mono text-xs font-semibold uppercase tracking-wider text-background/80 transition-colors hover:text-primary"
-    >
-      {label}
-    </Link>
-  ))}
+  {links.map(([label, href]) => {
+    const route = href.split("#")[0] || "/"
+    const active = route !== "/" && pathname === route
+
+    return (
+      <Link
+        key={href}
+        href={href}
+        aria-current={active ? "page" : undefined}
+        className={`relative py-2 font-mono text-[11px] font-bold uppercase tracking-[0.12em] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-primary after:transition-transform ${
+          active
+            ? "text-primary after:scale-x-100"
+            : "text-background/75 after:scale-x-0 hover:text-background hover:after:scale-x-100"
+        }`}
+      >
+        {label}
+      </Link>
+    )
+  })}
 </nav>
         {/* DESKTOP CTA */}
     
@@ -100,7 +124,7 @@ export function SiteHeader() {
       new Event("open-floating-contact")
     )
   }}
-  className="group hidden h-11 items-center gap-3 rounded-lg border border-primary/60 bg-primary/10 px-5 font-mono text-[11px] font-bold uppercase tracking-wider text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-black lg:inline-flex"
+  className="group hidden h-11 items-center gap-3 px-5 font-mono text-[11px] font-black uppercase tracking-wider lg:inline-flex"
 >
   <span>Zapytaj o wyjazd</span>
 
@@ -112,7 +136,7 @@ export function SiteHeader() {
         <Button
           variant="outline"
           size="icon-lg"
-          className="border-background/30 bg-transparent text-background lg:hidden"
+          className="size-11 border-background/30 bg-transparent text-background hover:bg-background/10 hover:text-background lg:hidden"
           aria-label={open ? "Zamknij menu" : "Otwórz menu"}
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
@@ -124,7 +148,7 @@ export function SiteHeader() {
 
 {open ? (
   <nav
-    className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 lg:hidden"
+    className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-5 lg:hidden"
     aria-label="Menu mobilne"
   >
     {links.map(([label, href]) => (
@@ -132,7 +156,7 @@ export function SiteHeader() {
         key={href}
         href={href}
         onClick={() => setOpen(false)}
-        className="rounded-md px-3 py-3 font-mono text-sm font-semibold uppercase tracking-wider text-background hover:bg-background/10 hover:text-primary"
+        className="flex min-h-12 items-center rounded-lg px-3 py-3 font-mono text-sm font-bold uppercase tracking-wider text-background hover:bg-background/10 hover:text-primary"
       >
         {label}
       </Link>
@@ -140,7 +164,7 @@ export function SiteHeader() {
 
     <Button
   type="button"
-  className="mt-2 w-full font-bold uppercase"
+  className="mt-3 h-12 w-full font-bold uppercase"
   onClick={() => {
     setOpen(false)
 

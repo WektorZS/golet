@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, BedDouble, CalendarDays, Check, Clock3, MapPin, 
 import { InquiryForm } from "@/components/inquiry-form"
 import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
+import { SiteHeader } from "@/components/site-header"
 import { TripDetailsTabs } from "@/components/trip-details-tabs"
 import { Button } from "@/components/ui/button"
 import { getPublishedTestimonials, getSiteContent } from "@/lib/content"
@@ -14,6 +15,7 @@ import { getPackageVariants, packageFeatures, parsePackageItems } from "@/lib/pa
 import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
 import { breadcrumbSchema } from "@/lib/seo"
 import { absoluteUrl } from "@/lib/site"
+import { getContactDetails } from "@/lib/site-data"
 import { getPublishedTrips, getTripBySlug, getTripGallery } from "@/lib/trips"
 
 export const dynamic = "force-dynamic"
@@ -103,7 +105,7 @@ export default async function TripDetailPage({ params, searchParams }: { params:
     ? Math.max(1, Math.round((asDate(trip.endDate).getTime() - asDate(trip.startDate).getTime()) / 86_400_000))
     : trip.durationNights
   const computedDays = computedNights !== trip.durationNights ? computedNights + 1 : trip.durationDays
-  const whatsappNumber = (content.contactPhone || "+48501465318").replace(/\D/g, "")
+  const whatsappHref = getContactDetails(content).whatsappHref
   const whatsappText = encodeURIComponent(`Dzień dobry, interesuje mnie wyjazd ${homeTeam} - ${awayTeam}, ${date}. Wariant: ${selectedPackageVariant.label}.`)
   const availableTripOptions = publishedTrips
     .filter((item) => item.id !== trip.id && item.availabilityStatus !== "sold_out")
@@ -175,12 +177,13 @@ export default async function TripDetailPage({ params, searchParams }: { params:
   return (
     <main className="bg-background">
       <JsonLd data={jsonLd} />
+      <SiteHeader />
 
-      <section className="relative isolate min-h-[620px] overflow-hidden bg-foreground text-background lg:min-h-[540px]">
+      <section className="relative isolate min-h-[700px] overflow-hidden bg-foreground pt-20 text-background lg:min-h-[620px]">
         <Image src={trip.image} alt={`Stadion ${trip.stadium || trip.city}`} fill preload className="object-cover" sizes="100vw" />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/30" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/50" />
-        <div className="relative mx-auto flex min-h-[620px] max-w-7xl flex-col px-4 py-6 md:px-6 md:py-8 lg:min-h-[540px]">
+        <div className="site-container relative flex min-h-[620px] flex-col py-6 md:py-8 lg:min-h-[540px]">
           <Button variant="ghost" className="w-fit text-background hover:bg-background/10 hover:text-background" nativeButton={false} render={<Link href="/wyjazdy" />}><ArrowLeft data-icon="inline-start" />Kalendarz wyjazdów</Button>
 
           <div className="mt-auto grid items-end gap-10 pb-6 lg:grid-cols-[1fr_auto]">
@@ -202,7 +205,7 @@ export default async function TripDetailPage({ params, searchParams }: { params:
               {fullPackageSelected ? <p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p> : <p className="mt-2 font-sans text-2xl font-black uppercase leading-tight text-primary">Ustalana indywidualnie</p>}
               <div className="mt-5 grid gap-3">
                 {soldOut ? <Button disabled size="lg">Wyprzedane</Button> : <Button size="lg" nativeButton={false} render={<a href="#rezerwacja" />}>Rezerwuj miejsce<ArrowRight data-icon="inline-end" /></Button>}
-                <Button variant="outline" size="lg" className="border-white/25 bg-white/5 text-white hover:bg-white/15 hover:text-white" nativeButton={false} render={<a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
+                <Button variant="outline" size="lg" className="border-white/25 bg-white/5 text-white hover:bg-white/15 hover:text-white" nativeButton={false} render={<a href={`${whatsappHref}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
               </div>
             </div>
           </div>
@@ -271,7 +274,7 @@ export default async function TripDetailPage({ params, searchParams }: { params:
               <h3 className="mt-5 font-sans text-2xl font-black uppercase">{homeTeam} - {awayTeam}</h3>
               <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-background/65"><p className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" />{date}</p><p className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || trip.city}</p></div>
               {!soldOut && <div className="mt-7 border-t border-background/10 pt-6"><p className="text-xs font-bold uppercase tracking-wider text-background/40">{fullPackageSelected ? "Cena od / osoba" : "Cena wariantu"}</p>{fullPackageSelected ? <p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p> : <><p className="mt-1 font-sans text-2xl font-black uppercase text-primary">Ustalana indywidualnie</p><p className="mt-2 max-w-sm text-xs leading-5 text-background/50">Cena zależy od wybranego zakresu i zazwyczaj jest niższa niż cena pełnego pakietu.</p></>}</div>}
-              <Button variant="outline" size="lg" className="mt-6 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white" nativeButton={false} render={<a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
+              <Button variant="outline" size="lg" className="mt-6 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white" nativeButton={false} render={<a href={`${whatsappHref}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
             </div>
           </div>
 

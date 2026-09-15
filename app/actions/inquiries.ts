@@ -32,7 +32,7 @@ const matchNameRegex =
 const messageRegex =
   /^[\p{L}\p{N}\s.,!?;:()"'’\-–—…\/%]+$/u
 
-const inquirySchema = z.object({
+const commonFields = {
   name: z
     .string()
     .trim()
@@ -52,13 +52,40 @@ const inquirySchema = z.object({
       value.toLowerCase()
     ),
 
-  phone: z
+  website: z
+    .string()
+    .max(200)
+    .optional(),
+
+  formLoadedAt: z.coerce
+    .number()
+    .optional(),
+
+  privacyConsent: z
+    .string({ error: "Zaznacz zgodę na przetwarzanie danych." })
+    .refine((value) => value === "on", {
+      message: "Zaznacz zgodę na przetwarzanie danych.",
+    }),
+}
+
+const requiredPhone = z
     .string()
     .trim()
     .regex(
       phoneRegex,
       "Numer telefonu powinien zawierać od 7 do 15 cyfr. Możesz użyć +48 lub innego kierunkowego."
-    ),
+    )
+
+const optionalPhone = z
+  .string()
+  .trim()
+  .refine((value) => value === "" || phoneRegex.test(value), {
+    message: "Podaj poprawny numer telefonu albo pozostaw pole puste.",
+  })
+
+const inquirySchema = z.object({
+  ...commonFields,
+  phone: requiredPhone,
 
   matchName: z
     .string()
@@ -123,17 +150,29 @@ const inquirySchema = z.object({
       }
     ),
 
-  website: z
+})
+
+const contactSchema = z.object({
+  ...commonFields,
+  formType: z.literal("contact"),
+  phone: optionalPhone,
+  inquiryType: z.enum([
+    "trip",
+    "booking",
+    "group",
+    "cooperation",
+    "other",
+  ]),
+  subject: z
     .string()
-    .max(200)
-    .optional(),
-
-  formLoadedAt: z.coerce
-    .number()
-    .optional(),
-
-  privacyConsent:
-    z.literal("on"),
+    .trim()
+    .min(2, "Temat jest za krótki.")
+    .max(120, "Temat jest za długi."),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Wiadomość powinna mieć co najmniej 10 znaków.")
+    .max(1000, "Wiadomość jest za długa."),
 })
 
 export type InquiryState = {
@@ -142,6 +181,7 @@ export type InquiryState = {
     | "success"
     | "error"
   message: string
+  errors?: Record<string, string[] | undefined>
 }
 
 const COOLDOWN_MS = 60_000
@@ -153,17 +193,10 @@ export async function createInquiry(
   _: InquiryState,
   formData: FormData
 ): Promise<InquiryState> {
-  const parsed =
-    inquirySchema.safeParse({
+  const commonData = {
       name: formData.get("name"),
       email: formData.get("email"),
       phone: formData.get("phone"),
-      matchName: formData.get("matchName"),
-      departureCity:
-        formData.get("departureCity"),
-      travelers: formData.get("travelers"),
-      message:
-        formData.get("message") ?? "",
       website:
         formData.get("website") ?? "",
       formLoadedAt:
@@ -171,17 +204,86 @@ export async function createInquiry(
         undefined,
       privacyConsent:
         formData.get("privacyConsent"),
-    })
-
-  if (!parsed.success) {
-    return {
-      status: "error",
-      message:
-        "Sprawdź poprawność wszystkich pól formularza i spróbuj ponownie.",
-    }
   }
 
-  if (parsed.data.website) {
+  let values: {
+    name: string
+    email: string
+    phone: string
+    matchName: string
+    departureCity: string
+    travelers: number
+    message: string
+  }
+  let website = ""
+  let formLoadedAt: number | undefined
+
+  if (formData.get("formType") === "contact") {
+    const parsed = contactSchema.safeParse({
+      ...commonData,
+      formType: "contact",
+      inquiryType: formData.get("inquiryType"),
+      subject: formData.get("subject"),
+      message: formData.get("message") ?? "",
+    })
+
+    if (!parsed.success) {
+      return {
+        status: "error",
+        message: "Sprawdź oznaczone pola i spróbuj ponownie.",
+        errors: parsed.error.flatten().fieldErrors,
+      }
+    }
+
+    const inquiryLabels = {
+      trip: "Pytanie o wyjazd",
+      booking: "Rezerwacja",
+      group: "Oferta dla grupy",
+      cooperation: "Współpraca",
+      other: "Inne",
+    } as const
+
+    values = {
+      name: parsed.data.name,
+      email: parsed.data.email,
+      phone: parsed.data.phone,
+      matchName: `${inquiryLabels[parsed.data.inquiryType]}: ${parsed.data.subject}`.slice(0, 160),
+      departureCity: "Nie dotyczy",
+      travelers: 1,
+      message: parsed.data.message,
+    }
+    website = parsed.data.website || ""
+    formLoadedAt = parsed.data.formLoadedAt
+  } else {
+    const parsed = inquirySchema.safeParse({
+      ...commonData,
+      matchName: formData.get("matchName"),
+      departureCity: formData.get("departureCity"),
+      travelers: formData.get("travelers"),
+      message: formData.get("message") ?? "",
+    })
+
+    if (!parsed.success) {
+      return {
+        status: "error",
+        message: "Sprawdź poprawność wszystkich pól formularza i spróbuj ponownie.",
+        errors: parsed.error.flatten().fieldErrors,
+      }
+    }
+
+    const {
+      website: parsedWebsite,
+      formLoadedAt: parsedFormLoadedAt,
+      privacyConsent: _privacyConsent,
+      ...parsedValues
+    } = parsed.data
+
+    values = parsedValues
+    website = parsedWebsite || ""
+    formLoadedAt = parsedFormLoadedAt
+  }
+
+  if (website) {
     return {
       status: "success",
       message:
@@ -190,9 +292,9 @@ export async function createInquiry(
   }
 
   if (
-    parsed.data.formLoadedAt &&
+    formLoadedAt &&
     Date.now() -
-        parsed.data.formLoadedAt <
+        formLoadedAt <
       MIN_FILL_TIME_MS
   ) {
     return {
@@ -210,11 +312,11 @@ export async function createInquiry(
   )
 
   const emailHash = hmac(
-    parsed.data.email
+    values.email
   )
 
   const contentHash = hmac(
-    `${parsed.data.email}|${parsed.data.matchName}|${parsed.data.message}`
+    `${values.email}|${values.matchName}|${values.message}`
   )
 
   const oneDayAgo = new Date(
@@ -334,13 +436,6 @@ export async function createInquiry(
           "Ochrona przed spamem: osiągnięto dzienny limit zapytań. Spróbuj ponownie jutro.",
       }
     }
-
-    const {
-      website,
-      formLoadedAt,
-      privacyConsent,
-      ...values
-    } = parsed.data
 
     await db
       .insert(inquiries)

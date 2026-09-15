@@ -1,7 +1,5 @@
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL
 
@@ -27,6 +25,10 @@ export type InquiryEmailData = {
 export async function sendInquiryEmails(
   inquiry: InquiryEmailData
 ) {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("Brak RESEND_API_KEY")
+  }
+
   if (!FROM_EMAIL) {
     throw new Error("Brak RESEND_FROM_EMAIL")
   }
@@ -34,6 +36,8 @@ export async function sendInquiryEmails(
   if (!ADMIN_EMAIL) {
     throw new Error("Brak ADMIN_EMAIL")
   }
+
+  const resend = new Resend(process.env.RESEND_API_KEY)
 
   const name = escapeHtml(inquiry.name)
   const email = escapeHtml(inquiry.email)

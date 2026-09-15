@@ -5,134 +5,78 @@ import {
   Building2,
   CalendarCheck,
   Check,
+  Compass,
   Headphones,
   MapPinned,
   Plane,
   ShieldCheck,
   Star,
   TicketCheck,
-  Trophy,
   Users,
-  Landmark,
 } from "lucide-react"
 
-import { SiteHeader } from "@/components/site-header"
-import { SiteFooter } from "@/components/site-footer"
-import { SocialLinks } from "@/components/social-links"
+import { HeroBackgroundSlider } from "@/components/hero-background-slider"
 import { HomeTripCalendar } from "@/components/home-trip-calendar"
-import { SectionHeading } from "@/components/section-heading"
-import { InquiryForm } from "@/components/inquiry-form"
 import { ImageLightbox } from "@/components/image-lightbox"
-import {
-  HeroBackgroundSlider,
-  HeroTypewriter,
-} from "@/components/hero-background-slider"
-import { Button } from "@/components/ui/button"
+import { InquiryForm } from "@/components/inquiry-form"
+import { SectionHeading } from "@/components/section-heading"
+import { SiteFooter } from "@/components/site-footer"
+import { SiteHeader } from "@/components/site-header"
+import { SocialLinks } from "@/components/social-links"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-
+import { Button } from "@/components/ui/button"
 import type { SiteContent, YouTubeVideo } from "@/lib/content"
-import type { Trip } from "@/lib/trips"
+import { popularFaqs } from "@/lib/faq"
 import { getPackageVariants } from "@/lib/package-options"
+import type { Trip } from "@/lib/trips"
 
-const trust = [
-  [Users, "Setki zadowolonych klientów"],
-  [TicketCheck, "Gwarantowane bilety na mecz"],
-  [Headphones, "Opieka koordynatora"],
+const trustPoints = [
   [ShieldCheck, "Legalny organizator turystyki"],
+  [TicketCheck, "Zakres potwierdzony przed rezerwacją"],
+  [Headphones, "Wsparcie i informacje organizacyjne"],
+  [Users, "Wyjazdy indywidualne i grupowe"],
+] as const
+
+const packageItems = [
+  [Plane, "Przelot"],
+  [TicketCheck, "Bilet na mecz"],
+  [Building2, "Zakwaterowanie"],
+  [MapPinned, "Transfery lokalne"],
+  [Headphones, "Opieka koordynatora"],
+  [ShieldCheck, "Ubezpieczenie"],
+  [CalendarCheck, "Plan podróży"],
+  [Compass, "Czas na poznanie miasta"],
 ] as const
 
 const reasons = [
   [
-    Plane,
-    "Kompleksowa organizacja",
-    "Lot, hotel, bilet i transfery w jednej, sprawdzonej rezerwacji.",
+    "01",
+    "Jedna czytelna oferta",
+    "Widzisz zakres wybranego wariantu i ustalenia ważne przed podjęciem decyzji.",
   ],
   [
-    TicketCheck,
-    "Pewne bilety",
-    "Miejsca z legalnego źródła i jasna kategoria biletu.",
+    "02",
+    "Podróż dopasowana do meczu",
+    "Dobór transportu i noclegu uwzględnia termin wydarzenia oraz potrzeby uczestników.",
   ],
   [
-    Building2,
-    "Sprawdzone hotele",
-    "Dobre lokalizacje i standard dopasowany do charakteru wyjazdu.",
-  ],
-  [
-    Headphones,
-    "Koordynator na miejscu",
-    "Polskojęzyczna pomoc od odprawy aż po powrót.",
-  ],
-  [
-    Star,
-    "Doświadczenie kibiców",
-    "Program układamy tak, jak sami chcielibyśmy podróżować.",
-  ],
-  [
-    ShieldCheck,
-    "Bezpieczna podróż",
-    "Umowa, ubezpieczenie i gwarancja turystyczna.",
+    "03",
+    "Informacje przed drogą",
+    "Dostajesz plan oraz szczegóły organizacyjne dotyczące konkretnego wyjazdu.",
   ],
 ] as const
 
 const process = [
-  [
-    "1",
-    "Wybierasz mecz",
-    "Z gotowej oferty albo wskazujesz wydarzenie spoza kalendarza.",
-  ],
-  [
-    "2",
-    "Ustalamy szczegóły",
-    "Wybieramy lotnisko, hotel, kategorię biletu i liczbę noclegów.",
-  ],
-   [
-    "3",
-    "Otrzymujesz ofertę",
-    "Prezentujemy Ci kompleksową ofertę podróży dopasowaną do twoich potrzeb.",
-  ],
-  [
-    "4",
-    "Podpisujemy umowę online",
-    "Dostajesz przejrzystą umowę, komplet dokumentów",
-  ],
-  [
-    "5",
-    "Wpłacasz zaliczkę",
-    "Zaliczka pokrywa koszta biletów na mecz i podróży",
-  ],
-  [
-    "6",
-    "Lecimy na mecz",
-    "Koordynator czuwa nad logistyką, a Ty skupiasz się na meczu.",
-  ],
-] as const
-
-const faqs = [
-  [
-    "Czy bilet na mecz jest gwarantowany?",
-    "Tak. Każda potwierdzona rezerwacja obejmuje bilet z legalnego źródła, a jego kategorię określamy w umowie.",
-  ],
-  [
-    "Z jakich miast organizujecie wyloty?",
-    "Wyloty organizujemy z najbliższego lotniska dla naszego klienta, o ile dane lotnisko zapewnia lot w danym kierunku. Szukamy najlepszego połączenia z Twojego regionu.",
-  ],
-  [
-    "Czy mogę kupić sam bilet?",
-    "Tak. Przy wybranych wydarzeniach przygotowujemy ofertę samych biletów, bez lotu i hotelu.",
-  ],
-  [
-    "Czy organizujecie wyjazdy dla firm i grup?",
-    "Tak. Obsługujemy grupy znajomych, firmy, szkółki piłkarskie i kluby kibica.",
-  ],
-  [
-    "Co jeśli termin meczu zostanie zmieniony?",
-    "Monitorujemy oficjalne komunikaty ligowe i dobieramy elastyczną logistykę. O każdej zmianie informujemy od razu i proponujemy najlepsze rozwiązanie.",
-  ],
+  ["01", "Wybierasz mecz", "Korzystasz z kalendarza albo wskazujesz inne wydarzenie."],
+  ["02", "Mówisz, czego potrzebujesz", "Ustalamy liczbę osób, punkt startu i zakres pakietu."],
+  ["03", "Otrzymujesz ofertę", "Sprawdzasz cenę, świadczenia oraz warunki rezerwacji."],
+  ["04", "Potwierdzasz wyjazd", "Po akceptacji otrzymujesz dokumenty i kolejne informacje."],
+  ["05", "Ruszamy na mecz", "Przed podróżą znasz plan i najważniejsze ustalenia organizacyjne."],
 ] as const
 
 type GalleryItem = {
@@ -153,42 +97,39 @@ type Testimonial = {
 }
 
 function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
-  const items = gallery.slice(0, 8)
+  const items = gallery.slice(0, 7)
 
   return (
-    <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
-      {items.map((item) => {
+    <div className="mt-10 grid auto-rows-[150px] grid-cols-2 gap-3 sm:auto-rows-[210px] lg:grid-cols-4">
+      {items.map((item, index) => {
+        const src = item.mediaId ? `/api/media/${item.mediaId}` : item.image
+        const featured = index === 0
+
         return (
-          <div
+          <figure
             key={item.id}
-            className="group relative aspect-[4/3] overflow-hidden rounded-xl"
+            className={`group relative overflow-hidden rounded-xl ${featured ? "col-span-2 row-span-2" : ""}`}
           >
             <ImageLightbox
-              src={
-                item.mediaId
-                  ? `/api/media/${item.mediaId}`
-                  : item.image
-              }
-              alt={item.alt || item.title}
-              caption={[item.title, item.city]
-                .filter(Boolean)
-                .join(" · ")}
+              src={src}
+              alt={item.alt || item.title || "Zdjęcie z wyjazdu Let's Gol"}
+              caption={[item.title, item.city].filter(Boolean).join(" - ")}
             >
               <Image
-                src={
-                  item.mediaId
-                    ? `/api/media/${item.mediaId}`
-                    : item.image
-                }
-                alt={item.alt || item.title}
+                src={src}
+                alt={item.alt || item.title || "Zdjęcie z wyjazdu Let's Gol"}
                 fill
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                sizes="(max-width: 768px) 50vw, 25vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                sizes={featured ? "(max-width: 1024px) 100vw, 50vw" : "(max-width: 640px) 50vw, 25vw"}
               />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
             </ImageLightbox>
-          </div>
+            {(item.title || item.city) ? (
+              <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 p-4 text-xs font-bold text-white md:p-5 md:text-sm">
+                {[item.title, item.city].filter(Boolean).join(" - ")}
+              </figcaption>
+            ) : null}
+          </figure>
         )
       })}
     </div>
@@ -208,1043 +149,352 @@ export function HomePage({
   testimonials: Testimonial[]
   videos: YouTubeVideo[]
 }) {
-  const parsedFacebookReviewsCount = Number.parseInt(
-    content.facebookReviewsCount ?? "",
-    10
-  )
-
-  const facebookReviewsCount = Number.isFinite(parsedFacebookReviewsCount)
-    ? Math.max(0, parsedFacebookReviewsCount)
-    : 172
-const parsedFacebookReviewsAverage = Number.parseFloat(
-  content.facebookReviewsAverage ?? ""
-)
-
-const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
-  ? Math.min(5, Math.max(0, parsedFacebookReviewsAverage)).toFixed(1)
-  : "5.0"
-  return (
-    <main>
-      <SiteHeader />
-
-      <section className="relative isolate flex flex-col overflow-hidden bg-foreground text-background md:h-dvh md:min-h-[700px]">
-        <HeroBackgroundSlider />
-
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/75 to-transparent" />
-
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-foreground to-transparent" />
-
-        <div className="relative mx-auto flex min-h-svh w-full flex-1 items-center px-4 pb-14 pt-28 md:min-h-0 md:px-6 md:pb-8 md:pt-24 lg:max-w-7xl">
-          <div className="flex max-w-3xl flex-col items-start gap-6">
-            <HeroTypewriter eyebrow={content.heroEyebrow} />
-
-            <h1 className="text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">
-              {content.heroTitle ||
-                "Leć z nami na największe mecze w Europie"}
-            </h1>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button
-                size="lg"
-                className="h-13 rounded-md px-6 font-bold uppercase"
-                nativeButton={false}
-                render={<Link href="/wyjazdy" />}
-              >
-                <span className="inline-flex items-center gap-2">
-                  {content.heroCta || "Zobacz wyjazdy"}
-                  <ArrowRight className="h-4 w-4" />
-                </span>
-              </Button>
-
-              <Button
-  size="lg"
-  variant="outline"
-  className="h-13 rounded-md border-background/35 bg-foreground/20 px-6 font-bold uppercase text-background hover:bg-background hover:text-foreground"
-  nativeButton={false}
-  render={
-    <button
-      type="button"
-      data-open-floating-contact
-    />
-  }
->
-  Wyceń mój wyjazd
-</Button>
-            </div>
-
-            <div className="hidden items-center gap-4 border-t border-background/20 pt-5 md:flex">
-              <p className="font-mono text-xs font-bold uppercase tracking-widest text-background/65">
-                Obserwuj nas
-              </p>
-
-              <SocialLinks />
-            </div>
-          </div>
-        </div>
-
-        <div className="absolute bottom-28 right-4 z-10 hidden md:block lg:right-8">
-          <div className="border border-background/15 bg-foreground/85 px-5 py-4 text-background shadow-xl backdrop-blur-md">
-            <div className="flex items-center gap-2">
-              <Star
-                className="size-5 text-primary"
-                fill="currentColor"
-                aria-hidden="true"
-              />
-
-              <span className="text-lg font-black">
-                100% poleca
-              </span>
-            </div>
-
-            <p className="mt-1 text-xs font-medium text-background/60">
-              {facebookReviewsCount} opinii na Facebooku
-            </p>
-
-            <div className="mt-3 border-t border-background/10 pt-3">
-              <p className="text-lg font-black">
-                5 000+
-              </p>
-
-              <p className="text-xs font-medium text-background/60">
-                obserwujących na Facebooku
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative border-t border-background/15 bg-foreground/75 backdrop-blur-sm">
-          <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:grid-cols-2 md:px-6 lg:grid-cols-4">
-            {trust.map(([Icon, text]) => (
-              <div
-                key={text}
-                className="flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-3 sm:text-left"
-              >
-                <Icon className="text-primary" aria-hidden="true" />
-
-                <span className="text-sm font-semibold leading-tight">
-                  {text}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="wyjazdy"
-        className="scroll-mt-8 bg-background px-4 py-16 md:px-6 md:py-20"
-      >
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            eyebrow="Terminarz meczowych podróży"
-            title="Kalendarz wyjazdów"
-            intro={
-              content.tripsDescription ||
-              "Wybierz gotowy pakiet i zajmij miejsce na trybunach największych stadionów Europy."
-            }
-          />
-
-          <HomeTripCalendar trips={trips} />
-
-          <div className="mt-8 flex justify-center">
-            <Button
-              variant="outline"
-              size="lg"
-              nativeButton={false}
-              render={<Link href="/wyjazdy" />}
-            >
-              Zobacz wszystkie wyjazdy
-              <ArrowRight data-icon="inline-end" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-<section
-  id="twoj-wyjazd"
-  className="scroll-mt-20 bg-secondary px-4 py-14 md:px-6 md:py-16"
->
-  <div className="mx-auto max-w-7xl">
-
-    <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
-
-      
-
-      <div className="relative overflow-hidden rounded-xl">
-        <div className="relative aspect-[16/11] lg:aspect-[4/3]">
-          <Image
-            src="/images/about-us.webp"
-            alt="Wyjazd na mecz z Let's Gol"
-            fill
-            className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 42vw"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
-
-          <div className="absolute bottom-5 left-5 right-5 md:bottom-6 md:left-6">
-            <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white/65">
-              Let's Gol
-            </p>
-
-            <p className="mt-1.5 max-w-md text-xl font-black uppercase leading-[1.05] tracking-[-0.02em] text-white md:text-2xl">
-              Ty wybierasz mecz.
-              <br />
-              My organizujemy wyjazd.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      
-
-      <div className="max-w-2xl">
-
-        <span className="inline-block bg-foreground px-2.5 py-1.5 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary">
-          Indywidualny wyjazd
-        </span>
-
-        <h2 className="mt-4 max-w-2xl text-balance font-sans text-[38px] font-black uppercase leading-[0.97] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-[52px]">
-          Nie ma Twojego meczu
-          <br className="hidden sm:block" />
-          w kalendarzu?
-        </h2>
-
-        <p className="mt-5 max-w-xl text-[15px] leading-7 text-muted-foreground">
-          To żaden problem. Wskaż mecz, termin i zakres wyjazdu,
-          a przygotujemy ofertę dopasowaną do Ciebie.
-        </p>
-
-        <div className="mt-7 grid gap-x-10 gap-y-3.5 sm:grid-cols-2">
-          {[
-            "Dowolny klub i liga",
-            "Wylot z dogodnego lotniska",
-            "Standard hotelu do wyboru",
-            "Wybrana kategoria biletu",
-          ].map((item) => (
-            <div
-              key={item}
-              className="flex items-center gap-2.5"
-            >
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-foreground">
-                <Check
-                  className="size-3 text-primary"
-                  strokeWidth={3}
-                  aria-hidden="true"
-                />
-              </span>
-
-              <span className="text-[13px] font-semibold text-foreground/85">
-                {item}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <p className="mt-7 max-w-lg text-xs leading-5 text-muted-foreground">
-          Nie widzisz interesującego Cię wyjazdu? Nie ograniczamy się
-          wyłącznie do terminów dostępnych w kalendarzu.
-        </p>
-
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<section className="bg-foreground px-4 md:px-6">
-  <div className="mx-auto max-w-7xl">
-
-    <div className="grid lg:grid-cols-[0.8fr_1.2fr]">
-
-      
-
-      <div className="flex flex-col justify-between py-10 pr-0 sm:py-12 lg:py-14 lg:pr-14">
-
-        <div>
-          <span className="inline-block bg-primary px-2.5 py-1.5 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary-foreground">
-            Wyjazd szyty na miarę
-          </span>
-
-          <h2 className="mt-5 max-w-md text-2xl font-black uppercase leading-[1.02] tracking-[-0.03em] text-white sm:text-3xl lg:text-[36px]">
-            Powiedz nam,
-            <br />
-            czego potrzebujesz.
-          </h2>
-
-          <p className="mt-4 max-w-sm text-[13px] leading-6 text-white/55">
-            Nie musisz wybierać gotowego wyjazdu z kalendarza.
-            Możemy zorganizować pojedynczy element albo całą podróż
-            od biletu aż po lot i hotel.
-          </p>
-        </div>
-
-      </div>
-
-      
-
-      <div className="relative py-10 sm:py-12 lg:py-14 lg:pl-14">
-
-        <div
-          className="absolute bottom-10 left-0 top-10 hidden w-px bg-white/10 lg:block"
-          aria-hidden="true"
-        />
-
-        
-
-        <div>
-          <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary">
-            Czego potrzebujesz?
-          </p>
-
-          <h3 className="mt-2 text-lg font-black uppercase tracking-[-0.02em] text-white sm:text-xl">
-            Dopasuj zakres wyjazdu
-          </h3>
-
-          <p className="mt-2 max-w-lg text-[12px] leading-5 text-white/45">
-            Możesz zacząć od samego biletu albo powierzyć nam
-            organizację całego wyjazdu.
-          </p>
-
-          <div className="mt-5 flex flex-wrap gap-2.5">
-            {[
-              "Tylko bilet",
-              "Bilet + lot",
-              "Bilet + hotel",
-              "Pełny pakiet",
-            ].map((item) => (
-              <div
-                key={item}
-                className="rounded-full bg-white/[0.09] px-4 py-2.5 text-[12px] font-bold text-white"
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        
-
-        <div className="mt-9">
-          <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary">
-            Dla kogo?
-          </p>
-
-          <h3 className="mt-2 text-lg font-black uppercase tracking-[-0.02em] text-white sm:text-xl">
-            Od jednej osoby po całą grupę
-          </h3>
-
-          <div className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-            {[
-              [
-                "Indywidualnie",
-                "Wyjazd przygotowany dokładnie pod Twoje potrzeby.",
-              ],
-              [
-                "Rodziny i grupy",
-                "Wspólna podróż na wybrany mecz.",
-              ],
-              [
-                "Firmy",
-                "Wyjazdy integracyjne i sportowe dla zespołów.",
-              ],
-              [
-                "Szkoły i kluby",
-                "Kompleksowa obsługa zorganizowanych grup.",
-              ],
-            ].map(([title, description]) => (
-              <div key={title}>
-                <p className="text-[12px] font-black uppercase text-white">
-                  {title}
-                </p>
-
-                <p className="mt-1 text-[11px] leading-5 text-white/45">
-                  {description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-</section>
-      <section className="bg-background px-4 py-20 md:px-6 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            eyebrow="Wszystko w jednym"
-            title={
-              content.packageTitle ||
-              "Co zawiera pełny pakiet?"
-            }
-          />
-
-          <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              [Plane, "Przelot"],
-              [TicketCheck, "Bilet na mecz"],
-              [Building2, "Sprawdzony hotel"],
-              [Headphones, "Opieka koordynatora"],
-              [MapPinned, "Transfery lokalne"],
-              [ShieldCheck, "Ubezpieczenie"],
-              [CalendarCheck, "Plan podróży"],
-              [Landmark, "Wspólne zwiedzanie miasta"],
-            ].map(([Icon, label]) => {
-              const I = Icon as typeof Plane
-
-              return (
-                <div
-                  key={label as string}
-                  className="flex items-center gap-3 rounded-lg border border-foreground/10 bg-secondary/45 p-4"
-                >
-                  <I className="text-primary" aria-hidden="true" />
-
-                  <span className="font-semibold">
-                    {label as string}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-secondary px-4 py-20 md:px-6 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            eyebrow="Dlaczego my"
-            title={
-              content.benefitsTitle ||
-              "Let’s Gol pilnuje szczegółów. Ty przeżywasz mecz."
-            }
-          />
-
-          <div className="mt-12 grid gap-x-8 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
-            {reasons.map(([Icon, title, copy]) => (
-              <article key={title} className="flex gap-4">
-                <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Icon aria-hidden="true" />
-                </span>
-
-                <div>
-                  <h3 className="font-bold uppercase">
-                    {title}
-                  </h3>
-
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {copy}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-<section className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24">
-  <div
-    aria-hidden="true"
-    className="pointer-events-none absolute inset-0"
-  >
-    <div className="absolute -right-40 top-[-120px] size-[420px] rounded-full bg-primary/[0.05] blur-[120px]" />
-  </div>
-
-  <div className="relative mx-auto max-w-7xl">
-    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-      <SectionHeading
-        eyebrow="Z pierwszego rzędu"
-        title={
-          content.galleryTitle ||
-          "Galeria z wyjazdów"
-        }
-        intro="Stadiony, miasta i emocje, których nie da się oddać samym opisem."
-        align="left"
-      />
-
-      <Button
-        className="w-fit shrink-0"
-        variant="outline"
-        nativeButton={false}
-        render={<Link href="/galeria" />}
-      >
-        Zobacz całą galerię
-        <ArrowRight data-icon="inline-end" />
-      </Button>
-    </div>
-
-    <HomeGallery gallery={gallery} />
-  </div>
-</section>
-
-<section className="relative overflow-hidden bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
-  
-  <div
-    aria-hidden="true"
-    className="pointer-events-none absolute inset-0"
-  >
-    <div className="absolute -left-40 top-1/2 size-[420px] -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
-  </div>
-
-  <div className="relative mx-auto max-w-7xl">
-    <SectionHeading
-      eyebrow="Opinie klientów"
-      title={
-        content.testimonialsTitle ||
-        "Emocje potwierdzone na trybunach"
-      }
-      intro="Najlepiej o naszych wyjazdach opowiadają osoby, które już poleciały z nami na mecz."
-      inverse
-    />
-
-    
-
-    <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-      {(
-        testimonials.length
-          ? testimonials.slice(0, 6)
-          : [
-              {
-                id: -1,
-                author: "Kamil",
-                tripName: "Barcelona",
-                content:
-                  "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!",
-                rating: 5,
-              },
-            ]
-      ).map((item) => (
-        <blockquote
-          key={item.id}
-          className="group relative flex min-h-[270px] flex-col overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.045] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-white/[0.065] md:p-7"
-        >
-          
-          <div className="absolute left-0 top-0 h-[2px] w-12 bg-primary transition-all duration-500 group-hover:w-full" />
-
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-1 top-1 select-none font-serif text-[110px] font-black leading-none text-white/[0.035]"
-          >
-            “
-          </span>
-
-          <div className="relative flex gap-1 text-primary">
-            <span className="sr-only">
-              Ocena {item.rating} na 5
-            </span>
-
-            {Array.from({
-              length: item.rating,
-            }).map((_, i) => (
-              <Star
-                key={i}
-                className="size-4"
-                fill="currentColor"
-                aria-hidden="true"
-              />
-            ))}
-          </div>
-
-          <p className="relative mt-6 flex-1 text-[15px] font-medium leading-7 text-background/78">
-            „{item.content}”
-          </p>
-
-          <footer className="relative mt-7 flex items-end justify-between gap-4 border-t border-white/[0.08] pt-5">
-            <div>
-              {item.author && (
-                <p className="text-sm font-bold text-background">
-                  {item.author}
-                </p>
-              )}
-
-              {item.tripName && (
-                <p className="mt-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-background/45">
-                  {item.tripName}
-                </p>
-              )}
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="size-1.5 shrink-0 rounded-full bg-primary"
-            />
-          </footer>
-        </blockquote>
-      ))}
-    </div>
-
-    
-
-    <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row">
-      <div className="flex items-center gap-3">
-        <Star
-          className="size-5 text-primary"
-          fill="currentColor"
-          aria-hidden="true"
-        />
-
-        <div>
-          <p className="text-sm font-bold text-background">
-            {facebookReviewsAverage}/5 · {facebookReviewsCount} opinii
-          </p>
-
-          <p className="mt-0.5 text-xs text-background/45">
-            100% poleca nas na Facebooku
-          </p>
-        </div>
-      </div>
-
-      <div className="hidden h-8 w-px bg-white/15 sm:block" />
-
-      <Button
-        variant="outline"
-        className="border-white/20 bg-transparent text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
-        nativeButton={false}
-        render={
-          <a
-            href="https://www.facebook.com/profile.php?id=61573517165441&sk=reviews"
-            target="_blank"
-            rel="noopener noreferrer"
-          />
-        }
-      >
-        Zobacz wszystkie opinie
-        <ArrowRight data-icon="inline-end" />
-      </Button>
-    </div>
-  </div>
-</section>
-
-<section className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24">
-
-  <div
-    aria-hidden="true"
-    className="pointer-events-none absolute inset-0"
-  >
-    <div className="absolute left-1/2 top-[-220px] h-[440px] w-[800px] -translate-x-1/2 rounded-full bg-primary/[0.06] blur-[130px]" />
-  </div>
-
-  <div className="relative mx-auto max-w-7xl">
-    <SectionHeading
-      eyebrow="Prosty plan"
-      title={
-        content.processTitle ||
-        "Jak wygląda rezerwacja?"
-      }
-      intro="Od wyboru meczu do miejsca na trybunach. Całą organizację bierzemy na siebie."
-    />
-
-    <div className="relative mt-16">
-
-      <div className="relative hidden lg:block">
-
-<div
-  aria-hidden="true"
-  className="absolute left-[8.333%] right-[8.333%] top-7 h-px bg-foreground/30"
->
-  <div className="process-flow absolute top-1/2 h-[3px] w-24 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-primary to-transparent opacity-100" />
-</div>
-
-        <div className="relative grid grid-cols-6">
-          {process.map(([number, title, copy], index) => (
-            <article
-              key={number}
-              className="group relative min-w-0 px-4 xl:px-6"
-            >
-
-<div
-  className={`process-step process-step-${index + 1} relative z-10 mx-auto flex size-14 items-center justify-center rounded-full border bg-background`}
->
-  <span className="relative z-10 font-mono text-[13px] font-black text-foreground">
-    {number}
-  </span>
-</div>
-
-              <div className="mt-4 text-center">
-
-                <div className="relative inline-flex">
-
-                  <span
-                    aria-hidden="true"
-                    className={`absolute -inset-x-2.5 -inset-y-1 bg-foreground ${
-                      index % 2 === 0
-                        ? "-rotate-[1.5deg] [clip-path:polygon(2%_16%,98%_4%,100%_82%,94%_94%,5%_88%,0_72%)]"
-                        : "rotate-[1deg] [clip-path:polygon(0_8%,96%_15%,100%_75%,97%_92%,3%_100%,1%_68%)]"
-                    }`}
-                  />
-
-                  <span
-                    aria-hidden="true"
-                    className="absolute -inset-x-1.5 -inset-y-0.5 rotate-[0.7deg] bg-foreground/70 [clip-path:polygon(0_25%,96%_8%,100%_74%,92%_100%,3%_84%)]"
-                  />
-
-                  <span className="relative z-10 px-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-primary">
-                    Krok {number}
-                  </span>
-                </div>
-
-                <h3 className="mt-4 font-sans text-[18px] font-black uppercase leading-[1.1] tracking-tight text-foreground xl:text-[19px]">
-                  {title}
-                </h3>
-
-                <p className="mx-auto mt-4 max-w-[195px] text-[14px] leading-[1.75] text-muted-foreground xl:text-[15px]">
-                  {copy}
-                </p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:hidden">
-        {process.map(([number, title, copy], index) => (
-          <article
-            key={number}
-            className="group relative rounded-xl border border-foreground/[0.08] bg-secondary/40 p-6 transition-all duration-300 hover:border-primary/40"
-          >
-            <div className="flex items-center gap-4">
-
-              <div className="flex size-12 shrink-0 items-center justify-center rounded-full border border-foreground/30 bg-background transition-all duration-300 group-hover:border-primary group-hover:bg-primary">
-                <span className="font-mono text-[13px] font-black text-foreground transition-colors duration-300 group-hover:text-primary-foreground">
-                  {number}
-                </span>
-              </div>
-
-              <div className="relative inline-flex">
-                <span
-                  aria-hidden="true"
-                  className={`absolute -inset-x-2.5 -inset-y-1 bg-foreground ${
-                    index % 2 === 0
-                      ? "-rotate-[1.5deg] [clip-path:polygon(2%_16%,98%_4%,100%_82%,94%_94%,5%_88%,0_72%)]"
-                      : "rotate-[1deg] [clip-path:polygon(0_8%,96%_15%,100%_75%,97%_92%,3%_100%,1%_68%)]"
-                  }`}
-                />
-
-                <span
-                  aria-hidden="true"
-                  className="absolute -inset-x-1.5 -inset-y-0.5 rotate-[0.7deg] bg-foreground/70 [clip-path:polygon(0_25%,96%_8%,100%_74%,92%_100%,3%_84%)]"
-                />
-
-                <span className="relative z-10 px-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-primary">
-                  Krok {number}
-                </span>
-              </div>
-            </div>
-
-            <h3 className="mt-6 font-sans text-xl font-black uppercase leading-tight tracking-tight text-foreground">
-              {title}
-            </h3>
-
-            <p className="mt-3 text-[15px] leading-7 text-muted-foreground">
-              {copy}
-            </p>
-          </article>
-        ))}
-      </div>
-    </div>
-  </div>
-</section>
-
-      <section
-        id="o-nas"
-        className="bg-secondary px-4 py-20 md:px-6"
-      >
-        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
-          <div>
-            <SectionHeading
-              eyebrow="O nas"
-              title={
-                content.aboutTitle ||
-                "Kibice, którzy zawodowo ogarniają podróże"
-              }
-              intro={
-                content.aboutText ||
-                "Let’s Gol powstało z prostego przekonania: droga na stadion powinna budować emocje, a nie stres. Łączymy znajomość futbolu z doświadczeniem w turystyce i bierzemy odpowiedzialność za każdy etap wyjazdu."
-              }
-              align="left"
-            />
-
-            <div className="mt-7 flex flex-wrap gap-x-8 gap-y-6">
-              <div>
-                <strong className="text-3xl font-black">
-                  42
-                </strong>
-
-                <p className="text-sm text-muted-foreground">
-                  stadiony w ofercie
-                </p>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <Star
-                    className="size-5 text-primary"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  />
-
-                  <strong className="text-3xl font-black">
-  {facebookReviewsAverage}/5
-</strong>
-                </div>
-
-                <p className="text-sm text-muted-foreground">
-                  Facebook · {facebookReviewsCount} opinii
-                </p>
-
-                <p className="mt-1 w-fit bg-foreground px-2 py-1 text-xs font-semibold text-background">
-                  100% poleca
-                </p>
-
-              </div>
-
-              <div>
-                <strong className="text-3xl font-black">
-                  5 000+
-                </strong>
-
-                <p className="text-sm text-muted-foreground">
-                  obserwujących na Facebooku
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
-            <Image
-              src="/images/hero-stadium.webp"
-              alt="Kibice Let’s Gol na stadionie"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          </div>
-        </div>
-      </section>
-
-<section
-  id="faq"
-  className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24"
->
-
-  <div
-    aria-hidden="true"
-    className="pointer-events-none absolute inset-0"
-  >
-    <div className="absolute -left-40 top-1/2 size-[420px] -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
-    <div className="absolute -right-48 -top-40 size-[420px] rounded-full bg-black/[0.018] blur-[120px]" />
-  </div>
-
-  <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.65fr_1fr] lg:gap-16">
-
-    <div className="flex flex-col items-start lg:pt-1">
-      <SectionHeading
-        eyebrow="FAQ"
-        title={
-          content.faqTitle ||
-          "Najczęstsze pytania"
-        }
-        intro="Jeśli nie ma tu odpowiedzi, napisz lub zadzwoń. Odpowiadamy konkretnie."
-        align="left"
-      />
-
-<div className="mt-7 flex items-center gap-4 border-l-2 border-primary pl-4">
-  <div>
-    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-      Nie znalazłeś odpowiedzi?
-    </p>
-
-    <button
-      type="button"
-      data-open-floating-contact
-      className="group mt-1.5 inline-flex items-center gap-2 text-sm font-bold text-foreground transition-colors hover:text-primary"
-    >
-      Zapytaj nas bezpośrednio
-
-      <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
-    </button>
-  </div>
-</div>
-    </div>
-
-    <div className="overflow-hidden rounded-xl border border-black/[0.09] bg-white/70 shadow-[0_12px_40px_rgba(0,0,0,0.045)] backdrop-blur-sm">
-      <Accordion>
-        {faqs.map(([q, a], index) => (
-          <AccordionItem
-            key={q}
-            className="group/faq border-b border-black/[0.08] last:border-b-0"
-          >
-            <AccordionTrigger className="group flex w-full items-center gap-4 px-5 py-5 text-left text-[15px] font-bold leading-snug transition-colors hover:no-underline sm:px-6 sm:py-6">
-
-              <span className="hidden w-7 shrink-0 font-mono text-[10px] font-bold tracking-[0.12em] text-black/30 sm:block">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-
-              <span className="flex-1 transition-colors duration-200 group-hover:text-primary">
-                {q}
-              </span>
-            </AccordionTrigger>
-
-            <AccordionContent className="px-5 pb-6 sm:px-6">
-              <div className="sm:ml-11">
-                <div className="mb-4 h-[2px] w-8 bg-primary" />
-
-                <p className="max-w-2xl text-[14px] leading-7 text-muted-foreground">
-                  {a}
-                </p>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </div>
-  </div>
-</section>
-
-{videos.length > 0 && (
-  <section className="relative overflow-hidden bg-secondary px-4 py-20 md:px-6 md:py-24">
-
-<div
-  aria-hidden="true"
-  className="pointer-events-none absolute inset-0"
->
-
-  <div className="absolute left-1/2 top-[-180px] h-[420px] w-[750px] -translate-x-1/2 rounded-full bg-primary/[0.07] blur-[120px]" />
-
-  <div className="absolute -left-40 bottom-[-180px] h-[420px] w-[420px] rounded-full bg-white/60 blur-[110px]" />
-
-  <div className="absolute -right-48 top-1/3 h-[420px] w-[420px] rounded-full bg-black/[0.025] blur-[120px]" />
-</div>
-
-    <div className="relative mx-auto max-w-7xl">
-      <SectionHeading
-        eyebrow="Zobacz atmosferę"
-        title={
-          content.youtubeTitle ||
-          "Zobacz, jak wyglądają nasze wyjazdy"
-        }
-        intro="Relacje, stadiony i emocje z naszych piłkarskich podróży."
-      />
-
-      <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {videos.map((video) => (
-          <a
-            key={video.id}
-            href={video.url}
-            target="_blank"
-            rel="noreferrer"
-            className="group relative block"
-          >
-            <article className="relative h-full overflow-hidden rounded-xl border border-black/[0.08] bg-gradient-to-br from-white via-[#fdfcf9] to-[#f5f1e8] shadow-[0_8px_30px_rgba(0,0,0,0.045)] transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:border-primary/50 group-hover:shadow-[0_22px_55px_rgba(0,0,0,0.13)]">
-
-              <div className="relative aspect-[16/9] overflow-hidden bg-black">
-                <Image
-                  src={video.thumbnail}
-                  alt={`Miniatura filmu: ${video.title}`}
-                  fill
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-black/10 transition-opacity duration-500 group-hover:opacity-80" />
-
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative flex size-[62px] items-center justify-center">
-
-                    <div className="absolute inset-0 rounded-full border border-white/35 transition-all duration-500 group-hover:scale-[1.18] group-hover:border-primary/40" />
-
-                    <div className="relative flex size-[50px] items-center justify-center rounded-full bg-white shadow-[0_8px_30px_rgba(0,0,0,0.25)] transition-all duration-300 group-hover:scale-105 group-hover:bg-primary">
-                      <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        className="ml-0.5 size-[18px] fill-black"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative flex min-h-[126px] items-start justify-between gap-5 bg-gradient-to-br from-transparent to-primary/[0.025] p-5 md:p-6">
-
-                <div className="absolute left-0 top-0 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full" />
-
-                <div className="min-w-0">
-                  <p className="mb-2.5 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-primary">
-                    Zobacz relację
-                  </p>
-
-                  <h3 className="line-clamp-2 text-[16px] font-bold leading-[1.45] text-foreground transition-colors duration-300 group-hover:text-black">
-                    {video.title}
-                  </h3>
-                </div>
-
-                <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center border border-black/10 bg-transparent transition-all duration-300 group-hover:border-primary group-hover:bg-primary">
-                  <ArrowRight className="size-4 text-black transition-transform duration-300 group-hover:translate-x-0.5" />
-                </div>
-              </div>
-            </article>
-          </a>
-        ))}
-      </div>
-
-      <div className="mt-9 flex items-center justify-center gap-3">
-        <div className="h-px w-8 bg-black/15" />
-
-        <span className="font-mono text-[12px] font-bold uppercase tracking-[0.18em] text-black/40">
-          Poczuj atmosferę przed swoim wyjazdem
-        </span>
-
-        <div className="h-px w-8 bg-black/15" />
-      </div>
-    </div>
-  </section>
-)}
-
-      <section
-        id="kontakt"
-        className="bg-foreground px-4 py-20 text-background md:px-6 md:py-24"
-      >
-        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.75fr_1.25fr]">
-          <div className="flex flex-col gap-6">
-            <p className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-primary">
-              Twój następny mecz
-            </p>
-
-            <h2 className="text-balance font-sans text-4xl font-black uppercase leading-tight md:text-6xl">
-              {content.contactTitle ||
-                "Zapytaj o swój wyjazd"}
-            </h2>
-
-            <p className="max-w-md leading-relaxed text-background/65">
-              Wypełnij formularz, a przygotujemy propozycję dopasowaną
-              do meczu, budżetu i lotniska wylotu.
-            </p>
-
-            <div className="flex items-center gap-3">
-              <Trophy
-                className="text-primary"
-                aria-hidden="true"
-              />
-
-              <span>
-                Odpowiedź zwykle w ciągu 24 godzin
-              </span>
-            </div>
-          </div>
-
-          <InquiryForm
-  trips={trips
+  const parsedReviewsCount = Number.parseInt(content.facebookReviewsCount || "0", 10)
+  const reviewsCount = Number.isFinite(parsedReviewsCount) ? Math.max(0, parsedReviewsCount) : 0
+  const parsedReviewsAverage = Number.parseFloat(content.facebookReviewsAverage || "0")
+  const reviewsAverage = Number.isFinite(parsedReviewsAverage)
+    ? Math.min(5, Math.max(0, parsedReviewsAverage)).toFixed(1)
+    : "0.0"
+  const availableTrips = trips
     .filter((trip) => trip.availabilityStatus !== "sold_out")
     .map((trip) => ({
       id: trip.id,
       title: trip.title,
       date: trip.matchDate || trip.startDate,
       packageVariants: getPackageVariants(trip.packageVariants, trip.packageItems).map((variant) => variant.label),
-    }))}
-/>
+    }))
+
+  return (
+    <main>
+      <SiteHeader />
+
+      <section className="relative isolate flex min-h-[720px] flex-col overflow-hidden bg-foreground pt-20 text-background md:min-h-[760px]">
+        <HeroBackgroundSlider />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/82 to-foreground/20" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-foreground to-transparent" />
+
+        <div className="site-container relative flex flex-1 items-center py-14 md:py-20">
+          <div className="max-w-4xl">
+            <p className="eyebrow eyebrow-on-dark">
+              {content.heroEyebrow || "Piłkarskie podróże bez organizacyjnego chaosu"}
+            </p>
+            <h1 className="mt-6 max-w-4xl text-balance font-sans text-5xl font-black uppercase leading-[0.9] tracking-[-0.05em] sm:text-7xl lg:text-[88px]">
+              {content.heroTitle || "Leć z nami na największe mecze w Europie"}
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-background/70 md:text-lg">
+              Wybierasz mecz i zakres podróży. My przygotowujemy ofertę, porządkujemy ustalenia i prowadzimy Cię do miejsca na trybunach.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button size="lg" className="h-12 px-6 font-bold uppercase" nativeButton={false} render={<Link href="/wyjazdy" />}>
+                {content.heroCta || "Zobacz wyjazdy"}
+                <ArrowRight data-icon="inline-end" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 border-background/35 bg-foreground/25 px-6 font-bold uppercase text-background hover:bg-background hover:text-foreground"
+                nativeButton={false}
+                render={<Link href="/kontakt#formularz" />}
+              >
+                Zapytaj o własny wyjazd
+              </Button>
+            </div>
+
+            <div className="mt-9 hidden items-center gap-4 border-t border-background/15 pt-5 md:flex">
+              <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-background/50">Obserwuj nas</span>
+              <SocialLinks />
+            </div>
+          </div>
+
+          {reviewsCount > 0 ? (
+            <a
+              href="https://www.facebook.com/profile.php?id=61573517165441&sk=reviews"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute bottom-8 right-0 hidden border-l-2 border-primary bg-foreground/80 px-5 py-4 backdrop-blur-md lg:block"
+            >
+              <span className="flex items-center gap-2 font-black">
+                <Star className="size-5 fill-primary text-primary" aria-hidden="true" />
+                {reviewsAverage}/5
+              </span>
+              <span className="mt-1 block text-xs text-background/55">{reviewsCount} opinii na Facebooku</span>
+            </a>
+          ) : null}
+        </div>
+
+        <div className="relative border-t border-background/15 bg-foreground/82 backdrop-blur-sm">
+          <div className="site-container grid gap-0 sm:grid-cols-2 lg:grid-cols-4">
+            {trustPoints.map(([Icon, text]) => (
+              <div key={text} className="flex min-h-20 items-center gap-3 border-b border-background/10 py-4 sm:px-4 lg:border-b-0 lg:border-r lg:last:border-r-0">
+                <Icon className="size-5 shrink-0 text-primary" aria-hidden="true" />
+                <span className="text-sm font-semibold leading-5">{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="wyjazdy" className="section-space scroll-mt-20 bg-background">
+        <div className="site-container">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <SectionHeading
+              eyebrow="Terminarz meczowych podróży"
+              title="Kalendarz wyjazdów"
+              intro={content.tripsDescription || "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."}
+              align="left"
+            />
+            <Button variant="outline" size="lg" className="w-fit" nativeButton={false} render={<Link href="/wyjazdy" />}>
+              Wszystkie wyjazdy <ArrowRight data-icon="inline-end" />
+            </Button>
+          </div>
+          <HomeTripCalendar trips={trips} />
+        </div>
+      </section>
+
+      <section id="twoj-wyjazd" className="section-space scroll-mt-20 bg-secondary/60">
+        <div className="site-container grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+          <div className="relative min-h-[420px] overflow-hidden rounded-xl">
+            <Image src="/images/about-us.webp" alt="Podróż kibiców na mecz" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-8">
+              <p className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-primary">Poza kalendarzem</p>
+              <p className="mt-3 max-w-md font-sans text-3xl font-black uppercase leading-none md:text-4xl">Twój mecz. Twój punkt startu. Twój zakres.</p>
+            </div>
+          </div>
+
+          <div>
+            <p className="eyebrow">Wyjazd indywidualny</p>
+            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight md:text-6xl">
+              Nie ma Twojego meczu w kalendarzu?
+            </h2>
+            <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
+              Napisz, dokąd chcesz jechać i czego potrzebujesz. Sprawdzimy dostępność i przygotujemy zakres dopasowany do Twojego planu.
+            </p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {["Dowolny klub i liga", "Dogodne miejsce startu", "Wybrany standard noclegu", "Zakres od biletu po pełny pakiet"].map((item) => (
+                <div key={item} className="flex items-center gap-3 text-sm font-semibold">
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-foreground text-primary">
+                    <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
+                  </span>
+                  {item}
+                </div>
+              ))}
+            </div>
+            <Button size="lg" className="mt-9 h-12 px-6" nativeButton={false} render={<Link href="/kontakt#formularz" />}>
+              Opisz swój wyjazd <ArrowRight data-icon="inline-end" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-space bg-foreground text-background">
+        <div className="site-container">
+          <div className="grid items-end gap-8 lg:grid-cols-[1fr_0.7fr]">
+            <SectionHeading
+              eyebrow="Wszystko w jednym"
+              title={content.packageTitle || "Zakres pełnego pakietu"}
+              intro="Dokładny zakres zawsze sprawdzisz w ofercie konkretnego wyjazdu. Pełny wariant może łączyć najważniejsze elementy podróży w jednej rezerwacji."
+              inverse
+              align="left"
+            />
+            <p className="border-l-2 border-primary pl-5 text-sm leading-7 text-background/55">
+              Wolisz sam bilet albo pakiet bez jednego z elementów? Przy wybranych wydarzeniach przygotowujemy również węższe warianty.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-px overflow-hidden rounded-xl bg-background/12 sm:grid-cols-2 lg:grid-cols-4">
+            {packageItems.map(([Icon, label]) => (
+              <div key={label} className="flex min-h-24 items-center gap-4 bg-foreground p-5">
+                <Icon className="size-6 shrink-0 text-primary" aria-hidden="true" />
+                <span className="font-semibold">{label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-14 grid gap-8 border-t border-background/15 pt-10 md:grid-cols-3">
+            {reasons.map(([number, title, copy]) => (
+              <article key={number}>
+                <span className="font-mono text-xs font-black text-primary">{number}</span>
+                <h3 className="mt-5 font-sans text-2xl font-black uppercase">{title}</h3>
+                <p className="mt-3 text-sm leading-7 text-background/55">{copy}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-space bg-background">
+        <div className="site-container">
+          <SectionHeading
+            eyebrow="Prosty plan"
+            title={content.processTitle || "Jak wygląda rezerwacja?"}
+            intro="Pięć czytelnych etapów, od pomysłu do informacji potrzebnych przed wyjazdem."
+          />
+          <ol className="mt-12 grid gap-3 md:grid-cols-5">
+            {process.map(([number, title, copy], index) => (
+              <li key={number} className="surface-card relative p-5 md:min-h-64">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-black text-primary">{number}</span>
+                  {index < process.length - 1 ? <ArrowRight className="hidden size-4 text-foreground/25 md:block" aria-hidden="true" /> : null}
+                </div>
+                <h3 className="mt-10 font-sans text-xl font-black uppercase leading-tight">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {gallery.length ? (
+        <section className="section-space bg-secondary/60">
+          <div className="site-container">
+            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+              <SectionHeading
+                eyebrow="Z pierwszego rzędu"
+                title={content.galleryTitle || "Galeria z wyjazdów"}
+                intro="Stadiony, miasta i momenty, które najlepiej pokazują charakter wspólnej podróży."
+                align="left"
+              />
+              <Button variant="outline" size="lg" nativeButton={false} render={<Link href="/galeria" />}>
+                Cała galeria <ArrowRight data-icon="inline-end" />
+              </Button>
+            </div>
+            <HomeGallery gallery={gallery} />
+          </div>
+        </section>
+      ) : null}
+
+      {testimonials.length ? (
+        <section className="section-space bg-foreground text-background">
+          <div className="site-container">
+            <SectionHeading
+              eyebrow="Opinie uczestników"
+              title={content.testimonialsTitle || "Jak wspominają wyjazd?"}
+              intro="Głos oddajemy osobom, które oglądały mecze razem z Let's Gol."
+              inverse
+            />
+            <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {testimonials.slice(0, 6).map((item) => (
+                <blockquote key={item.id} className="flex min-h-64 flex-col rounded-xl border border-background/12 bg-background/[0.04] p-6 md:p-7">
+                  <div className="flex gap-1 text-primary">
+                    <span className="sr-only">Ocena {item.rating} na 5</span>
+                    {Array.from({ length: item.rating }).map((_, index) => (
+                      <Star key={index} className="size-4 fill-current" aria-hidden="true" />
+                    ))}
+                  </div>
+                  <p className="mt-6 flex-1 text-[15px] leading-7 text-background/75">„{item.content}”</p>
+                  <footer className="mt-7 border-t border-background/10 pt-5">
+                    {item.author ? <p className="font-bold">{item.author}</p> : null}
+                    {item.tripName ? <p className="mt-1 text-xs text-background/45">{item.tripName}</p> : null}
+                  </footer>
+                </blockquote>
+              ))}
+            </div>
+            {reviewsCount > 0 ? (
+              <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                <p className="flex items-center gap-2 text-sm font-bold"><Star className="size-5 fill-primary text-primary" aria-hidden="true" />{reviewsAverage}/5 na podstawie {reviewsCount} opinii</p>
+                <Button variant="outline" className="border-background/20 bg-transparent text-background hover:bg-primary hover:text-primary-foreground" nativeButton={false} render={<a href="https://www.facebook.com/profile.php?id=61573517165441&sk=reviews" target="_blank" rel="noopener noreferrer" />}>
+                  Opinie na Facebooku <ArrowRight data-icon="inline-end" />
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
+      <section id="o-nas" className="section-space scroll-mt-20 bg-background">
+        <div className="site-container grid items-center gap-10 lg:grid-cols-[1fr_0.9fr] lg:gap-16">
+          <div>
+            <SectionHeading
+              eyebrow="O nas"
+              title={content.aboutTitle || "Za każdym wyjazdem stoją ludzie"}
+              intro={content.aboutText || "Let's Gol łączy pasję do futbolu z przygotowaniem podróży. Chcemy, by droga na stadion budowała emocje, a nie listę organizacyjnych problemów."}
+              align="left"
+            />
+            <Button variant="outline" size="lg" className="mt-8" nativeButton={false} render={<Link href="/o-nas" />}>
+              Poznaj Let's Gol <ArrowRight data-icon="inline-end" />
+            </Button>
+          </div>
+          <div className="relative min-h-[420px] overflow-hidden rounded-xl">
+            <Image src="/images/hero-stadium.webp" alt="Trybuny stadionu podczas meczu" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <p className="absolute inset-x-0 bottom-0 p-6 font-sans text-2xl font-black uppercase leading-tight text-white md:p-8 md:text-3xl">Piłka. Podróż. Wspólne emocje.</p>
+          </div>
+        </div>
+      </section>
+
+      {videos.length ? (
+        <section className="section-space bg-secondary/60">
+          <div className="site-container">
+            <SectionHeading
+              eyebrow="Zobacz atmosferę"
+              title={content.youtubeTitle || "Relacje z naszych wyjazdów"}
+              intro="Materiały ze stadionów i miast, które odwiedzamy razem z uczestnikami."
+            />
+            <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {videos.map((video) => (
+                <a key={video.id} href={video.url} target="_blank" rel="noopener noreferrer" className="surface-card interactive-card group overflow-hidden">
+                  <div className="relative aspect-video overflow-hidden bg-foreground">
+                    <Image src={video.thumbnail} alt={`Miniatura filmu: ${video.title}`} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" sizes="(max-width: 768px) 100vw, 33vw" />
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl" aria-hidden="true">
+                        <span className="ml-0.5 text-lg">▶</span>
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex min-h-28 items-start justify-between gap-4 p-5">
+                    <div>
+                      <p className="font-mono text-[10px] font-black uppercase tracking-[0.14em] text-primary">Zobacz relację</p>
+                      <h3 className="mt-2 line-clamp-2 font-bold leading-6">{video.title}</h3>
+                    </div>
+                    <ArrowRight className="mt-1 size-5 shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section id="faq" className="section-space scroll-mt-20 bg-background">
+        <div className="site-container grid gap-12 lg:grid-cols-[0.6fr_1fr] lg:gap-16">
+          <div>
+            <SectionHeading
+              eyebrow="FAQ"
+              title={content.faqTitle || "Najczęstsze pytania"}
+              intro="Krótko odpowiadamy na najważniejsze kwestie. Pełne centrum pomocy obejmuje wszystkie etapy wyjazdu."
+              align="left"
+            />
+            <Button variant="outline" size="lg" className="mt-8" nativeButton={false} render={<Link href="/faq" />}>
+              Zobacz całe FAQ <ArrowRight data-icon="inline-end" />
+            </Button>
+          </div>
+          <Accordion className="border-t border-foreground/15">
+            {popularFaqs.map((item) => (
+              <AccordionItem key={item.question} className="border-b border-foreground/15">
+                <AccordionTrigger className="min-h-16 py-5 text-base font-bold leading-6 hover:no-underline hover:text-primary">{item.question}</AccordionTrigger>
+                <AccordionContent className="max-w-2xl pb-6 text-[15px] leading-7 text-muted-foreground"><p>{item.answer}</p></AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
+
+      <section id="kontakt" className="scroll-mt-20 bg-foreground text-background">
+        <div className="site-container grid gap-12 py-16 md:py-20 lg:grid-cols-[0.65fr_1.15fr] lg:gap-20">
+          <div>
+            <p className="eyebrow eyebrow-on-dark">Twój następny mecz</p>
+            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
+              {content.contactTitle || "Zapytaj o swój wyjazd"}
+            </h2>
+            <p className="mt-5 max-w-md leading-7 text-background/60">
+              Wybierz mecz lub wpisz własny pomysł. Podaj miejsce startu i liczbę osób, abyśmy mogli przygotować konkretną odpowiedź.
+            </p>
+            <Link href="/kontakt" className="mt-7 inline-flex items-center gap-2 font-bold text-primary hover:text-background">
+              Inne formy kontaktu <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
+          <InquiryForm trips={availableTrips} />
         </div>
       </section>
 
