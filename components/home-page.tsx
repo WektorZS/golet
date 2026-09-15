@@ -208,6 +208,21 @@ export function HomePage({
   testimonials: Testimonial[]
   videos: YouTubeVideo[]
 }) {
+  const parsedFacebookReviewsCount = Number.parseInt(
+    content.facebookReviewsCount ?? "",
+    10
+  )
+
+  const facebookReviewsCount = Number.isFinite(parsedFacebookReviewsCount)
+    ? Math.max(0, parsedFacebookReviewsCount)
+    : 172
+const parsedFacebookReviewsAverage = Number.parseFloat(
+  content.facebookReviewsAverage ?? ""
+)
+
+const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
+  ? Math.min(5, Math.max(0, parsedFacebookReviewsAverage)).toFixed(1)
+  : "5.0"
   return (
     <main>
       <SiteHeader />
@@ -288,7 +303,7 @@ export function HomePage({
             </div>
 
             <p className="mt-1 text-xs font-medium text-background/60">
-              160 opinii na Facebooku
+              {facebookReviewsCount} opinii na Facebooku
             </p>
 
             <div className="mt-3 border-t border-background/10 pt-3">
@@ -690,6 +705,7 @@ export function HomePage({
 </section>
 
 <section className="relative overflow-hidden bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
+  {/* subtelne tło */}
   <div
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
@@ -699,14 +715,18 @@ export function HomePage({
 
   <div className="relative mx-auto max-w-7xl">
     <SectionHeading
-  eyebrow="Opinie klientów"
-  title={
-    content.testimonialsTitle ||
-    "Emocje potwierdzone na trybunach"
-  }
-  intro="Najlepiej o naszych wyjazdach opowiadają osoby, które już poleciały z nami na mecz."
-  inverse
-/>
+      eyebrow="Opinie klientów"
+      title={
+        content.testimonialsTitle ||
+        "Emocje potwierdzone na trybunach"
+      }
+      intro="Najlepiej o naszych wyjazdach opowiadają osoby, które już poleciały z nami na mecz."
+      inverse
+    />
+
+    {/* ====================================================== */}
+    {/* KARTY OPINII */}
+    {/* ====================================================== */}
 
     <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
       {(
@@ -725,11 +745,21 @@ export function HomePage({
       ).map((item) => (
         <blockquote
           key={item.id}
-          className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-black/[0.08] bg-card p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_18px_45px_rgba(0,0,0,0.08)] md:p-7"
+          className="group relative flex min-h-[270px] flex-col overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.045] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-white/[0.065] md:p-7"
         >
-          <div className="absolute left-0 top-0 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full" />
+          {/* żółty akcent na górze */}
+          <div className="absolute left-0 top-0 h-[2px] w-12 bg-primary transition-all duration-500 group-hover:w-full" />
 
-          <div className="flex gap-1 text-primary">
+          {/* duży dekoracyjny cudzysłów */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-1 top-1 select-none font-serif text-[110px] font-black leading-none text-white/[0.035]"
+          >
+            “
+          </span>
+
+          {/* GWIAZDKI */}
+          <div className="relative flex gap-1 text-primary">
             <span className="sr-only">
               Ocena {item.rating} na 5
             </span>
@@ -746,61 +776,77 @@ export function HomePage({
             ))}
           </div>
 
-          <p className="mt-5 flex-1 text-[15px] leading-7 text-foreground/80">
+          {/* TREŚĆ OPINII */}
+          <p className="relative mt-6 flex-1 text-[15px] font-medium leading-7 text-background/78">
             „{item.content}”
           </p>
 
-          <footer className="mt-6 border-t border-black/[0.07] pt-4">
-            <p className="font-bold">
-              {item.author}
-            </p>
+          {/* DOLNA CZĘŚĆ */}
+          <footer className="relative mt-7 flex items-end justify-between gap-4 border-t border-white/[0.08] pt-5">
+            <div>
+              {item.author && (
+                <p className="text-sm font-bold text-background">
+                  {item.author}
+                </p>
+              )}
 
-            {item.tripName && (
-              <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                {item.tripName}
-              </p>
-            )}
+              {item.tripName && (
+                <p className="mt-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-background/45">
+                  {item.tripName}
+                </p>
+              )}
+            </div>
+
+            <div
+              aria-hidden="true"
+              className="size-1.5 shrink-0 rounded-full bg-primary"
+            />
           </footer>
         </blockquote>
       ))}
     </div>
 
+    {/* ====================================================== */}
+    {/* PODSUMOWANIE OPINII */}
+    {/* ====================================================== */}
+
     <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row">
-  <div className="flex items-center gap-3">
-    <Star
-      className="size-5 text-primary"
-      fill="currentColor"
-      aria-hidden="true"
-    />
+      <div className="flex items-center gap-3">
+        <Star
+          className="size-5 text-primary"
+          fill="currentColor"
+          aria-hidden="true"
+        />
 
-    <div>
-      <p className="font-bold">
-        5.0/5 · 160 opinii
-      </p>
+        <div>
+          <p className="text-sm font-bold text-background">
+            {facebookReviewsAverage}/5 · {facebookReviewsCount} opinii
+          </p>
 
-      <p className="text-xs text-muted-foreground">
-        100% poleca nas na Facebooku
-      </p>
+          <p className="mt-0.5 text-xs text-background/45">
+            100% poleca nas na Facebooku
+          </p>
+        </div>
+      </div>
+
+      <div className="hidden h-8 w-px bg-white/15 sm:block" />
+
+      <Button
+        variant="outline"
+        className="border-white/20 bg-transparent text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
+        nativeButton={false}
+        render={
+          <a
+            href="https://www.facebook.com/profile.php?id=61573517165441&sk=reviews"
+            target="_blank"
+            rel="noopener noreferrer"
+          />
+        }
+      >
+        Zobacz wszystkie opinie
+        <ArrowRight data-icon="inline-end" />
+      </Button>
     </div>
-  </div>
-
-  <div className="hidden h-8 w-px bg-border sm:block" />
-
-  <Button
-    variant="outline"
-    nativeButton={false}
-    render={
-      <a
-        href="https://www.facebook.com/profile.php?id=61573517165441&sk=reviews"
-        target="_blank"
-        rel="noopener noreferrer"
-      />
-    }
-  >
-    Zobacz wszystkie opinie
-    <ArrowRight data-icon="inline-end" />
-  </Button>
-</div>
   </div>
 </section>
 
@@ -973,12 +1019,12 @@ export function HomePage({
                   />
 
                   <strong className="text-3xl font-black">
-                    5.0/5
-                  </strong>
+  {facebookReviewsAverage}/5
+</strong>
                 </div>
 
                 <p className="text-sm text-muted-foreground">
-                  Facebook · 160 opinii
+                  Facebook · {facebookReviewsCount} opinii
                 </p>
 
                 <p className="mt-1 w-fit bg-foreground px-2 py-1 text-xs font-semibold text-background">

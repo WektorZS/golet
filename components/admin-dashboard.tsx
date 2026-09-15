@@ -1677,6 +1677,26 @@ const handleYouTubeDragEnd = async (event: any) => {
     }
   />
 
+  {/* Statystyki Facebook */}
+  <Card className="mb-6">
+    <CardHeader>
+      <CardTitle className="flex items-center gap-2">
+        <Star className="size-5 text-primary" />
+        Statystyki Facebook
+      </CardTitle>
+
+      <CardDescription>
+        Ustaw liczbę opinii wyświetlaną na stronie głównej.
+        Zmieniaj tę wartość, gdy liczba opinii na Facebooku wzrośnie.
+      </CardDescription>
+    </CardHeader>
+
+   <CardContent>
+  <FacebookReviewsSettingsForm settings={data.settings} />
+</CardContent>
+  </Card>
+
+  {/* Opinie klientów */}
   <div className="grid gap-4 lg:grid-cols-2">
     {data.testimonials.map((item) => (
       <Card key={item.id}>
@@ -4765,7 +4785,72 @@ function TestimonialDialog({
     </Dialog>
   )
 }
+const initialFacebookReviewsSettingsState: SaveSettingsState = {}
 
+function FacebookReviewsSettingsForm({
+  settings,
+}: {
+  settings: Record<string, string>
+}) {
+  const [state, action, pending] = useActionState(
+    saveSettings,
+    initialFacebookReviewsSettingsState
+  )
+
+  useEffect(() => {
+    if (state?.success) {
+      toast.success("Liczba opinii została zapisana")
+    }
+
+    if (state?.error) {
+      toast.error(state.error)
+    }
+  }, [state])
+
+  return (
+    <form
+      action={action}
+      className="flex flex-col gap-4 sm:flex-row sm:items-end"
+    >
+      <div className="w-full sm:max-w-xs">
+        <Label htmlFor="facebookReviewsCount">
+          Liczba opinii na Facebooku
+        </Label>
+
+        <Input
+          id="facebookReviewsCount"
+          name="setting.facebookReviewsCount"
+          type="number"
+          min="0"
+          max="100000"
+          step="1"
+          defaultValue={settings.facebookReviewsCount || "160"}
+          className="mt-2"
+        />
+      </div>
+      <div className="w-full sm:max-w-xs">
+  <Label htmlFor="facebookReviewsAverage">
+    Średnia ocen na Facebooku
+  </Label>
+
+  <Input
+    id="facebookReviewsAverage"
+    name="setting.facebookReviewsAverage"
+    type="number"
+    min="0"
+    max="5"
+    step="0.1"
+    defaultValue={settings.facebookReviewsAverage || "5.0"}
+    className="mt-2"
+  />
+</div>
+
+      <Button type="submit" disabled={pending}>
+        {pending ? "Zapisywanie..." : "Zapisz liczbę opinii"}
+      </Button>
+    </form>
+  )
+}
 function SettingsForm({
   settings,
 }: {

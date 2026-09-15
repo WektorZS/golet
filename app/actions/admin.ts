@@ -500,29 +500,90 @@ const ALLOWED_SETTING_KEYS = new Set([
   "seoTitle", "seoDescription",
   "heroEyebrow", "heroTitle", "heroDescription", "heroCta", "tripsTitle", "tripsDescription",
   "customTripTitle", "packageTitle", "benefitsTitle", "galleryTitle", "galleryHomeLimit",
-  "testimonialsTitle", "processTitle", "aboutTitle", "aboutText", "faqTitle", "contactTitle",
+  "testimonialsTitle", "facebookReviewsCount", "facebookReviewsAverage", "processTitle", "aboutTitle", "aboutText", "faqTitle", "contactTitle",
   "contactEmail", "contactPhone", "footerText", "companyName", "companyAddress", "companyNip",
-  "youtubeTitle", "youtubeUrl", "youtubeEnabled",
+  "youtubeTitle", "youtubeUrl", "youtubeLimit", "youtubeEnabled",
 ])
 
-export type SaveSettingsState = { error?: string; success?: boolean }
+export type SaveSettingsState = {
+  error?: string
+  success?: boolean
+}
 
-export async function saveSettings(_: SaveSettingsState, formData: FormData): Promise<SaveSettingsState> {
+export async function saveSettings(
+  _: SaveSettingsState,
+  formData: FormData
+): Promise<SaveSettingsState> {
   const user = await requireAdmin()
+
   try {
     for (const [key, value] of formData.entries()) {
       if (!key.startsWith("setting.")) continue
+
       const settingKey = key.slice(8)
+
       if (!ALLOWED_SETTING_KEYS.has(settingKey)) continue
+
       let settingValue = String(value).slice(0, 4000)
-      if (settingKey === "galleryHomeLimit") settingValue = String(Math.min(5, Math.max(1, Number(settingValue) || 5)))
-      await db.insert(siteSettings).values({ key: settingKey, value: settingValue, updatedAt: new Date() }).onConflictDoUpdate({ target: siteSettings.key, set: { value: settingValue, updatedAt: new Date() } })
+
+      if (settingKey === "galleryHomeLimit") {
+        settingValue = String(
+          Math.min(5, Math.max(1, Number(settingValue) || 5))
+        )
+      }
+
+      if (settingKey === "facebookReviewsCount") {
+        const reviewsCount = Number(settingValue)
+
+        settingValue = String(
+          Number.isFinite(reviewsCount)
+            ? Math.min(
+                100000,
+                Math.max(0, Math.floor(reviewsCount))
+              )
+            : 0
+        )
+      }
+      if (settingKey === "facebookReviewsAverage") {
+  const reviewsAverage = Number(settingValue.replace(",", "."))
+
+  settingValue = Number.isFinite(reviewsAverage)
+    ? Math.min(5, Math.max(0, reviewsAverage)).toFixed(1)
+    : "5.0"
+}
+
+      await db
+        .insert(siteSettings)
+        .values({
+          key: settingKey,
+          value: settingValue,
+          updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: siteSettings.key,
+          set: {
+            value: settingValue,
+            updatedAt: new Date(),
+          },
+        })
     }
-    await logActivity(user.id, "updated", "settings", undefined, "Treści strony")
+
+    await logActivity(
+      user.id,
+      "updated",
+      "settings",
+      undefined,
+      "Treści strony"
+    )
+
     refreshPublic()
+
     return { success: true }
   } catch {
-    return { error: "Nie udało się zapisać treści strony. Spróbuj ponownie." }
+    return {
+      error:
+        "Nie udało się zapisać treści strony. Spróbuj ponownie.",
+    }
   }
 }
 
