@@ -444,59 +444,49 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
 <section className="bg-foreground px-4 md:px-6">
   <div className="mx-auto max-w-7xl">
+    <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
 
-    <div className="grid lg:grid-cols-[0.8fr_1.2fr]">
-
-      
-
-      <div className="flex flex-col justify-between py-10 pr-0 sm:py-12 lg:py-14 lg:pr-14">
-
-        <div>
-          <span className="inline-block bg-primary px-2.5 py-1.5 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary-foreground">
+      <div className="flex h-full flex-col justify-center py-12 pr-0 sm:py-14 lg:py-16 lg:pr-16">
+        <div className="max-w-xl">
+          <p className="eyebrow eyebrow-on-dark">
             Wyjazd szyty na miarę
-          </span>
+          </p>
 
-          <h2 className="mt-5 max-w-md text-2xl font-black uppercase leading-[1.02] tracking-[-0.03em] text-white sm:text-3xl lg:text-[36px]">
+          <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[0.95] tracking-tight text-white md:text-5xl">
             Powiedz nam,
             <br />
             czego potrzebujesz.
           </h2>
 
-          <p className="mt-4 max-w-sm text-[13px] leading-6 text-white/55">
+          <p className="mt-6 max-w-lg text-base leading-7 text-white/65 md:text-lg">
             Nie musisz wybierać gotowego wyjazdu z kalendarza.
             Możemy zorganizować pojedynczy element albo całą podróż
             od biletu aż po lot i hotel.
           </p>
         </div>
-
       </div>
 
-      
-
-      <div className="relative py-10 sm:py-12 lg:py-14 lg:pl-14">
-
+      <div className="relative py-12 sm:py-14 lg:py-16 lg:pl-16">
         <div
-          className="absolute bottom-10 left-0 top-10 hidden w-px bg-white/10 lg:block"
+          className="absolute bottom-12 left-0 top-12 hidden w-px bg-white/10 lg:block"
           aria-hidden="true"
         />
 
-        
-
         <div>
-          <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary">
+          <p className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-primary">
             Czego potrzebujesz?
           </p>
 
-          <h3 className="mt-2 text-lg font-black uppercase tracking-[-0.02em] text-white sm:text-xl">
+          <h3 className="mt-3 font-sans text-2xl font-black uppercase leading-tight tracking-tight text-white md:text-[28px]">
             Dopasuj zakres wyjazdu
           </h3>
 
-          <p className="mt-2 max-w-lg text-[12px] leading-5 text-white/45">
+          <p className="mt-3 max-w-xl text-base leading-7 text-white/55">
             Możesz zacząć od samego biletu albo powierzyć nam
             organizację całego wyjazdu.
           </p>
 
-          <div className="mt-5 flex flex-wrap gap-2.5">
+          <div className="mt-6 flex flex-wrap gap-3">
             {[
               "Tylko bilet",
               "Bilet + lot",
@@ -505,7 +495,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             ].map((item) => (
               <div
                 key={item}
-                className="rounded-full bg-white/[0.09] px-4 py-2.5 text-[12px] font-bold text-white"
+                className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:border-primary/40 hover:bg-white/[0.09]"
               >
                 {item}
               </div>
@@ -513,18 +503,16 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           </div>
         </div>
 
-        
-
-        <div className="mt-9">
-          <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary">
+        <div className="mt-12 border-t border-white/10 pt-10">
+          <p className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-primary">
             Dla kogo?
           </p>
 
-          <h3 className="mt-2 text-lg font-black uppercase tracking-[-0.02em] text-white sm:text-xl">
+          <h3 className="mt-3 font-sans text-2xl font-black uppercase leading-tight tracking-tight text-white md:text-[28px]">
             Od jednej osoby po całą grupę
           </h3>
 
-          <div className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+          <div className="mt-7 grid gap-x-10 gap-y-7 sm:grid-cols-2">
             {[
               [
                 "Indywidualnie",
@@ -544,21 +532,19 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               ],
             ].map(([title, description]) => (
               <div key={title}>
-                <p className="text-[12px] font-black uppercase text-white">
+                <p className="font-sans text-base font-black uppercase tracking-tight text-white">
                   {title}
                 </p>
 
-                <p className="mt-1 text-[11px] leading-5 text-white/45">
+                <p className="mt-2 text-sm leading-6 text-white/50">
                   {description}
                 </p>
               </div>
             ))}
           </div>
         </div>
-
       </div>
     </div>
-
   </div>
 </section>
       <section className="bg-background px-4 py-20 md:px-6 md:py-24">
