@@ -212,12 +212,12 @@ export function TestimonialsCarousel({
               <div className="my-7 h-px bg-white/10 md:my-9" />
 
               <div className="relative">
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -left-2 -top-8 select-none font-serif text-[110px] font-black leading-none text-white/[0.035]"
-                >
-                  “
-                </span>
+               <span
+  aria-hidden="true"
+  className="pointer-events-none absolute -right-2 -top-8 select-none font-serif text-[110px] font-black leading-none text-white/[0.035]"
+>
+  “
+</span>
 
                 <p className="relative whitespace-pre-line text-base font-medium leading-8 text-white/80 md:text-lg md:leading-9">
                   „{selected.content}”
@@ -225,17 +225,6 @@ export function TestimonialsCarousel({
               </div>
 
               <div className="mt-9 flex items-center justify-between border-t border-white/10 pt-6">
-                <div>
-                  <p className="text-sm font-bold text-white">
-                    {selected.author}
-                  </p>
-
-                  {selected.tripName && (
-                    <p className="mt-1.5 text-xs text-white/40">
-                      {selected.tripName}
-                    </p>
-                  )}
-                </div>
 
                 <button
                   type="button"
