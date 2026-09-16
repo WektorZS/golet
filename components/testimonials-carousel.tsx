@@ -35,15 +35,15 @@ export function TestimonialsCarousel({
   const items = testimonials.length
     ? testimonials.slice(0, 6)
     : [
-        {
-          id: -1,
-          author: "Kamil",
-          tripName: "Barcelona",
-          content:
-            "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!",
-          rating: 5,
-        },
-      ]
+      {
+        id: -1,
+        author: "Kamil",
+        tripName: "Barcelona",
+        content:
+          "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!",
+        rating: 5,
+      },
+    ]
 
   useEffect(() => {
     if (!selected) return
@@ -111,7 +111,7 @@ export function TestimonialsCarousel({
                   </div>
 
                   <div className="relative mt-6 flex-1">
-                    <p className="line-clamp-6 text-[15px] font-medium leading-7 text-background/85">
+                    <p className="line-clamp-4 text-[15px] font-medium leading-7 text-background/85">
                       „{item.content}”
                     </p>
 
