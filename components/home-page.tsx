@@ -22,6 +22,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { TestimonialsCarousel } from "@/components/testimonials-carousel"
 
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
@@ -725,91 +726,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       inverse
     />
 
-    <Carousel
-      opts={{
-        align: "start",
-        loop: true,
-      }}
-      className="mt-12 w-full"
-    >
-      <CarouselContent className="-ml-4">
-        {(
-          testimonials.length
-            ? testimonials.slice(0, 6)
-            : [
-                {
-                  id: -1,
-                  author: "Kamil",
-                  tripName: "Barcelona",
-                  content:
-                    "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!",
-                  rating: 5,
-                },
-              ]
-        ).map((item) => (
-          <CarouselItem
-            key={item.id}
-            className="pl-4 md:basis-1/2 lg:basis-1/3"
-          >
-            <blockquote className="group relative flex h-full min-h-[250px] flex-col overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.045] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-white/[0.065] md:p-7">
-              <div className="absolute left-0 top-0 h-[2px] w-12 bg-primary transition-all duration-500 group-hover:w-full" />
-
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute -right-1 top-1 select-none font-serif text-[90px] font-black leading-none text-white/[0.035]"
-              >
-                “
-              </span>
-
-              <div className="relative flex gap-1 text-primary">
-                <span className="sr-only">
-                  Ocena {item.rating} na 5
-                </span>
-
-                {Array.from({
-                  length: item.rating,
-                }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className="size-4"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  />
-                ))}
-              </div>
-
-              <p className="relative mt-6 flex-1 text-[15px] font-medium leading-7 text-background/85">
-                „{item.content}”
-              </p>
-
-              <footer className="relative mt-7 border-t border-white/[0.08] pt-5">
-                {item.author && (
-                  <p className="text-sm font-bold text-background">
-                    {item.author}
-                  </p>
-                )}
-
-                {item.tripName && (
-                  <p className="mt-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-background/45">
-                    {item.tripName}
-                  </p>
-                )}
-              </footer>
-            </blockquote>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-
-      <div className="mt-8 flex items-center justify-center gap-3">
-        <CarouselPrevious
-          className="static size-11 translate-x-0 translate-y-0 border-white/15 bg-white/[0.05] text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
-        />
-
-        <CarouselNext
-          className="static size-11 translate-x-0 translate-y-0 border-white/15 bg-white/[0.05] text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
-        />
-      </div>
-    </Carousel>
+<TestimonialsCarousel testimonials={testimonials} />
 
     <div className="mt-8 flex flex-col items-center justify-center gap-5 sm:flex-row">
       <div className="flex items-center gap-3">
