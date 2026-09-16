@@ -249,3 +249,20 @@
     transition-duration: 0.01ms !important;
   }
 }
+.eyebrow {
+  width: fit-content;
+  background: var(--foreground);
+  color: var(--primary);
+  padding: 0.42rem 0.65rem;
+  font-family: var(--font-geist), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.eyebrow-on-dark {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}

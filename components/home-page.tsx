@@ -330,125 +330,115 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
       </section>
 
-  <section
-        id="wyjazdy"
-        className="scroll-mt-8 bg-background px-4 py-16 md:px-6 md:py-20"
+      <section
+  id="wyjazdy"
+  className="scroll-mt-20 bg-background px-4 py-16 md:px-6 md:py-20"
+>
+  <div className="mx-auto max-w-7xl">
+    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <SectionHeading
+        eyebrow="Terminarz meczowych podróży"
+        title="Kalendarz wyjazdów"
+        intro={
+          content.tripsDescription ||
+          "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."
+        }
+        align="left"
+      />
+
+      <Button
+        variant="outline"
+        size="lg"
+        className="w-fit shrink-0"
+        nativeButton={false}
+        render={<Link href="/wyjazdy" />}
       >
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            eyebrow="Terminarz meczowych podróży"
-            title="Kalendarz wyjazdów"
-            intro={
-              content.tripsDescription ||
-              "Wybierz gotowy pakiet i zajmij miejsce na trybunach największych stadionów Europy."
-            }
-          />
+        Wszystkie wyjazdy
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    </div>
 
-          <HomeTripCalendar trips={trips} />
-
-          <div className="mt-8 flex justify-center">
-            <Button
-              variant="outline"
-              size="lg"
-              nativeButton={false}
-              render={<Link href="/wyjazdy" />}
-            >
-              Zobacz wszystkie wyjazdy
-              <ArrowRight data-icon="inline-end" />
-            </Button>
-          </div>
-        </div>
-      </section>
+    <HomeTripCalendar trips={trips} />
+  </div>
+</section>
 
 <section
   id="twoj-wyjazd"
-  className="scroll-mt-20 bg-secondary px-4 py-14 md:px-6 md:py-16"
+  className="scroll-mt-20 bg-secondary/60 px-4 py-16 md:px-6 md:py-20"
 >
-  <div className="mx-auto max-w-7xl">
+  <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+    <div className="relative min-h-[420px] overflow-hidden rounded-xl">
+      <Image
+        src="/images/about-us.webp"
+        alt="Podróż kibiców na mecz"
+        fill
+        className="object-cover"
+        sizes="(max-width: 1024px) 100vw, 45vw"
+      />
 
-    <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
 
-      
-
-      <div className="relative overflow-hidden rounded-xl">
-        <div className="relative aspect-[16/11] lg:aspect-[4/3]">
-          <Image
-            src="/images/about-us.webp"
-            alt="Wyjazd na mecz z Let's Gol"
-            fill
-            className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 42vw"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
-
-          <div className="absolute bottom-5 left-5 right-5 md:bottom-6 md:left-6">
-            <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white/65">
-              Let's Gol
-            </p>
-
-            <p className="mt-1.5 max-w-md text-xl font-black uppercase leading-[1.05] tracking-[-0.02em] text-white md:text-2xl">
-              Ty wybierasz mecz.
-              <br />
-              My organizujemy wyjazd.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      
-
-      <div className="max-w-2xl">
-
-        <span className="inline-block bg-foreground px-2.5 py-1.5 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-primary">
-          Indywidualny wyjazd
-        </span>
-
-        <h2 className="mt-4 max-w-2xl text-balance font-sans text-[38px] font-black uppercase leading-[0.97] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-[52px]">
-          Nie ma Twojego meczu
-          <br className="hidden sm:block" />
-          w kalendarzu?
-        </h2>
-
-        <p className="mt-5 max-w-xl text-[15px] leading-7 text-muted-foreground">
-          To żaden problem. Wskaż mecz, termin i zakres wyjazdu,
-          a przygotujemy ofertę dopasowaną do Ciebie.
+      <div className="absolute bottom-5 left-5 right-5 text-white md:bottom-6 md:left-6 md:right-6">
+        <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white/65">
+          Let&apos;s Gol
         </p>
 
-        <div className="mt-7 grid gap-x-10 gap-y-3.5 sm:grid-cols-2">
-          {[
-            "Dowolny klub i liga",
-            "Wylot z dogodnego lotniska",
-            "Standard hotelu do wyboru",
-            "Wybrana kategoria biletu",
-          ].map((item) => (
-            <div
-              key={item}
-              className="flex items-center gap-2.5"
-            >
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-foreground">
-                <Check
-                  className="size-3 text-primary"
-                  strokeWidth={3}
-                  aria-hidden="true"
-                />
-              </span>
-
-              <span className="text-[13px] font-semibold text-foreground/85">
-                {item}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <p className="mt-7 max-w-lg text-xs leading-5 text-muted-foreground">
-          Nie widzisz interesującego Cię wyjazdu? Nie ograniczamy się
-          wyłącznie do terminów dostępnych w kalendarzu.
+        <p className="mt-1.5 max-w-md text-xl font-black uppercase leading-[1.05] tracking-[-0.02em] text-white md:text-2xl">
+          Ty wybierasz mecz.
+          <br />
+          My organizujemy wyjazd.
         </p>
-
       </div>
     </div>
 
+    <div>
+      <p className="eyebrow">
+        Wyjazd indywidualny
+      </p>
+
+      <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight md:text-6xl">
+        Nie ma Twojego meczu w kalendarzu?
+      </h2>
+
+      <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
+        Napisz, dokąd chcesz jechać i czego potrzebujesz. Sprawdzimy
+        dostępność i przygotujemy zakres dopasowany do Twojego planu.
+      </p>
+
+      <div className="mt-8 grid gap-3 sm:grid-cols-2">
+        {[
+          "Dowolny klub i liga",
+          "Dogodne miejsce startu",
+          "Wybrany standard noclegu",
+          "Zakres od biletu po pełny pakiet",
+        ].map((item) => (
+          <div
+            key={item}
+            className="flex items-center gap-3 text-sm font-semibold"
+          >
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-foreground text-primary">
+              <Check
+                className="size-3.5"
+                strokeWidth={3}
+                aria-hidden="true"
+              />
+            </span>
+
+            {item}
+          </div>
+        ))}
+      </div>
+
+      <Button
+        size="lg"
+        className="mt-9 h-12 px-6"
+        nativeButton={false}
+        render={<Link href="/kontakt#formularz" />}
+      >
+        Opisz swój wyjazd
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    </div>
   </div>
 </section>
 
