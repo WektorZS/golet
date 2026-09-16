@@ -15,6 +15,13 @@ import {
   Users,
   Landmark,
 } from "lucide-react"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
@@ -156,39 +163,51 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
   const items = gallery.slice(0, 8)
 
   return (
-    <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
+    <div className="mt-10 grid grid-cols-2 gap-3 lg:grid-cols-4">
       {items.map((item) => {
+        const src = item.mediaId
+          ? `/api/media/${item.mediaId}`
+          : item.image
+
         return (
-          <div
+          <figure
             key={item.id}
             className="group relative aspect-[4/3] overflow-hidden rounded-xl"
           >
             <ImageLightbox
-              src={
-                item.mediaId
-                  ? `/api/media/${item.mediaId}`
-                  : item.image
-              }
+              src={src}
               alt={item.alt || item.title}
               caption={[item.title, item.city]
                 .filter(Boolean)
                 .join(" · ")}
             >
               <Image
-                src={
-                  item.mediaId
-                    ? `/api/media/${item.mediaId}`
-                    : item.image
-                }
+                src={src}
                 alt={item.alt || item.title}
                 fill
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
                 sizes="(max-width: 768px) 50vw, 25vw"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent opacity-35 transition-opacity duration-300 group-hover:opacity-75" />
             </ImageLightbox>
-          </div>
+
+            {(item.title || item.city) && (
+              <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-2 p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                {item.title && (
+                  <p className="text-sm font-bold text-white">
+                    {item.title}
+                  </p>
+                )}
+
+                {item.city && (
+                  <p className="mt-1 text-xs text-white/70">
+                    {item.city}
+                  </p>
+                )}
+              </figcaption>
+            )}
+          </figure>
         )
       })}
     </div>
@@ -547,77 +566,110 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
   </div>
 </section>
-      <section className="bg-background px-4 py-20 md:px-6 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            eyebrow="Wszystko w jednym"
-            title={
-              content.packageTitle ||
-              "Co zawiera pełny pakiet?"
-            }
-          />
+<section className="bg-background px-4 py-16 md:px-6 md:py-20">
+  <div className="mx-auto max-w-7xl">
+    <SectionHeading
+      eyebrow="Wszystko w jednym"
+      title={
+        content.packageTitle ||
+        "Co zawiera pełny pakiet?"
+      }
+    />
 
-          <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              [Plane, "Przelot"],
-              [TicketCheck, "Bilet na mecz"],
-              [Building2, "Sprawdzony hotel"],
-              [Headphones, "Opieka koordynatora"],
-              [MapPinned, "Transfery lokalne"],
-              [ShieldCheck, "Ubezpieczenie"],
-              [CalendarCheck, "Plan podróży"],
-              [Landmark, "Wspólne zwiedzanie miasta"],
-            ].map(([Icon, label]) => {
-              const I = Icon as typeof Plane
+    <div className="mt-14 grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
+      <div className="max-w-md">
+        <p className="eyebrow">
+          Pełny pakiet
+        </p>
 
-              return (
-                <div
-                  key={label as string}
-                  className="flex items-center gap-3 rounded-lg border border-foreground/10 bg-secondary/45 p-4"
-                >
-                  <I className="text-primary" aria-hidden="true" />
+        <h3 className="mt-5 font-sans text-3xl font-black uppercase leading-[0.98] tracking-tight text-foreground md:text-4xl">
+          Wszystkie najważniejsze elementy jednej podróży.
+        </h3>
 
-                  <span className="font-semibold">
-                    {label as string}
-                  </span>
-                </div>
-              )
-            })}
+        <p className="mt-5 text-base leading-7 text-muted-foreground">
+          Zakres konkretnego wyjazdu może się różnić, ale pełny wariant
+          łączy najważniejsze elementy organizacji w jednej ofercie.
+        </p>
+      </div>
+
+      <div className="grid gap-x-10 gap-y-0 sm:grid-cols-2">
+        {[
+          [Plane, "Przelot", "Transport dopasowany do terminu meczu."],
+          [TicketCheck, "Bilet na mecz", "Miejsce na stadionie w wybranej kategorii."],
+          [Building2, "Sprawdzony hotel", "Nocleg dopasowany do charakteru wyjazdu."],
+          [Headphones, "Opieka koordynatora", "Wsparcie organizacyjne przed i w trakcie podróży."],
+          [MapPinned, "Transfery lokalne", "Przejazdy pomiędzy kluczowymi punktami wyjazdu."],
+          [ShieldCheck, "Ubezpieczenie", "Ochrona podróży zgodnie z zakresem oferty."],
+          [CalendarCheck, "Plan podróży", "Najważniejsze informacje i ustalenia przed wyjazdem."],
+          [Landmark, "Zwiedzanie miasta", "Czas na poznanie miasta poza stadionem."],
+        ].map(([Icon, title, description]) => {
+          const I = Icon as typeof Plane
+
+          return (
+            <div
+              key={title as string}
+              className="group flex gap-4 border-b border-foreground/10 py-6"
+            >
+              <div className="pt-1">
+                <I
+                  className="size-6 text-primary transition-transform duration-300 group-hover:scale-110"
+                  aria-hidden="true"
+                />
+              </div>
+
+              <div>
+                <h4 className="font-sans text-base font-black uppercase text-foreground">
+                  {title as string}
+                </h4>
+
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {description as string}
+                </p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  </div>
+</section>
+<section className="bg-secondary px-4 py-16 md:px-6 md:py-20 lg:py-24">
+  <div className="mx-auto max-w-7xl">
+    <SectionHeading
+      eyebrow="Dlaczego my"
+      title={
+        content.benefitsTitle ||
+        "Let’s Gol pilnuje szczegółów. Ty przeżywasz mecz."
+      }
+    />
+
+    <div className="mt-12 grid gap-x-10 gap-y-9 md:grid-cols-2 lg:grid-cols-3 lg:gap-y-10">
+      {reasons.map(([Icon, title, copy]) => (
+        <article
+          key={title}
+          className="group flex items-start gap-4"
+        >
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-colors duration-300 group-hover:bg-primary/15 sm:size-12">
+            <Icon
+              className="size-5 text-foreground sm:size-6"
+              aria-hidden="true"
+            />
+          </span>
+
+          <div className="min-w-0">
+            <h3 className="font-sans text-base font-black uppercase leading-tight tracking-tight text-foreground">
+              {title}
+            </h3>
+
+            <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground md:text-[15px]">
+              {copy}
+            </p>
           </div>
-        </div>
-      </section>
-
-      <section className="bg-secondary px-4 py-20 md:px-6 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            eyebrow="Dlaczego my"
-            title={
-              content.benefitsTitle ||
-              "Let’s Gol pilnuje szczegółów. Ty przeżywasz mecz."
-            }
-          />
-
-          <div className="mt-12 grid gap-x-8 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
-            {reasons.map(([Icon, title, copy]) => (
-              <article key={title} className="flex gap-4">
-                <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Icon aria-hidden="true" />
-                </span>
-
-                <div>
-                  <h3 className="font-bold uppercase">
-                    {title}
-                  </h3>
-
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {copy}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
 
 <section className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24">
   <div
@@ -654,8 +706,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   </div>
 </section>
 
-<section className="relative overflow-hidden bg-foreground px-4 py-20 text-background md:px-6 md:py-24">
-  
+<section className="relative overflow-hidden bg-foreground px-4 py-16 text-background md:px-6 md:py-24">
   <div
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
@@ -674,85 +725,93 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       inverse
     />
 
-    
-
-    <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-      {(
-        testimonials.length
-          ? testimonials.slice(0, 6)
-          : [
-              {
-                id: -1,
-                author: "Kamil",
-                tripName: "Barcelona",
-                content:
-                  "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!",
-                rating: 5,
-              },
-            ]
-      ).map((item) => (
-        <blockquote
-          key={item.id}
-          className="group relative flex min-h-[270px] flex-col overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.045] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-white/[0.065] md:p-7"
-        >
-          
-          <div className="absolute left-0 top-0 h-[2px] w-12 bg-primary transition-all duration-500 group-hover:w-full" />
-
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-1 top-1 select-none font-serif text-[110px] font-black leading-none text-white/[0.035]"
+    <Carousel
+      opts={{
+        align: "start",
+        loop: true,
+      }}
+      className="mt-12 w-full"
+    >
+      <CarouselContent className="-ml-4">
+        {(
+          testimonials.length
+            ? testimonials.slice(0, 6)
+            : [
+                {
+                  id: -1,
+                  author: "Kamil",
+                  tripName: "Barcelona",
+                  content:
+                    "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!",
+                  rating: 5,
+                },
+              ]
+        ).map((item) => (
+          <CarouselItem
+            key={item.id}
+            className="pl-4 md:basis-1/2 lg:basis-1/3"
           >
-            “
-          </span>
+            <blockquote className="group relative flex h-full min-h-[250px] flex-col overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.045] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-white/[0.065] md:p-7">
+              <div className="absolute left-0 top-0 h-[2px] w-12 bg-primary transition-all duration-500 group-hover:w-full" />
 
-          <div className="relative flex gap-1 text-primary">
-            <span className="sr-only">
-              Ocena {item.rating} na 5
-            </span>
-
-            {Array.from({
-              length: item.rating,
-            }).map((_, i) => (
-              <Star
-                key={i}
-                className="size-4"
-                fill="currentColor"
+              <span
                 aria-hidden="true"
-              />
-            ))}
-          </div>
+                className="pointer-events-none absolute -right-1 top-1 select-none font-serif text-[90px] font-black leading-none text-white/[0.035]"
+              >
+                “
+              </span>
 
-          <p className="relative mt-6 flex-1 text-[15px] font-medium leading-7 text-background/78">
-            „{item.content}”
-          </p>
+              <div className="relative flex gap-1 text-primary">
+                <span className="sr-only">
+                  Ocena {item.rating} na 5
+                </span>
 
-          <footer className="relative mt-7 flex items-end justify-between gap-4 border-t border-white/[0.08] pt-5">
-            <div>
-              {item.author && (
-                <p className="text-sm font-bold text-background">
-                  {item.author}
-                </p>
-              )}
+                {Array.from({
+                  length: item.rating,
+                }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className="size-4"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  />
+                ))}
+              </div>
 
-              {item.tripName && (
-                <p className="mt-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-background/45">
-                  {item.tripName}
-                </p>
-              )}
-            </div>
+              <p className="relative mt-6 flex-1 text-[15px] font-medium leading-7 text-background/85">
+                „{item.content}”
+              </p>
 
-            <div
-              aria-hidden="true"
-              className="size-1.5 shrink-0 rounded-full bg-primary"
-            />
-          </footer>
-        </blockquote>
-      ))}
-    </div>
+              <footer className="relative mt-7 border-t border-white/[0.08] pt-5">
+                {item.author && (
+                  <p className="text-sm font-bold text-background">
+                    {item.author}
+                  </p>
+                )}
 
-    
+                {item.tripName && (
+                  <p className="mt-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-background/45">
+                    {item.tripName}
+                  </p>
+                )}
+              </footer>
+            </blockquote>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
 
-    <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row">
+      <div className="mt-8 flex items-center justify-center gap-3">
+        <CarouselPrevious
+          className="static size-11 translate-x-0 translate-y-0 border-white/15 bg-white/[0.05] text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
+        />
+
+        <CarouselNext
+          className="static size-11 translate-x-0 translate-y-0 border-white/15 bg-white/[0.05] text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
+        />
+      </div>
+    </Carousel>
+
+    <div className="mt-8 flex flex-col items-center justify-center gap-5 sm:flex-row">
       <div className="flex items-center gap-3">
         <Star
           className="size-5 text-primary"
@@ -791,7 +850,6 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
   </div>
 </section>
-
 <section className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24">
 
   <div
