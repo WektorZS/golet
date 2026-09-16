@@ -4657,7 +4657,7 @@ function TestimonialDialog({
         }
       />
 
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>
             {item
