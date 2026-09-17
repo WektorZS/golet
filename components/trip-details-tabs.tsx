@@ -3,6 +3,7 @@
 import Image from "next/image"
 import {
   useEffect,
+  useRef,
   useState,
   type ComponentType,
 } from "react"
@@ -24,6 +25,8 @@ import {
   TramFront,
   UserRoundCheck,
   UtensilsCrossed,
+  ArrowRight,
+X,
 } from "lucide-react"
 
 import type { PackageFeatureKey } from "@/lib/package-options"
@@ -336,13 +339,133 @@ function MissingPackageElement({
     </div>
   )
 }
+function TestimonialCard({
+  item,
+  onOpen,
+}: {
+  item: TestimonialItem
+  onOpen: () => void
+}) {
+  const textRef =
+    useRef<HTMLParagraphElement>(null)
 
+  const [isTruncated, setIsTruncated] =
+    useState(false)
+
+  useEffect(() => {
+    const element = textRef.current
+
+    if (!element) return
+
+    const checkTruncation = () => {
+      const visibleHeight = element.clientHeight
+      const clone = element.cloneNode(true) as HTMLParagraphElement
+
+      clone.classList.remove("line-clamp-4")
+      clone.style.position = "absolute"
+      clone.style.visibility = "hidden"
+      clone.style.pointerEvents = "none"
+      clone.style.height = "auto"
+      clone.style.maxHeight = "none"
+      clone.style.overflow = "visible"
+      clone.style.display = "block"
+      clone.style.width = `${element.clientWidth}px`
+      clone.style.webkitLineClamp = "unset"
+      clone.style.webkitBoxOrient = "unset"
+
+      document.body.appendChild(clone)
+      const fullHeight = clone.clientHeight
+      document.body.removeChild(clone)
+
+      setIsTruncated(fullHeight > visibleHeight + 1)
+    }
+
+    checkTruncation()
+
+    const observer =
+      new ResizeObserver(checkTruncation)
+
+    observer.observe(element)
+
+    window.addEventListener(
+      "resize",
+      checkTruncation
+    )
+
+    document.fonts?.ready.then(
+      checkTruncation
+    )
+
+    return () => {
+      observer.disconnect()
+
+      window.removeEventListener(
+        "resize",
+        checkTruncation
+      )
+    }
+  }, [item.content])
+
+  return (
+    <blockquote className="flex h-full flex-col border-l-2 border-primary pl-5">
+      <div
+        className="flex gap-1 text-primary"
+        aria-label={`${item.rating} na 5 gwiazdek`}
+      >
+        {Array.from({
+          length: item.rating,
+        }).map((_, index) => (
+          <span key={index}>★</span>
+        ))}
+      </div>
+
+      <div className="mt-3">
+        <p
+          ref={textRef}
+          className="line-clamp-4 text-sm leading-7 text-muted-foreground"
+        >
+          „{item.content}”
+        </p>
+
+        {isTruncated ? (
+          <button
+            type="button"
+            onClick={onOpen}
+            className="group mt-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-primary transition-colors hover:text-primary/80"
+          >
+            Zobacz więcej
+
+            <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+          </button>
+        ) : null}
+      </div>
+
+      <footer className="mt-4 text-sm font-bold">
+        {item.author}
+
+        <span className="block text-xs font-normal text-muted-foreground">
+          {item.tripName}
+        </span>
+      </footer>
+    </blockquote>
+  )
+}
 export function TripDetailsTabs(
   props: TripDetailsTabsProps
 ) {
   const [activeTab, setActiveTab] =
     useState("opis")
+    const [mobileTabsOpen, setMobileTabsOpen] =
+  useState(false)
+  const mobileTabsRef =
+  useRef<HTMLDivElement>(null)
 
+const shouldScrollToTabs =
+  useRef(false)
+const [
+  selectedTestimonial,
+  setSelectedTestimonial,
+] = useState<TestimonialItem | null>(null)
   const partialPackageSelected =
     props.partialPackageSelected ??
     false
@@ -398,7 +521,51 @@ export function TripDetailsTabs(
           flightIncluded
         )
       : props.itinerary
+useEffect(() => {
+  if (!selectedTestimonial) return
 
+  const previousOverflow =
+    document.body.style.overflow
+
+  document.body.style.overflow = "hidden"
+
+  const handleKeyDown = (
+    event: KeyboardEvent
+  ) => {
+    if (event.key === "Escape") {
+      setSelectedTestimonial(null)
+    }
+  }
+
+  window.addEventListener(
+    "keydown",
+    handleKeyDown
+  )
+
+  return () => {
+    document.body.style.overflow =
+      previousOverflow
+
+    window.removeEventListener(
+      "keydown",
+      handleKeyDown
+    )
+  }
+}, [selectedTestimonial])
+useEffect(() => {
+  if (!shouldScrollToTabs.current) {
+    return
+  }
+
+  shouldScrollToTabs.current = false
+
+  requestAnimationFrame(() => {
+    mobileTabsRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    })
+  })
+}, [activeTab])
   const tabs = [
     {
       id: "opis",
@@ -477,7 +644,7 @@ export function TripDetailsTabs(
         {partialPackageSelected ? (
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <span className="rounded-lg bg-primary px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-primary-foreground">
-              Wybrany wariant niepełny
+              Wybrany wariant
             </span>
 
             <span className="text-sm font-semibold text-muted-foreground">
@@ -487,16 +654,124 @@ export function TripDetailsTabs(
         ) : null}
       </div>
 
-      <div className="pt-5 lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-10 lg:pt-8">
-        <div className="relative min-w-0">
+      <div
+  ref={mobileTabsRef}
+  className="sticky top-20 z-40 -mx-4 mt-5 scroll-mt-20 border-y border-foreground/10 bg-background/95 backdrop-blur-md lg:hidden"
+>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() =>
+              setMobileTabsOpen((current) => !current)
+            }
+            aria-expanded={mobileTabsOpen}
+            aria-controls="mobile-trip-tabs"
+            className="flex min-h-17 w-full items-center justify-between gap-4 px-4 py-3 text-left"
+          >
+            <div className="min-w-0">
+              <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-muted-foreground">
+                Szczegóły wyjazdu
+              </p>
+
+              <div className="mt-1 flex items-center gap-2">
+                {(() => {
+                  const currentTab =
+                    tabs.find(
+                      (tab) => tab.id === activeTab
+                    ) ?? tabs[0]
+
+                  const CurrentIcon =
+                    currentTab.icon
+
+                  return (
+                    <>
+                      <CurrentIcon
+                        className="size-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
+
+                      <span className="truncate font-sans text-lg font-black uppercase leading-none text-foreground">
+                        {currentTab.label}
+                      </span>
+                    </>
+                  )
+                })()}
+              </div>
+            </div>
+
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-foreground/15 bg-background">
+              <ChevronDown
+                className={`size-4 transition-transform duration-200 ${
+                  mobileTabsOpen ? "rotate-180" : ""
+                }`}
+                aria-hidden="true"
+              />
+            </span>
+          </button>
+
+          {mobileTabsOpen ? (
+            <div
+              id="mobile-trip-tabs"
+              className="absolute inset-x-0 top-full z-50 border-t border-foreground/10 bg-background p-3 shadow-xl"
+            >
+              <div
+                role="tablist"
+                aria-label="Informacje o wyjeździe"
+                className="grid max-h-80 grid-cols-2 gap-2 overflow-y-auto"
+              >
+                {tabs.map((tab) => {
+                  const TabIcon = tab.icon
+                  const selected =
+                    activeTab === tab.id
+
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={selected}
+                      aria-controls={`panel-${tab.id}`}
+                      onClick={() => {
+  shouldScrollToTabs.current = true
+  setActiveTab(tab.id)
+  setMobileTabsOpen(false)
+}}
+                      className={`flex min-h-16 items-center gap-3 rounded-lg border px-3 py-3 text-left transition-colors ${
+                        selected
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-foreground/10 bg-secondary/50 text-foreground"
+                      }`}
+                    >
+                      <TabIcon
+                        className={`size-4 shrink-0 ${
+                          selected
+                            ? "text-primary-foreground"
+                            : "text-primary"
+                        }`}
+                        aria-hidden="true"
+                      />
+
+                      <span className="font-sans text-sm font-black uppercase leading-tight">
+                        {tab.label}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="pt-7 lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-10 lg:pt-8">
+        <div className="hidden min-w-0 lg:block">
           <div
             role="tablist"
             aria-label="Informacje o wyjeździe"
-            className="flex snap-x gap-2 overflow-x-auto border-b pb-4 pr-12 [scrollbar-width:thin] lg:flex-col lg:border-b-0 lg:border-r lg:pb-0 lg:pr-6"
+            className="flex flex-col border-r pr-6"
           >
             {tabs.map((tab) => {
               const TabIcon = tab.icon
-
               const selected =
                 activeTab === tab.id
 
@@ -505,16 +780,12 @@ export function TripDetailsTabs(
                   key={tab.id}
                   type="button"
                   role="tab"
-                  aria-selected={
-                    selected
-                  }
+                  aria-selected={selected}
                   aria-controls={`panel-${tab.id}`}
                   onClick={() =>
-                    setActiveTab(
-                      tab.id
-                    )
+                    setActiveTab(tab.id)
                   }
-                  className={`flex shrink-0 snap-start items-center gap-3 border-b-2 px-3 py-3 text-left text-sm font-bold transition-colors lg:border-b-0 lg:border-l-2 ${
+                  className={`flex items-center gap-3 border-l-2 px-3 py-3 text-left text-sm font-bold transition-colors ${
                     selected
                       ? "border-primary text-foreground"
                       : "border-transparent text-muted-foreground hover:text-foreground"
@@ -522,10 +793,9 @@ export function TripDetailsTabs(
                 >
                   <TabIcon
                     className={`size-4 shrink-0 ${
-                      selected
-                        ? "text-primary"
-                        : ""
+                      selected ? "text-primary" : ""
                     }`}
+                    aria-hidden="true"
                   />
 
                   {tab.label}
@@ -533,14 +803,9 @@ export function TripDetailsTabs(
               )
             })}
           </div>
-
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-linear-to-l from-background via-background/90 to-transparent lg:hidden"
-          />
         </div>
 
-        <div className="min-h-107.5 pt-7 lg:pt-0">
+        <div className="min-h-107.5 lg:pt-0">
           <div
             id="panel-opis"
             role="tabpanel"
@@ -606,37 +871,11 @@ export function TripDetailsTabs(
                 : "Co obejmuje cena"}
             </h3>
 
-            {partialPackageSelected ? (
-              <div className="mt-5 max-w-3xl rounded-lg border border-primary/35 bg-primary/10 px-4 py-3">
-                <p className="font-mono text-[10px] font-black uppercase tracking-[0.14em] text-primary">
-                  Zakres dopasowany do
-                  Twojego wyboru
-                </p>
-
-                <p className="mt-1 text-sm font-semibold text-foreground">
-                  {selectedPackageLabel}
-                </p>
-
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  Poniżej pokazujemy
-                  wyłącznie elementy
-                  dotyczące wybranego
-                  wariantu. Hotel, lot i
-                  powiązane usługi, których
-                  ten wariant nie obejmuje,
-                  zostały pominięte.
-                </p>
-              </div>
-            ) : (
-              <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
-                Tutaj dokładnie
-                sprawdzisz, które elementy
-                są już zawarte w cenie,
-                które możesz dobrać
-                dodatkowo i co pozostaje po
-                Twojej stronie.
-              </p>
-            )}
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
+  {partialPackageSelected
+    ? `Zakres poniżej został dopasowany do wybranego wariantu: ${selectedPackageLabel}.`
+    : "Tutaj dokładnie sprawdzisz, które elementy są już zawarte w cenie, które możesz dobrać dodatkowo i co pozostaje po Twojej stronie."}
+</p>
 
             <div className="mt-6 divide-y border-y">
               {includedItems.length >
@@ -1066,14 +1305,11 @@ export function TripDetailsTabs(
             </div>
           ) : null}
 
-          {props.testimonials
-            .length > 0 ? (
+          {props.testimonials.length > 0 ? (
             <div
               id="panel-opinie"
               role="tabpanel"
-              hidden={
-                activeTab !== "opinie"
-              }
+              hidden={activeTab !== "opinie"}
             >
               <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
                 Sprawdzone emocje
@@ -1084,63 +1320,17 @@ export function TripDetailsTabs(
               </h3>
 
               <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
-                Przeczytaj doświadczenia
-                osób, które wybrały się z
-                nami na piłkarską podróż.
+                Przeczytaj doświadczenia osób, które wybrały się z nami na piłkarską podróż.
               </p>
 
               <div className="mt-7 grid gap-x-10 gap-y-8 md:grid-cols-2">
-                {props.testimonials.map(
-                  (item) => (
-                    <blockquote
-                      key={item.id}
-                      className="border-l-2 border-primary pl-5"
-                    >
-                      <div
-                        className="flex gap-1 text-primary"
-                        aria-label={`${item.rating} na 5 gwiazdek`}
-                      >
-                        {Array.from({
-                          length:
-                            item.rating,
-                        }).map(
-                          (
-                            _,
-                            index
-                          ) => (
-                            <span
-                              key={
-                                index
-                              }
-                            >
-                              ★
-                            </span>
-                          )
-                        )}
-                      </div>
-
-                      <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                        „
-                        {
-                          item.content
-                        }
-                        ”
-                      </p>
-
-                      <footer className="mt-4 text-sm font-bold">
-                        {
-                          item.author
-                        }
-
-                        <span className="block text-xs font-normal text-muted-foreground">
-                          {
-                            item.tripName
-                          }
-                        </span>
-                      </footer>
-                    </blockquote>
-                  )
-                )}
+                {props.testimonials.map((item) => (
+                  <TestimonialCard
+                    key={item.id}
+                    item={item}
+                    onOpen={() => setSelectedTestimonial(item)}
+                  />
+                ))}
               </div>
             </div>
           ) : null}
@@ -1195,6 +1385,73 @@ export function TripDetailsTabs(
           </div>
         </div>
       </div>
+
+      {selectedTestimonial ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="trip-testimonial-title"
+          className="fixed inset-x-0 bottom-0 top-20 z-100 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setSelectedTestimonial(null)
+            }
+          }}
+        >
+          <div className="relative max-h-[calc(100dvh-6rem)] w-full max-w-2xl overflow-y-auto rounded-xl bg-foreground p-6 text-background shadow-2xl md:p-8">
+            <button
+              type="button"
+              onClick={() => setSelectedTestimonial(null)}
+              aria-label="Zamknij opinię"
+              className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full border border-white/10 text-white transition-colors hover:border-primary hover:bg-primary hover:text-black"
+            >
+              <X className="size-5" />
+            </button>
+
+            <div
+              className="flex gap-1 text-primary"
+              aria-label={`${selectedTestimonial.rating} na 5 gwiazdek`}
+            >
+              {Array.from({ length: selectedTestimonial.rating }).map((_, index) => (
+                <span key={index} className="text-lg">
+                  ★
+                </span>
+              ))}
+            </div>
+
+            <p className="mt-3 font-mono text-[10px] font-black uppercase tracking-[0.18em] text-primary">
+              Opinia klienta
+            </p>
+
+            <h3
+              id="trip-testimonial-title"
+              className="mt-4 pr-12 font-sans text-3xl font-black uppercase"
+            >
+              {selectedTestimonial.author || "Klient Let's Gol"}
+            </h3>
+
+            {selectedTestimonial.tripName ? (
+              <p className="mt-2 text-sm text-background/50">
+                {selectedTestimonial.tripName}
+              </p>
+            ) : null}
+
+            <div className="my-6 h-px bg-white/10" />
+
+            <p className="whitespace-pre-line text-base leading-8 text-background/80">
+              „{selectedTestimonial.content}”
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setSelectedTestimonial(null)}
+              className="mt-7 rounded-lg bg-primary px-5 py-2.5 font-sans text-sm font-black uppercase text-primary-foreground transition-opacity hover:opacity-85"
+            >
+              Zamknij
+            </button>
+          </div>
+        </div>
+      ) : null}
     </section>
   )
 }
