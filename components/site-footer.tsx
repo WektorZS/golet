@@ -8,9 +8,9 @@ const quickLinks = [
   { label: "Wyjazdy", href: "/wyjazdy" },
   { label: "Twój wyjazd", href: "/#twoj-wyjazd" },
   { label: "Galeria", href: "/galeria" },
-  { label: "O nas", href: "/#o-nas" },
-  { label: "FAQ", href: "/#faq" },
-  { label: "Kontakt", href: "/#kontakt" },
+  { label: "O nas", href: "/o-nas" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Kontakt", href: "/kontakt" },
 ] as const
 
 export function SiteFooter({ content = {} }: { content?: SiteContent }) {
