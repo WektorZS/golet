@@ -14,6 +14,7 @@ export type InquiryEmailData = {
   email: string
   phone: string
   matchName: string
+  packageVariant: string
   departureCity: string
   travelers: number
   message: string
@@ -27,6 +28,9 @@ export async function sendInquiryEmails(
   const inquiryNotificationEmail =
     process.env.INQUIRY_NOTIFICATION_EMAIL
   const replyToEmail = process.env.RESEND_REPLY_TO_EMAIL
+  const packageVariant = escapeHtml(
+  inquiry.packageVariant || "Nie wybrano"
+)
 
   if (!apiKey) {
     throw new Error("Brak RESEND_API_KEY")
@@ -108,6 +112,14 @@ export async function sendInquiryEmails(
                     ${matchName}
                   </div>
                 </div>
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+    Wybrany pakiet
+  </div>
+  <div style="font-size:15px;font-weight:700;color:#111111;">
+    ${packageVariant}
+  </div>
+</div>
 
                 <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
@@ -270,7 +282,14 @@ export async function sendInquiryEmails(
                     ${matchName}
                   </div>
                 </div>
-
+<div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+    Wybrany pakiet
+  </div>
+  <div style="font-size:15px;font-weight:700;color:#111111;">
+    ${packageVariant}
+  </div>
+</div>
                 <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Skąd wylot
