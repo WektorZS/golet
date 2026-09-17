@@ -164,25 +164,26 @@ const contact = {
 
       <SiteHeader />
 
-      <section className="relative isolate overflow-hidden bg-foreground pt-20 text-background">
-        <Image
-          src="/images/madrid-trip.webp"
-          alt=""
-          fill
-          priority
-          className="object-cover opacity-25"
-          sizes="100vw"
-        />
+     <section className="relative isolate overflow-hidden bg-foreground pt-20 text-background">
+  <Image
+    src="/images/madrid-trip.webp"
+    alt=""
+    fill
+    priority
+    className="object-cover opacity-25"
+    sizes="100vw"
+  />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/95 to-foreground/55" />
+  <div className="absolute inset-0 bg-linear-to-r from-foreground via-foreground/95 to-foreground/55" />
 
-        <div className="site-container relative grid min-h-[520px] items-center gap-10 py-16 lg:grid-cols-[1fr_0.55fr] lg:py-20">
+  <div className="relative mx-auto grid min-h-140 max-w-7xl items-center gap-12 px-4 py-16 md:px-6 lg:grid-cols-[1fr_0.5fr] lg:py-20">
+
           <div className="max-w-4xl">
             <p className="eyebrow eyebrow-on-dark">
               Kontakt
             </p>
 
-            <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-8xl">
+            <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
               Porozmawiajmy o Twoim następnym meczu
             </h1>
 
@@ -211,8 +212,8 @@ const contact = {
         </div>
       </section>
 
-      <section className="section-space bg-background">
-        <div className="site-container">
+     <section className="bg-background px-4 py-16 md:px-6 md:py-24">
+  <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="eyebrow">
               Wybierz kanał
@@ -272,9 +273,9 @@ const contact = {
         </div>
       </section>
 
-      <section
-        id="formularz"
-        className="scroll-mt-20 bg-foreground text-background"
+    <section
+  id="formularz"
+  className="scroll-mt-20 bg-foreground px-4 py-16 text-background md:px-6 md:py-20"
       >
         <div className="site-container grid gap-12 py-16 md:py-20 lg:grid-cols-[0.65fr_1.15fr] lg:gap-20">
           <div>
@@ -322,8 +323,8 @@ const contact = {
         </div>
       </section>
 
-      <section className="section-space bg-secondary/55">
-        <div className="site-container">
+     <section className="bg-secondary/55 px-4 py-16 md:px-6 md:py-24">
+  <div className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="eyebrow">

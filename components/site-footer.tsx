@@ -26,7 +26,7 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
         <div className="flex flex-col items-start gap-4">
           <Brand />
 
-          <p className="max-w-[230px] text-sm leading-relaxed text-background/60">
+          <p className="max-w-57.5 text-sm leading-relaxed text-background/60">
             {content.footerText ||
               "Piłkarskie podróże, które pamięta się dłużej niż wynik."}
           </p>
@@ -70,7 +70,7 @@ export function SiteFooter({ content = {} }: { content?: SiteContent }) {
               {content.companyName || "LB Coaching Łukasz Borger"}
             </p>
 
-            <p className="max-w-[230px] leading-relaxed text-background/65">
+            <p className="max-w-57.5 leading-relaxed text-background/65">
               {content.companyAddress ||
                 "ul. Stefana Roweckiego 1/2, 72-010 Police"}
             </p>

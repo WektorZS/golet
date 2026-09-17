@@ -174,7 +174,7 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
         return (
           <figure
             key={item.id}
-            className="group relative aspect-[4/3] overflow-hidden rounded-xl"
+            className="group relative aspect-4/3 overflow-hidden rounded-xl"
           >
             <ImageLightbox
               src={src}
@@ -187,11 +187,11 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
                 src={src}
                 alt={item.alt || item.title}
                 fill
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 sizes="(max-width: 768px) 50vw, 25vw"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent opacity-35 transition-opacity duration-300 group-hover:opacity-75" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/5 to-transparent opacity-35 transition-opacity duration-300 group-hover:opacity-75" />
             </ImageLightbox>
 
             {(item.title || item.city) && (
@@ -248,12 +248,12 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     <main>
       <SiteHeader />
 
-      <section className="relative isolate flex flex-col overflow-hidden bg-section-dark text-background md:h-dvh md:min-h-[700px]">
+      <section className="relative isolate flex flex-col overflow-hidden bg-section-dark text-background md:h-dvh md:min-h-175">
         <HeroBackgroundSlider />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/75 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-foreground via-foreground/75 to-transparent" />
 
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-foreground to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-linear-to-t from-foreground to-transparent" />
 
         <div className="relative mx-auto flex min-h-svh w-full flex-1 items-center px-4 pb-14 pt-28 md:min-h-0 md:px-6 md:pb-8 md:pt-24 lg:max-w-7xl">
           <div className="flex max-w-3xl flex-col items-start gap-6">
@@ -401,7 +401,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   className="scroll-mt-20 bg-secondary/60 px-4 py-16 md:px-6 md:py-20"
 >
   <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-    <div className="relative min-h-[420px] overflow-hidden rounded-xl">
+    <div className="relative min-h-105 overflow-hidden rounded-xl">
       <Image
         src="/images/about-us.webp"
         alt="Podróż kibiców na mecz"
@@ -410,7 +410,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         sizes="(max-width: 1024px) 100vw, 45vw"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/5 to-transparent" />
 
       <div className="absolute bottom-5 left-5 right-5 text-white md:bottom-6 md:left-6 md:right-6">
         <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white/65">
@@ -560,14 +560,14 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
     <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.24)_36%,rgba(0,0,0,0.28)_68%,rgba(0,0,0,0.72)_100%)]" />
 
-    <div className="absolute inset-0 bg-gradient-to-t from-black/58 via-transparent to-black/34" />
+    <div className="absolute inset-0 bg-linear-to-t from-black/58 via-transparent to-black/34" />
 
-    <div className="absolute inset-y-0 left-0 w-[74%] bg-gradient-to-r from-black/85 via-black/55 to-transparent" />
+    <div className="absolute inset-y-0 left-0 w-[74%] bg-linear-to-r from-black/85 via-black/55 to-transparent" />
   </div>
 
   <div className="relative mx-auto max-w-7xl px-4 md:px-6">
     <div className="grid lg:grid-cols-2">
-      <div className="relative flex min-h-[420px] items-center py-12 sm:py-14 lg:min-h-[650px] lg:py-14 lg:pr-16">
+      <div className="relative flex min-h-105 items-center py-12 sm:py-14 lg:min-h-162.5 lg:py-14 lg:pr-16">
         <div className="relative z-10 max-w-xl lg:-translate-y-8">
           <p className="eyebrow eyebrow-on-dark">
             Wyjazd szyty na miarę
@@ -587,7 +587,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
       </div>
 
-      <div className="relative py-12 sm:py-14 lg:min-h-[650px] lg:py-16 lg:pl-16">
+      <div className="relative py-12 sm:py-14 lg:min-h-162.5 lg:py-16 lg:pl-16">
         <div
           className="absolute bottom-12 left-0 top-12 hidden w-px bg-white/10 lg:block"
           aria-hidden="true"
@@ -722,7 +722,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
   >
-    <div className="absolute left-1/2 top-[-220px] h-[440px] w-[800px] -translate-x-1/2 rounded-full bg-primary/[0.06] blur-[130px]" />
+    <div className="absolute left-1/2 -top-55 h-110 w-200 -translate-x-1/2 rounded-full bg-primary/6 blur-[130px]" />
   </div>
 
   <div className="relative mx-auto max-w-7xl">
@@ -743,7 +743,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   aria-hidden="true"
   className="absolute left-[8.333%] right-[8.333%] top-7 h-px bg-foreground/30"
 >
-  <div className="process-flow absolute top-1/2 h-[3px] w-24 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-primary to-transparent opacity-100" />
+  <div className="process-flow absolute top-1/2 h-0.75 w-24 -translate-x-1/2 -translate-y-1/2 bg-linear-to-r from-transparent via-primary to-transparent opacity-100" />
 </div>
 
         <div className="relative grid grid-cols-6">
@@ -769,8 +769,8 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                     aria-hidden="true"
                     className={`absolute -inset-x-2.5 -inset-y-1 bg-foreground ${
                       index % 2 === 0
-                        ? "-rotate-[1.5deg] [clip-path:polygon(2%_16%,98%_4%,100%_82%,94%_94%,5%_88%,0_72%)]"
-                        : "rotate-[1deg] [clip-path:polygon(0_8%,96%_15%,100%_75%,97%_92%,3%_100%,1%_68%)]"
+                        ? "-rotate-1.5 [clip-path:polygon(2%_16%,98%_4%,100%_82%,94%_94%,5%_88%,0_72%)]"
+                        : "rotate-1 [clip-path:polygon(0_8%,96%_15%,100%_75%,97%_92%,3%_100%,1%_68%)]"
                     }`}
                   />
 
@@ -784,11 +784,11 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                   </span>
                 </div>
 
-                <h3 className="mt-4 font-sans text-[18px] font-black uppercase leading-[1.1] tracking-tight text-foreground xl:text-[19px]">
+                <h3 className="mt-4 font-sans text-lg font-black uppercase leading-[1.1] tracking-tight text-foreground xl:text-[19px]">
                   {title}
                 </h3>
 
-                <p className="mx-auto mt-4 max-w-[195px] text-[14px] leading-[1.75] text-muted-foreground xl:text-[15px]">
+                <p className="mx-auto mt-4 max-w-48.75 text-sm leading-[1.75] text-muted-foreground xl:text-[15px]">
                   {copy}
                 </p>
               </div>
@@ -801,7 +801,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         {process.map(([number, title, copy], index) => (
           <article
             key={number}
-            className="group relative rounded-xl border border-foreground/[0.08] bg-secondary/40 p-6 transition-all duration-300 hover:border-primary/40"
+            className="group relative rounded-xl border border-foreground/8 bg-secondary/40 p-6 transition-all duration-300 hover:border-primary/40"
           >
             <div className="flex items-center gap-4">
 
@@ -816,8 +816,8 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                   aria-hidden="true"
                   className={`absolute -inset-x-2.5 -inset-y-1 bg-foreground ${
                     index % 2 === 0
-                      ? "-rotate-[1.5deg] [clip-path:polygon(2%_16%,98%_4%,100%_82%,94%_94%,5%_88%,0_72%)]"
-                      : "rotate-[1deg] [clip-path:polygon(0_8%,96%_15%,100%_75%,97%_92%,3%_100%,1%_68%)]"
+                      ? "-rotate-1.5 [clip-path:polygon(2%_16%,98%_4%,100%_82%,94%_94%,5%_88%,0_72%)]"
+                      : "rotate-1 [clip-path:polygon(0_8%,96%_15%,100%_75%,97%_92%,3%_100%,1%_68%)]"
                   }`}
                 />
 
@@ -887,7 +887,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
   >
-    <div className="absolute -right-40 top-[-120px] size-[420px] rounded-full bg-primary/[0.05] blur-[120px]" />
+    <div className="absolute -right-40 -top-30 size-105 rounded-full bg-primary/5 blur-[120px]" />
   </div>
 
   <div className="relative mx-auto max-w-7xl">
@@ -933,7 +933,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
   >
-    <div className="absolute -left-40 top-1/2 size-[420px] -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
+    <div className="absolute -left-40 top-1/2 size-105 -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
   </div>
 
   <div className="relative mx-auto max-w-7xl">
@@ -994,11 +994,11 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       aria-hidden="true"
       className="pointer-events-none absolute inset-0"
     >
-      <div className="absolute left-1/2 top-[-180px] h-[420px] w-[750px] -translate-x-1/2 rounded-full bg-primary/[0.07] blur-[120px]" />
+      <div className="absolute left-1/2 -top-45 h-105 w-187.5 -translate-x-1/2 rounded-full bg-primary/7 blur-[120px]" />
 
-      <div className="absolute -left-40 bottom-[-180px] h-[420px] w-[420px] rounded-full bg-white/60 blur-[110px]" />
+      <div className="absolute -left-40 -bottom-45 h-105 w-105 rounded-full bg-white/60 blur-[110px]" />
 
-      <div className="absolute -right-48 top-1/3 h-[420px] w-[420px] rounded-full bg-black/[0.025] blur-[120px]" />
+      <div className="absolute -right-48 top-1/3 h-105 w-105 rounded-full bg-black/2.5 blur-[120px]" />
     </div>
 
     <div className="relative mx-auto max-w-7xl">
@@ -1020,10 +1020,10 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             rel="noreferrer"
             className="group relative block"
           >
-            <article className="relative h-full overflow-hidden rounded-2xl border border-white/[0.08] bg-foreground shadow-[0_16px_45px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:border-primary/40 group-hover:shadow-[0_24px_70px_rgba(0,0,0,0.22),0_0_0_1px_rgba(244,185,30,0.08)]">
-              <div className="absolute left-0 top-0 z-20 h-[2px] w-10 bg-primary transition-all duration-500 group-hover:w-16" />
+            <article className="relative h-full overflow-hidden rounded-2xl border border-white/8 bg-foreground shadow-[0_16px_45px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:border-primary/40 group-hover:shadow-[0_24px_70px_rgba(0,0,0,0.22),0_0_0_1px_rgba(244,185,30,0.08)]">
+              <div className="absolute left-0 top-0 z-20 h-0.5 w-10 bg-primary transition-all duration-500 group-hover:w-16" />
 
-              <div className="relative aspect-[16/9] overflow-hidden bg-black">
+              <div className="relative aspect-video overflow-hidden bg-black">
                 <Image
                   src={video.thumbnail}
                   alt={`Miniatura filmu: ${video.title}`}
@@ -1032,17 +1032,17 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-black/15 transition-opacity duration-500 group-hover:from-black/40" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/5 to-black/15 transition-opacity duration-500 group-hover:from-black/40" />
 
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative flex size-[62px] items-center justify-center">
+                  <div className="relative flex size-15.5 items-center justify-center">
                     <div className="absolute inset-0 rounded-full border border-white/25 transition-all duration-500 group-hover:scale-[1.18] group-hover:border-primary/50" />
 
-                    <div className="relative flex size-[50px] items-center justify-center rounded-full border border-white/[0.08] bg-foreground/90 shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:border-primary group-hover:bg-primary">
+                    <div className="relative flex size-12.5 items-center justify-center rounded-full border border-white/8 bg-foreground/90 shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:border-primary group-hover:bg-primary">
                       <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
-                        className="ml-0.5 size-[18px] fill-primary transition-colors duration-300 group-hover:fill-primary-foreground"
+                        className="ml-0.5 size-4.5 fill-primary transition-colors duration-300 group-hover:fill-primary-foreground"
                       >
                         <path d="M8 5v14l11-7z" />
                       </svg>
@@ -1051,18 +1051,18 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                 </div>
               </div>
 
-              <div className="relative flex min-h-[130px] items-start justify-between gap-5 bg-white/[0.035] p-5 md:p-6">
+              <div className="relative flex min-h-32.5 items-start justify-between gap-5 bg-white/3.5 p-5 md:p-6">
                 <div className="min-w-0">
                   <p className="mb-2.5 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-primary">
                     Zobacz relację
                   </p>
 
-                  <h3 className="line-clamp-2 text-[16px] font-bold leading-[1.45] text-background transition-colors duration-300 group-hover:text-white">
+                  <h3 className="line-clamp-2 text-base font-bold leading-[1.45] text-background transition-colors duration-300 group-hover:text-white">
                     {video.title}
                   </h3>
                 </div>
 
-                <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center border border-white/[0.12] bg-white/[0.035] transition-all duration-300 group-hover:border-primary group-hover:bg-primary">
+                <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center border border-white/12 bg-white/3.5 transition-all duration-300 group-hover:border-primary group-hover:bg-primary">
                   <ArrowRight className="size-4 text-background transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-primary-foreground" />
                 </div>
               </div>
@@ -1074,7 +1074,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       <div className="mt-9 flex items-center justify-center gap-3">
         <div className="h-px w-8 bg-black/15" />
 
-        <span className="text-center font-mono text-[12px] font-bold uppercase tracking-[0.18em] text-black/40">
+        <span className="text-center font-mono text-xs font-bold uppercase tracking-[0.18em] text-black/40">
           Poczuj atmosferę przed swoim wyjazdem
         </span>
 
@@ -1092,7 +1092,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
   >
-    <div className="absolute -right-40 top-[-140px] size-[420px] rounded-full bg-primary/[0.06] blur-[120px]" />
+    <div className="absolute -right-40 -top-35 size-105 rounded-full bg-primary/6 blur-[120px]" />
   </div>
 
   <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
@@ -1152,7 +1152,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
 
     <div className="relative">
-      <div className="relative min-h-[440px] overflow-hidden rounded-xl md:min-h-[520px]">
+      <div className="relative min-h-110 overflow-hidden rounded-xl md:min-h-130">
         <Image
           src="/images/about-us.webp"
           alt="Atmosfera wspólnego wyjazdu na mecz"
@@ -1161,7 +1161,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           sizes="(max-width: 1024px) 100vw, 55vw"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/10 to-transparent" />
 
         <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-8">
           <p className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-primary">
@@ -1187,8 +1187,8 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     aria-hidden="true"
     className="pointer-events-none absolute inset-0"
   >
-    <div className="absolute -left-40 top-1/2 size-[420px] -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
-    <div className="absolute -right-48 -top-40 size-[420px] rounded-full bg-black/[0.018] blur-[120px]" />
+    <div className="absolute -left-40 top-1/2 size-105 -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
+    <div className="absolute -right-48 -top-40 size-105 rounded-full bg-black/[0.018] blur-[120px]" />
   </div>
 
   <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.65fr_1fr] lg:gap-16">
@@ -1223,12 +1223,12 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 </div>
     </div>
 
-    <div className="overflow-hidden rounded-xl border border-black/[0.09] bg-white/70 shadow-[0_12px_40px_rgba(0,0,0,0.045)] backdrop-blur-sm">
+    <div className="overflow-hidden rounded-xl border border-black/9 bg-white/70 shadow-[0_12px_40px_rgba(0,0,0,0.045)] backdrop-blur-sm">
       <Accordion>
         {faqs.map(([q, a], index) => (
           <AccordionItem
             key={q}
-            className="group/faq border-b border-black/[0.08] last:border-b-0"
+            className="group/faq border-b border-black/8 last:border-b-0"
           >
             <AccordionTrigger className="group flex w-full items-center gap-4 px-5 py-5 text-left text-[15px] font-bold leading-snug transition-colors hover:no-underline sm:px-6 sm:py-6">
 
@@ -1243,9 +1243,9 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
             <AccordionContent className="px-5 pb-6 sm:px-6">
               <div className="sm:ml-11">
-                <div className="mb-4 h-[2px] w-8 bg-primary" />
+                <div className="mb-4 h-0.5 w-8 bg-primary" />
 
-                <p className="max-w-2xl text-[14px] leading-7 text-muted-foreground">
+                <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
                   {a}
                 </p>
               </div>

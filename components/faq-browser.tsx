@@ -49,7 +49,7 @@ export function FaqBrowser() {
             Kategorie
           </p>
 
-          <nav className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-col" aria-label="Kategorie FAQ">
+          <nav className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none[&::-webkit-scrollbar]:hidden lg:flex-col" aria-label="Kategorie FAQ">
             {faqCategories.map((category, index) => (
               <a
                 key={category.id}
