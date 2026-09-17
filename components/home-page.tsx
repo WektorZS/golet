@@ -123,24 +123,28 @@ const process = [
 
 const faqs = [
   [
-    "Czy bilet na mecz jest gwarantowany?",
-    "Tak. Każda potwierdzona rezerwacja obejmuje bilet z legalnego źródła, a jego kategorię określamy w umowie.",
+    "Jak zarezerwować wyjazd?",
+    "Wybierz wyjazd z kalendarza i wyślij formularz albo skontaktuj się z nami, jeśli interesuje Cię inne wydarzenie. Po sprawdzeniu dostępności otrzymasz ofertę z zakresem pakietu, ceną i kolejnymi krokami.",
   ],
   [
-    "Z jakich miast organizujecie wyloty?",
-    "Wyloty organizujemy z najbliższego lotniska dla naszego klienta, o ile dane lotnisko zapewnia lot w danym kierunku. Szukamy najlepszego połączenia z Twojego regionu.",
+    "Kiedy rezerwacja jest potwierdzona?",
+    "Rezerwacja jest potwierdzona zgodnie z warunkami wskazanymi w przekazanej ofercie i umowie. Samo wysłanie formularza nie oznacza jeszcze rezerwacji miejsca.",
   ],
   [
-    "Czy mogę kupić sam bilet?",
-    "Tak. Przy wybranych wydarzeniach przygotowujemy ofertę samych biletów, bez lotu i hotelu.",
+    "Czy bilet na mecz jest zawarty w cenie?",
+    "Zależy to od wybranego wariantu. Zakres każdego pakietu jest pokazany na stronie konkretnego wyjazdu i potwierdzony w ofercie oraz umowie.",
   ],
   [
-    "Czy organizujecie wyjazdy dla firm i grup?",
-    "Tak. Obsługujemy grupy znajomych, firmy, szkółki piłkarskie i kluby kibica.",
+    "Skąd odbywa się wyjazd?",
+    "Lotnisko lub miejsce zbiórki zależy od konkretnego wyjazdu i wybranego wariantu. Przy ofercie indywidualnej sprawdzamy rozwiązania dogodne dla miejsca zamieszkania uczestników.",
   ],
   [
-    "Co jeśli termin meczu zostanie zmieniony?",
-    "Monitorujemy oficjalne komunikaty ligowe i dobieramy elastyczną logistykę. O każdej zmianie informujemy od razu i proponujemy najlepsze rozwiązanie.",
+    "Czy potrzebuję dowodu osobistego czy paszportu?",
+    "Wymagany dokument zależy od kraju, obywatelstwa i aktualnych przepisów. Przed podróżą sprawdź oficjalne wymagania dla kierunku oraz upewnij się, że dokument jest ważny przez wymagany okres.",
+  ],
+  [
+    "Czy godzina meczu może się zmienić?",
+    "Tak. Organizator rozgrywek, nadawca lub klub może zmienić godzinę spotkania także po opublikowaniu wstępnego terminarza. Warto zachować elastyczność przy planowaniu dodatkowych aktywności.",
   ],
 ] as const
 
@@ -476,73 +480,6 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   </div>
 </section>
 
-<section className="bg-section-light px-4 py-16 md:px-6 md:py-20">
-  <div className="mx-auto max-w-7xl">
-    <SectionHeading
-      eyebrow="Wszystko w jednym"
-      title={
-        content.packageTitle ||
-        "Co zawiera pełny pakiet?"
-      }
-    />
-
-    <div className="mt-14 grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
-      <div className="max-w-md">
-        <p className="eyebrow">
-          Pełny pakiet
-        </p>
-
-        <h3 className="mt-5 font-sans text-3xl font-black uppercase leading-[0.98] tracking-tight text-foreground md:text-4xl">
-          Wszystkie najważniejsze elementy jednej podróży.
-        </h3>
-
-        <p className="mt-5 text-base leading-7 text-muted-foreground">
-          Zakres konkretnego wyjazdu może się różnić, ale pełny wariant
-          łączy najważniejsze elementy organizacji w jednej ofercie.
-        </p>
-      </div>
-
-      <div className="grid gap-x-10 gap-y-0 sm:grid-cols-2">
-        {[
-          [Plane, "Przelot", "Transport dopasowany do terminu meczu."],
-          [TicketCheck, "Bilet na mecz", "Miejsce na stadionie w wybranej kategorii."],
-          [Building2, "Sprawdzony hotel", "Nocleg dopasowany do charakteru wyjazdu."],
-          [Headphones, "Opieka koordynatora", "Wsparcie organizacyjne przed i w trakcie podróży."],
-          [MapPinned, "Transfery lokalne", "Przejazdy pomiędzy kluczowymi punktami wyjazdu."],
-          [ShieldCheck, "Ubezpieczenie", "Ochrona podróży zgodnie z zakresem oferty."],
-          [CalendarCheck, "Plan podróży", "Najważniejsze informacje i ustalenia przed wyjazdem."],
-          [Landmark, "Zwiedzanie miasta", "Czas na poznanie miasta poza stadionem."],
-        ].map(([Icon, title, description]) => {
-          const I = Icon as typeof Plane
-
-          return (
-            <div
-              key={title as string}
-              className="group flex gap-4 border-b border-foreground/10 py-6"
-            >
-              <div className="pt-1">
-                <I
-                  className="size-6 text-primary transition-transform duration-300 group-hover:scale-110"
-                  aria-hidden="true"
-                />
-              </div>
-
-              <div>
-                <h4 className="font-sans text-base font-black uppercase text-foreground">
-                  {title as string}
-                </h4>
-
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {description as string}
-                </p>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  </div>
-</section>
 <section className="relative overflow-hidden bg-section-dark">
   <div
     className="absolute inset-y-0 left-0 hidden w-1/2 lg:block"
@@ -716,35 +653,90 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
   </div>
 </section>
-<section className="relative overflow-hidden bg-section-light px-4 py-20 md:px-6 md:py-24">
+<section className="bg-section-light px-4 py-16 md:px-6 md:py-20">
+  <div className="mx-auto max-w-7xl">
+    <SectionHeading
+      eyebrow="Wszystko w jednym"
+      title={
+        content.packageTitle ||
+        "Co zawiera pełny pakiet?"
+      }
+    />
 
-  <div
-    aria-hidden="true"
-    className="pointer-events-none absolute inset-0"
-  >
-    <div className="absolute left-1/2 -top-55 h-110 w-200 -translate-x-1/2 rounded-full bg-primary/6 blur-[130px]" />
+    <div className="mt-14 grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
+      <div className="max-w-md">
+        <p className="eyebrow">
+          Pełny pakiet
+        </p>
+
+        <h3 className="mt-5 font-sans text-3xl font-black uppercase leading-[0.98] tracking-tight text-foreground md:text-4xl">
+          Wszystkie najważniejsze elementy jednej podróży.
+        </h3>
+
+        <p className="mt-5 text-base leading-7 text-muted-foreground">
+          Zakres konkretnego wyjazdu może się różnić, ale pełny wariant
+          łączy najważniejsze elementy organizacji w jednej ofercie.
+        </p>
+      </div>
+
+      <div className="grid gap-x-10 gap-y-0 sm:grid-cols-2">
+        {[
+          [Plane, "Przelot", "Transport dopasowany do terminu meczu."],
+          [TicketCheck, "Bilet na mecz", "Miejsce na stadionie w wybranej kategorii."],
+          [Building2, "Sprawdzony hotel", "Nocleg dopasowany do charakteru wyjazdu."],
+          [Headphones, "Opieka koordynatora", "Wsparcie organizacyjne przed i w trakcie podróży."],
+          [MapPinned, "Transfery lokalne", "Przejazdy pomiędzy kluczowymi punktami wyjazdu."],
+          [ShieldCheck, "Ubezpieczenie", "Ochrona podróży zgodnie z zakresem oferty."],
+          [CalendarCheck, "Plan podróży", "Najważniejsze informacje i ustalenia przed wyjazdem."],
+          [Landmark, "Zwiedzanie miasta", "Czas na poznanie miasta poza stadionem."],
+        ].map(([Icon, title, description]) => {
+          const I = Icon as typeof Plane
+
+          return (
+            <div
+              key={title as string}
+              className="group flex gap-4 border-b border-foreground/10 py-6"
+            >
+              <div className="pt-1">
+                <I
+                  className="size-6 text-primary transition-transform duration-300 group-hover:scale-110"
+                  aria-hidden="true"
+                />
+              </div>
+
+              <div>
+                <h4 className="font-sans text-base font-black uppercase text-foreground">
+                  {title as string}
+                </h4>
+
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {description as string}
+                </p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
   </div>
-
+</section>
+<section className="relative overflow-hidden bg-section-dark px-4 py-20 md:px-6 md:py-24">
   <div className="relative mx-auto max-w-7xl">
     <SectionHeading
+      inverse
       eyebrow="Prosty plan"
-      title={
-        content.processTitle ||
-        "Jak wygląda rezerwacja?"
-      }
+      title={content.processTitle || "Jak wygląda rezerwacja?"}
       intro="Od wyboru meczu do miejsca na trybunach. Całą organizację bierzemy na siebie."
     />
 
-    <div className="relative mt-16">
-
+    <div className="relative mt-12">
       <div className="relative hidden lg:block">
-
-<div
-  aria-hidden="true"
-  className="absolute left-[8.333%] right-[8.333%] top-7 h-px bg-foreground/30"
->
-  <div className="process-flow absolute top-1/2 h-0.75 w-24 -translate-x-1/2 -translate-y-1/2 bg-linear-to-r from-transparent via-primary to-transparent opacity-100" />
-</div>
+        <div
+          aria-hidden="true"
+          className="absolute left-[8.333%] right-[8.333%] top-6 h-px bg-white/10"
+        >
+          <div className="process-flow absolute top-1/2 h-0.75 w-24 -translate-x-1/2 -translate-y-1/2 bg-linear-to-r from-transparent via-primary to-transparent" />
+        </div>
 
         <div className="relative grid grid-cols-6">
           {process.map(([number, title, copy], index) => (
@@ -752,43 +744,22 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               key={number}
               className="group relative min-w-0 px-4 xl:px-6"
             >
+              <div
+                className={`process-step process-step-${index + 1} relative z-10 mx-auto flex size-12 items-center justify-center rounded-full bg-section-dark`}
+              >
+                <span className="relative z-10 font-mono text-xs font-black text-white/90">
+                  {number}
+                </span>
+              </div>
 
-<div
-  className={`process-step process-step-${index + 1} relative z-10 mx-auto flex size-14 items-center justify-center rounded-full border bg-background`}
->
-  <span className="relative z-10 font-mono text-[13px] font-black text-foreground">
-    {number}
-  </span>
-</div>
+              <div className="mt-6 text-center">
+          
 
-              <div className="mt-4 text-center">
-
-                <div className="relative inline-flex">
-
-                  <span
-                    aria-hidden="true"
-                    className={`absolute -inset-x-2.5 -inset-y-1 bg-foreground ${
-                      index % 2 === 0
-                        ? "-rotate-1.5 [clip-path:polygon(2%_16%,98%_4%,100%_82%,94%_94%,5%_88%,0_72%)]"
-                        : "rotate-1 [clip-path:polygon(0_8%,96%_15%,100%_75%,97%_92%,3%_100%,1%_68%)]"
-                    }`}
-                  />
-
-                  <span
-                    aria-hidden="true"
-                    className="absolute -inset-x-1.5 -inset-y-0.5 rotate-[0.7deg] bg-foreground/70 [clip-path:polygon(0_25%,96%_8%,100%_74%,92%_100%,3%_84%)]"
-                  />
-
-                  <span className="relative z-10 px-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-primary">
-                    Krok {number}
-                  </span>
-                </div>
-
-                <h3 className="mt-4 font-sans text-lg font-black uppercase leading-[1.1] tracking-tight text-foreground xl:text-[19px]">
+                <h3 className="font-sans text-lg font-black uppercase leading-[1.1] tracking-tight text-white/90 xl:text-[19px]">
                   {title}
                 </h3>
 
-                <p className="mx-auto mt-4 max-w-48.75 text-sm leading-[1.75] text-muted-foreground xl:text-[15px]">
+                <p className="mx-auto mt-3 max-w-48.75 text-sm leading-[1.75] text-white/50 xl:text-[15px]">
                   {copy}
                 </p>
               </div>
@@ -798,45 +769,33 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:hidden">
-        {process.map(([number, title, copy], index) => (
+        {process.map(([number, title, copy]) => (
           <article
             key={number}
-            className="group relative rounded-xl border border-foreground/8 bg-secondary/40 p-6 transition-all duration-300 hover:border-primary/40"
+            className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/4 p-6 transition-all duration-300 hover:border-white/20 hover:bg-white/6"
           >
-            <div className="flex items-center gap-4">
+            <div
+              aria-hidden="true"
+              className="absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-white/20 to-transparent"
+            />
 
-              <div className="flex size-12 shrink-0 items-center justify-center rounded-full border border-foreground/30 bg-background transition-all duration-300 group-hover:border-primary group-hover:bg-primary">
-                <span className="font-mono text-[13px] font-black text-foreground transition-colors duration-300 group-hover:text-primary-foreground">
+            <div className="flex items-center gap-4">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 transition-all duration-300 group-hover:border-primary/70">
+                <span className="font-mono text-xs font-black text-white/80 transition-colors duration-300 group-hover:text-primary">
                   {number}
                 </span>
               </div>
 
-              <div className="relative inline-flex">
-                <span
-                  aria-hidden="true"
-                  className={`absolute -inset-x-2.5 -inset-y-1 bg-foreground ${
-                    index % 2 === 0
-                      ? "-rotate-1.5 [clip-path:polygon(2%_16%,98%_4%,100%_82%,94%_94%,5%_88%,0_72%)]"
-                      : "rotate-1 [clip-path:polygon(0_8%,96%_15%,100%_75%,97%_92%,3%_100%,1%_68%)]"
-                  }`}
-                />
-
-                <span
-                  aria-hidden="true"
-                  className="absolute -inset-x-1.5 -inset-y-0.5 rotate-[0.7deg] bg-foreground/70 [clip-path:polygon(0_25%,96%_8%,100%_74%,92%_100%,3%_84%)]"
-                />
-
-                <span className="relative z-10 px-1 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-primary">
-                  Krok {number}
-                </span>
-              </div>
+              <span className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-primary/90">
+                Krok {number}
+              </span>
             </div>
 
-            <h3 className="mt-6 font-sans text-xl font-black uppercase leading-tight tracking-tight text-foreground">
+            <h3 className="mt-5 font-sans text-xl font-black uppercase leading-tight tracking-tight text-white/90">
               {title}
             </h3>
 
-            <p className="mt-3 text-[15px] leading-7 text-muted-foreground">
+            <p className="mt-3 text-[15px] leading-7 text-white/50">
               {copy}
             </p>
           </article>
@@ -845,6 +804,8 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
   </div>
 </section>
+
+
 <section className="bg-secondary px-4 py-16 md:px-6 md:py-20 lg:py-24">
   <div className="mx-auto max-w-7xl">
     <SectionHeading
@@ -1178,81 +1139,50 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
   </div>
 </section>
-<section
+   <section
   id="faq"
-  className="relative overflow-hidden bg-section-light px-4 py-20 md:px-6 md:py-24"
+  className="scroll-mt-20 bg-background px-4 py-20 md:px-6 md:py-24"
 >
+  <div className="mx-auto max-w-7xl">
+    <div className="grid gap-12 lg:grid-cols-[0.65fr_1fr] lg:gap-20">
+      <div className="lg:pt-16">
+  <SectionHeading
+          eyebrow="FAQ"
+          title={content.faqTitle || "Najczęstsze pytania"}
+          intro="Krótko odpowiadamy na najważniejsze kwestie. Pełne centrum pomocy obejmuje wszystkie etapy wyjazdu."
+          align="left"
+        />
 
-  <div
-    aria-hidden="true"
-    className="pointer-events-none absolute inset-0"
-  >
-    <div className="absolute -left-40 top-1/2 size-105 -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
-    <div className="absolute -right-48 -top-40 size-105 rounded-full bg-black/[0.018] blur-[120px]" />
-  </div>
+        <Button
+          variant="outline"
+          size="lg"
+          className="mt-8"
+          nativeButton={false}
+          render={<Link href="/faq" />}
+        >
+          Zobacz całe FAQ
+          <ArrowRight data-icon="inline-end" />
+        </Button>
+      </div>
 
-  <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.65fr_1fr] lg:gap-16">
+      <div className="lg:pt-2">
+        <Accordion className="border-t border-foreground/15">
+          {faqs.map(([question, answer]) => (
+            <AccordionItem
+              key={question}
+              className="border-b border-foreground/15"
+            >
+              <AccordionTrigger className="min-h-18 py-5 text-left text-base font-bold leading-6 hover:no-underline hover:text-primary">
+                {question}
+              </AccordionTrigger>
 
-    <div className="flex flex-col items-start lg:pt-1">
-      <SectionHeading
-        eyebrow="FAQ"
-        title={
-          content.faqTitle ||
-          "Najczęstsze pytania"
-        }
-        intro="Jeśli nie ma tu odpowiedzi, napisz lub zadzwoń. Odpowiadamy konkretnie."
-        align="left"
-      />
-
-<div className="mt-7 flex items-center gap-4 border-l-2 border-primary pl-4">
-  <div>
-    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-      Nie znalazłeś odpowiedzi?
-    </p>
-
-    <button
-      type="button"
-      data-open-floating-contact
-      className="group mt-1.5 inline-flex items-center gap-2 text-sm font-bold text-foreground transition-colors hover:text-primary"
-    >
-      Zapytaj nas bezpośrednio
-
-      <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
-    </button>
-  </div>
-</div>
-    </div>
-
-    <div className="overflow-hidden rounded-xl border border-black/9 bg-white/70 shadow-[0_12px_40px_rgba(0,0,0,0.045)] backdrop-blur-sm">
-      <Accordion>
-        {faqs.map(([q, a], index) => (
-          <AccordionItem
-            key={q}
-            className="group/faq border-b border-black/8 last:border-b-0"
-          >
-            <AccordionTrigger className="group flex w-full items-center gap-4 px-5 py-5 text-left text-[15px] font-bold leading-snug transition-colors hover:no-underline sm:px-6 sm:py-6">
-
-              <span className="hidden w-7 shrink-0 font-mono text-[10px] font-bold tracking-[0.12em] text-black/30 sm:block">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-
-              <span className="flex-1 transition-colors duration-200 group-hover:text-primary">
-                {q}
-              </span>
-            </AccordionTrigger>
-
-            <AccordionContent className="px-5 pb-6 sm:px-6">
-              <div className="sm:ml-11">
-                <div className="mb-4 h-0.5 w-8 bg-primary" />
-
-                <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
-                  {a}
-                </p>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+              <AccordionContent className="max-w-2xl pb-6 pr-8 text-[15px] leading-7 text-muted-foreground">
+                <p>{answer}</p>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
     </div>
   </div>
 </section>

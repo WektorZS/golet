@@ -103,15 +103,16 @@
 }
 
 .process-step {
-  --step-normal: rgb(0 0 0 / 0.3);
-  --step-shadow-normal: 0 0 0 7px var(--background);
-  --step-shadow-active:
-    0 0 0 7px var(--background),
-    0 0 0 2px var(--primary),
-    0 0 12px rgb(244 185 30 / 0.8),
-    0 0 24px rgb(244 185 30 / 0.4);
+  --step-normal: transparent;
+  --step-shadow-normal: 0 0 0 3px rgb(64 64 64 / 0.8);
 
-  border-color: var(--step-normal);
+  --step-shadow-active:
+    0 0 0 3px rgb(64 64 64 / 0.8),
+    0 0 0 2px var(--primary),
+    0 0 12px rgb(244 185 30 / 0.65),
+    0 0 24px rgb(244 185 30 / 0.25);
+
+  border-color: transparent;
   box-shadow: var(--step-shadow-normal);
   animation-duration: 12s;
   animation-timing-function: linear;
