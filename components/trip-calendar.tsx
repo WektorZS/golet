@@ -141,7 +141,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
     const [desktopMonthStart, setDesktopMonthStart] =
   useState(0)
 
-const DESKTOP_MONTHS_VISIBLE = 5
+const DESKTOP_MONTHS_VISIBLE = 6
 
 const visibleDesktopMonths = groups.slice(
   desktopMonthStart,
@@ -213,19 +213,19 @@ const selectedMonth =
             aria-current={
               active ? "true" : undefined
             }
-            className={`min-w-0 rounded-lg px-3 py-3 text-center font-sans text-sm font-black uppercase tracking-wide transition-colors ${
+            className={`min-w-0 rounded-lg px-3 py-2.5 text-center font-sans text-sm font-black uppercase tracking-wide transition-colors ${
               active
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground"
             }`}
           >
             <span className="block truncate">
-              {group.label}
-            </span>
+  {group.label}
+</span>
 
-            <span className="ml-1 font-mono text-[10px] opacity-60">
-              {group.trips.length}
-            </span>
+<span className="mt-1 block font-mono text-[9px] font-bold normal-case tracking-normal opacity-60">
+  {tripsCount(group.trips.length)}
+</span>
           </a>
         )
       })}
