@@ -104,7 +104,7 @@ export default async function GalleryPage() {
                   key={item.id}
                   className="group overflow-hidden rounded-xl border bg-card"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden">
+                  <div className="relative aspect-4/3 overflow-hidden">
                     <ImageLightbox
                       src={
                         item.mediaId

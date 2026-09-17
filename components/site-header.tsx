@@ -13,9 +13,9 @@ const links = [
   ["WYJAZDY", "/wyjazdy"],
   ["TWÓJ WYJAZD", "/#twoj-wyjazd"],
   ["GALERIA", "/galeria"],
-  ["O NAS", "/#o-nas"],
-  ["FAQ", "/#faq"],
-  ["KONTAKT", "/#kontakt"],
+  ["O NAS", "/o-nas"],
+  ["FAQ", "/faq"],
+  ["KONTAKT", "/kontakt"],
 ] as const
 
 export function Brand() {
@@ -67,7 +67,7 @@ export function SiteHeader() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-[99999] isolate transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-99999 isolate transition-all duration-300 ${
         scrolled
           ? "bg-black"
           : "bg-foreground/70 backdrop-blur-md"

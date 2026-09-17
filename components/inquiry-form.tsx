@@ -40,7 +40,7 @@ type InquiryTrip = {
 }
 
 const inputClassName =
-  "h-11 rounded-lg border-white/25 bg-white/[0.015] px-3.5 text-sm text-white transition-all duration-200 placeholder:text-white/25 hover:border-white/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15"
+  "h-11 rounded-lg border-white/25 bg-white/1.5 px-3.5 text-sm text-white transition-all duration-200 placeholder:text-white/25 hover:border-white/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15"
 
 function formatTripDate(date: string | null) {
   if (!date) {
@@ -316,7 +316,7 @@ const selectedTripLabel = selectedTrip
         onClick={() =>
           setMatchDropdownOpen((open) => !open)
         }
-        className={`flex h-11 w-full items-center justify-between gap-3 rounded-lg border bg-white/[0.015] px-3.5 text-left text-sm outline-none transition-all duration-200 ${
+        className={`flex h-11 w-full items-center justify-between gap-3 rounded-lg border bg-white/1.5 px-3.5 text-left text-sm outline-none transition-all duration-200 ${
           matchDropdownOpen
             ? "border-primary ring-2 ring-primary/15"
             : "border-white/25 hover:border-white/40"
@@ -415,7 +415,7 @@ const selectedTripLabel = selectedTrip
   </Field>
 )}
 
-        {availablePackageVariants.length > 0 && <Field><FieldLabel id="packageVariantLabel" className="text-sm font-semibold text-white">Wariant pakietu</FieldLabel><div ref={packageDropdownRef} className="relative"><button id="packageVariant" type="button" aria-haspopup="listbox" aria-expanded={packageDropdownOpen} aria-labelledby="packageVariantLabel packageVariant" onClick={() => setPackageDropdownOpen((open) => !open)} className={`flex h-11 w-full items-center justify-between gap-3 rounded-lg border bg-white/[0.015] px-3.5 text-left text-sm outline-none transition-all duration-200 ${packageDropdownOpen ? "border-primary ring-2 ring-primary/15" : "border-white/25 hover:border-white/40"}`}><span className={selectedPackageVariant ? "min-w-0 truncate text-white" : "min-w-0 truncate text-white/40"}>{selectedPackageVariant || "Wybierz wariant"}</span><ChevronDown aria-hidden="true" className={`size-4 shrink-0 text-white/50 transition-transform duration-200 ${packageDropdownOpen ? "rotate-180 text-primary" : ""}`} /></button>{packageDropdownOpen && <div role="listbox" aria-labelledby="packageVariantLabel" className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-lg border border-white/15 bg-[#151515] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55)]"><div className="max-h-64 overflow-y-auto">{availablePackageVariants.map((variant) => { const active = selectedPackageVariant === variant; return <button key={variant} type="button" role="option" aria-selected={active} onClick={() => { setSelectedPackageVariant(variant); setPackageDropdownOpen(false) }} className={`w-full rounded-md px-3 py-2.5 text-left text-sm transition-colors ${active ? "bg-primary/20 text-primary" : "text-white/80 hover:bg-primary/15 hover:text-primary"}`}>{variant}</button> })}</div></div>}</div></Field>}
+        {availablePackageVariants.length > 0 && <Field><FieldLabel id="packageVariantLabel" className="text-sm font-semibold text-white">Wariant pakietu</FieldLabel><div ref={packageDropdownRef} className="relative"><button id="packageVariant" type="button" aria-haspopup="listbox" aria-expanded={packageDropdownOpen} aria-labelledby="packageVariantLabel packageVariant" onClick={() => setPackageDropdownOpen((open) => !open)} className={`flex h-11 w-full items-center justify-between gap-3 rounded-lg border bg-white/1.5 px-3.5 text-left text-sm outline-none transition-all duration-200 ${packageDropdownOpen ? "border-primary ring-2 ring-primary/15" : "border-white/25 hover:border-white/40"}`}><span className={selectedPackageVariant ? "min-w-0 truncate text-white" : "min-w-0 truncate text-white/40"}>{selectedPackageVariant || "Wybierz wariant"}</span><ChevronDown aria-hidden="true" className={`size-4 shrink-0 text-white/50 transition-transform duration-200 ${packageDropdownOpen ? "rotate-180 text-primary" : ""}`} /></button>{packageDropdownOpen && <div role="listbox" aria-labelledby="packageVariantLabel" className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-lg border border-white/15 bg-[#151515] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55)]"><div className="max-h-64 overflow-y-auto">{availablePackageVariants.map((variant) => { const active = selectedPackageVariant === variant; return <button key={variant} type="button" role="option" aria-selected={active} onClick={() => { setSelectedPackageVariant(variant); setPackageDropdownOpen(false) }} className={`w-full rounded-md px-3 py-2.5 text-left text-sm transition-colors ${active ? "bg-primary/20 text-primary" : "text-white/80 hover:bg-primary/15 hover:text-primary"}`}>{variant}</button> })}</div></div>}</div></Field>}
 
         <Field>
           <FieldLabel
@@ -522,7 +522,7 @@ const selectedTripLabel = selectedTrip
           maxLength={MESSAGE_MAX_LENGTH}
           placeholder="Termin, preferowany standard hotelu, specjalne potrzeby…"
           onInput={handleMessageInput}
-          className="min-h-[112px] resize-none rounded-lg border-white/25 bg-white/[0.015] px-3.5 py-3 text-sm text-white transition-all duration-200 placeholder:text-white/25 hover:border-white/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15"
+          className="min-h-28 resize-none rounded-lg border-white/25 bg-white/1.5 px-3.5 py-3 text-sm text-white transition-all duration-200 placeholder:text-white/25 hover:border-white/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15"
         />
       </Field>
 
@@ -532,7 +532,7 @@ const selectedTripLabel = selectedTrip
           htmlFor="privacyConsent"
           className="group flex cursor-pointer items-start gap-3.5"
         >
-          <span className="relative mt-0.5 flex size-[18px] shrink-0">
+          <span className="relative mt-0.5 flex size-4.5 shrink-0">
             <input
               id="privacyConsent"
               name="privacyConsent"
@@ -545,9 +545,9 @@ const selectedTripLabel = selectedTrip
               className="peer absolute inset-0 cursor-pointer opacity-0"
             />
 
-            <span className="flex size-[18px] items-center justify-center rounded-[4px] border border-white/40 bg-transparent transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30">
+            <span className="flex size-4.5 items-center justify-center rounded border border-white/40 bg-transparent transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30">
               <Check
-                className={`size-3.5 stroke-[3] text-black transition-opacity ${
+                className={`size-3.5 stroke-3 text-black transition-opacity ${
                   privacyConsent
                     ? "opacity-100"
                     : "opacity-0"
