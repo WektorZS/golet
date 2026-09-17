@@ -13,14 +13,14 @@ import {
   Star,
   TicketCheck,
   Ticket,
-Hotel,
+  Hotel,
   Trophy,
   Users,
   CircleCheckBig,
   Landmark,
   User,
-BriefcaseBusiness,
-GraduationCap,
+  BriefcaseBusiness,
+  GraduationCap,
 } from "lucide-react"
 
 import { TestimonialsCarousel } from "@/components/testimonials-carousel"
@@ -28,7 +28,7 @@ import { TestimonialsCarousel } from "@/components/testimonials-carousel"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { SocialLinks } from "@/components/social-links"
-import { HomeTripCalendar } from "@/components/home-trip-calendar"
+import { HomeTripsSection } from "@/components/home-trips-section"
 import { SectionHeading } from "@/components/section-heading"
 import { InquiryForm } from "@/components/inquiry-form"
 import { ImageLightbox } from "@/components/image-lightbox"
@@ -351,50 +351,13 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
       </section>
 
-     <section
-  id="wyjazdy"
-  className="scroll-mt-20 bg-section-light px-4 py-16 md:px-6 md:py-20"
->
-  <div className="mx-auto max-w-7xl">
-    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-      <SectionHeading
-        eyebrow="Terminarz meczowych podróży"
-        title="Kalendarz wyjazdów"
-        intro={
-          content.tripsDescription ||
-          "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."
-        }
-        align="left"
-      />
-
-      <Button
-        variant="outline"
-        size="lg"
-        className="hidden w-fit shrink-0 md:inline-flex"
-        nativeButton={false}
-        render={<Link href="/wyjazdy" />}
-      >
-        Wszystkie wyjazdy
-        <ArrowRight data-icon="inline-end" />
-      </Button>
-    </div>
-
-    <HomeTripCalendar trips={trips} />
-
-    <div className="mt-8 flex md:hidden">
-      <Button
-        variant="outline"
-        size="lg"
-        className="w-full"
-        nativeButton={false}
-        render={<Link href="/wyjazdy" />}
-      >
-        Wszystkie wyjazdy
-        <ArrowRight data-icon="inline-end" />
-      </Button>
-    </div>
-  </div>
-</section>
+  <HomeTripsSection
+    trips={trips}
+    description={
+      content.tripsDescription ||
+      "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."
+    }
+  />
 
 <section
   id="twoj-wyjazd"
