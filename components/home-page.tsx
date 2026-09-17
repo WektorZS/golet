@@ -13,14 +13,14 @@ import {
   Star,
   TicketCheck,
   Ticket,
-  Hotel,
+Hotel,
   Trophy,
   Users,
   CircleCheckBig,
   Landmark,
   User,
-  BriefcaseBusiness,
-  GraduationCap,
+BriefcaseBusiness,
+GraduationCap,
 } from "lucide-react"
 
 import { TestimonialsCarousel } from "@/components/testimonials-carousel"
@@ -28,7 +28,7 @@ import { TestimonialsCarousel } from "@/components/testimonials-carousel"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { SocialLinks } from "@/components/social-links"
-import { HomeTripsSection } from "@/components/home-trips-section"
+import { HomeTripCalendar } from "@/components/home-trip-calendar"
 import { SectionHeading } from "@/components/section-heading"
 import { InquiryForm } from "@/components/inquiry-form"
 import { ImageLightbox } from "@/components/image-lightbox"
@@ -248,7 +248,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     <main>
       <SiteHeader />
 
-      <section className="relative isolate flex flex-col overflow-hidden bg-foreground text-background md:h-dvh md:min-h-[700px]">
+      <section className="relative isolate flex flex-col overflow-hidden bg-section-dark text-background md:h-dvh md:min-h-[700px]">
         <HeroBackgroundSlider />
 
         <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/75 to-transparent" />
@@ -351,13 +351,50 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
       </section>
 
-  <HomeTripsSection
-    trips={trips}
-    description={
-      content.tripsDescription ||
-      "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."
-    }
-  />
+     <section
+  id="wyjazdy"
+  className="scroll-mt-20 bg-section-light px-4 py-16 md:px-6 md:py-20"
+>
+  <div className="mx-auto max-w-7xl">
+    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <SectionHeading
+        eyebrow="Terminarz meczowych podróży"
+        title="Kalendarz wyjazdów"
+        intro={
+          content.tripsDescription ||
+          "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."
+        }
+        align="left"
+      />
+
+      <Button
+        variant="outline"
+        size="lg"
+        className="hidden w-fit shrink-0 md:inline-flex"
+        nativeButton={false}
+        render={<Link href="/wyjazdy" />}
+      >
+        Wszystkie wyjazdy
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    </div>
+
+    <HomeTripCalendar trips={trips} />
+
+    <div className="mt-8 flex md:hidden">
+      <Button
+        variant="outline"
+        size="lg"
+        className="w-full"
+        nativeButton={false}
+        render={<Link href="/wyjazdy" />}
+      >
+        Wszystkie wyjazdy
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    </div>
+  </div>
+</section>
 
 <section
   id="twoj-wyjazd"
@@ -1047,82 +1084,100 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   </section>
 )}
 
-      <section
-        id="o-nas"
-        className="bg-secondary px-4 py-20 md:px-6"
-      >
-        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
-          <div>
-            <SectionHeading
-              eyebrow="O nas"
-              title={
-                content.aboutTitle ||
-                "Kibice, którzy zawodowo ogarniają podróże"
-              }
-              intro={
-                content.aboutText ||
-                "Let’s Gol powstało z prostego przekonania: droga na stadion powinna budować emocje, a nie stres. Łączymy znajomość futbolu z doświadczeniem w turystyce i bierzemy odpowiedzialność za każdy etap wyjazdu."
-              }
-              align="left"
-            />
+    <section
+  id="o-nas"
+  className="relative overflow-hidden bg-secondary px-4 py-20 md:px-6 md:py-24"
+>
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0"
+  >
+    <div className="absolute -right-40 top-[-140px] size-[420px] rounded-full bg-primary/[0.06] blur-[120px]" />
+  </div>
 
-            <div className="mt-7 flex flex-wrap gap-x-8 gap-y-6">
-              <div>
-                <strong className="text-3xl font-black">
-                  42
-                </strong>
+  <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+    <div>
+      <p className="eyebrow">O Let&apos;s Gol</p>
 
-                <p className="text-sm text-muted-foreground">
-                  stadiony w ofercie
-                </p>
-              </div>
+      <h2 className="mt-5 max-w-2xl text-balance font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight text-foreground md:text-6xl">
+        Mecz to więcej niż 90 minut.
+      </h2>
 
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <Star
-                    className="size-5 text-primary"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  />
+      <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
+        Łączymy piłkę nożną z podróżowaniem i organizacją, która porządkuje
+        drogę od pierwszego pomysłu aż do miejsca na trybunach.
+      </p>
 
-                  <strong className="text-3xl font-black">
-  {facebookReviewsAverage}/5
-</strong>
-                </div>
+      <div className="mt-8 border-l-2 border-primary pl-5">
+        <p className="max-w-lg font-sans text-xl font-black uppercase leading-tight text-foreground md:text-2xl">
+          Ty wybierasz mecz.
+          <br />
+          My pomagamy poukładać drogę na stadion.
+        </p>
+      </div>
 
-                <p className="text-sm text-muted-foreground">
-                  Facebook · {facebookReviewsCount} opinii
-                </p>
+      <div className="mt-9 flex flex-wrap items-center gap-4">
+        <Button
+          size="lg"
+          className="h-12 px-6"
+          nativeButton={false}
+          render={<Link href="/o-nas" />}
+        >
+          Poznaj Let&apos;s Gol
+          <ArrowRight data-icon="inline-end" />
+        </Button>
 
-                <p className="mt-1 w-fit bg-foreground px-2 py-1 text-xs font-semibold text-background">
-                  100% poleca
-                </p>
+        <div className="flex items-center gap-3">
+          <div className="flex -space-x-2">
+            <div className="flex size-10 items-center justify-center rounded-full border-2 border-secondary bg-foreground text-sm font-black text-primary">
+              Ł
+            </div>
 
-              </div>
-
-              <div>
-                <strong className="text-3xl font-black">
-                  5 000+
-                </strong>
-
-                <p className="text-sm text-muted-foreground">
-                  obserwujących na Facebooku
-                </p>
-              </div>
+            <div className="flex size-10 items-center justify-center rounded-full border-2 border-secondary bg-primary text-sm font-black text-primary-foreground">
+              M
             </div>
           </div>
 
-          <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
-            <Image
-              src="/images/hero-stadium.webp"
-              alt="Kibice Let’s Gol na stadionie"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
+          <div>
+            <p className="text-sm font-bold text-foreground">
+              Łukasz & Mateusz
+            </p>
+
+            <p className="text-xs text-muted-foreground">
+              współtwórcy Let&apos;s Gol
+            </p>
           </div>
         </div>
-      </section>
+      </div>
+    </div>
+
+    <div className="relative">
+      <div className="relative min-h-[440px] overflow-hidden rounded-xl md:min-h-[520px]">
+        <Image
+          src="/images/about-us.webp"
+          alt="Atmosfera wspólnego wyjazdu na mecz"
+          fill
+          className="object-cover"
+          sizes="(max-width: 1024px) 100vw, 55vw"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+
+        <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-8">
+          <p className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-primary">
+            Piłka · podróże · emocje
+          </p>
+
+          <p className="mt-3 max-w-md font-sans text-2xl font-black uppercase leading-[1.05] md:text-3xl">
+            Najlepsze mecze pamięta się razem z drogą na stadion.
+          </p>
+        </div>
+      </div>
+
+     
+    </div>
+  </div>
+</section>
 <section
   id="faq"
   className="relative overflow-hidden bg-section-light px-4 py-20 md:px-6 md:py-24"
