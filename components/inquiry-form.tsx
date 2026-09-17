@@ -35,7 +35,8 @@ const OTHER_MATCH_VALUE = "__other__"
 type InquiryTrip = {
   id: number
   title: string
-  date: string | null
+  startDate: string
+  endDate: string | null
   packageVariants: string[]
 }
 
@@ -56,16 +57,39 @@ function formatTripDate(date: string | null) {
   return `${day}.${month}.${year}`
 }
 
+function formatTripDateRange(
+  startDate: string | null,
+  endDate: string | null
+) {
+  const start = formatTripDate(startDate)
+
+  if (!start) {
+    return ""
+  }
+
+  const end = formatTripDate(endDate)
+
+  if (!end || endDate === startDate) {
+    return start
+  }
+
+  return `${start} - ${end}`
+}
+
 export function InquiryForm({
   matchName = "",
   trips = [],
   packageVariants = [],
   defaultPackageVariant = "",
+  tripStartDate = "",
+  tripEndDate = "",
 }: {
   matchName?: string
   trips?: InquiryTrip[]
   packageVariants?: string[]
   defaultPackageVariant?: string
+  tripStartDate?: string
+  tripEndDate?: string | null
 }) {
   const [state, action, pending] = useActionState(
     createInquiry,
@@ -118,8 +142,8 @@ const availablePackageVariants = hasSelectedTrip ? packageVariants : selectedTri
 
 const selectedTripLabel = selectedTrip
   ? `${selectedTrip.title}${
-      formatTripDate(selectedTrip.date)
-        ? ` - ${formatTripDate(selectedTrip.date)}`
+      formatTripDateRange(selectedTrip.startDate, selectedTrip.endDate)
+        ? ` - ${formatTripDateRange(selectedTrip.startDate, selectedTrip.endDate)}`
         : ""
     }`
   : isOtherMatch
@@ -200,7 +224,7 @@ const selectedTripLabel = selectedTrip
       action={action}
       className="flex flex-col gap-5"
     >
-      {/* HONEYPOT */}
+
       <input
         type="text"
         name="website"
@@ -216,22 +240,57 @@ const selectedTripLabel = selectedTrip
         value={formLoadedAt}
       />
 
-      {/* Mecz przekazany z konkretnego wyjazdu */}
-    {!hasSelectedTrip && selectedMatch && !isOtherMatch && (
-  <>
-    <input
-      type="hidden"
-      name="matchName"
-      value={selectedMatch.slice(0, 160)}
-    />
+   
+      {hasSelectedTrip && (
+        <>
+          <input
+            type="hidden"
+            name="matchName"
+            value={matchName.slice(0, 160)}
+          />
+          <input
+            type="hidden"
+            name="packageVariant"
+            value={selectedPackageVariant.slice(0, 160)}
+          />
+          <input
+            type="hidden"
+            name="tripStartDate"
+            value={tripStartDate}
+          />
+          <input
+            type="hidden"
+            name="tripEndDate"
+            value={tripEndDate || ""}
+          />
+        </>
+      )}
 
-    <input
-      type="hidden"
-      name="packageVariant"
-      value={selectedPackageVariant.slice(0, 160)}
-    />
-  </>
-)}
+   
+      {!hasSelectedTrip && selectedTrip && !isOtherMatch && (
+        <>
+          <input
+            type="hidden"
+            name="matchName"
+            value={selectedTrip.title.slice(0, 160)}
+          />
+          <input
+            type="hidden"
+            name="packageVariant"
+            value={selectedPackageVariant.slice(0, 160)}
+          />
+          <input
+            type="hidden"
+            name="tripStartDate"
+            value={selectedTrip.startDate}
+          />
+          <input
+            type="hidden"
+            name="tripEndDate"
+            value={selectedTrip.endDate || ""}
+          />
+        </>
+      )}
       <FieldGroup className="grid gap-x-4 gap-y-4 md:grid-cols-2">
         <Field>
           <FieldLabel
@@ -357,8 +416,9 @@ const selectedTripLabel = selectedTrip
         >
           <div className="max-h-64 overflow-y-auto">
             {trips.map((trip) => {
-              const formattedDate = formatTripDate(
-                trip.date
+              const formattedDate = formatTripDateRange(
+                trip.startDate,
+                trip.endDate
               )
 
               const active =
@@ -468,16 +528,7 @@ const selectedTripLabel = selectedTrip
         </Field>
       </FieldGroup>
 
-      {/* Wybrany gotowy wyjazd */}
-      {!hasSelectedTrip && selectedMatch && !isOtherMatch && (
-        <input
-          type="hidden"
-          name="matchName"
-          value={`${selectedMatch}${selectedPackageVariant ? ` - Pakiet: ${selectedPackageVariant}` : ""}`.slice(0, 160)}
-        />
-      )}
-
-      {/* Ręczne wpisanie meczu */}
+   
       {!hasSelectedTrip && isOtherMatch && (
         <Field>
           <FieldLabel
@@ -500,7 +551,7 @@ const selectedTripLabel = selectedTrip
         </Field>
       )}
 
-      {/* DODATKOWE INFORMACJE */}
+  
       <Field>
         <div className="flex items-center justify-between gap-3">
           <FieldLabel
@@ -533,7 +584,7 @@ const selectedTripLabel = selectedTrip
         />
       </Field>
 
-      {/* ZGODA */}
+     
       <Field>
         <label
           htmlFor="privacyConsent"
@@ -586,7 +637,7 @@ const selectedTripLabel = selectedTrip
         </label>
       </Field>
 
-      {/* KOMUNIKAT */}
+     
       {state.message && (
         <div
           role="status"
@@ -607,7 +658,6 @@ const selectedTripLabel = selectedTrip
         </div>
       )}
 
-      {/* PRZYCISK */}
       <Button
         type="submit"
         size="lg"

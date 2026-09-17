@@ -1,4 +1,3 @@
-
 "use server"
 
 import { and, eq, gt, sql } from "drizzle-orm"
@@ -32,6 +31,8 @@ const matchNameRegex =
 const messageRegex =
   /^[\p{L}\p{N}\s.,!?;:()"'’\-–—…\/%]+$/u
 
+const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/
+
 const inquirySchema = z.object({
   name: z
     .string()
@@ -48,9 +49,7 @@ const inquirySchema = z.object({
     .trim()
     .email("Podaj poprawny adres e-mail.")
     .max(160, "Adres e-mail jest za długi.")
-    .transform((value) =>
-      value.toLowerCase()
-    ),
+    .transform((value) => value.toLowerCase()),
 
   phone: z
     .string()
@@ -63,40 +62,48 @@ const inquirySchema = z.object({
   matchName: z
     .string()
     .trim()
-    .min(
-      2,
-      "Nazwa meczu jest za krótka."
-    )
-    .max(
-      160,
-      "Nazwa meczu jest za długa."
-    )
+    .min(2, "Nazwa meczu jest za krótka.")
+    .max(160, "Nazwa meczu jest za długa.")
     .regex(
       matchNameRegex,
       "Nazwa meczu zawiera niedozwolone znaki."
     ),
 
-    packageVariant: z
-  .string()
-  .trim()
-  .max(
-    160,
-    "Nazwa wariantu pakietu jest za długa."
-  )
-  .optional()
-  .default(""),
+  tripStartDate: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value === "" || isoDateRegex.test(value),
+      "Nieprawidłowa data rozpoczęcia wyjazdu."
+    )
+    .optional()
+    .default(""),
+
+  tripEndDate: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value === "" || isoDateRegex.test(value),
+      "Nieprawidłowa data zakończenia wyjazdu."
+    )
+    .optional()
+    .default(""),
+
+  packageVariant: z
+    .string()
+    .trim()
+    .max(
+      160,
+      "Nazwa wariantu pakietu jest za długa."
+    )
+    .optional()
+    .default(""),
 
   departureCity: z
     .string()
     .trim()
-    .min(
-      2,
-      "Podaj miasto wylotu."
-    )
-    .max(
-      100,
-      "Nazwa miasta jest za długa."
-    )
+    .min(2, "Podaj miasto wylotu.")
+    .max(100, "Nazwa miasta jest za długa.")
     .regex(
       cityRegex,
       "Miasto może zawierać tylko litery, spacje, myślniki i apostrofy."
@@ -104,25 +111,14 @@ const inquirySchema = z.object({
 
   travelers: z.coerce
     .number()
-    .int(
-      "Liczba osób musi być liczbą całkowitą."
-    )
-    .min(
-      1,
-      "Liczba osób musi wynosić co najmniej 1."
-    )
-    .max(
-      99,
-      "Maksymalna liczba osób to 99."
-    ),
+    .int("Liczba osób musi być liczbą całkowitą.")
+    .min(1, "Liczba osób musi wynosić co najmniej 1.")
+    .max(99, "Maksymalna liczba osób to 99."),
 
   message: z
     .string()
     .trim()
-    .max(
-      1000,
-      "Wiadomość jest za długa."
-    )
+    .max(1000, "Wiadomość jest za długa.")
     .refine(
       (value) =>
         value === "" ||
@@ -169,11 +165,16 @@ export async function createInquiry(
       email: formData.get("email"),
       phone: formData.get("phone"),
       matchName: formData.get("matchName"),
+      tripStartDate:
+        formData.get("tripStartDate") ?? "",
+      tripEndDate:
+        formData.get("tripEndDate") ?? "",
       packageVariant:
-  formData.get("packageVariant") ?? "",
+        formData.get("packageVariant") ?? "",
       departureCity:
         formData.get("departureCity"),
-      travelers: formData.get("travelers"),
+      travelers:
+        formData.get("travelers"),
       message:
         formData.get("message") ?? "",
       website:
@@ -204,7 +205,7 @@ export async function createInquiry(
   if (
     parsed.data.formLoadedAt &&
     Date.now() -
-        parsed.data.formLoadedAt <
+      parsed.data.formLoadedAt <
       MIN_FILL_TIME_MS
   ) {
     return {
@@ -225,9 +226,9 @@ export async function createInquiry(
     parsed.data.email
   )
 
- const contentHash = hmac(
-  `${parsed.data.email}|${parsed.data.matchName}|${parsed.data.packageVariant}|${parsed.data.message}`
-)
+  const contentHash = hmac(
+    `${parsed.data.email}|${parsed.data.matchName}|${parsed.data.tripStartDate}|${parsed.data.tripEndDate}|${parsed.data.packageVariant}|${parsed.data.message}`
+  )
 
   const oneDayAgo = new Date(
     Date.now() -
@@ -347,19 +348,23 @@ export async function createInquiry(
       }
     }
 
-const {
-  website,
-  formLoadedAt,
-  privacyConsent,
-  ...values
-} = parsed.data
+    const {
+      website,
+      formLoadedAt,
+      privacyConsent,
+      ...values
+    } = parsed.data
 
-   await db
-  .insert(inquiries)
-  .values({
-    ...values,
-    consentAcceptedAt: new Date(),
-  })
+    await db
+      .insert(inquiries)
+      .values({
+        ...values,
+        tripStartDate:
+          values.tripStartDate || null,
+        tripEndDate:
+          values.tripEndDate || null,
+        consentAcceptedAt: new Date(),
+      })
 
     await db
       .insert(inquiryAttempts)
@@ -372,15 +377,23 @@ const {
 
     try {
       await sendInquiryEmails({
-  name: values.name,
-  email: values.email,
-  phone: values.phone,
-  matchName: values.matchName,
-  packageVariant: values.packageVariant,
-  departureCity: values.departureCity,
-  travelers: values.travelers,
-  message: values.message,
-})
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        matchName: values.matchName,
+        tripStartDate:
+          values.tripStartDate,
+        tripEndDate:
+          values.tripEndDate,
+        packageVariant:
+          values.packageVariant,
+        departureCity:
+          values.departureCity,
+        travelers:
+          values.travelers,
+        message:
+          values.message,
+      })
     } catch (error) {
       console.error(
         "Nie udało się wysłać wiadomości e-mail dla zapytania:",

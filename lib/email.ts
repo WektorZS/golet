@@ -9,11 +9,46 @@ function escapeHtml(value: string) {
     .replace(/'/g, "&#039;")
 }
 
+function formatDate(date: string) {
+  if (!date) {
+    return ""
+  }
+
+  const [year, month, day] = date.split("-")
+
+  if (!year || !month || !day) {
+    return ""
+  }
+
+  return `${day}.${month}.${year}`
+}
+
+function formatTripDateRange(
+  startDate: string,
+  endDate: string
+) {
+  const start = formatDate(startDate)
+
+  if (!start) {
+    return "Nie podano"
+  }
+
+  const end = formatDate(endDate)
+
+  if (!end || endDate === startDate) {
+    return start
+  }
+
+  return `${start} - ${end}`
+}
+
 export type InquiryEmailData = {
   name: string
   email: string
   phone: string
   matchName: string
+  tripStartDate: string
+  tripEndDate: string
   packageVariant: string
   departureCity: string
   travelers: number
@@ -29,8 +64,14 @@ export async function sendInquiryEmails(
     process.env.INQUIRY_NOTIFICATION_EMAIL
   const replyToEmail = process.env.RESEND_REPLY_TO_EMAIL
   const packageVariant = escapeHtml(
-  inquiry.packageVariant || "Nie wybrano"
-)
+    inquiry.packageVariant || "Nie wybrano"
+  )
+  const tripDate = escapeHtml(
+    formatTripDateRange(
+      inquiry.tripStartDate,
+      inquiry.tripEndDate
+    )
+  )
 
   if (!apiKey) {
     throw new Error("Brak RESEND_API_KEY")
@@ -110,6 +151,22 @@ export async function sendInquiryEmails(
                   </div>
                   <div style="font-size:15px;font-weight:700;color:#111111;">
                     ${matchName}
+                  </div>
+                </div>
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Termin wyjazdu
+                  </div>
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${tripDate}
+                  </div>
+                </div>
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Termin wyjazdu
+                  </div>
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${tripDate}
                   </div>
                 </div>
                 <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
