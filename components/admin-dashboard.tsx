@@ -2357,17 +2357,29 @@ const handleYouTubeDragEnd = async (event: any) => {
                 </div>
 
                 <div className="space-y-3">
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Mecz
-                    </p>
+                 <div>
+  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+    Mecz
+  </p>
 
-                    <p className="mt-0.5 font-semibold">
-                      {lead.matchName}
-                    </p>
-                  </div>
+  <p className="mt-0.5 font-semibold">
+    {lead.matchName}
+  </p>
+</div>
 
-                  <div className="grid grid-cols-2 gap-4">
+{lead.packageVariant ? (
+  <div>
+    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      Pakiet
+    </p>
+
+    <p className="mt-0.5 text-sm font-medium">
+      {lead.packageVariant}
+    </p>
+  </div>
+) : null}
+
+<div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         Skąd wylot
