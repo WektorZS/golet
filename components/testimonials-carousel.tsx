@@ -38,27 +38,35 @@ function TestimonialCard({
   onOpen: () => void
 }) {
   const textRef = useRef<HTMLParagraphElement>(null)
+  const fullTextRef = useRef<HTMLParagraphElement>(null)
   const [isTruncated, setIsTruncated] = useState(false)
 
   useEffect(() => {
-    const element = textRef.current
+    const visible = textRef.current
+    const full = fullTextRef.current
 
-    if (!element) return
+    if (!visible || !full) return
 
     const checkTruncation = () => {
-      setIsTruncated(
-        element.scrollHeight > element.clientHeight + 1
-      )
+      const visibleHeight = visible.getBoundingClientRect().height
+      const fullHeight = full.getBoundingClientRect().height
+
+      setIsTruncated(fullHeight > visibleHeight + 2)
     }
 
-    checkTruncation()
+    const frame = requestAnimationFrame(checkTruncation)
 
     const observer = new ResizeObserver(checkTruncation)
-    observer.observe(element)
+
+    observer.observe(visible)
+    observer.observe(full)
 
     window.addEventListener("resize", checkTruncation)
 
+    document.fonts?.ready.then(checkTruncation)
+
     return () => {
+      cancelAnimationFrame(frame)
       observer.disconnect()
       window.removeEventListener("resize", checkTruncation)
     }
@@ -85,43 +93,53 @@ function TestimonialCard({
         “
       </span>
 
-      <div className="relative flex gap-1 text-primary">
-        <span className="sr-only">
-          Ocena {item.rating} na 5
-        </span>
+      <div className="relative flex flex-1 flex-col justify-center">
+        <div className="flex gap-1 text-primary">
+          <span className="sr-only">
+            Ocena {item.rating} na 5
+          </span>
 
-        {Array.from({
-          length: item.rating,
-        }).map((_, index) => (
-          <Star
-            key={index}
-            className="size-4"
-            fill="currentColor"
+          {Array.from({
+            length: item.rating,
+          }).map((_, index) => (
+            <Star
+              key={index}
+              className="size-4"
+              fill="currentColor"
+              aria-hidden="true"
+            />
+          ))}
+        </div>
+
+        <div className="relative mt-6">
+          <p
+            ref={textRef}
+            className="line-clamp-5 text-[14px] font-medium leading-6 text-background/85 sm:line-clamp-4 sm:text-[15px] sm:leading-7 md:text-base"
+          >
+            „{item.content}”
+          </p>
+
+          <p
+            ref={fullTextRef}
             aria-hidden="true"
-          />
-        ))}
+            className="pointer-events-none absolute left-0 top-0 -z-10 w-full text-[14px] font-medium leading-6 opacity-0 sm:text-[15px] sm:leading-7 md:text-base"
+          >
+            „{item.content}”
+          </p>
+
+          {isTruncated && (
+            <button
+              type="button"
+              onClick={onOpen}
+              className="group/more mt-4 inline-flex w-fit items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-primary transition-colors hover:text-primary/80"
+            >
+              Zobacz więcej
+
+              <ArrowRight className="size-3.5 transition-transform duration-200 group-hover/more:translate-x-1" />
+            </button>
+          )}
+        </div>
       </div>
-
-<div className="relative mt-6 flex flex-1 flex-col justify-center">
-  <p
-    ref={textRef}
-    className="line-clamp-5 text-[14px] font-medium leading-6 text-background/85 sm:line-clamp-4 sm:text-[15px] sm:leading-7 md:text-base"
-  >
-    „{item.content}”
-  </p>
-
-  {isTruncated && (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="group/more mt-4 inline-flex w-fit items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-primary transition-colors hover:text-primary/80"
-    >
-      Zobacz więcej
-
-      <ArrowRight className="size-3.5 transition-transform duration-200 group-hover/more:translate-x-1" />
-    </button>
-  )}
-</div>
 
       <footer className="relative mt-7 border-t border-white/[0.08] pt-5">
         {item.author && (
@@ -379,7 +397,7 @@ export function TestimonialsCarousel({
       {selected && (
         <div
           className="
-            fixed inset-x-0 bottom-0 top-[88px] z-[100]
+            fixed inset-x-0 bottom-0 top-[80px] z-[100]
             bg-black/80 backdrop-blur-md
             md:top-[76px] md:flex md:items-center md:justify-center md:p-6
           "
@@ -408,7 +426,7 @@ export function TestimonialsCarousel({
               md:shadow-2xl
             "
           >
-            <div className="sticky left-0 top-0 z-30 h-[3px] w-full bg-primary" />
+            <div className="sticky left-0 top-0 z-30 hidden h-[3px] w-full bg-primary md:block" />
 
             <div className="sticky top-0 z-40 h-0">
               <button
