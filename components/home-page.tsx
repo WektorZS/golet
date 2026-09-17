@@ -489,18 +489,18 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       sizes="50vw"
     />
 
-   <div className="absolute inset-0 bg-black/34" />
+    <div className="absolute inset-0 bg-black/24" />
 
-<div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.24)_36%,rgba(0,0,0,0.28)_68%,rgba(0,0,0,0.72)_100%)]" />
+    <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.24)_36%,rgba(0,0,0,0.28)_68%,rgba(0,0,0,0.72)_100%)]" />
 
-<div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/40" />
+    <div className="absolute inset-0 bg-gradient-to-t from-black/58 via-transparent to-black/34" />
 
-<div className="absolute inset-y-0 left-0 w-[78%] bg-gradient-to-r from-black/90 via-black/65 to-transparent" />
+    <div className="absolute inset-y-0 left-0 w-[74%] bg-gradient-to-r from-black/85 via-black/55 to-transparent" />
   </div>
 
   <div className="relative mx-auto max-w-7xl px-4 md:px-6">
     <div className="grid lg:grid-cols-2">
-      <div className="relative flex min-h-[560px] items-center py-14 lg:min-h-[650px] lg:pr-16">
+      <div className="relative flex min-h-[420px] items-center py-12 sm:py-14 lg:min-h-[650px] lg:py-14 lg:pr-16">
         <div className="relative z-10 max-w-xl lg:-translate-y-8">
           <p className="eyebrow eyebrow-on-dark">
             Wyjazd szyty na miarę
@@ -512,11 +512,11 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             czego potrzebujesz.
           </h2>
 
-          <p className="mt-6 max-w-md text-base leading-7 text-white md:text-lg [text-shadow:0_2px_12px_rgba(0,0,0,0.1)]">
-  Nie musisz wybierać gotowego wyjazdu z kalendarza.
-  Możemy zorganizować pojedynczy element albo całą podróż
-  od biletu aż po lot i hotel.
-</p>
+          <p className="mt-6 max-w-md text-base leading-7 text-white md:text-lg">
+            Nie musisz wybierać gotowego wyjazdu z kalendarza.
+            Możemy zorganizować pojedynczy element albo całą podróż
+            od biletu aż po lot i hotel.
+          </p>
         </div>
       </div>
 
