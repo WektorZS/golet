@@ -337,7 +337,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           </div>
         </div>
 
-        <div className="relative border-t border-background/15 bg-foreground/75 backdrop-blur-sm">
+        <div className="relative border-t border-background/7 bg-foreground/75 backdrop-blur-sm">
           <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:grid-cols-2 md:px-6 lg:grid-cols-4">
             {trust.map(([Icon, text]) => (
               <div
