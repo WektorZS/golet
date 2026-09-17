@@ -13,14 +13,14 @@ import {
   Star,
   TicketCheck,
   Ticket,
-Hotel,
+  Hotel,
   Trophy,
   Users,
   CircleCheckBig,
   Landmark,
   User,
-BriefcaseBusiness,
-GraduationCap,
+  BriefcaseBusiness,
+  GraduationCap,
 } from "lucide-react"
 
 import { TestimonialsCarousel } from "@/components/testimonials-carousel"
@@ -28,7 +28,7 @@ import { TestimonialsCarousel } from "@/components/testimonials-carousel"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { SocialLinks } from "@/components/social-links"
-import { HomeTripCalendar } from "@/components/home-trip-calendar"
+import { HomeTripsSection } from "@/components/home-trips-section"
 import { SectionHeading } from "@/components/section-heading"
 import { InquiryForm } from "@/components/inquiry-form"
 import { ImageLightbox } from "@/components/image-lightbox"
@@ -351,50 +351,13 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
       </section>
 
-     <section
-  id="wyjazdy"
-  className="scroll-mt-20 bg-background px-4 py-16 md:px-6 md:py-20"
->
-  <div className="mx-auto max-w-7xl">
-    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-      <SectionHeading
-        eyebrow="Terminarz meczowych podróży"
-        title="Kalendarz wyjazdów"
-        intro={
-          content.tripsDescription ||
-          "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."
-        }
-        align="left"
-      />
-
-      <Button
-        variant="outline"
-        size="lg"
-        className="hidden w-fit shrink-0 md:inline-flex"
-        nativeButton={false}
-        render={<Link href="/wyjazdy" />}
-      >
-        Wszystkie wyjazdy
-        <ArrowRight data-icon="inline-end" />
-      </Button>
-    </div>
-
-    <HomeTripCalendar trips={trips} />
-
-    <div className="mt-8 flex md:hidden">
-      <Button
-        variant="outline"
-        size="lg"
-        className="w-full"
-        nativeButton={false}
-        render={<Link href="/wyjazdy" />}
-      >
-        Wszystkie wyjazdy
-        <ArrowRight data-icon="inline-end" />
-      </Button>
-    </div>
-  </div>
-</section>
+  <HomeTripsSection
+    trips={trips}
+    description={
+      content.tripsDescription ||
+      "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."
+    }
+  />
 
 <section
   id="twoj-wyjazd"
@@ -476,7 +439,74 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   </div>
 </section>
 
-<section className="relative overflow-hidden bg-foreground">
+<section className="bg-section-light px-4 py-16 md:px-6 md:py-20">
+  <div className="mx-auto max-w-7xl">
+    <SectionHeading
+      eyebrow="Wszystko w jednym"
+      title={
+        content.packageTitle ||
+        "Co zawiera pełny pakiet?"
+      }
+    />
+
+    <div className="mt-14 grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
+      <div className="max-w-md">
+        <p className="eyebrow">
+          Pełny pakiet
+        </p>
+
+        <h3 className="mt-5 font-sans text-3xl font-black uppercase leading-[0.98] tracking-tight text-foreground md:text-4xl">
+          Wszystkie najważniejsze elementy jednej podróży.
+        </h3>
+
+        <p className="mt-5 text-base leading-7 text-muted-foreground">
+          Zakres konkretnego wyjazdu może się różnić, ale pełny wariant
+          łączy najważniejsze elementy organizacji w jednej ofercie.
+        </p>
+      </div>
+
+      <div className="grid gap-x-10 gap-y-0 sm:grid-cols-2">
+        {[
+          [Plane, "Przelot", "Transport dopasowany do terminu meczu."],
+          [TicketCheck, "Bilet na mecz", "Miejsce na stadionie w wybranej kategorii."],
+          [Building2, "Sprawdzony hotel", "Nocleg dopasowany do charakteru wyjazdu."],
+          [Headphones, "Opieka koordynatora", "Wsparcie organizacyjne przed i w trakcie podróży."],
+          [MapPinned, "Transfery lokalne", "Przejazdy pomiędzy kluczowymi punktami wyjazdu."],
+          [ShieldCheck, "Ubezpieczenie", "Ochrona podróży zgodnie z zakresem oferty."],
+          [CalendarCheck, "Plan podróży", "Najważniejsze informacje i ustalenia przed wyjazdem."],
+          [Landmark, "Zwiedzanie miasta", "Czas na poznanie miasta poza stadionem."],
+        ].map(([Icon, title, description]) => {
+          const I = Icon as typeof Plane
+
+          return (
+            <div
+              key={title as string}
+              className="group flex gap-4 border-b border-foreground/10 py-6"
+            >
+              <div className="pt-1">
+                <I
+                  className="size-6 text-primary transition-transform duration-300 group-hover:scale-110"
+                  aria-hidden="true"
+                />
+              </div>
+
+              <div>
+                <h4 className="font-sans text-base font-black uppercase text-foreground">
+                  {title as string}
+                </h4>
+
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {description as string}
+                </p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  </div>
+</section>
+<section className="relative overflow-hidden bg-section-dark">
   <div
     className="absolute inset-y-0 left-0 hidden w-1/2 lg:block"
     aria-hidden="true"
@@ -649,219 +679,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
   </div>
 </section>
-<section className="bg-background px-4 py-16 md:px-6 md:py-20">
-  <div className="mx-auto max-w-7xl">
-    <SectionHeading
-      eyebrow="Wszystko w jednym"
-      title={
-        content.packageTitle ||
-        "Co zawiera pełny pakiet?"
-      }
-    />
-
-    <div className="mt-14 grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
-      <div className="max-w-md">
-        <p className="eyebrow">
-          Pełny pakiet
-        </p>
-
-        <h3 className="mt-5 font-sans text-3xl font-black uppercase leading-[0.98] tracking-tight text-foreground md:text-4xl">
-          Wszystkie najważniejsze elementy jednej podróży.
-        </h3>
-
-        <p className="mt-5 text-base leading-7 text-muted-foreground">
-          Zakres konkretnego wyjazdu może się różnić, ale pełny wariant
-          łączy najważniejsze elementy organizacji w jednej ofercie.
-        </p>
-      </div>
-
-      <div className="grid gap-x-10 gap-y-0 sm:grid-cols-2">
-        {[
-          [Plane, "Przelot", "Transport dopasowany do terminu meczu."],
-          [TicketCheck, "Bilet na mecz", "Miejsce na stadionie w wybranej kategorii."],
-          [Building2, "Sprawdzony hotel", "Nocleg dopasowany do charakteru wyjazdu."],
-          [Headphones, "Opieka koordynatora", "Wsparcie organizacyjne przed i w trakcie podróży."],
-          [MapPinned, "Transfery lokalne", "Przejazdy pomiędzy kluczowymi punktami wyjazdu."],
-          [ShieldCheck, "Ubezpieczenie", "Ochrona podróży zgodnie z zakresem oferty."],
-          [CalendarCheck, "Plan podróży", "Najważniejsze informacje i ustalenia przed wyjazdem."],
-          [Landmark, "Zwiedzanie miasta", "Czas na poznanie miasta poza stadionem."],
-        ].map(([Icon, title, description]) => {
-          const I = Icon as typeof Plane
-
-          return (
-            <div
-              key={title as string}
-              className="group flex gap-4 border-b border-foreground/10 py-6"
-            >
-              <div className="pt-1">
-                <I
-                  className="size-6 text-primary transition-transform duration-300 group-hover:scale-110"
-                  aria-hidden="true"
-                />
-              </div>
-
-              <div>
-                <h4 className="font-sans text-base font-black uppercase text-foreground">
-                  {title as string}
-                </h4>
-
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {description as string}
-                </p>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  </div>
-</section>
-<section className="bg-secondary px-4 py-16 md:px-6 md:py-20 lg:py-24">
-  <div className="mx-auto max-w-7xl">
-    <SectionHeading
-      eyebrow="Dlaczego my"
-      title={
-        content.benefitsTitle ||
-        "Let’s Gol pilnuje szczegółów. Ty przeżywasz mecz."
-      }
-    />
-
-    <div className="mt-12 grid gap-x-10 gap-y-9 md:grid-cols-2 lg:grid-cols-3 lg:gap-y-10">
-      {reasons.map(([Icon, title, copy]) => (
-        <article
-          key={title}
-          className="group flex items-start gap-4"
-        >
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-colors duration-300 group-hover:bg-primary/15 sm:size-12">
-            <Icon
-              className="size-5 text-foreground sm:size-6"
-              aria-hidden="true"
-            />
-          </span>
-
-          <div className="min-w-0">
-            <h3 className="font-sans text-base font-black uppercase leading-tight tracking-tight text-foreground">
-              {title}
-            </h3>
-
-            <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground md:text-[15px]">
-              {copy}
-            </p>
-          </div>
-        </article>
-      ))}
-    </div>
-  </div>
-</section>
-
-<section className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24">
-  <div
-    aria-hidden="true"
-    className="pointer-events-none absolute inset-0"
-  >
-    <div className="absolute -right-40 top-[-120px] size-[420px] rounded-full bg-primary/[0.05] blur-[120px]" />
-  </div>
-
-  <div className="relative mx-auto max-w-7xl">
-    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-      <SectionHeading
-        eyebrow="Z pierwszego rzędu"
-        title={
-          content.galleryTitle ||
-          "Galeria z wyjazdów"
-        }
-        intro="Stadiony, miasta i emocje, których nie da się oddać samym opisem."
-        align="left"
-      />
-
-      <Button
-        className="hidden w-fit shrink-0 md:inline-flex"
-        variant="outline"
-        nativeButton={false}
-        render={<Link href="/galeria" />}
-      >
-        Zobacz całą galerię
-        <ArrowRight data-icon="inline-end" />
-      </Button>
-    </div>
-
-    <HomeGallery gallery={gallery} />
-
-    <div className="mt-8 flex md:hidden">
-      <Button
-        className="w-full"
-        variant="outline"
-        nativeButton={false}
-        render={<Link href="/galeria" />}
-      >
-        Zobacz całą galerię
-        <ArrowRight data-icon="inline-end" />
-      </Button>
-    </div>
-  </div>
-</section>
-
-<section className="relative overflow-hidden bg-foreground px-4 py-16 text-background md:px-6 md:py-24">
-  <div
-    aria-hidden="true"
-    className="pointer-events-none absolute inset-0"
-  >
-    <div className="absolute -left-40 top-1/2 size-[420px] -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
-  </div>
-
-  <div className="relative mx-auto max-w-7xl">
-    <SectionHeading
-      eyebrow="Opinie klientów"
-      title={
-        content.testimonialsTitle ||
-        "Emocje potwierdzone na trybunach"
-      }
-      intro="Najlepiej o naszych wyjazdach opowiadają osoby, które już poleciały z nami na mecz."
-      inverse
-    />
-
-<TestimonialsCarousel testimonials={testimonials} />
-
-    <div className="mt-8 flex flex-col items-center justify-center gap-5 sm:flex-row">
-      <div className="flex items-center gap-3">
-        <Star
-          className="size-5 text-primary"
-          fill="currentColor"
-          aria-hidden="true"
-        />
-
-        <div>
-          <p className="text-sm font-bold text-background">
-            {facebookReviewsAverage}/5 · {facebookReviewsCount} opinii
-          </p>
-
-          <p className="mt-0.5 text-xs text-background/45">
-            100% poleca nas na Facebooku
-          </p>
-        </div>
-      </div>
-
-      <div className="hidden h-8 w-px bg-white/15 sm:block" />
-
-      <Button
-        variant="outline"
-        className="border-white/20 bg-transparent text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
-        nativeButton={false}
-        render={
-          <a
-            href="https://www.facebook.com/profile.php?id=61573517165441&sk=reviews"
-            target="_blank"
-            rel="noopener noreferrer"
-          />
-        }
-      >
-        Zobacz wszystkie opinie
-        <ArrowRight data-icon="inline-end" />
-      </Button>
-    </div>
-  </div>
-</section>
-<section className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24">
+<section className="relative overflow-hidden bg-section-light px-4 py-20 md:px-6 md:py-24">
 
   <div
     aria-hidden="true"
@@ -990,6 +808,244 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
   </div>
 </section>
+<section className="bg-secondary px-4 py-16 md:px-6 md:py-20 lg:py-24">
+  <div className="mx-auto max-w-7xl">
+    <SectionHeading
+      eyebrow="Dlaczego my"
+      title={
+        content.benefitsTitle ||
+        "Let’s Gol pilnuje szczegółów. Ty przeżywasz mecz."
+      }
+    />
+
+    <div className="mt-12 grid gap-x-10 gap-y-9 md:grid-cols-2 lg:grid-cols-3 lg:gap-y-10">
+      {reasons.map(([Icon, title, copy]) => (
+        <article
+          key={title}
+          className="group flex items-start gap-4"
+        >
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-colors duration-300 group-hover:bg-primary/15 sm:size-12">
+            <Icon
+              className="size-5 text-foreground sm:size-6"
+              aria-hidden="true"
+            />
+          </span>
+
+          <div className="min-w-0">
+            <h3 className="font-sans text-base font-black uppercase leading-tight tracking-tight text-foreground">
+              {title}
+            </h3>
+
+            <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground md:text-[15px]">
+              {copy}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+<section className="relative overflow-hidden bg-section-light px-4 py-20 md:px-6 md:py-24">
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0"
+  >
+    <div className="absolute -right-40 top-[-120px] size-[420px] rounded-full bg-primary/[0.05] blur-[120px]" />
+  </div>
+
+  <div className="relative mx-auto max-w-7xl">
+    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <SectionHeading
+        eyebrow="Z pierwszego rzędu"
+        title={
+          content.galleryTitle ||
+          "Galeria z wyjazdów"
+        }
+        intro="Stadiony, miasta i emocje, których nie da się oddać samym opisem."
+        align="left"
+      />
+
+      <Button
+        className="hidden w-fit shrink-0 md:inline-flex"
+        variant="outline"
+        nativeButton={false}
+        render={<Link href="/galeria" />}
+      >
+        Zobacz całą galerię
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    </div>
+
+    <HomeGallery gallery={gallery} />
+
+    <div className="mt-8 flex md:hidden">
+      <Button
+        className="w-full"
+        variant="outline"
+        nativeButton={false}
+        render={<Link href="/galeria" />}
+      >
+        Zobacz całą galerię
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    </div>
+  </div>
+</section>
+<section className="relative overflow-hidden bg-section-dark px-4 py-16 text-background md:px-6 md:py-24">
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0"
+  >
+    <div className="absolute -left-40 top-1/2 size-[420px] -translate-y-1/2 rounded-full bg-primary/[0.035] blur-[120px]" />
+  </div>
+
+  <div className="relative mx-auto max-w-7xl">
+    <SectionHeading
+      eyebrow="Opinie klientów"
+      title={
+        content.testimonialsTitle ||
+        "Emocje potwierdzone na trybunach"
+      }
+      intro="Najlepiej o naszych wyjazdach opowiadają osoby, które już poleciały z nami na mecz."
+      inverse
+    />
+
+<TestimonialsCarousel testimonials={testimonials} />
+
+    <div className="mt-8 flex flex-col items-center justify-center gap-5 sm:flex-row">
+      <div className="flex items-center gap-3">
+        <Star
+          className="size-5 text-primary"
+          fill="currentColor"
+          aria-hidden="true"
+        />
+
+        <div>
+          <p className="text-sm font-bold text-background">
+            {facebookReviewsAverage}/5 · {facebookReviewsCount} opinii
+          </p>
+
+          <p className="mt-0.5 text-xs text-background/45">
+            100% poleca nas na Facebooku
+          </p>
+        </div>
+      </div>
+
+      <div className="hidden h-8 w-px bg-white/15 sm:block" />
+
+      <Button
+        variant="outline"
+        className="border-white/20 bg-transparent text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
+        nativeButton={false}
+        render={
+          <a
+            href="https://www.facebook.com/profile.php?id=61573517165441&sk=reviews"
+            target="_blank"
+            rel="noopener noreferrer"
+          />
+        }
+      >
+        Zobacz wszystkie opinie
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    </div>
+  </div>
+</section>
+{videos.length > 0 && (
+ <section className="relative overflow-hidden bg-section-light px-4 py-20 md:px-6 md:py-24">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0"
+    >
+      <div className="absolute left-1/2 top-[-180px] h-[420px] w-[750px] -translate-x-1/2 rounded-full bg-primary/[0.07] blur-[120px]" />
+
+      <div className="absolute -left-40 bottom-[-180px] h-[420px] w-[420px] rounded-full bg-white/60 blur-[110px]" />
+
+      <div className="absolute -right-48 top-1/3 h-[420px] w-[420px] rounded-full bg-black/[0.025] blur-[120px]" />
+    </div>
+
+    <div className="relative mx-auto max-w-7xl">
+      <SectionHeading
+        eyebrow="Zobacz atmosferę"
+        title={
+          content.youtubeTitle ||
+          "Zobacz, jak wyglądają nasze wyjazdy"
+        }
+        intro="Relacje, stadiony i emocje z naszych piłkarskich podróży."
+      />
+
+      <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {videos.map((video) => (
+          <a
+            key={video.id}
+            href={video.url}
+            target="_blank"
+            rel="noreferrer"
+            className="group relative block"
+          >
+            <article className="relative h-full overflow-hidden rounded-2xl border border-white/[0.08] bg-foreground shadow-[0_16px_45px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:border-primary/40 group-hover:shadow-[0_24px_70px_rgba(0,0,0,0.22),0_0_0_1px_rgba(244,185,30,0.08)]">
+              <div className="absolute left-0 top-0 z-20 h-[2px] w-10 bg-primary transition-all duration-500 group-hover:w-16" />
+
+              <div className="relative aspect-[16/9] overflow-hidden bg-black">
+                <Image
+                  src={video.thumbnail}
+                  alt={`Miniatura filmu: ${video.title}`}
+                  fill
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-black/15 transition-opacity duration-500 group-hover:from-black/40" />
+
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative flex size-[62px] items-center justify-center">
+                    <div className="absolute inset-0 rounded-full border border-white/25 transition-all duration-500 group-hover:scale-[1.18] group-hover:border-primary/50" />
+
+                    <div className="relative flex size-[50px] items-center justify-center rounded-full border border-white/[0.08] bg-foreground/90 shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:border-primary group-hover:bg-primary">
+                      <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        className="ml-0.5 size-[18px] fill-primary transition-colors duration-300 group-hover:fill-primary-foreground"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative flex min-h-[130px] items-start justify-between gap-5 bg-white/[0.035] p-5 md:p-6">
+                <div className="min-w-0">
+                  <p className="mb-2.5 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-primary">
+                    Zobacz relację
+                  </p>
+
+                  <h3 className="line-clamp-2 text-[16px] font-bold leading-[1.45] text-background transition-colors duration-300 group-hover:text-white">
+                    {video.title}
+                  </h3>
+                </div>
+
+                <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center border border-white/[0.12] bg-white/[0.035] transition-all duration-300 group-hover:border-primary group-hover:bg-primary">
+                  <ArrowRight className="size-4 text-background transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-primary-foreground" />
+                </div>
+              </div>
+            </article>
+          </a>
+        ))}
+      </div>
+
+      <div className="mt-9 flex items-center justify-center gap-3">
+        <div className="h-px w-8 bg-black/15" />
+
+        <span className="text-center font-mono text-[12px] font-bold uppercase tracking-[0.18em] text-black/40">
+          Poczuj atmosferę przed swoim wyjazdem
+        </span>
+
+        <div className="h-px w-8 bg-black/15" />
+      </div>
+    </div>
+  </section>
+)}
 
       <section
         id="o-nas"
@@ -1067,10 +1123,9 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           </div>
         </div>
       </section>
-
 <section
   id="faq"
-  className="relative overflow-hidden bg-background px-4 py-20 md:px-6 md:py-24"
+  className="relative overflow-hidden bg-section-light px-4 py-20 md:px-6 md:py-24"
 >
 
   <div
@@ -1146,111 +1201,9 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
   </div>
 </section>
-
-{videos.length > 0 && (
-  <section className="relative overflow-hidden bg-secondary px-4 py-20 md:px-6 md:py-24">
-
-<div
-  aria-hidden="true"
-  className="pointer-events-none absolute inset-0"
->
-
-  <div className="absolute left-1/2 top-[-180px] h-[420px] w-[750px] -translate-x-1/2 rounded-full bg-primary/[0.07] blur-[120px]" />
-
-  <div className="absolute -left-40 bottom-[-180px] h-[420px] w-[420px] rounded-full bg-white/60 blur-[110px]" />
-
-  <div className="absolute -right-48 top-1/3 h-[420px] w-[420px] rounded-full bg-black/[0.025] blur-[120px]" />
-</div>
-
-    <div className="relative mx-auto max-w-7xl">
-      <SectionHeading
-        eyebrow="Zobacz atmosferę"
-        title={
-          content.youtubeTitle ||
-          "Zobacz, jak wyglądają nasze wyjazdy"
-        }
-        intro="Relacje, stadiony i emocje z naszych piłkarskich podróży."
-      />
-
-      <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {videos.map((video) => (
-          <a
-            key={video.id}
-            href={video.url}
-            target="_blank"
-            rel="noreferrer"
-            className="group relative block"
-          >
-            <article className="relative h-full overflow-hidden rounded-xl border border-black/[0.08] bg-gradient-to-br from-white via-[#fdfcf9] to-[#f5f1e8] shadow-[0_8px_30px_rgba(0,0,0,0.045)] transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:border-primary/50 group-hover:shadow-[0_22px_55px_rgba(0,0,0,0.13)]">
-
-              <div className="relative aspect-[16/9] overflow-hidden bg-black">
-                <Image
-                  src={video.thumbnail}
-                  alt={`Miniatura filmu: ${video.title}`}
-                  fill
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-black/10 transition-opacity duration-500 group-hover:opacity-80" />
-
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative flex size-[62px] items-center justify-center">
-
-                    <div className="absolute inset-0 rounded-full border border-white/35 transition-all duration-500 group-hover:scale-[1.18] group-hover:border-primary/40" />
-
-                    <div className="relative flex size-[50px] items-center justify-center rounded-full bg-white shadow-[0_8px_30px_rgba(0,0,0,0.25)] transition-all duration-300 group-hover:scale-105 group-hover:bg-primary">
-                      <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        className="ml-0.5 size-[18px] fill-black"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative flex min-h-[126px] items-start justify-between gap-5 bg-gradient-to-br from-transparent to-primary/[0.025] p-5 md:p-6">
-
-                <div className="absolute left-0 top-0 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full" />
-
-                <div className="min-w-0">
-                  <p className="mb-2.5 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-primary">
-                    Zobacz relację
-                  </p>
-
-                  <h3 className="line-clamp-2 text-[16px] font-bold leading-[1.45] text-foreground transition-colors duration-300 group-hover:text-black">
-                    {video.title}
-                  </h3>
-                </div>
-
-                <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center border border-black/10 bg-transparent transition-all duration-300 group-hover:border-primary group-hover:bg-primary">
-                  <ArrowRight className="size-4 text-black transition-transform duration-300 group-hover:translate-x-0.5" />
-                </div>
-              </div>
-            </article>
-          </a>
-        ))}
-      </div>
-
-      <div className="mt-9 flex items-center justify-center gap-3">
-        <div className="h-px w-8 bg-black/15" />
-
-        <span className="font-mono text-[12px] font-bold uppercase tracking-[0.18em] text-black/40">
-          Poczuj atmosferę przed swoim wyjazdem
-        </span>
-
-        <div className="h-px w-8 bg-black/15" />
-      </div>
-    </div>
-  </section>
-)}
-
       <section
         id="kontakt"
-        className="bg-foreground px-4 py-20 text-background md:px-6 md:py-24"
+        className="bg-section-dark px-4 py-20 text-background md:px-6 md:py-24"
       >
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.75fr_1.25fr]">
           <div className="flex flex-col gap-6">
