@@ -71,17 +71,31 @@ export const trips = pgTable("trips", {
 
 export const inquiries = pgTable("inquiries", {
   id: serial("id").primaryKey(),
+
   name: text("name").notNull(),
+
   email: text("email").notNull(),
+
   phone: text("phone").notNull(),
+
   matchName: text("match_name").notNull(),
-  departureCity: text("departure_city").notNull(),
+
+packageVariant: text("package_variant").notNull().default(""),
+
+departureCity: text("departure_city").notNull(),
+
   travelers: integer("travelers").notNull().default(1),
+
   message: text("message").notNull().default(""),
+
   status: text("status").notNull().default("new"),
+
   adminNote: text("admin_note").notNull().default(""),
+
   consentAcceptedAt: timestamp("consent_accepted_at"),
+
   createdAt: timestamp("created_at").notNull().defaultNow(),
+
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 })
 

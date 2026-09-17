@@ -204,11 +204,7 @@ export async function sendInquiryEmails(
             </div>
           </div>
 
-          <div style="padding:34px 30px 30px;">
-
-            <div style="display:inline-block;margin-bottom:14px;padding:6px 10px;background:#fff7df;border-radius:6px;color:#9b7300;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">
-              Nowy lead
-            </div>
+          <div style="padding:34px 30px 30px;"
 
             <h1 style="margin:0 0 10px;font-size:25px;line-height:1.25;font-weight:800;color:#111111;">
               🔔 Nowe zapytanie

@@ -347,21 +347,19 @@ export async function createInquiry(
       }
     }
 
-   const {
+const {
   website,
   formLoadedAt,
   privacyConsent,
-  packageVariant,
   ...values
 } = parsed.data
 
-    await db
-      .insert(inquiries)
-      .values({
-        ...values,
-        consentAcceptedAt:
-          new Date(),
-      })
+   await db
+  .insert(inquiries)
+  .values({
+    ...values,
+    consentAcceptedAt: new Date(),
+  })
 
     await db
       .insert(inquiryAttempts)
@@ -378,7 +376,7 @@ export async function createInquiry(
   email: values.email,
   phone: values.phone,
   matchName: values.matchName,
-  packageVariant,
+  packageVariant: values.packageVariant,
   departureCity: values.departureCity,
   travelers: values.travelers,
   message: values.message,
