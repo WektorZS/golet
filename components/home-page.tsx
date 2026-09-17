@@ -11,17 +11,18 @@ import {
   ShieldCheck,
   Star,
   TicketCheck,
+  Ticket,
+Hotel,
+Sparkles,
   Trophy,
   Users,
+  CircleCheckBig,
   Landmark,
+  User,
+BriefcaseBusiness,
+GraduationCap,
 } from "lucide-react"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
+
 import { TestimonialsCarousel } from "@/components/testimonials-carousel"
 
 import { SiteHeader } from "@/components/site-header"
@@ -350,7 +351,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
       </section>
 
-      <section
+     <section
   id="wyjazdy"
   className="scroll-mt-20 bg-background px-4 py-16 md:px-6 md:py-20"
 >
@@ -369,7 +370,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       <Button
         variant="outline"
         size="lg"
-        className="w-fit shrink-0"
+        className="hidden w-fit shrink-0 md:inline-flex"
         nativeButton={false}
         render={<Link href="/wyjazdy" />}
       >
@@ -379,6 +380,19 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
 
     <HomeTripCalendar trips={trips} />
+
+    <div className="mt-8 flex md:hidden">
+      <Button
+        variant="outline"
+        size="lg"
+        className="w-full"
+        nativeButton={false}
+        render={<Link href="/wyjazdy" />}
+      >
+        Wszystkie wyjazdy
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    </div>
   </div>
 </section>
 
@@ -462,31 +476,51 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   </div>
 </section>
 
-<section className="bg-foreground px-4 md:px-6">
-  <div className="mx-auto max-w-7xl">
-    <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
+<section className="relative overflow-hidden bg-foreground">
+  <div
+    className="absolute inset-y-0 left-0 hidden w-1/2 lg:block"
+    aria-hidden="true"
+  >
+    <Image
+      src="/images/about-us.webp"
+      alt=""
+      fill
+      className="object-cover"
+      sizes="50vw"
+    />
 
-      <div className="flex h-full flex-col justify-center py-12 pr-0 sm:py-14 lg:py-16 lg:pr-16">
-        <div className="max-w-xl">
+   <div className="absolute inset-0 bg-black/34" />
+
+<div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.70)_0%,rgba(0,0,0,0.25)_38%,rgba(0,0,0,0.45)_68%,rgba(0,0,0,0.96)_100%)]" />
+
+<div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/40" />
+
+<div className="absolute inset-y-0 left-0 w-[78%] bg-gradient-to-r from-black/90 via-black/65 to-transparent" />
+  </div>
+
+  <div className="relative mx-auto max-w-7xl px-4 md:px-6">
+    <div className="grid lg:grid-cols-2">
+      <div className="relative flex min-h-[560px] items-center py-14 lg:min-h-[650px] lg:pr-16">
+        <div className="relative z-10 max-w-xl lg:-translate-y-8">
           <p className="eyebrow eyebrow-on-dark">
             Wyjazd szyty na miarę
           </p>
 
-          <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[0.95] tracking-tight text-white md:text-5xl">
+          <h2 className="mt-5 text-balance font-sans text-[38px] font-black uppercase leading-[0.94] tracking-tight text-white md:text-[46px]">
             Powiedz nam,
             <br />
             czego potrzebujesz.
           </h2>
 
-          <p className="mt-6 max-w-lg text-base leading-7 text-white/65 md:text-lg">
-            Nie musisz wybierać gotowego wyjazdu z kalendarza.
-            Możemy zorganizować pojedynczy element albo całą podróż
-            od biletu aż po lot i hotel.
-          </p>
+          <p className="mt-6 max-w-md text-base leading-7 text-white md:text-lg [text-shadow:0_2px_12px_rgba(0,0,0,0.1)]">
+  Nie musisz wybierać gotowego wyjazdu z kalendarza.
+  Możemy zorganizować pojedynczy element albo całą podróż
+  od biletu aż po lot i hotel.
+</p>
         </div>
       </div>
 
-      <div className="relative py-12 sm:py-14 lg:py-16 lg:pl-16">
+      <div className="relative py-12 sm:py-14 lg:min-h-[650px] lg:py-16 lg:pl-16">
         <div
           className="absolute bottom-12 left-0 top-12 hidden w-px bg-white/10 lg:block"
           aria-hidden="true"
@@ -506,24 +540,47 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             organizację całego wyjazdu.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-7 grid gap-x-10 gap-y-7 sm:grid-cols-2">
             {[
-              "Tylko bilet",
-              "Bilet + lot",
-              "Bilet + hotel",
-              "Pełny pakiet",
-            ].map((item) => (
-              <div
-                key={item}
-                className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:border-primary/40 hover:bg-white/[0.09]"
-              >
-                {item}
-              </div>
-            ))}
+              [Ticket, "Tylko bilet", "Wejście na wybrany mecz."],
+              [Plane, "Bilet + lot", "Bilet oraz przelot."],
+              [Hotel, "Bilet + hotel", "Bilet oraz nocleg."],
+              [
+                CircleCheckBig,
+                "Pełny pakiet",
+                "Bilet, lot, hotel i zwiedzanie.",
+              ],
+            ].map(([Icon, title, description]) => {
+              const I = Icon as typeof Ticket
+
+              return (
+                <div
+                  key={title as string}
+                  className="flex items-start gap-4"
+                >
+                  <div className="flex size-10 shrink-0 items-center justify-center">
+                    <I
+                      className="size-5 text-primary"
+                      aria-hidden="true"
+                    />
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="font-sans text-base font-black tracking-tight text-white">
+                      {title as string}
+                    </p>
+
+                    <p className="mt-2 text-sm leading-6 text-white/50">
+                      {description as string}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
 
-        <div className="mt-12 border-t border-white/10 pt-10">
+        <div className="mt-10 border-t border-white/10 pt-9">
           <p className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-primary">
             Dla kogo?
           </p>
@@ -532,35 +589,60 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             Od jednej osoby po całą grupę
           </h3>
 
+          <p className="mt-3 max-w-xl text-base leading-7 text-white/55">
+            Organizujemy wyjazdy zarówno indywidualne, jak i dla rodzin,
+            firm oraz większych grup.
+          </p>
+
           <div className="mt-7 grid gap-x-10 gap-y-7 sm:grid-cols-2">
             {[
               [
+                User,
                 "Indywidualnie",
                 "Wyjazd przygotowany dokładnie pod Twoje potrzeby.",
               ],
               [
+                Users,
                 "Rodziny i grupy",
                 "Wspólna podróż na wybrany mecz.",
               ],
               [
+                BriefcaseBusiness,
                 "Firmy",
                 "Wyjazdy integracyjne i sportowe dla zespołów.",
               ],
               [
+                GraduationCap,
                 "Szkoły i kluby",
                 "Kompleksowa obsługa zorganizowanych grup.",
               ],
-            ].map(([title, description]) => (
-              <div key={title}>
-                <p className="font-sans text-base font-black uppercase tracking-tight text-white">
-                  {title}
-                </p>
+            ].map(([Icon, title, description]) => {
+              const I = Icon as typeof User
 
-                <p className="mt-2 text-sm leading-6 text-white/50">
-                  {description}
-                </p>
-              </div>
-            ))}
+              return (
+                <div
+                  key={title as string}
+                  className="flex items-start gap-4"
+                >
+                  <div className="flex size-10 shrink-0 items-center justify-center">
+                    <I
+                      className="size-5 text-primary"
+                      aria-hidden="true"
+                    />
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="font-sans text-base font-black tracking-tight text-white">
+                      {title as string}
+                    </p>
+
+                    <p className="mt-2 text-sm leading-6 text-white/50">
+                      {description as string}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -693,7 +775,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       />
 
       <Button
-        className="w-fit shrink-0"
+        className="hidden w-fit shrink-0 md:inline-flex"
         variant="outline"
         nativeButton={false}
         render={<Link href="/galeria" />}
@@ -704,6 +786,18 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
 
     <HomeGallery gallery={gallery} />
+
+    <div className="mt-8 flex md:hidden">
+      <Button
+        className="w-full"
+        variant="outline"
+        nativeButton={false}
+        render={<Link href="/galeria" />}
+      >
+        Zobacz całą galerię
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    </div>
   </div>
 </section>
 

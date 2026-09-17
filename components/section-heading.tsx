@@ -4,8 +4,8 @@ export function SectionHeading({ eyebrow, title, intro, inverse = false, align =
   return (
     <div className={cn("flex max-w-3xl flex-col gap-3", align === "center" && "mx-auto items-center text-center")}>
 {eyebrow && (
-  <p className="font-mono text-[15px] font-bold uppercase tracking-[0.2em] text-primary">
-          <span className="inline-block bg-black px-2 py-1">
+  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-primary sm:text-[15px] sm:tracking-[0.2em]">
+    <span className="inline-block whitespace-nowrap bg-black px-2 py-1">
       {eyebrow}
     </span>
   </p>
