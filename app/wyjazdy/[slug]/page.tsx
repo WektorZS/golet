@@ -2,11 +2,14 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, ArrowRight, BedDouble, CalendarDays, Check, Clock3, MapPin, MessageCircle, Plane, TicketCheck } from "lucide-react"
+import { ArrowLeft, ArrowRight, CalendarDays, BedDouble,
+Check,
+Plane, Clock3, MapPin, MessageCircle, TicketCheck } from "lucide-react"
 
 import { InquiryForm } from "@/components/inquiry-form"
 import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
+import { SiteHeader } from "@/components/site-header"
 import { TripDetailsTabs } from "@/components/trip-details-tabs"
 import { Button } from "@/components/ui/button"
 import { getPublishedTestimonials, getSiteContent } from "@/lib/content"
@@ -86,17 +89,96 @@ export default async function TripDetailPage({ params, searchParams }: { params:
   const teams = getTeams(trip.title, trip.opponent, trip.homeTeam, trip.awayTeam)
   const packageOptions = parsePackageItems(trip.packageItems)
   const packageVariants = getPackageVariants(trip.packageVariants, trip.packageItems)
-  const selectedPackageVariant = packageVariants.find((variant) => variant.key === pakiet) || packageVariants.find((variant) => variant.key === "full") || packageVariants[0]
-  const fullPackageSelected = selectedPackageVariant.key === "full"
+  const variantOrder = [
+  "ticket",
+  "ticket_flight",
+  "ticket_hotel",
+  "full",
+]
+
+const orderedPackageVariants = [...packageVariants].sort(
+  (a, b) =>
+    variantOrder.indexOf(a.key) -
+    variantOrder.indexOf(b.key)
+)
+ const selectedPackageVariant =
+  packageVariants.find(
+    (variant) => variant.key === pakiet
+  ) ??
+  packageVariants.find(
+    (variant) => variant.key === "full"
+  ) ??
+  packageVariants[0]
+
+if (!selectedPackageVariant) {
+  notFound()
+}
+
+const fullPackageSelected =
+  selectedPackageVariant.key === "full"
+
+const selectedPackageKey =
+  selectedPackageVariant.key
+
+const partialPackageSelected =
+  selectedPackageKey !== "full"
+
+const selectedHasFlight =
+  packageOptions.flight !== "excluded" &&
+  (
+    selectedPackageKey === "full" ||
+    selectedPackageKey === "ticket_flight"
+  )
+
+const selectedHasHotel =
+  packageOptions.hotel !== "excluded" &&
+  (
+    selectedPackageKey === "full" ||
+    selectedPackageKey === "ticket_hotel"
+  )
   const includedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "included")
   const optionalFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "optional")
   const excludedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "excluded")
-  const includedItems: { key: string; label: string }[] = [
-    ...includedFeatures.map((feature) => ({ key: feature.key, label: feature.label })),
-    ...trip.includes.map((label, index) => ({ key: `custom-${index}`, label })),
-  ].filter((item, index, items) => items.findIndex((candidate) => candidate.label === item.label) === index)
-  const hasHotel = packageOptions.hotel !== "excluded"
-  const hasFlight = packageOptions.flight !== "excluded"
+const selectedIncludedFeatures =
+  includedFeatures.filter((feature) => {
+    if (feature.key === "flight") {
+      return selectedHasFlight
+    }
+
+    if (feature.key === "baggage") {
+      return selectedHasFlight
+    }
+
+    if (feature.key === "hotel") {
+      return selectedHasHotel
+    }
+
+    if (feature.key === "breakfast") {
+      return selectedHasHotel
+    }
+
+    return true
+  })
+
+const includedItems: {
+  key: string
+  label: string
+}[] = [
+  ...selectedIncludedFeatures.map((feature) => ({
+    key: feature.key,
+    label: feature.label,
+  })),
+  ...trip.includes.map((label, index) => ({
+    key: `custom-${index}`,
+    label,
+  })),
+].filter(
+  (item, index, items) =>
+    items.findIndex(
+      (candidate) =>
+        candidate.label === item.label
+    ) === index
+)
   const homeTeam = teams.home
   const awayTeam = teams.away
   const computedNights = trip.endDate && trip.endDate !== trip.startDate && trip.durationDays === 1 && trip.durationNights === 0
@@ -172,24 +254,44 @@ export default async function TripDetailPage({ params, searchParams }: { params:
       ]),
     ],
   }
+const defaultPlan = [
+  selectedHasFlight
+    ? "Wylot z wybranego lotniska i przejazd do miasta"
+    : "Dojazd do miasta we własnym zakresie",
 
-  const defaultPlan = [
-    hasFlight ? "Wylot z wybranego lotniska i przejazd do miasta" : "Dojazd do miasta we własnym zakresie",
-    ...(hasHotel ? ["Zakwaterowanie w hotelu i czas wolny"] : []),
-    "Dzień meczowy i wejście na stadion",
-    "Czas na poznanie miasta",
-    hasFlight ? "Lot powrotny do Polski" : "Powrót we własnym zakresie",
-  ]
+  ...(selectedHasHotel
+    ? ["Zakwaterowanie w hotelu i czas wolny"]
+    : []),
+
+  "Dzień meczowy i wejście na stadion",
+  "Czas na poznanie miasta",
+
+  selectedHasFlight
+    ? "Lot powrotny do Polski"
+    : "Powrót we własnym zakresie",
+]
+
   return (
     <main className="bg-background">
       <JsonLd data={jsonLd} />
 
-      <section className="relative isolate min-h-[620px] overflow-hidden bg-foreground text-background lg:min-h-[540px]">
-        <Image src={trip.image} alt={`Stadion ${trip.stadium || trip.city}`} fill preload className="object-cover" sizes="100vw" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/50" />
-        <div className="relative mx-auto flex min-h-[620px] max-w-7xl flex-col px-4 py-6 md:px-6 md:py-8 lg:min-h-[540px]">
-          <Button variant="ghost" className="w-fit text-background hover:bg-background/10 hover:text-background" nativeButton={false} render={<Link href="/wyjazdy" />}><ArrowLeft data-icon="inline-start" />Kalendarz wyjazdów</Button>
+      <SiteHeader />
+
+      <section className="relative isolate min-h-155 overflow-hidden bg-foreground pt-20 text-background lg:min-h-135">
+  <Image
+    src={trip.image}
+    alt={`Stadion ${trip.stadium || trip.city}`}
+    fill
+    preload
+    className="object-cover"
+    sizes="100vw"
+  />
+
+  <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-black/30" />
+  <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/50" />
+
+  <div className="relative mx-auto flex min-h-135 max-w-7xl flex-col px-4 py-6 md:px-6 md:py-8 lg:min-h-115">
+
 
           <div className="mt-auto grid items-end gap-10 pb-6 lg:grid-cols-[1fr_auto]">
             <div className="max-w-4xl">
@@ -220,7 +322,57 @@ export default async function TripDetailPage({ params, searchParams }: { params:
       <section aria-labelledby="wariant-pakietu" className="border-b bg-secondary px-4 py-8 md:px-6 md:py-10">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between"><div><p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Dopasuj ofertę</p><h2 id="wariant-pakietu" className="mt-1 font-sans text-2xl font-black uppercase md:text-3xl">Wybierz wariant pakietu</h2></div><p className="max-w-xl text-sm leading-6 text-muted-foreground">Niepełne pakiety wyceniamy indywidualnie według Twoich potrzeb. Zazwyczaj kosztują mniej niż pełny pakiet.</p></div>
-          <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">{packageVariants.map((variant) => { const VariantIcon = variant.key === "ticket" ? TicketCheck : variant.key === "ticket_flight" ? Plane : variant.key === "ticket_hotel" ? BedDouble : Check; const selected = variant.key === selectedPackageVariant.key; return <Link key={variant.key} href={`?pakiet=${variant.key}#wariant-pakietu`} aria-current={selected ? "true" : undefined} className={`group flex min-h-20 items-center gap-4 border-l-2 px-4 py-3 transition-colors ${selected ? "border-primary bg-background text-foreground" : "border-border bg-transparent text-muted-foreground hover:border-primary/60 hover:bg-background/60 hover:text-foreground"}`}><span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${selected ? "bg-primary text-primary-foreground" : "bg-background text-foreground group-hover:text-primary"}`}><VariantIcon className="size-5" /></span><span><strong className="block text-sm uppercase">{variant.shortLabel}</strong><span className="mt-1 block text-xs">{variant.key === "full" ? `od ${trip.price.toLocaleString("pl-PL")} zł` : "Wycena indywidualna"}</span></span></Link> })}</div>
+         <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+  {orderedPackageVariants.map((variant) => {
+    const VariantIcon =
+      variant.key === "ticket"
+        ? TicketCheck
+        : variant.key === "ticket_flight"
+          ? Plane
+          : variant.key === "ticket_hotel"
+            ? BedDouble
+            : Check
+
+    const selected =
+      variant.key === selectedPackageVariant.key
+
+    return (
+      <Link
+        key={variant.key}
+        href={`?pakiet=${variant.key}#wariant-pakietu`}
+        aria-current={selected ? "true" : undefined}
+        className={`group flex min-h-20 items-center gap-4 border-l-2 px-4 py-3 transition-colors ${
+          selected
+            ? "border-primary bg-background text-foreground"
+            : "border-border bg-transparent text-muted-foreground hover:border-primary/60 hover:bg-background/60 hover:text-foreground"
+        }`}
+      >
+        <span
+          className={`flex size-10 shrink-0 items-center justify-center rounded-full ${
+            selected
+              ? "bg-primary text-primary-foreground"
+              : "bg-background text-foreground group-hover:text-primary"
+          }`}
+        >
+          <VariantIcon className="size-5" />
+        </span>
+
+        <span>
+          <strong className="block text-sm uppercase">
+            {variant.shortLabel}
+          </strong>
+
+          <span className="mt-1 block text-xs">
+            {variant.key === "full"
+              ? `od ${trip.price.toLocaleString("pl-PL")} zł`
+              : "Wycena indywidualna"}
+          </span>
+        </span>
+      </Link>
+    )
+  })}
+</div>
+
         </div>
       </section>
 
@@ -234,14 +386,14 @@ export default async function TripDetailPage({ params, searchParams }: { params:
             ticketCategory={trip.ticketCategory}
             seatingInfo={trip.seatingInfo}
             itinerary={trip.itinerary.length > 0 ? trip.itinerary : defaultPlan}
-            hotel={hasHotel ? {
+            hotel={selectedHasHotel ? {
               stars: trip.hotelStars,
               info: trip.hotelInfo || "Dokładny obiekt potwierdzimy przed rezerwacją.",
               board: trip.hotelBoard,
               roomType: trip.roomType,
               optional: packageOptions.hotel === "optional",
             } : undefined}
-            flight={hasFlight ? {
+            flight={selectedHasFlight ? {
               info: trip.flightInfo || "Godziny i połączenie potwierdzamy po ustaleniu wariantu.",
               airports: trip.departureAirports,
               type: trip.flightType,
@@ -252,6 +404,19 @@ export default async function TripDetailPage({ params, searchParams }: { params:
             testimonials={testimonials.slice(0, 4).map(({ id, author, tripName, content: testimonialContent, rating }) => ({ id, author, tripName, content: testimonialContent, rating }))}
             faq={faq}
             tripTitle={trip.title}
+              selectedPackageLabel={
+    selectedPackageVariant.label
+  }
+  partialPackageSelected={
+    partialPackageSelected
+  }
+  hotelIncluded={
+    selectedHasHotel
+  }
+  flightIncluded={
+    selectedHasFlight
+  }
+  changePackageHref="#wariant-pakietu"
           />
         </div>
       </section>
