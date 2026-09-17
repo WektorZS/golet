@@ -11,7 +11,7 @@ import {
   MapPin,
   Star,
   ChevronLeft,
-ChevronRight,
+  ChevronRight,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -94,15 +94,15 @@ function getStay(trip: Trip) {
 function TeamLogo({ src, name }: { src: string; name: string }) {
   if (!src) {
     return (
-      <span className="flex size-14 items-center justify-center rounded-full border border-white/25 bg-black/35 font-sans text-sm font-black text-white backdrop-blur-sm">
+      <span className="flex size-20 items-center justify-center rounded-full border border-white/25 bg-black/35 font-sans text-sm font-black text-white backdrop-blur-sm">
         {name.slice(0, 2).toUpperCase()}
       </span>
     )
   }
 
   return (
-    <span className="relative block size-14 shrink-0 drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)]">
-      <Image src={src} alt={`Herb ${name}`} fill className="object-contain" sizes="56px" />
+    <span className="relative block size-20 shrink-0 drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)]">
+      <Image src={src} alt={`Herb ${name}`} fill className="object-contain" sizes="80px" />
     </span>
   )
 }
@@ -138,22 +138,22 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
 
   const [selectedMonthKey, setSelectedMonthKey] =
     useState(groups[0]?.key ?? "")
-    const [desktopMonthStart, setDesktopMonthStart] =
-  useState(0)
+  const [desktopMonthStart, setDesktopMonthStart] =
+    useState(0)
 
-const DESKTOP_MONTHS_VISIBLE = 6
+  const DESKTOP_MONTHS_VISIBLE = 6
 
-const visibleDesktopMonths = groups.slice(
-  desktopMonthStart,
-  desktopMonthStart + DESKTOP_MONTHS_VISIBLE
-)
+  const visibleDesktopMonths = groups.slice(
+    desktopMonthStart,
+    desktopMonthStart + DESKTOP_MONTHS_VISIBLE
+  )
 
-const canGoPrevious =
-  desktopMonthStart > 0
+  const canGoPrevious =
+    desktopMonthStart > 0
 
-const canGoNext =
-  desktopMonthStart + DESKTOP_MONTHS_VISIBLE <
-  groups.length
+  const canGoNext =
+    desktopMonthStart + DESKTOP_MONTHS_VISIBLE <
+    groups.length
 
   if (groups.length === 0) {
     return (
@@ -164,192 +164,188 @@ const canGoNext =
       </div>
     )
   }
-const selectedMonth =
-  groups.find(
-    (group) => group.key === selectedMonthKey
-  ) ?? groups[0]
+  const selectedMonth =
+    groups.find(
+      (group) => group.key === selectedMonthKey
+    ) ?? groups[0]
   return (
     <div>
-   <div className="sticky top-20 z-40 -mx-4 border-y border-foreground/10 bg-background/95 backdrop-blur-md md:mx-0">
-<nav
-  aria-label="Miesiące wyjazdów"
-  className="hidden md:block"
->
-  <div className="flex items-stretch gap-2 px-3 py-3">
-    {groups.length > DESKTOP_MONTHS_VISIBLE ? (
-      <button
-        type="button"
-        onClick={() =>
-          setDesktopMonthStart((current) =>
-            Math.max(
-              0,
-              current - 1
-            )
-          )
-        }
-        disabled={!canGoPrevious}
-        aria-label="Poprzednie miesiące"
-        className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-25"
-      >
-        <ChevronLeft
-          className="size-4"
-          aria-hidden="true"
-        />
-      </button>
-    ) : null}
-
-    <div className="flex min-w-0 flex-1 items-stretch justify-center gap-2">
-  {visibleDesktopMonths.map((group) => {
-        const active =
-          group.key === selectedMonthKey
-
-        return (
-          <a
-            key={group.key}
-            href={`#miesiac-${group.key}`}
-            onClick={() =>
-              setSelectedMonthKey(group.key)
-            }
-            aria-current={
-              active ? "true" : undefined
-            }
-            className={`w-40 shrink-0 rounded-lg px-2.5 py-2 text-center font-sans text-sm font-black uppercase tracking-wide transition-colors ${
-              active
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground"
-            }`}
-          >
-            <span className="block truncate">
-  {group.label}
-</span>
-
-<span className="mt-1 block font-mono text-[11px] font-bold normal-case tracking-normal opacity-65">
-  {tripsCount(group.trips.length)}
-</span>
-          </a>
-        )
-      })}
-    </div>
-
-    {groups.length > DESKTOP_MONTHS_VISIBLE ? (
-      <button
-        type="button"
-        onClick={() =>
-          setDesktopMonthStart((current) =>
-            Math.min(
-              groups.length -
-                DESKTOP_MONTHS_VISIBLE,
-              current + 1
-            )
-          )
-        }
-        disabled={!canGoNext}
-        aria-label="Następne miesiące"
-        className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-25"
-      >
-        <ChevronRight
-          className="size-4"
-          aria-hidden="true"
-        />
-      </button>
-    ) : null}
-  </div>
-</nav>
-
-  <div className="relative md:hidden">
-    <button
-      type="button"
-      onClick={() =>
-        setMobileMonthsOpen(
-          (current) => !current
-        )
-      }
-      aria-expanded={mobileMonthsOpen}
-      aria-controls="mobile-months-menu"
-      className="flex min-h-17 w-full items-center justify-between gap-4 px-4 py-3 text-left"
-    >
-      <div className="min-w-0">
-        <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-muted-foreground">
-          Wybierz miesiąc
-        </p>
-
-        <div className="mt-1 flex items-center gap-2">
-          <span className="truncate font-sans text-lg font-black uppercase leading-none text-foreground">
-            {selectedMonth.label}
-          </span>
-
-          <span className="font-mono text-[10px] text-muted-foreground">
-            {tripsCount(
-              selectedMonth.trips.length
-            )}
-          </span>
-        </div>
-      </div>
-
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-foreground/15 bg-background">
-        <ChevronDown
-          className={`size-4 transition-transform duration-200 ${
-            mobileMonthsOpen
-              ? "rotate-180"
-              : ""
-          }`}
-          aria-hidden="true"
-        />
-      </span>
-    </button>
-
-    {mobileMonthsOpen ? (
-      <div
-        id="mobile-months-menu"
-        className="absolute inset-x-0 top-full z-50 border-t border-foreground/10 bg-background p-3 shadow-xl"
-      >
-        <div className="grid max-h-96 grid-cols-2 gap-2 overflow-y-auto">
-          {groups.map((group) => {
-            const active =
-              group.key === selectedMonthKey
-
-            return (
-              <a
-                key={group.key}
-                href={`#miesiac-${group.key}`}
-                onClick={() => {
-                  setSelectedMonthKey(
-                    group.key
+      <div className="sticky top-20 z-40 -mx-4 border-y border-foreground/10 bg-background/95 backdrop-blur-md md:mx-0">
+        <nav
+          aria-label="Miesiące wyjazdów"
+          className="hidden md:block"
+        >
+          <div className="flex items-stretch gap-2 px-3 py-3">
+            {groups.length > DESKTOP_MONTHS_VISIBLE ? (
+              <button
+                type="button"
+                onClick={() =>
+                  setDesktopMonthStart((current) =>
+                    Math.max(
+                      0,
+                      current - 1
+                    )
                   )
-                  setMobileMonthsOpen(false)
-                }}
-                aria-current={
-                  active ? "true" : undefined
                 }
-                className={`flex min-h-16 flex-col justify-center rounded-lg border px-3 py-3 transition-colors ${
-                  active
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-foreground/10 bg-secondary/50 text-foreground"
-                }`}
+                disabled={!canGoPrevious}
+                aria-label="Poprzednie miesiące"
+                className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-25"
               >
-                <span className="font-sans text-sm font-black uppercase leading-tight">
-                  {group.label}
+                <ChevronLeft
+                  className="size-4"
+                  aria-hidden="true"
+                />
+              </button>
+            ) : null}
+
+            <div className="flex min-w-0 flex-1 items-stretch justify-center gap-2">
+              {visibleDesktopMonths.map((group) => {
+                const active =
+                  group.key === selectedMonthKey
+
+                return (
+                  <a
+                    key={group.key}
+                    href={`#miesiac-${group.key}`}
+                    onClick={() =>
+                      setSelectedMonthKey(group.key)
+                    }
+                    aria-current={
+                      active ? "true" : undefined
+                    }
+                    className={`w-40 shrink-0 rounded-lg px-2.5 py-2 text-center font-sans text-sm font-black uppercase tracking-wide transition-colors ${active
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground"
+                      }`}
+                  >
+                    <span className="block truncate">
+                      {group.label}
+                    </span>
+
+                    <span className="mt-1 block font-mono text-[11px] font-bold normal-case tracking-normal opacity-65">
+                      {tripsCount(group.trips.length)}
+                    </span>
+                  </a>
+                )
+              })}
+            </div>
+
+            {groups.length > DESKTOP_MONTHS_VISIBLE ? (
+              <button
+                type="button"
+                onClick={() =>
+                  setDesktopMonthStart((current) =>
+                    Math.min(
+                      groups.length -
+                      DESKTOP_MONTHS_VISIBLE,
+                      current + 1
+                    )
+                  )
+                }
+                disabled={!canGoNext}
+                aria-label="Następne miesiące"
+                className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-25"
+              >
+                <ChevronRight
+                  className="size-4"
+                  aria-hidden="true"
+                />
+              </button>
+            ) : null}
+          </div>
+        </nav>
+
+        <div className="relative md:hidden">
+          <button
+            type="button"
+            onClick={() =>
+              setMobileMonthsOpen(
+                (current) => !current
+              )
+            }
+            aria-expanded={mobileMonthsOpen}
+            aria-controls="mobile-months-menu"
+            className="flex min-h-17 w-full items-center justify-between gap-4 px-4 py-3 text-left"
+          >
+            <div className="min-w-0">
+              <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-muted-foreground">
+                Wybierz miesiąc
+              </p>
+
+              <div className="mt-1 flex items-center gap-2">
+                <span className="truncate font-sans text-lg font-black uppercase leading-none text-foreground">
+                  {selectedMonth.label}
                 </span>
 
-                <span
-                  className={`mt-1 font-mono text-[9px] font-bold ${
-                    active
-                      ? "text-primary-foreground/65"
-                      : "text-muted-foreground"
-                  }`}
-                >
+                <span className="font-mono text-[10px] text-muted-foreground">
                   {tripsCount(
-                    group.trips.length
+                    selectedMonth.trips.length
                   )}
                 </span>
-              </a>
-            )
-          })}
+              </div>
+            </div>
+
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-foreground/15 bg-background">
+              <ChevronDown
+                className={`size-4 transition-transform duration-200 ${mobileMonthsOpen
+                  ? "rotate-180"
+                  : ""
+                  }`}
+                aria-hidden="true"
+              />
+            </span>
+          </button>
+
+          {mobileMonthsOpen ? (
+            <div
+              id="mobile-months-menu"
+              className="absolute inset-x-0 top-full z-50 border-t border-foreground/10 bg-background p-3 shadow-xl"
+            >
+              <div className="grid max-h-96 grid-cols-2 gap-2 overflow-y-auto">
+                {groups.map((group) => {
+                  const active =
+                    group.key === selectedMonthKey
+
+                  return (
+                    <a
+                      key={group.key}
+                      href={`#miesiac-${group.key}`}
+                      onClick={() => {
+                        setSelectedMonthKey(
+                          group.key
+                        )
+                        setMobileMonthsOpen(false)
+                      }}
+                      aria-current={
+                        active ? "true" : undefined
+                      }
+                      className={`flex min-h-16 flex-col justify-center rounded-lg border px-3 py-3 transition-colors ${active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-foreground/10 bg-secondary/50 text-foreground"
+                        }`}
+                    >
+                      <span className="font-sans text-sm font-black uppercase leading-tight">
+                        {group.label}
+                      </span>
+
+                      <span
+                        className={`mt-1 font-mono text-[9px] font-bold ${active
+                          ? "text-primary-foreground/65"
+                          : "text-muted-foreground"
+                          }`}
+                      >
+                        {tripsCount(
+                          group.trips.length
+                        )}
+                      </span>
+                    </a>
+                  )
+                })}
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
-    ) : null}
-  </div>
-</div>
       <div className="mt-8 space-y-12">
         {groups.map((group) => (
           <section key={group.key} id={`miesiac-${group.key}`} className="scroll-mt-40">
@@ -376,8 +372,7 @@ const selectedMonth =
                         <Image src={trip.image} alt={`Stadion ${trip.stadium || trip.city}`} fill className="scale-[1.04] object-cover blur-[1.5px] transition-all duration-500 group-hover:scale-[1.09] group-hover:blur-[0.5px]" sizes="(max-width: 1024px) 100vw, 210px" />
                         <div className="absolute inset-0 bg-black/45" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/25" />
-                        <span className={`absolute left-3 top-3 rounded-md px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-wider shadow ${status.className}`}>{status.label}</span>
-                        <div className="absolute inset-0 flex items-center justify-center gap-3 pt-3">
+                                               <div className="absolute inset-0 flex items-center justify-center gap-3 pt-3">
                           <TeamLogo src={trip.homeLogo} name={homeTeam} />
                           <span className="font-sans text-lg font-black text-white/75">VS</span>
                           <TeamLogo src={trip.awayLogo} name={awayTeam} />
@@ -387,8 +382,7 @@ const selectedMonth =
 
                       <div className="grid gap-5 p-5 md:grid-cols-[1.2fr_1fr]">
                         <div>
-                          {(trip.leagueName || trip.leagueLogo) && <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{trip.leagueLogo && <span className="relative size-5"><Image src={trip.leagueLogo} alt={`Logo ${trip.leagueName}`} fill className="object-contain" sizes="20px" /></span>}<span>{trip.leagueName}</span></div>}
-                          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-primary">{trip.city}, {trip.country}</p>
+                          {(trip.leagueName || trip.leagueLogo) && <div className="mb-2 flex items-center gap-2 text-[12px] font-bold uppercase tracking-wider text-muted-foreground">{trip.leagueLogo && <span className="relative size-7"><Image src={trip.leagueLogo} alt={`Logo ${trip.leagueName}`} fill className="object-contain" sizes="28px" /></span>}<span>{trip.leagueName}</span></div>}
                           <h3 className="mt-1 font-sans text-2xl font-black uppercase leading-tight">{homeTeam} - {awayTeam}</h3>
                           <div className="mt-3 flex flex-wrap gap-2">
                             <span className="rounded-md bg-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-background">{packageSummary(trip.packageItems)}</span>
@@ -397,7 +391,7 @@ const selectedMonth =
                             {trip.hotelStars > 0 && packageOptions.hotel !== "excluded" && <span className="inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"><Star className="size-3 fill-primary text-primary" />Hotel {trip.hotelStars}*</span>}
                             {trip.ticketCategory && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">{trip.ticketCategory}</span>}
                           </div>
-                          <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1"><span className="text-[10px] font-bold uppercase text-muted-foreground">Dostępne warianty:</span>{variants.map((variant, index) => <span key={variant.key} className="text-xs font-semibold">{index > 0 && <span className="mr-2 text-primary">/</span>}{variant.shortLabel}</span>)}</div>
+                          <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1">{variants.map((variant, index) => <span key={variant.key} className="text-xs font-semibold">{index > 0 && <span className="mr-2 text-primary">/</span>}{variant.shortLabel}</span>)}</div>
                         </div>
 
                         <dl className="grid content-center gap-3 text-sm">
@@ -407,16 +401,32 @@ const selectedMonth =
                         </dl>
                       </div>
 
-                      <div className="flex items-center justify-between gap-5 border-t bg-secondary/45 p-5 lg:w-48 lg:flex-col lg:items-stretch lg:justify-center lg:border-l lg:border-t-0">
-                        <div>
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Cena od / osoba</p>
-                          <p className="font-sans text-3xl font-black">{trip.price.toLocaleString("pl-PL")} zł</p>
-                        </div>
-                        <Button nativeButton={false} render={<Link href={`/wyjazdy/${trip.slug}`} />} className="shrink-0">
-                          Szczegóły
-                          <ArrowRight data-icon="inline-end" />
-                        </Button>
-                      </div>
+                      <div className="flex items-center justify-between gap-4 border-t bg-secondary/45 p-4 lg:w-48 lg:flex-col lg:items-stretch lg:justify-center lg:gap-3 lg:border-l lg:border-t-0">
+  <span
+    className={`w-fit rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${status.className}`}
+  >
+    {status.label}
+  </span>
+
+  <div>
+    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+      Cena od / osoba
+    </p>
+
+    <p className="font-sans text-2xl font-black leading-none">
+      {trip.price.toLocaleString("pl-PL")} zł
+    </p>
+  </div>
+
+  <Button
+  nativeButton={false}
+  render={<Link href={`/wyjazdy/${trip.slug}`} />}
+  className="h-11 shrink-0 px-5 text-sm font-bold lg:w-full"
+>
+  Szczegóły
+  <ArrowRight className="size-4.5" data-icon="inline-end" />
+</Button>
+</div>
                     </div>
                   </article>
                 )
