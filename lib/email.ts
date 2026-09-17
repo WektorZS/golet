@@ -3,7 +3,8 @@ import { Resend } from "resend"
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL
+const INQUIRY_NOTIFICATION_EMAIL =
+  process.env.INQUIRY_NOTIFICATION_EMAIL
 
 function escapeHtml(value: string) {
   return value
@@ -31,10 +32,9 @@ export async function sendInquiryEmails(
     throw new Error("Brak RESEND_FROM_EMAIL")
   }
 
-  if (!ADMIN_EMAIL) {
-    throw new Error("Brak ADMIN_EMAIL")
-  }
-
+if (!INQUIRY_NOTIFICATION_EMAIL) {
+  throw new Error("Brak INQUIRY_NOTIFICATION_EMAIL")
+}
   const name = escapeHtml(inquiry.name)
   const email = escapeHtml(inquiry.email)
   const phone = escapeHtml(inquiry.phone)
@@ -160,9 +160,9 @@ export async function sendInquiryEmails(
   }
 
   const adminResult = await resend.emails.send({
-    from: FROM_EMAIL,
-    to: ADMIN_EMAIL,
-    replyTo: inquiry.email,
+  from: FROM_EMAIL,
+  to: INQUIRY_NOTIFICATION_EMAIL,
+  replyTo: inquiry.email,
     subject: `🔔 Nowe zapytanie od ${inquiry.name}`,
     html: `
       <div style="margin:0;padding:32px 16px;background:#f3f3f3;font-family:Arial,Helvetica,sans-serif;color:#111;">
