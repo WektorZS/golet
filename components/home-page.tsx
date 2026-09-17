@@ -1,3 +1,4 @@
+
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -13,7 +14,6 @@ import {
   TicketCheck,
   Ticket,
 Hotel,
-Sparkles,
   Trophy,
   Users,
   CircleCheckBig,
@@ -463,15 +463,15 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         ))}
       </div>
 
-      <Button
-        size="lg"
-        className="mt-9 h-12 px-6"
-        nativeButton={false}
-        render={<Link href="/kontakt#formularz" />}
-      >
-        Opisz swój wyjazd
-        <ArrowRight data-icon="inline-end" />
-      </Button>
+   <Button
+  size="lg"
+  className="mt-9 h-12 px-6"
+  nativeButton={false}
+  render={<a href="/kontakt#formularz" />}
+>
+  Opisz swój wyjazd
+  <ArrowRight data-icon="inline-end" />
+</Button>
     </div>
   </div>
 </section>
@@ -482,7 +482,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     aria-hidden="true"
   >
     <Image
-      src="/images/about-us.webp"
+      src="/images/oferta.webp"
       alt=""
       fill
       className="object-cover"
