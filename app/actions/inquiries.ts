@@ -76,6 +76,16 @@ const inquirySchema = z.object({
       "Nazwa meczu zawiera niedozwolone znaki."
     ),
 
+    packageVariant: z
+  .string()
+  .trim()
+  .max(
+    160,
+    "Nazwa wariantu pakietu jest za długa."
+  )
+  .optional()
+  .default(""),
+
   departureCity: z
     .string()
     .trim()
@@ -159,6 +169,8 @@ export async function createInquiry(
       email: formData.get("email"),
       phone: formData.get("phone"),
       matchName: formData.get("matchName"),
+      packageVariant:
+  formData.get("packageVariant") ?? "",
       departureCity:
         formData.get("departureCity"),
       travelers: formData.get("travelers"),
@@ -213,9 +225,9 @@ export async function createInquiry(
     parsed.data.email
   )
 
-  const contentHash = hmac(
-    `${parsed.data.email}|${parsed.data.matchName}|${parsed.data.message}`
-  )
+ const contentHash = hmac(
+  `${parsed.data.email}|${parsed.data.matchName}|${parsed.data.packageVariant}|${parsed.data.message}`
+)
 
   const oneDayAgo = new Date(
     Date.now() -
@@ -335,12 +347,13 @@ export async function createInquiry(
       }
     }
 
-    const {
-      website,
-      formLoadedAt,
-      privacyConsent,
-      ...values
-    } = parsed.data
+   const {
+  website,
+  formLoadedAt,
+  privacyConsent,
+  packageVariant,
+  ...values
+} = parsed.data
 
     await db
       .insert(inquiries)
@@ -361,18 +374,15 @@ export async function createInquiry(
 
     try {
       await sendInquiryEmails({
-        name: values.name,
-        email: values.email,
-        phone: values.phone,
-        matchName:
-          values.matchName,
-        departureCity:
-          values.departureCity,
-        travelers:
-          values.travelers,
-        message:
-          values.message,
-      })
+  name: values.name,
+  email: values.email,
+  phone: values.phone,
+  matchName: values.matchName,
+  packageVariant,
+  departureCity: values.departureCity,
+  travelers: values.travelers,
+  message: values.message,
+})
     } catch (error) {
       console.error(
         "Nie udało się wysłać wiadomości e-mail dla zapytania:",

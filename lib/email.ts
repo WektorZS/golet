@@ -14,11 +14,14 @@ export type InquiryEmailData = {
   email: string
   phone: string
   matchName: string
+  packageVariant: string
   departureCity: string
   travelers: number
   message: string
 }
-
+const packageVariant = escapeHtml(
+  inquiry.packageVariant || "Nie wybrano"
+)
 export async function sendInquiryEmails(
   inquiry: InquiryEmailData
 ) {
@@ -108,6 +111,14 @@ export async function sendInquiryEmails(
                     ${matchName}
                   </div>
                 </div>
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+    Wybrany pakiet
+  </div>
+  <div style="font-size:15px;font-weight:700;color:#111111;">
+    ${packageVariant}
+  </div>
+</div>
 
                 <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
@@ -270,7 +281,14 @@ export async function sendInquiryEmails(
                     ${matchName}
                   </div>
                 </div>
-
+<div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+    Wybrany pakiet
+  </div>
+  <div style="font-size:15px;font-weight:700;color:#111111;">
+    ${packageVariant}
+  </div>
+</div>
                 <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Skąd wylot

@@ -217,14 +217,21 @@ const selectedTripLabel = selectedTrip
       />
 
       {/* Mecz przekazany z konkretnego wyjazdu */}
-      {hasSelectedTrip && (
-        <input
-          type="hidden"
-          name="matchName"
-          value={`${matchName}${selectedPackageVariant ? ` - Pakiet: ${selectedPackageVariant}` : ""}`.slice(0, 160)}
-        />
-      )}
+    {!hasSelectedTrip && selectedMatch && !isOtherMatch && (
+  <>
+    <input
+      type="hidden"
+      name="matchName"
+      value={selectedMatch.slice(0, 160)}
+    />
 
+    <input
+      type="hidden"
+      name="packageVariant"
+      value={selectedPackageVariant.slice(0, 160)}
+    />
+  </>
+)}
       <FieldGroup className="grid gap-x-4 gap-y-4 md:grid-cols-2">
         <Field>
           <FieldLabel
