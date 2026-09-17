@@ -401,14 +401,15 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                         </dl>
                       </div>
 
-                      <div className="flex items-center justify-between gap-4 border-t bg-secondary/45 p-4 lg:w-48 lg:flex-col lg:items-stretch lg:justify-center lg:gap-3 lg:border-l lg:border-t-0">
+                     <div className="grid gap-4 border-t bg-secondary/45 p-4 sm:grid-cols-[auto_1fr] sm:items-center lg:w-48 lg:grid-cols-1 lg:items-stretch lg:justify-center lg:gap-3 lg:border-l lg:border-t-0">
+  <div className="flex items-center justify-between gap-4 sm:contents lg:block lg:text-center">
   <span
-    className={`w-fit rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${status.className}`}
+    className={`w-fit rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wide lg:mx-auto ${status.className}`}
   >
     {status.label}
   </span>
 
-  <div>
+  <div className="text-right sm:text-left lg:mt-3 lg:text-center">
     <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
       Cena od / osoba
     </p>
@@ -417,15 +418,16 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
       {trip.price.toLocaleString("pl-PL")} zł
     </p>
   </div>
+</div>
 
   <Button
-  nativeButton={false}
-  render={<Link href={`/wyjazdy/${trip.slug}`} />}
-  className="h-11 shrink-0 px-5 text-sm font-bold lg:w-full"
->
-  Szczegóły
-  <ArrowRight className="size-4.5" data-icon="inline-end" />
-</Button>
+    nativeButton={false}
+    render={<Link href={`/wyjazdy/${trip.slug}`} />}
+    className="h-11 w-full shrink-0 px-5 text-sm font-bold sm:col-span-2 lg:col-span-1"
+  >
+    Szczegóły
+    <ArrowRight className="size-4.5" data-icon="inline-end" />
+  </Button>
 </div>
                     </div>
                   </article>
