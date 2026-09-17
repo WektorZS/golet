@@ -1,11 +1,5 @@
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL
-const INQUIRY_NOTIFICATION_EMAIL =
-  process.env.INQUIRY_NOTIFICATION_EMAIL
-
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, "&amp;")
@@ -28,13 +22,26 @@ export type InquiryEmailData = {
 export async function sendInquiryEmails(
   inquiry: InquiryEmailData
 ) {
-  if (!FROM_EMAIL) {
+  const apiKey = process.env.RESEND_API_KEY
+  const fromEmail = process.env.RESEND_FROM_EMAIL
+  const inquiryNotificationEmail =
+    process.env.INQUIRY_NOTIFICATION_EMAIL
+  const replyToEmail = process.env.RESEND_REPLY_TO_EMAIL
+
+  if (!apiKey) {
+    throw new Error("Brak RESEND_API_KEY")
+  }
+
+  if (!fromEmail) {
     throw new Error("Brak RESEND_FROM_EMAIL")
   }
 
-if (!INQUIRY_NOTIFICATION_EMAIL) {
-  throw new Error("Brak INQUIRY_NOTIFICATION_EMAIL")
-}
+  if (!inquiryNotificationEmail) {
+    throw new Error("Brak INQUIRY_NOTIFICATION_EMAIL")
+  }
+
+  const resend = new Resend(apiKey)
+
   const name = escapeHtml(inquiry.name)
   const email = escapeHtml(inquiry.email)
   const phone = escapeHtml(inquiry.phone)
@@ -45,9 +52,9 @@ if (!INQUIRY_NOTIFICATION_EMAIL) {
   )
 
   const clientResult = await resend.emails.send({
-    from: FROM_EMAIL,
+    from: fromEmail,
     to: inquiry.email,
-    replyTo: process.env.RESEND_REPLY_TO_EMAIL,
+    replyTo: replyToEmail,
     subject: "Otrzymaliśmy Twoje zapytanie - Let's Gol",
     html: `
       <div style="margin:0;padding:32px 16px;background:#f3f3f3;font-family:Arial,Helvetica,sans-serif;color:#111;">
@@ -160,9 +167,9 @@ if (!INQUIRY_NOTIFICATION_EMAIL) {
   }
 
   const adminResult = await resend.emails.send({
-  from: FROM_EMAIL,
-  to: INQUIRY_NOTIFICATION_EMAIL,
-  replyTo: inquiry.email,
+    from: fromEmail,
+    to: inquiryNotificationEmail,
+    replyTo: inquiry.email,
     subject: `🔔 Nowe zapytanie od ${inquiry.name}`,
     html: `
       <div style="margin:0;padding:32px 16px;background:#f3f3f3;font-family:Arial,Helvetica,sans-serif;color:#111;">
