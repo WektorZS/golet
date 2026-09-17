@@ -397,7 +397,7 @@ export function TestimonialsCarousel({
       {selected && (
         <div
           className="
-            fixed inset-x-0 bottom-0 top-[88px] z-[100]
+            fixed inset-x-0 bottom-0 top-[80px] z-[100]
             bg-black/80 backdrop-blur-md
             md:top-[76px] md:flex md:items-center md:justify-center md:p-6
           "
@@ -426,7 +426,7 @@ export function TestimonialsCarousel({
               md:shadow-2xl
             "
           >
-            <div className="sticky left-0 top-0 z-30 h-[3px] w-full bg-primary" />
+            <div className="sticky left-0 top-0 z-30 hidden h-[3px] w-full bg-primary md:block" />
 
             <div className="sticky top-0 z-40 h-0">
               <button
