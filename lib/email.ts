@@ -19,9 +19,7 @@ export type InquiryEmailData = {
   travelers: number
   message: string
 }
-const packageVariant = escapeHtml(
-  inquiry.packageVariant || "Nie wybrano"
-)
+
 export async function sendInquiryEmails(
   inquiry: InquiryEmailData
 ) {
@@ -30,6 +28,9 @@ export async function sendInquiryEmails(
   const inquiryNotificationEmail =
     process.env.INQUIRY_NOTIFICATION_EMAIL
   const replyToEmail = process.env.RESEND_REPLY_TO_EMAIL
+  const packageVariant = escapeHtml(
+  inquiry.packageVariant || "Nie wybrano"
+)
 
   if (!apiKey) {
     throw new Error("Brak RESEND_API_KEY")
