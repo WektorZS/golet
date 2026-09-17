@@ -13,9 +13,9 @@ const links = [
   ["WYJAZDY", "/wyjazdy"],
   ["TWÓJ WYJAZD", "/#twoj-wyjazd"],
   ["GALERIA", "/galeria"],
-  ["O NAS", "/#o-nas"],
-  ["FAQ", "/#faq"],
-  ["KONTAKT", "/#kontakt"],
+  ["O NAS", "/o-nas"],
+  ["FAQ", "/faq"],
+  ["KONTAKT", "/kontakt"],
 ] as const
 
 export function Brand() {
