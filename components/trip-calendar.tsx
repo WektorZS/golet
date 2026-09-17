@@ -1,6 +1,18 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, CalendarDays, Clock3, MapPin, Plane, Star } from "lucide-react"
+import { useState } from "react"
+import {
+  ArrowRight,
+  CalendarDays,
+  ChevronDown,
+  Clock3,
+  MapPin,
+  Star,
+  ChevronLeft,
+ChevronRight,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { getPackageVariants, packageSummary, parsePackageItems } from "@/lib/package-options"
@@ -96,13 +108,52 @@ function TeamLogo({ src, name }: { src: string; name: string }) {
 }
 
 export function TripCalendar({ trips }: { trips: Trip[] }) {
-  const groups = trips.reduce<Array<{ key: string; label: string; trips: Trip[] }>>((result, trip) => {
+  const groups = trips.reduce<
+    Array<{
+      key: string
+      label: string
+      trips: Trip[]
+    }>
+  >((result, trip) => {
     const key = monthKey(trip.startDate)
-    const group = result.find((item) => item.key === key)
-    if (group) group.trips.push(trip)
-    else result.push({ key, label: monthLabel(trip.startDate), trips: [trip] })
+    const group = result.find(
+      (item) => item.key === key
+    )
+
+    if (group) {
+      group.trips.push(trip)
+    } else {
+      result.push({
+        key,
+        label: monthLabel(trip.startDate),
+        trips: [trip],
+      })
+    }
+
     return result
   }, [])
+
+  const [mobileMonthsOpen, setMobileMonthsOpen] =
+    useState(false)
+
+  const [selectedMonthKey, setSelectedMonthKey] =
+    useState(groups[0]?.key ?? "")
+    const [desktopMonthStart, setDesktopMonthStart] =
+  useState(0)
+
+const DESKTOP_MONTHS_VISIBLE = 5
+
+const visibleDesktopMonths = groups.slice(
+  desktopMonthStart,
+  desktopMonthStart + DESKTOP_MONTHS_VISIBLE
+)
+
+const canGoPrevious =
+  desktopMonthStart > 0
+
+const canGoNext =
+  desktopMonthStart + DESKTOP_MONTHS_VISIBLE <
+  groups.length
 
   if (groups.length === 0) {
     return (
@@ -113,30 +164,195 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
       </div>
     )
   }
-
+const selectedMonth =
+  groups.find(
+    (group) => group.key === selectedMonthKey
+  ) ?? groups[0]
   return (
     <div>
-      <div className="relative -mx-4 md:mx-0">
-      <nav aria-label="Miesiące wyjazdów" className="sticky top-0 z-20 overflow-x-auto border-y bg-background/95 px-4 py-3 pr-16 backdrop-blur [scrollbar-width:thin] md:static md:rounded-xl md:border md:px-3">
-        <div className="flex min-w-max snap-x gap-2">
-          {groups.map((group, index) => (
-            <a
-              key={group.key}
-              href={`#miesiac-${group.key}`}
-              className={`min-w-[160px] snap-start rounded-lg px-5 py-3 text-center font-sans text-sm font-black uppercase tracking-wide transition-colors hover:bg-primary hover:text-primary-foreground md:min-w-0 ${index === 0 ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"}`}
-            >
+   <div className="sticky top-20 z-40 -mx-4 border-y border-foreground/10 bg-background/95 backdrop-blur-md md:mx-0">
+<nav
+  aria-label="Miesiące wyjazdów"
+  className="hidden md:block"
+>
+  <div className="flex items-stretch gap-2 px-3 py-3">
+    {groups.length > DESKTOP_MONTHS_VISIBLE ? (
+      <button
+        type="button"
+        onClick={() =>
+          setDesktopMonthStart((current) =>
+            Math.max(
+              0,
+              current - 1
+            )
+          )
+        }
+        disabled={!canGoPrevious}
+        aria-label="Poprzednie miesiące"
+        className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-25"
+      >
+        <ChevronLeft
+          className="size-4"
+          aria-hidden="true"
+        />
+      </button>
+    ) : null}
+
+    <div className="grid min-w-0 flex-1 grid-cols-5 gap-2">
+      {visibleDesktopMonths.map((group) => {
+        const active =
+          group.key === selectedMonthKey
+
+        return (
+          <a
+            key={group.key}
+            href={`#miesiac-${group.key}`}
+            onClick={() =>
+              setSelectedMonthKey(group.key)
+            }
+            aria-current={
+              active ? "true" : undefined
+            }
+            className={`min-w-0 rounded-lg px-3 py-3 text-center font-sans text-sm font-black uppercase tracking-wide transition-colors ${
+              active
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground"
+            }`}
+          >
+            <span className="block truncate">
               {group.label}
-              <span className="ml-2 font-mono text-[10px] opacity-60">{group.trips.length}</span>
-            </a>
-          ))}
+            </span>
+
+            <span className="ml-1 font-mono text-[10px] opacity-60">
+              {group.trips.length}
+            </span>
+          </a>
+        )
+      })}
+    </div>
+
+    {groups.length > DESKTOP_MONTHS_VISIBLE ? (
+      <button
+        type="button"
+        onClick={() =>
+          setDesktopMonthStart((current) =>
+            Math.min(
+              groups.length -
+                DESKTOP_MONTHS_VISIBLE,
+              current + 1
+            )
+          )
+        }
+        disabled={!canGoNext}
+        aria-label="Następne miesiące"
+        className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-25"
+      >
+        <ChevronRight
+          className="size-4"
+          aria-hidden="true"
+        />
+      </button>
+    ) : null}
+  </div>
+</nav>
+
+  <div className="relative md:hidden">
+    <button
+      type="button"
+      onClick={() =>
+        setMobileMonthsOpen(
+          (current) => !current
+        )
+      }
+      aria-expanded={mobileMonthsOpen}
+      aria-controls="mobile-months-menu"
+      className="flex min-h-17 w-full items-center justify-between gap-4 px-4 py-3 text-left"
+    >
+      <div className="min-w-0">
+        <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-muted-foreground">
+          Wybierz miesiąc
+        </p>
+
+        <div className="mt-1 flex items-center gap-2">
+          <span className="truncate font-sans text-lg font-black uppercase leading-none text-foreground">
+            {selectedMonth.label}
+          </span>
+
+          <span className="font-mono text-[10px] text-muted-foreground">
+            {tripsCount(
+              selectedMonth.trips.length
+            )}
+          </span>
         </div>
-      </nav>
-      <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 z-30 flex w-14 items-center justify-end bg-gradient-to-l from-background via-background/90 to-transparent pr-2 md:hidden"><ArrowRight className="size-4 text-primary" /></div>
       </div>
 
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-foreground/15 bg-background">
+        <ChevronDown
+          className={`size-4 transition-transform duration-200 ${
+            mobileMonthsOpen
+              ? "rotate-180"
+              : ""
+          }`}
+          aria-hidden="true"
+        />
+      </span>
+    </button>
+
+    {mobileMonthsOpen ? (
+      <div
+        id="mobile-months-menu"
+        className="absolute inset-x-0 top-full z-50 border-t border-foreground/10 bg-background p-3 shadow-xl"
+      >
+        <div className="grid max-h-96 grid-cols-2 gap-2 overflow-y-auto">
+          {groups.map((group) => {
+            const active =
+              group.key === selectedMonthKey
+
+            return (
+              <a
+                key={group.key}
+                href={`#miesiac-${group.key}`}
+                onClick={() => {
+                  setSelectedMonthKey(
+                    group.key
+                  )
+                  setMobileMonthsOpen(false)
+                }}
+                aria-current={
+                  active ? "true" : undefined
+                }
+                className={`flex min-h-16 flex-col justify-center rounded-lg border px-3 py-3 transition-colors ${
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-foreground/10 bg-secondary/50 text-foreground"
+                }`}
+              >
+                <span className="font-sans text-sm font-black uppercase leading-tight">
+                  {group.label}
+                </span>
+
+                <span
+                  className={`mt-1 font-mono text-[9px] font-bold ${
+                    active
+                      ? "text-primary-foreground/65"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {tripsCount(
+                    group.trips.length
+                  )}
+                </span>
+              </a>
+            )
+          })}
+        </div>
+      </div>
+    ) : null}
+  </div>
+</div>
       <div className="mt-8 space-y-12">
         {groups.map((group) => (
-          <section key={group.key} id={`miesiac-${group.key}`} className="scroll-mt-24">
+          <section key={group.key} id={`miesiac-${group.key}`} className="scroll-mt-40">
             <div className="mb-4 flex items-end justify-between border-b-2 border-foreground pb-3">
               <div>
                 <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Terminarz</p>
