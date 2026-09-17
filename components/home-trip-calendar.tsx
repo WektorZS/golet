@@ -1,6 +1,10 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import {
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import {
   CalendarDays,
   ChevronDown,
@@ -21,6 +25,7 @@ const monthFormatter = new Intl.DateTimeFormat("pl-PL", {
 function monthKey(date: string) {
   return date.slice(0, 7)
 }
+
 
 function monthLabel(key: string) {
   const [year, month] = key.split("-").map(Number)
@@ -89,7 +94,36 @@ export function HomeTripCalendar({
 
   const [mobileMonthsOpen, setMobileMonthsOpen] =
     useState(false)
+const calendarAnchorRef =
+  useRef<HTMLDivElement>(null)
 
+  const handleMonthChange = (
+  month: string
+) => {
+  setSelectedMonth(month)
+  setMobileMonthsOpen(false)
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const anchor =
+        calendarAnchorRef.current
+
+      if (!anchor) return
+
+      const headerOffset = 80
+
+      const top =
+        window.scrollY +
+        anchor.getBoundingClientRect().top -
+        headerOffset
+
+      window.scrollTo({
+        top: Math.max(0, top),
+        behavior: "smooth",
+      })
+    })
+  })
+}
   const [desktopMonthStart, setDesktopMonthStart] =
     useState(initialDesktopStart)
 
@@ -138,7 +172,12 @@ export function HomeTripCalendar({
     <div className="mt-10">
      
 
-      <div className="sticky top-20 z-40 -mx-4 border-y border-foreground/10 bg-section-light/95 backdrop-blur-md md:mx-0">
+      <div
+  ref={calendarAnchorRef}
+  className="h-0"
+/>
+
+<div className="sticky top-20 z-40 -mx-4 border-y border-foreground/10 bg-section-light/95 backdrop-blur-md md:mx-0">
         <div
           role="tablist"
           aria-label="Miesiąc wyjazdu"
@@ -181,8 +220,8 @@ export function HomeTripCalendar({
                     role="tab"
                     aria-selected={active}
                     onClick={() =>
-                      setSelectedMonth(month)
-                    }
+  handleMonthChange(month)
+}
                     className={`w-40 shrink-0 rounded-lg px-2.5 py-2 text-center transition-colors ${
                       active
                         ? "bg-primary text-primary-foreground"
@@ -289,10 +328,9 @@ export function HomeTripCalendar({
                     <button
                       key={month}
                       type="button"
-                      onClick={() => {
-                        setSelectedMonth(month)
-                        setMobileMonthsOpen(false)
-                      }}
+                      onClick={() =>
+  handleMonthChange(month)
+}
                       aria-pressed={active}
                       className={`flex min-h-16 flex-col justify-center rounded-lg border px-3 py-3 text-left transition-colors ${
                         active

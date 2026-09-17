@@ -455,17 +455,17 @@ export function TripDetailsTabs(
 ) {
   const [activeTab, setActiveTab] =
     useState("opis")
-    const [mobileTabsOpen, setMobileTabsOpen] =
-  useState(false)
-  const mobileTabsRef =
-  useRef<HTMLDivElement>(null)
 
-const shouldScrollToTabs =
-  useRef(false)
-const [
-  selectedTestimonial,
-  setSelectedTestimonial,
-] = useState<TestimonialItem | null>(null)
+  const [mobileTabsOpen, setMobileTabsOpen] =
+    useState(false)
+
+  const mobileTabsAnchorRef =
+    useRef<HTMLDivElement>(null)
+
+  const [
+    selectedTestimonial,
+    setSelectedTestimonial,
+  ] = useState<TestimonialItem | null>(null)
   const partialPackageSelected =
     props.partialPackageSelected ??
     false
@@ -552,20 +552,31 @@ useEffect(() => {
     )
   }
 }, [selectedTestimonial])
-useEffect(() => {
-  if (!shouldScrollToTabs.current) {
-    return
+
+  const handleMobileTabChange = (tabId: string) => {
+    setActiveTab(tabId)
+    setMobileTabsOpen(false)
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const anchor = mobileTabsAnchorRef.current
+
+        if (!anchor) return
+
+        const headerOffset = 80
+        const top =
+          window.scrollY +
+          anchor.getBoundingClientRect().top -
+          headerOffset
+
+        window.scrollTo({
+          top: Math.max(0, top),
+          behavior: "smooth",
+        })
+      })
+    })
   }
 
-  shouldScrollToTabs.current = false
-
-  requestAnimationFrame(() => {
-    mobileTabsRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    })
-  })
-}, [activeTab])
   const tabs = [
     {
       id: "opis",
@@ -655,9 +666,12 @@ useEffect(() => {
       </div>
 
       <div
-  ref={mobileTabsRef}
-  className="sticky top-20 z-40 -mx-4 mt-5 scroll-mt-20 border-y border-foreground/10 bg-background/95 backdrop-blur-md lg:hidden"
->
+        ref={mobileTabsAnchorRef}
+        className="h-0 lg:hidden"
+        aria-hidden="true"
+      />
+
+      <div className="sticky top-20 z-40 -mx-4 mt-5 border-y border-foreground/10 bg-background/95 backdrop-blur-md lg:hidden">
         <div className="relative">
           <button
             type="button"
@@ -731,11 +745,9 @@ useEffect(() => {
                       role="tab"
                       aria-selected={selected}
                       aria-controls={`panel-${tab.id}`}
-                      onClick={() => {
-  shouldScrollToTabs.current = true
-  setActiveTab(tab.id)
-  setMobileTabsOpen(false)
-}}
+                      onClick={() =>
+                        handleMobileTabChange(tab.id)
+                      }
                       className={`flex min-h-16 items-center gap-3 rounded-lg border px-3 py-3 text-left transition-colors ${
                         selected
                           ? "border-primary bg-primary text-primary-foreground"
