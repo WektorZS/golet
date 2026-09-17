@@ -1220,12 +1220,19 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
           <InquiryForm
   trips={trips
-    .filter((trip) => trip.availabilityStatus !== "sold_out")
+    .filter(
+      (trip) =>
+        trip.availabilityStatus !== "sold_out"
+    )
     .map((trip) => ({
       id: trip.id,
       title: trip.title,
-      date: trip.matchDate || trip.startDate,
-      packageVariants: getPackageVariants(trip.packageVariants, trip.packageItems).map((variant) => variant.label),
+      startDate: trip.startDate,
+      endDate: trip.endDate,
+      packageVariants: getPackageVariants(
+        trip.packageVariants,
+        trip.packageItems
+      ).map((variant) => variant.label),
     }))}
 />
         </div>
