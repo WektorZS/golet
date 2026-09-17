@@ -431,7 +431,7 @@ function TestimonialCard({
           <button
             type="button"
             onClick={onOpen}
-            className="group mt-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-primary transition-colors hover:text-primary/80"
+            className="group mt-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary transition-colors hover:text-primary/80"
           >
             Zobacz więcej
 
