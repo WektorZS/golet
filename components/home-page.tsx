@@ -357,51 +357,37 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
      <section
   id="wyjazdy"
-  className="scroll-mt-20 bg-section-light px-4 py-16 md:px-6 md:py-20"
+  className="relative scroll-mt-20 bg-section-light px-4 py-16 md:px-6 md:py-20"
 >
-  <div className="mx-auto max-w-7xl">
-    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-      <SectionHeading
-        eyebrow="Terminarz meczowych podróży"
-        title="Kalendarz wyjazdów"
-        intro={
-          content.tripsDescription ||
-          "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."
-        }
-        align="left"
-      />
-
-      <Button
-        variant="outline"
-        size="lg"
-        className="hidden w-fit shrink-0 md:inline-flex"
-        nativeButton={false}
-        render={<Link href="/wyjazdy" />}
-      >
-       <span className="inline-flex items-center gap-2">
-  Wszystkie wyjazdy
-  <ArrowRight className="size-4 shrink-0" />
-</span>
-      </Button>
-    </div>
-
-    <HomeTripCalendar trips={trips} />
-
-    <div className="mt-8 flex md:hidden">
-      <Button
-        variant="outline"
-        size="lg"
-        className="w-full"
-        nativeButton={false}
-        render={<Link href="/wyjazdy" />}
-      >
-      <span className="inline-flex items-center gap-2">
-  Wszystkie wyjazdy
-  <ArrowRight className="size-4 shrink-0" />
-</span>
-      </Button>
-    </div>
+<div className="mx-auto max-w-7xl">
+  <div className="flex flex-col items-center text-center">
+    <SectionHeading
+      eyebrow="Terminarz meczowych podróży"
+      title="Kalendarz wyjazdów"
+      intro={
+        content.tripsDescription ||
+        "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."
+      }
+      align="center"
+    />
   </div>
+
+  <HomeTripCalendar trips={trips} />
+
+  <div className="mt-8 flex justify-center">
+    <Button
+      variant="outline"
+      size="lg"
+      nativeButton={false}
+      render={<Link href="/wyjazdy" />}
+    >
+      <span className="inline-flex items-center gap-2">
+        Wszystkie wyjazdy
+        <ArrowRight className="size-4 shrink-0" />
+      </span>
+    </Button>
+  </div>
+</div>
 </section>
 
 <section

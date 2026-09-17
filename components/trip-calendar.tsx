@@ -198,8 +198,8 @@ const selectedMonth =
       </button>
     ) : null}
 
-    <div className="grid min-w-0 flex-1 grid-cols-5 gap-2">
-      {visibleDesktopMonths.map((group) => {
+    <div className="flex min-w-0 flex-1 items-stretch justify-center gap-2">
+  {visibleDesktopMonths.map((group) => {
         const active =
           group.key === selectedMonthKey
 
@@ -213,7 +213,7 @@ const selectedMonth =
             aria-current={
               active ? "true" : undefined
             }
-            className={`min-w-0 rounded-lg px-3 py-2.5 text-center font-sans text-sm font-black uppercase tracking-wide transition-colors ${
+            className={`w-40 shrink-0 rounded-lg px-2.5 py-2 text-center font-sans text-sm font-black uppercase tracking-wide transition-colors ${
               active
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground"
@@ -223,7 +223,7 @@ const selectedMonth =
   {group.label}
 </span>
 
-<span className="mt-1 block font-mono text-[9px] font-bold normal-case tracking-normal opacity-60">
+<span className="mt-1 block font-mono text-[11px] font-bold normal-case tracking-normal opacity-65">
   {tripsCount(group.trips.length)}
 </span>
           </a>
