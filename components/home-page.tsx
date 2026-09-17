@@ -491,7 +491,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
    <div className="absolute inset-0 bg-black/34" />
 
-<div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.70)_0%,rgba(0,0,0,0.25)_38%,rgba(0,0,0,0.45)_68%,rgba(0,0,0,0.96)_100%)]" />
+<div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.24)_36%,rgba(0,0,0,0.28)_68%,rgba(0,0,0,0.72)_100%)]" />
 
 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/40" />
 
