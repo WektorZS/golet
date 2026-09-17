@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   Clock3,
   Star,
+  Landmark,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -117,19 +118,19 @@ function TeamLogo({
 }) {
   if (!src) {
     return (
-      <span className="flex size-16 items-center justify-center rounded-full border border-white/25 bg-black/35 font-sans text-sm font-black text-white backdrop-blur-sm">
+      <span className="flex size-16 items-center justify-center rounded-full border border-white/25 bg-black/35 font-sans text-sm font-black text-white backdrop-blur-sm sm:size-20">
         {name.slice(0, 2).toUpperCase()}
       </span>
     )
   }
 
   return (
-    <span className="relative block size-16 drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)] sm:size-20">
+    <span className="relative flex size-16 shrink-0 items-center justify-center sm:size-20">
       <Image
         src={src}
         alt={`Herb ${name}`}
         fill
-        className="object-contain"
+        className="object-contain object-center drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)]"
         sizes="80px"
       />
     </span>
@@ -194,7 +195,7 @@ export function TripCard({
 
             <div className="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-black/25" />
 
-            <div className="absolute inset-0 flex items-center justify-center gap-3 pt-3">
+            <div className="absolute inset-0 flex items-center justify-center gap-3">
               <TeamLogo
                 src={trip.homeLogo}
                 name={teams.home}
@@ -265,8 +266,8 @@ export function TripCard({
                   packageOptions.hotel !==
                     "excluded" && (
                     <span className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-2 py-1 text-[12px] font-semibold">
-                      <Star
-                        className="size-3.5 fill-primary text-primary"
+                      <Landmark
+                        className="size-3.5 fill-primary text-black"
                         aria-hidden="true"
                       />
 
