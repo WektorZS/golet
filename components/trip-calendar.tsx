@@ -371,7 +371,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                       <div className="relative min-h-40 overflow-hidden bg-foreground lg:min-h-full">
                         <Image src={trip.image} alt={`Stadion ${trip.stadium || trip.city}`} fill className="scale-[1.04] object-cover blur-[1.5px] transition-all duration-500 group-hover:scale-[1.09] group-hover:blur-[0.5px]" sizes="(max-width: 1024px) 100vw, 210px" />
                         <div className="absolute inset-0 bg-black/45" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/25" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-black/25" />
                                                <div className="absolute inset-0 flex items-center justify-center gap-3 pt-3">
                           <TeamLogo src={trip.homeLogo} name={homeTeam} />
                           <span className="font-sans text-lg font-black text-white/75">VS</span>
