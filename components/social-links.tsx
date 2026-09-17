@@ -17,7 +17,7 @@ export function SocialLinks({
   const linkClassName =
     variant === "light"
       ? "border-border bg-background text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground"
-      : "border-background/20 bg-background/5 text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
+      : "border-zinc-800 bg-background/5 text-background hover:border-primary hover:bg-primary hover:text-primary-foreground"
 
   return (
     <div
