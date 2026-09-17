@@ -482,7 +482,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     aria-hidden="true"
   >
     <Image
-      src="/images/about-us.webp"
+      src="/images/oferta.webp"
       alt=""
       fill
       className="object-cover"
