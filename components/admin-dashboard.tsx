@@ -164,6 +164,8 @@ const sections = [
   ["account", "Bezpieczeństwo", Settings],
 ] as const
 
+const MEDIA_PAGE_SIZE = 6
+
 const formatActivityDate = (date: Date | string) => {
   return new Intl.DateTimeFormat("pl-PL", {
     day: "2-digit",
@@ -265,6 +267,48 @@ const [tripSort, setTripSort] = useState("nearest")
   const [activeSection, setActiveSection] = useState<(typeof sections)[number][0]>("dashboard")
   const [galleryItems, setGalleryItems] = useState(data.gallery)
   const [youtubeItems, setYoutubeItems] = useState(data.videos)
+  const [mediaLibraryPage, setMediaLibraryPage] = useState(1)
+
+  const mediaLibraryAssets = useMemo(
+    () =>
+      data.media.filter(
+        (asset) =>
+          !data.teams.some(
+            (team) =>
+              team.logo === `/api/media/${asset.id}`
+          ) &&
+          !data.leagues.some(
+            (league) =>
+              league.logo === `/api/media/${asset.id}`
+          )
+      ),
+    [data.media, data.teams, data.leagues]
+  )
+
+  const mediaLibraryPageCount = Math.max(
+    1,
+    Math.ceil(mediaLibraryAssets.length / MEDIA_PAGE_SIZE)
+  )
+
+  const currentMediaLibraryPage = Math.min(
+    mediaLibraryPage,
+    mediaLibraryPageCount
+  )
+
+  const visibleMediaLibraryAssets = useMemo(
+    () =>
+      mediaLibraryAssets.slice(
+        (currentMediaLibraryPage - 1) * MEDIA_PAGE_SIZE,
+        currentMediaLibraryPage * MEDIA_PAGE_SIZE
+      ),
+    [mediaLibraryAssets, currentMediaLibraryPage]
+  )
+
+  useEffect(() => {
+    if (mediaLibraryPage > mediaLibraryPageCount) {
+      setMediaLibraryPage(mediaLibraryPageCount)
+    }
+  }, [mediaLibraryPage, mediaLibraryPageCount])
 
   useEffect(() => {
     const savedSection = window.sessionStorage.getItem("admin-active-section")
@@ -1326,10 +1370,9 @@ const handleYouTubeDragEnd = async (event: any) => {
               </CardContent>
             </Card>
 
-            <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-              {data.media
-                .filter((asset) => !data.teams.some((team) => team.logo === `/api/media/${asset.id}`) && !data.leagues.some((league) => league.logo === `/api/media/${asset.id}`))
-                .map((asset) => (
+            <div className="min-w-0">
+              <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+                {visibleMediaLibraryAssets.map((asset) => (
                 <Card
                   key={asset.id}
                   className="overflow-hidden"
@@ -1410,7 +1453,96 @@ const handleYouTubeDragEnd = async (event: any) => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+                ))}
+              </div>
+
+              {mediaLibraryPageCount > 1 && (
+                <div className="mt-6 flex flex-col gap-4 border-t pt-5 sm:flex-row sm:items-center sm:justify-between">
+      <p className="text-sm text-muted-foreground">
+        Strona{" "}
+        <strong className="text-foreground">
+          {currentMediaLibraryPage}
+        </strong>{" "}
+        z{" "}
+        <strong className="text-foreground">
+          {mediaLibraryPageCount}
+        </strong>
+        {" · "}
+        {mediaLibraryAssets.length} zdjęć
+      </p>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={
+            currentMediaLibraryPage === 1
+          }
+          onClick={() =>
+            setMediaLibraryPage(
+              Math.max(
+                1,
+                currentMediaLibraryPage - 1
+              )
+            )
+          }
+        >
+          Poprzednia
+        </Button>
+
+        {Array.from({
+          length: mediaLibraryPageCount,
+        }).map((_, index) => {
+          const page = index + 1
+          const active =
+            page === currentMediaLibraryPage
+
+          return (
+            <Button
+              key={page}
+              type="button"
+              size="sm"
+              variant={
+                active
+                  ? "default"
+                  : "outline"
+              }
+              aria-current={
+                active ? "page" : undefined
+              }
+              onClick={() =>
+                setMediaLibraryPage(page)
+              }
+              className="min-w-9 px-3"
+            >
+              {page}
+            </Button>
+          )
+        })}
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={
+            currentMediaLibraryPage ===
+            mediaLibraryPageCount
+          }
+          onClick={() =>
+            setMediaLibraryPage(
+              Math.min(
+                mediaLibraryPageCount,
+                currentMediaLibraryPage + 1
+              )
+            )
+          }
+        >
+          Następna
+        </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -2841,7 +2973,6 @@ function ImageDropzone({
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [fileName, setFileName] = useState("")
-
   const setFiles = (files: FileList | null) => {
     if (!files || !files.length || !inputRef.current) return
 
