@@ -2357,7 +2357,7 @@ const handleYouTubeDragEnd = async (event: any) => {
                 </div>
 
                 <div className="space-y-3">
-                 <div>
+      <div>
   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
     Mecz
   </p>
@@ -2366,6 +2366,35 @@ const handleYouTubeDragEnd = async (event: any) => {
     {lead.matchName}
   </p>
 </div>
+
+{lead.tripStartDate ? (
+  <div>
+    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      Termin wyjazdu
+    </p>
+
+    <p className="mt-0.5 text-sm font-medium">
+      {new Intl.DateTimeFormat("pl-PL", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }).format(
+        new Date(`${lead.tripStartDate}T00:00:00`)
+      )}
+
+      {lead.tripEndDate &&
+      lead.tripEndDate !== lead.tripStartDate
+        ? ` - ${new Intl.DateTimeFormat("pl-PL", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }).format(
+            new Date(`${lead.tripEndDate}T00:00:00`)
+          )}`
+        : ""}
+    </p>
+  </div>
+) : null}
 
 {lead.packageVariant ? (
   <div>
@@ -2380,26 +2409,26 @@ const handleYouTubeDragEnd = async (event: any) => {
 ) : null}
 
 <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                        Skąd wylot
-                      </p>
+  <div>
+    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      Skąd wylot
+    </p>
 
-                      <p className="mt-0.5 text-sm font-medium">
-                        {lead.departureCity}
-                      </p>
-                    </div>
+    <p className="mt-0.5 text-sm font-medium">
+      {lead.departureCity}
+    </p>
+  </div>
 
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                        Liczba osób
-                      </p>
+  <div>
+    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      Liczba osób
+    </p>
 
-                      <p className="mt-0.5 text-sm font-medium">
-                        {lead.travelers} os.
-                      </p>
-                    </div>
-                  </div>
+    <p className="mt-0.5 text-sm font-medium">
+      {lead.travelers} os.
+    </p>
+  </div>
+</div>
 
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -3032,7 +3061,7 @@ function YouTubeSettingsForm({
         <Button
           type="submit"
           disabled={pending}
-          className="min-w-[170px]"
+          className="min-w-42.5"
         >
           <Clapperboard />
 

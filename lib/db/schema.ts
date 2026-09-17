@@ -1,4 +1,12 @@
-import { boolean, date, integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core"
+import {
+  boolean,
+  date,
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core"
 
 export const teams = pgTable("teams", {
   id: serial("id").primaryKey(),
@@ -71,31 +79,20 @@ export const trips = pgTable("trips", {
 
 export const inquiries = pgTable("inquiries", {
   id: serial("id").primaryKey(),
-
   name: text("name").notNull(),
-
   email: text("email").notNull(),
-
   phone: text("phone").notNull(),
-
   matchName: text("match_name").notNull(),
-
-packageVariant: text("package_variant").notNull().default(""),
-
-departureCity: text("departure_city").notNull(),
-
+  tripStartDate: date("trip_start_date"),
+  tripEndDate: date("trip_end_date"),
+  packageVariant: text("package_variant").notNull().default(""),
+  departureCity: text("departure_city").notNull(),
   travelers: integer("travelers").notNull().default(1),
-
   message: text("message").notNull().default(""),
-
   status: text("status").notNull().default("new"),
-
   adminNote: text("admin_note").notNull().default(""),
-
   consentAcceptedAt: timestamp("consent_accepted_at"),
-
   createdAt: timestamp("created_at").notNull().defaultNow(),
-
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 })
 
@@ -179,7 +176,6 @@ export const adminActivity = pgTable("admin_activity", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 })
 
-/** Hashed (never raw) fingerprints of inquiry-form submission attempts, used for cooldown/rate-limit and duplicate detection. */
 export const inquiryAttempts = pgTable("inquiry_attempts", {
   id: serial("id").primaryKey(),
   ipHash: text("ip_hash").notNull(),
@@ -189,19 +185,13 @@ export const inquiryAttempts = pgTable("inquiry_attempts", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 })
 
-/** Local cache of the channel's YouTube videos, refreshed once a day by a Vercel Cron job. */
 export const youtubeVideos = pgTable("youtube_videos", {
   id: serial("id").primaryKey(),
   videoId: text("video_id").notNull().unique(),
   title: text("title").notNull(),
   thumbnailUrl: text("thumbnail_url").notNull(),
   publishedAt: timestamp("published_at").notNull(),
-
-  // Czy film został ręcznie wybrany do wyświetlania na stronie głównej.
   featured: boolean("featured").notNull().default(false),
-
-  // Kolejność ręcznie wybranych filmów na stronie głównej.
   sortOrder: integer("sort_order").notNull().default(0),
-
   createdAt: timestamp("created_at").notNull().defaultNow(),
 })
