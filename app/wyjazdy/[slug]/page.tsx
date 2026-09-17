@@ -183,29 +183,13 @@ export default async function TripDetailPage({ params, searchParams }: { params:
   return (
     <main className="bg-background">
       <JsonLd data={jsonLd} />
-<section className="relative isolate min-h-155 overflow-hidden bg-foreground text-background lg:min-h-135">
-  <Image
-    src={trip.image}
-    alt={`Stadion ${trip.stadium || trip.city}`}
-    fill
-    preload
-    className="object-cover"
-    sizes="100vw"
-  />
 
-  <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-black/30" />
-  <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/50" />
-
-  <div className="relative mx-auto flex min-h-155 max-w-7xl flex-col px-4 py-6 md:px-6 md:py-8 lg:min-h-135">
-    <Button
-      variant="ghost"
-      className="w-fit text-background hover:bg-background/10 hover:text-background"
-      nativeButton={false}
-      render={<Link href="/wyjazdy" />}
-    >
-      <ArrowLeft data-icon="inline-start" />
-      Kalendarz wyjazdów
-    </Button>
+      <section className="relative isolate min-h-[620px] overflow-hidden bg-foreground text-background lg:min-h-[540px]">
+        <Image src={trip.image} alt={`Stadion ${trip.stadium || trip.city}`} fill preload className="object-cover" sizes="100vw" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/50" />
+        <div className="relative mx-auto flex min-h-[620px] max-w-7xl flex-col px-4 py-6 md:px-6 md:py-8 lg:min-h-[540px]">
+          <Button variant="ghost" className="w-fit text-background hover:bg-background/10 hover:text-background" nativeButton={false} render={<Link href="/wyjazdy" />}><ArrowLeft data-icon="inline-start" />Kalendarz wyjazdów</Button>
 
           <div className="mt-auto grid items-end gap-10 pb-6 lg:grid-cols-[1fr_auto]">
             <div className="max-w-4xl">

@@ -378,8 +378,10 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         nativeButton={false}
         render={<Link href="/wyjazdy" />}
       >
-        Wszystkie wyjazdy
-        <ArrowRight data-icon="inline-end" />
+       <span className="inline-flex items-center gap-2">
+  Wszystkie wyjazdy
+  <ArrowRight className="size-4 shrink-0" />
+</span>
       </Button>
     </div>
 
@@ -393,8 +395,10 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         nativeButton={false}
         render={<Link href="/wyjazdy" />}
       >
-        Wszystkie wyjazdy
-        <ArrowRight data-icon="inline-end" />
+      <span className="inline-flex items-center gap-2">
+  Wszystkie wyjazdy
+  <ArrowRight className="size-4 shrink-0" />
+</span>
       </Button>
     </div>
   </div>
@@ -471,10 +475,17 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   size="lg"
   className="mt-9 h-12 px-6"
   nativeButton={false}
-  render={<a href="/kontakt#formularz" />}
+  render={
+    <button
+      type="button"
+      data-open-floating-contact
+    />
+  }
 >
+ <span className="inline-flex items-center gap-2">
   Opisz swój wyjazd
-  <ArrowRight data-icon="inline-end" />
+  <ArrowRight className="size-4 shrink-0" />
+</span>
 </Button>
     </div>
   </div>
@@ -869,8 +880,10 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         nativeButton={false}
         render={<Link href="/galeria" />}
       >
-        Zobacz całą galerię
-        <ArrowRight data-icon="inline-end" />
+       <span className="inline-flex items-center gap-2">
+  Zobacz całą galerię
+  <ArrowRight className="size-4 shrink-0" />
+</span>
       </Button>
     </div>
 
@@ -883,8 +896,10 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         nativeButton={false}
         render={<Link href="/galeria" />}
       >
-        Zobacz całą galerię
-        <ArrowRight data-icon="inline-end" />
+       <span className="inline-flex items-center gap-2">
+  Zobacz całą galerię
+  <ArrowRight className="size-4 shrink-0" />
+</span>
       </Button>
     </div>
   </div>
@@ -943,8 +958,10 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           />
         }
       >
-        Zobacz wszystkie opinie
-        <ArrowRight data-icon="inline-end" />
+        <span className="inline-flex items-center gap-2">
+  Zobacz wszystkie opinie
+  <ArrowRight className="size-4 shrink-0" />
+</span>
       </Button>
     </div>
   </div>
@@ -1084,8 +1101,10 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           nativeButton={false}
           render={<Link href="/o-nas" />}
         >
-          Poznaj Let&apos;s Gol
-          <ArrowRight data-icon="inline-end" />
+          <span className="inline-flex items-center gap-2">
+  Poznaj Let's Gol
+  <ArrowRight className="size-4 shrink-0" />
+</span>
         </Button>
 
         <div className="flex items-center gap-3">

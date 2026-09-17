@@ -10,10 +10,20 @@ import {
   Users,
 } from "lucide-react"
 
+
+
 import {
   getSiteContent,
   type SiteContent,
 } from "@/lib/content"
+
+import {
+  getPublishedTrips,
+  type Trip,
+} from "@/lib/trips"
+
+import { getPackageVariants } from "@/lib/package-options"
+
 import { InquiryForm } from "@/components/inquiry-form"
 import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
@@ -40,7 +50,7 @@ const socialProfiles = [
   {
     name: "TikTok",
     href: "https://tiktok.com/@letsgol.wyjazdynamecze",
-    icon: "/icons/social/tiktok-white.webp",
+    icon: "/icons/social/tiktok.svg",
     description:
       "Krótkie materiały prosto z meczowych wyjazdów.",
   },
@@ -81,22 +91,27 @@ function WhatsAppIcon({ className = "" }: { className?: string }) {
 }
 export default async function ContactPage() {
   const content: SiteContent = process.env.DATABASE_URL
-  ? await getSiteContent().catch(() => ({} as SiteContent))
-  : {}
-const phone =
-  content.contactPhone || "+48 501 465 318"
+    ? await getSiteContent().catch(() => ({} as SiteContent))
+    : {}
 
-const phoneDigits = phone.replace(/\D/g, "")
+  const trips: Trip[] = process.env.DATABASE_URL
+    ? await getPublishedTrips().catch(() => [])
+    : []
 
-const contact = {
-  phone,
-  phoneHref: `tel:${phone.replace(/[^+\d]/g, "")}`,
-  whatsappHref: `https://wa.me/${phoneDigits}`,
-  email:
-    content.contactEmail ||
-    "kontakt.letsgol@gmail.com",
-}
+  const phone =
+    content.contactPhone || "+48 501 465 318"
 
+  const phoneDigits = phone.replace(/\D/g, "")
+
+  const contact = {
+    phone,
+    phoneHref: `tel:${phone.replace(/[^+\d]/g, "")}`,
+    whatsappHref: `https://wa.me/${phoneDigits}`,
+    email:
+      content.contactEmail ||
+      "kontakt.letsgol@gmail.com",
+  }
+  
   const whatsappMessage = encodeURIComponent(
     "Dzień dobry, mam pytanie dotyczące wyjazdu z Let's Gol."
   )
@@ -230,46 +245,46 @@ const contact = {
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 lg:grid-cols-3">
-            {channels.map((channel) => (
-              <a
-                key={channel.title}
-                href={channel.href}
-                target={channel.external ? "_blank" : undefined}
-                rel={
-                  channel.external
-                    ? "noopener noreferrer"
-                    : undefined
-                }
-                className="surface-card interactive-card group flex min-h-72 flex-col p-6 md:p-7"
-              >
-                <span className="flex size-12 items-center justify-center rounded-lg bg-foreground text-primary">
-                  {channel.icon}
-                </span>
+         <div className="mt-10 grid gap-4 lg:grid-cols-3">
+  {channels.map((channel) => (
+    <a
+      key={channel.title}
+      href={channel.href}
+      target={channel.external ? "_blank" : undefined}
+      rel={
+        channel.external
+          ? "noopener noreferrer"
+          : undefined
+      }
+      className="group flex min-h-72 flex-col rounded-xl border border-border bg-background p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-xl md:p-7"
+    >
+      <span className="flex size-12 items-center justify-center rounded-lg bg-foreground text-primary">
+        {channel.icon}
+      </span>
 
-                <h3 className="mt-7 font-sans text-3xl font-black uppercase">
-                  {channel.title}
-                </h3>
+      <h3 className="mt-7 font-sans text-3xl font-black uppercase">
+        {channel.title}
+      </h3>
 
-                <p className="mt-3 flex-1 text-sm leading-7 text-muted-foreground">
-                  {channel.description}
-                </p>
+      <p className="mt-3 flex-1 text-sm leading-7 text-muted-foreground">
+        {channel.description}
+      </p>
 
-                <p className="mt-6 break-all text-sm font-bold">
-                  {channel.detail}
-                </p>
+      <p className="mt-6 break-all text-sm font-bold">
+        {channel.detail}
+      </p>
 
-                <span className="mt-3 inline-flex items-center gap-2 font-bold text-foreground transition-colors group-hover:text-primary">
-                  {channel.label}
+      <span className="mt-3 inline-flex items-center gap-2 font-bold text-foreground transition-colors duration-300 group-hover:text-primary">
+        {channel.label}
 
-                  <ArrowRight
-                    className="size-4 transition-transform group-hover:translate-x-1"
-                    aria-hidden="true"
-                  />
-                </span>
-              </a>
-            ))}
-          </div>
+        <ArrowRight
+          className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+          aria-hidden="true"
+        />
+      </span>
+    </a>
+  ))}
+</div>
         </div>
       </section>
 
@@ -319,7 +334,23 @@ const contact = {
             </div>
           </div>
 
-          <InquiryForm />
+          <InquiryForm
+  trips={trips
+    .filter(
+      (trip) =>
+        trip.availabilityStatus !== "sold_out"
+    )
+    .map((trip) => ({
+      id: trip.id,
+      title: trip.title,
+      startDate: trip.startDate,
+      endDate: trip.endDate,
+      packageVariants: getPackageVariants(
+        trip.packageVariants,
+        trip.packageItems
+      ).map((variant) => variant.label),
+    }))}
+/>
         </div>
       </section>
 
@@ -352,43 +383,52 @@ const contact = {
             </Button>
           </div>
 
-          <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {socialProfiles.map((profile) => (
-              <a
-                key={profile.name}
-                href={profile.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="surface-card interactive-card group p-5"
-              >
-                <Image
-                  src={profile.icon}
-                  alt=""
-                  width={24}
-                  height={24}
-                  className="size-6 object-contain"
-                  unoptimized
-                />
+     <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  {socialProfiles.map((profile) => (
+    <a
+      key={profile.name}
+      href={profile.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative flex min-h-60 flex-col overflow-hidden rounded-xl border border-white/10 bg-neutral-800 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-neutral-700"
+    >
+      <span
+        aria-hidden="true"
+        className="absolute left-0 top-0 h-0.5 w-12 bg-primary transition-all duration-500 group-hover:w-full"
+      />
 
-                <h3 className="mt-5 font-sans text-xl font-black uppercase">
-                  {profile.name}
-                </h3>
+      <div className="flex size-11 items-center justify-center rounded-lg border border-white/10 bg-white/5">
+        <Image
+          src={profile.icon}
+          alt=""
+          width={24}
+          height={24}
+          className="size-6 object-contain"
+          unoptimized
+        />
+      </div>
 
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {profile.description}
-                </p>
+      <h3 className="mt-6 font-sans text-xl font-black uppercase text-white">
+        {profile.name}
+      </h3>
 
-                <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold transition-colors group-hover:text-primary">
-                  Otwórz profil
+      <p className="mt-3 flex-1 text-sm leading-6 text-white/60">
+        {profile.description}
+      </p>
 
-                  <ArrowRight
-                    className="size-4"
-                    aria-hidden="true"
-                  />
-                </span>
-              </a>
-            ))}
-          </div>
+      <div className="mt-6 border-t border-white/10 pt-5">
+        <span className="inline-flex items-center gap-2 text-sm font-bold text-white transition-colors duration-300 group-hover:text-primary">
+          Otwórz profil
+
+          <ArrowRight
+            className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+            aria-hidden="true"
+          />
+        </span>
+      </div>
+    </a>
+  ))}
+</div>
         </div>
       </section>
 

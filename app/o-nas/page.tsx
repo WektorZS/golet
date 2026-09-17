@@ -30,14 +30,14 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "O nas",
   description:
-    "Poznaj ideę Let's Gol i ludzi, którzy łączą piłkę nożną z dobrze przygotowanymi podróżami na mecze.",
+    "Poznaj Let's Gol, Łukasza i Mateusza oraz sprawdź, jak organizujemy wyjazdy na mecze w Europie.",
   alternates: {
     canonical: "/o-nas",
   },
   openGraph: {
-    title: "O Let's Gol",
+    title: "O nas | Let's Gol",
     description:
-      "Piłka, podróże i organizacja, dzięki której możesz skupić się na emocjach.",
+      "Jeździmy na mecze i organizujemy wyjazdy dla tych, którzy chcą zobaczyć największe stadiony Europy na żywo.",
     url: "/o-nas",
   },
 }
@@ -45,51 +45,51 @@ export const metadata: Metadata = {
 const processSteps = [
   [
     Compass,
-    "Wybierasz kierunek",
-    "Gotowy wyjazd z kalendarza albo mecz, którego jeszcze w nim nie ma.",
+    "Wybierasz mecz",
+    "Wybierasz jeden z dostępnych wyjazdów albo piszesz do nas z własnym pomysłem.",
   ],
   [
     CalendarCheck,
-    "Ustalamy zakres",
-    "Dopasowujemy elementy podróży i potwierdzamy, co obejmuje oferta.",
+    "Ustalamy szczegóły",
+    "Sprawdzamy dostępność i ustalamy termin, wariant wyjazdu oraz najważniejsze szczegóły.",
   ],
   [
     TicketCheck,
-    "Rezerwujesz",
-    "Otrzymujesz warunki, dokumenty i informacje potrzebne do podjęcia decyzji.",
+    "Dostajesz ofertę",
+    "Przesyłamy konkretną ofertę z ceną i informacją, co dokładnie obejmuje.",
   ],
   [
     Plane,
-    "Ruszamy",
-    "Przed podróżą dostajesz plan i najważniejsze wskazówki organizacyjne.",
+    "Organizujemy wyjazd",
+    "Po rezerwacji zajmujemy się ustalonym zakresem wyjazdu i przekazujemy potrzebne informacje.",
   ],
   [
     MapPinned,
-    "Przeżywasz mecz",
-    "Na miejscu możesz skupić się na stadionie, mieście i wspólnej atmosferze.",
+    "Lecisz na mecz",
+    "Na końcu zostaje już najważniejsze: wyjazd, stadion i mecz, dla którego to wszystko robimy.",
   ],
 ] as const
 
 const values = [
   [
-    Check,
-    "Jedna organizacja",
-    "Elementy wskazane w wybranym pakiecie łączymy w czytelną całość.",
+    TicketCheck,
+    "Bilety na mecz",
+    "Organizujemy bilety zgodnie z kategorią i zakresem podanym w ofercie.",
+  ],
+  [
+    Plane,
+    "Lot i nocleg",
+    "W zależności od wybranego pakietu organizujemy lot oraz nocleg dopasowane do terminu meczu.",
   ],
   [
     CalendarCheck,
-    "Mniej szukania",
-    "Nie musisz samodzielnie składać podróży z wielu osobnych rezerwacji.",
+    "Plan wyjazdu",
+    "Przed podróżą dostajesz najważniejsze informacje dotyczące swojego wyjazdu w jednym miejscu.",
   ],
   [
     Headphones,
-    "Informacje przed drogą",
-    "Wiesz, gdzie znaleźć ustalenia dotyczące swojego wyjazdu.",
-  ],
-  [
-    Users,
-    "Wspólne emocje",
-    "Podróżujesz z ludźmi, którzy także czekają na pierwszy gwizdek.",
+    "Kontakt z nami",
+    "Jeżeli przed wyjazdem pojawi się pytanie, nie szukasz odpowiedzi po omacku. Kontaktujesz się bezpośrednio z nami.",
   ],
 ] as const
 
@@ -133,38 +133,50 @@ export default async function AboutPage() {
 
       <SiteHeader />
 
-      <section className="bg-foreground pt-20 text-background">
-        <div className="mx-auto grid min-h-160 max-w-7xl items-stretch px-4 md:px-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="flex flex-col justify-center py-16 lg:pr-16">
+      <section className="relative isolate overflow-hidden bg-foreground pt-20 text-background">
+        <Image
+          src="/images/about-us.webp"
+          alt=""
+          fill
+          priority
+          className="object-cover opacity-25"
+          sizes="100vw"
+        />
+
+        <div className="absolute inset-0 bg-linear-to-r from-foreground via-foreground/95 to-foreground/55" />
+
+        <div className="relative mx-auto grid min-h-140 max-w-7xl items-center gap-12 px-4 py-16 md:px-6 lg:grid-cols-[1fr_0.5fr] lg:py-20">
+          <div className="max-w-4xl">
             <p className="eyebrow eyebrow-on-dark">
               O nas
             </p>
 
-            <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[68px]">
-              Jedziemy po emocje, nie po odhaczony kierunek
+            <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
+              Jeździmy na mecze. Teraz zabieramy na nie Was.
             </h1>
 
-            <p className="mt-6 max-w-xl text-lg leading-8 text-background/65">
-              Łączymy piłkę nożną z podróżowaniem i organizacją,
-              która porządkuje drogę od pomysłu do miejsca na
-              trybunach.
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-background/70">
+              Let&apos;s Gol powstało z połączenia dwóch rzeczy, które
+              od lat są nam bliskie: piłki nożnej i podróży.
+              Organizujemy wyjazdy na mecze w Europie i zajmujemy się
+              tym, co potrzebne, żeby dostać się na trybuny.
             </p>
           </div>
 
-          <div className="relative min-h-105 overflow-hidden lg:min-h-full">
-            <Image
-              src="/images/about-us.webp"
-              alt="Atmosfera wspólnego wyjazdu na mecz"
-              fill
-              priority
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 55vw"
+          <div className="border-l-2 border-primary pl-6">
+            <Compass
+              className="size-6 text-primary"
+              aria-hidden="true"
             />
 
-            <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent lg:bg-linear-to-r lg:from-foreground lg:via-transparent lg:to-transparent" />
+            <p className="mt-4 font-sans text-2xl font-black uppercase">
+              Zaczęło się od własnych wyjazdów
+            </p>
 
-            <p className="absolute bottom-7 left-7 max-w-sm font-sans text-2xl font-black uppercase leading-tight text-white md:bottom-10 md:left-10 md:text-3xl">
-              Najlepsze mecze pamięta się razem z drogą na stadion.
+            <p className="mt-2 text-sm leading-6 text-background/60">
+              Najpierw sami planowaliśmy kolejne mecze i stadiony.
+              Z czasem postanowiliśmy wykorzystać to doświadczenie
+              i zacząć organizować takie wyjazdy dla innych.
             </p>
           </div>
         </div>
@@ -174,31 +186,31 @@ export default async function AboutPage() {
         <div className="mx-auto grid max-w-7xl items-start gap-12 px-4 md:px-6 lg:grid-cols-[0.65fr_1fr] lg:gap-20">
           <div className="lg:sticky lg:top-28">
             <p className="eyebrow">
-              Idea Let's Gol
+              Skąd ten pomysł?
             </p>
 
             <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Mecz to więcej niż 90 minut
+              Po prostu lubimy jeździć na mecze
             </h2>
           </div>
 
           <div className="space-y-6 text-lg leading-8 text-muted-foreground">
             <p>
-              Są stadiony, które zna się z transmisji, hymny
-              słyszane setki razy i mecze odkładane na później.
-              My pomagamy zamienić taki plan w realną podróż.
+              Sami jesteśmy kibicami i dobrze wiemy, że wyjazd na mecz
+              nie zaczyna się przy wejściu na stadion. Trzeba znaleźć
+              bilety, lot, nocleg, sprawdzić dojazdy i poukładać
+              wszystko tak, żeby terminy się zgadzały.
             </p>
 
             <p>
-              W Let's Gol ważne są emocje, ale równie ważny jest
-              porządek. Zakres pakietu, kolejne kroki i informacje
-              organizacyjne mają być czytelne, żeby uczestnik
-              wiedział, czego się spodziewać.
+              Robiliśmy to wcześniej dla siebie. Dzisiaj robimy to
+              dla osób, które chcą zobaczyć mecz na żywo, ale
+              niekoniecznie chcą spędzić kilka wieczorów na
+              porównywaniu lotów, hoteli i biletów.
             </p>
 
             <p className="border-l-4 border-primary pl-6 font-sans text-2xl font-black uppercase leading-tight text-foreground md:text-3xl">
-              Ty wybierasz mecz. My pomagamy poukładać drogę na
-              trybuny.
+              Ty wybierasz mecz. My zajmujemy się organizacją.
             </p>
           </div>
         </div>
@@ -207,53 +219,79 @@ export default async function AboutPage() {
       <section className="bg-secondary/60 py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <SectionHeading
-            eyebrow="Ludzie za marką"
-            title="Dwie osoby. Jeden kierunek."
-            intro="Let's Gol współtworzą Łukasz i Mateusz. Razem rozwijają wyjazdy, w których liczą się emocje, czytelne zasady i dobre przygotowanie."
+            eyebrow="Kto za tym stoi?"
+            title="Łukasz i Mateusz"
+            intro="Za Let's Gol stoimy my, Łukasz i Mateusz. Łączy nas piłka, podróże i pomysł, żeby organizować wyjazdy, na które sami chcielibyśmy pojechać."
             align="left"
           />
 
           <div className="mt-12 grid gap-5 lg:grid-cols-2">
-            {[
-              ["Ł", "Łukasz"],
-              ["M", "Mateusz"],
-            ].map(([initial, name]) => (
-              <article
-                key={name}
-                className="group grid min-h-96 overflow-hidden rounded-xl bg-foreground text-background sm:grid-cols-[0.8fr_1fr]"
-              >
-                <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-primary text-primary-foreground">
-                  <span
-                    className="font-sans text-[10rem] font-black leading-none opacity-90"
-                    aria-hidden="true"
-                  >
-                    {initial}
-                  </span>
+            <article className="group grid min-h-96 overflow-hidden rounded-xl bg-foreground text-background sm:grid-cols-[0.8fr_1fr]">
+              <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-primary text-primary-foreground">
+                <span
+                  className="font-sans text-[10rem] font-black leading-none opacity-90"
+                  aria-hidden="true"
+                >
+                  Ł
+                </span>
 
-                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/20 to-transparent" />
-                </div>
+                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/20 to-transparent" />
+              </div>
 
-                <div className="flex flex-col justify-end p-7 md:p-9">
-                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
-                    Współwłaściciel
-                  </p>
+              <div className="flex flex-col justify-end p-7 md:p-9">
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
+                  Współwłaściciel
+                </p>
 
-                  <h3 className="mt-3 font-sans text-4xl font-black uppercase">
-                    {name}
-                  </h3>
+                <h3 className="mt-3 font-sans text-4xl font-black uppercase">
+                  Łukasz
+                </h3>
 
-                  <p className="mt-4 text-sm leading-7 text-background/60">
-                    Współtworzy kierunek marki i doświadczenie
-                    wyjazdu, od pierwszego kontaktu po informacje
-                    potrzebne przed podróżą.
-                  </p>
+                <p className="mt-4 text-sm leading-7 text-background/60">
+                  Na co dzień zajmuje się organizacją wyjazdów
+                  i kontaktem z klientami. Prywatnie kibic, który
+                  zdecydowanie częściej sprawdza terminarze meczów
+                  niż oferty zwykłych wakacji.
+                </p>
 
-                  <span className="mt-8 w-fit border-t border-background/20 pt-3 text-xs text-background/40">
-                    Let's Gol / zespół
-                  </span>
-                </div>
-              </article>
-            ))}
+                <span className="mt-8 w-fit border-t border-background/20 pt-3 text-xs text-background/40">
+                  Let&apos;s Gol
+                </span>
+              </div>
+            </article>
+
+            <article className="group grid min-h-96 overflow-hidden rounded-xl bg-foreground text-background sm:grid-cols-[0.8fr_1fr]">
+              <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-primary text-primary-foreground">
+                <span
+                  className="font-sans text-[10rem] font-black leading-none opacity-90"
+                  aria-hidden="true"
+                >
+                  M
+                </span>
+
+                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/20 to-transparent" />
+              </div>
+
+              <div className="flex flex-col justify-end p-7 md:p-9">
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
+                  Współwłaściciel
+                </p>
+
+                <h3 className="mt-3 font-sans text-4xl font-black uppercase">
+                  Mateusz
+                </h3>
+
+                <p className="mt-4 text-sm leading-7 text-background/60">
+                  Zajmuje się przygotowaniem wyjazdów i rozwojem
+                  Let&apos;s Gol. Tak samo jak Łukasz uważa, że dobry
+                  weekend zaczyna się od sprawdzenia, gdzie grają.
+                </p>
+
+                <span className="mt-8 w-fit border-t border-background/20 pt-3 text-xs text-background/40">
+                  Let&apos;s Gol
+                </span>
+              </div>
+            </article>
           </div>
         </div>
       </section>
@@ -262,8 +300,8 @@ export default async function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <SectionHeading
             eyebrow="Jak działamy"
-            title="Od pomysłu do trybun"
-            intro="Każdy wyjazd jest inny, ale dobra organizacja zawsze prowadzi przez kilka czytelnych etapów."
+            title="Jak wygląda wyjazd z Let's Gol?"
+            intro="Bez komplikowania. Wybierasz mecz, ustalamy szczegóły i organizujemy wyjazd."
           />
 
           <ol className="mt-12 grid gap-0 border-y border-foreground/15 lg:grid-cols-5">
@@ -300,17 +338,17 @@ export default async function AboutPage() {
         <div className="mx-auto grid max-w-7xl gap-12 px-4 md:px-6 lg:grid-cols-[0.75fr_1fr] lg:gap-20">
           <div>
             <p className="eyebrow eyebrow-on-dark">
-              Dlaczego z nami
+              Co bierzemy na siebie?
             </p>
 
             <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Więcej miejsca na mecz
+              Nie musisz organizować wszystkiego sam
             </h2>
 
             <p className="mt-5 max-w-md leading-7 text-background/60">
-              Nasza rola polega na uporządkowaniu wskazanych
-              elementów podróży i przekazaniu informacji, które są
-              ważne przed drogą.
+              Wyjazd na zagraniczny mecz to kilka osobnych rzeczy do
+              ogarnięcia. W zależności od wybranego pakietu możemy
+              zająć się nimi za Ciebie.
             </p>
           </div>
 
@@ -343,9 +381,9 @@ export default async function AboutPage() {
           <div className="mx-auto max-w-7xl px-4 md:px-6">
             <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <SectionHeading
-                eyebrow="Z drogi"
-                title="To dzieje się naprawdę"
-                intro="Kilka kadrów z miejsc, do których prowadzą piłkarskie podróże."
+                eyebrow="Nasze wyjazdy"
+                title="Kilka zdjęć"
+                intro="Stadiony, miasta i ludzie, z którymi mieliśmy okazję przeżyć te mecze."
                 align="left"
               />
 
@@ -355,7 +393,7 @@ export default async function AboutPage() {
                 nativeButton={false}
                 render={<Link href="/galeria" />}
               >
-                Cała galeria
+                Zobacz całą galerię
                 <ArrowRight data-icon="inline-end" />
               </Button>
             </div>
@@ -396,7 +434,7 @@ export default async function AboutPage() {
                     <figcaption className="absolute inset-x-0 bottom-0 p-5 text-sm font-bold text-white">
                       {[item.title, item.city]
                         .filter(Boolean)
-                        .join(" - ")}
+                        .join(" · ")}
                     </figcaption>
                   ) : null}
                 </figure>
@@ -410,34 +448,39 @@ export default async function AboutPage() {
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-7 px-4 md:flex-row md:items-center md:px-6">
           <div>
             <p className="font-mono text-[11px] font-black uppercase tracking-[0.16em]">
-              Kolejny krok
+              Masz już jakiś mecz na oku?
             </p>
 
             <h2 className="mt-3 font-sans text-4xl font-black uppercase leading-none md:text-5xl">
-              Wybierz swój mecz
+              To co, gdzie lecimy?
             </h2>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Button
-              size="lg"
-              className="h-12 bg-foreground px-6 text-background hover:bg-foreground/85"
-              nativeButton={false}
-              render={<Link href="/wyjazdy" />}
-            >
-              Zobacz wyjazdy
-              <ArrowRight data-icon="inline-end" />
-            </Button>
+         <Button
+  size="lg"
+  className="h-12 gap-3 bg-foreground pl-6 pr-5 text-background hover:bg-foreground/85"
+  nativeButton={false}
+  render={<Link href="/wyjazdy" />}
+>
+  Zobacz najbliższe wyjazdy
+  <ArrowRight className="size-4 shrink-0" />
+</Button>
 
-            <Button
-              size="lg"
-              variant="outline"
-              className="h-12 border-foreground/30 bg-transparent px-6 hover:bg-foreground hover:text-background"
-              nativeButton={false}
-              render={<Link href="/kontakt" />}
-            >
-              Skontaktuj się
-            </Button>
+     <Button
+  size="lg"
+  variant="outline"
+  className="h-12 border-foreground/30 bg-transparent px-6 hover:bg-foreground hover:text-background"
+  nativeButton={false}
+  render={
+    <button
+      type="button"
+      data-open-floating-contact
+    />
+  }
+>
+  Skontaktuj się
+</Button>
           </div>
         </div>
       </section>

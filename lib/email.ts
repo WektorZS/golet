@@ -62,10 +62,13 @@ export async function sendInquiryEmails(
   const fromEmail = process.env.RESEND_FROM_EMAIL
   const inquiryNotificationEmail =
     process.env.INQUIRY_NOTIFICATION_EMAIL
-  const replyToEmail = process.env.RESEND_REPLY_TO_EMAIL
+  const replyToEmail =
+    process.env.RESEND_REPLY_TO_EMAIL
+
   const packageVariant = escapeHtml(
     inquiry.packageVariant || "Nie wybrano"
   )
+
   const tripDate = escapeHtml(
     formatTripDateRange(
       inquiry.tripStartDate,
@@ -82,7 +85,9 @@ export async function sendInquiryEmails(
   }
 
   if (!inquiryNotificationEmail) {
-    throw new Error("Brak INQUIRY_NOTIFICATION_EMAIL")
+    throw new Error(
+      "Brak INQUIRY_NOTIFICATION_EMAIL"
+    )
   }
 
   const resend = new Resend(apiKey)
@@ -91,16 +96,20 @@ export async function sendInquiryEmails(
   const email = escapeHtml(inquiry.email)
   const phone = escapeHtml(inquiry.phone)
   const matchName = escapeHtml(inquiry.matchName)
-  const departureCity = escapeHtml(inquiry.departureCity)
+  const departureCity = escapeHtml(
+    inquiry.departureCity
+  )
   const message = escapeHtml(
-    inquiry.message || "Brak dodatkowych informacji."
+    inquiry.message ||
+      "Brak dodatkowych informacji."
   )
 
   const clientResult = await resend.emails.send({
     from: fromEmail,
     to: inquiry.email,
     replyTo: replyToEmail,
-    subject: "Otrzymaliśmy Twoje zapytanie - Let's Gol",
+    subject:
+      "Otrzymaliśmy Twoje zapytanie - Let's Gol",
     html: `
       <div style="margin:0;padding:32px 16px;background:#f3f3f3;font-family:Arial,Helvetica,sans-serif;color:#111;">
         <div style="max-width:620px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
@@ -149,39 +158,37 @@ export async function sendInquiryEmails(
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Mecz
                   </div>
+
                   <div style="font-size:15px;font-weight:700;color:#111111;">
                     ${matchName}
                   </div>
                 </div>
+
                 <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Termin wyjazdu
                   </div>
+
                   <div style="font-size:15px;font-weight:700;color:#111111;">
                     ${tripDate}
                   </div>
                 </div>
+
                 <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
-                    Termin wyjazdu
+                    Wybrany pakiet
                   </div>
+
                   <div style="font-size:15px;font-weight:700;color:#111111;">
-                    ${tripDate}
+                    ${packageVariant}
                   </div>
                 </div>
-                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
-  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
-    Wybrany pakiet
-  </div>
-  <div style="font-size:15px;font-weight:700;color:#111111;">
-    ${packageVariant}
-  </div>
-</div>
 
                 <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Skąd wylot
                   </div>
+
                   <div style="font-size:15px;font-weight:700;color:#111111;">
                     ${departureCity}
                   </div>
@@ -191,6 +198,7 @@ export async function sendInquiryEmails(
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Liczba osób
                   </div>
+
                   <div style="font-size:15px;font-weight:700;color:#111111;">
                     ${inquiry.travelers}
                   </div>
@@ -261,7 +269,7 @@ export async function sendInquiryEmails(
             </div>
           </div>
 
-          <div style="padding:34px 30px 30px;"
+          <div style="padding:34px 30px 30px;">
 
             <h1 style="margin:0 0 10px;font-size:25px;line-height:1.25;font-weight:800;color:#111111;">
               🔔 Nowe zapytanie
@@ -284,6 +292,7 @@ export async function sendInquiryEmails(
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Imię i nazwisko
                   </div>
+
                   <div style="font-size:15px;font-weight:700;color:#111111;">
                     ${name}
                   </div>
@@ -293,6 +302,7 @@ export async function sendInquiryEmails(
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     E-mail
                   </div>
+
                   <div style="font-size:15px;font-weight:700;">
                     <a
                       href="mailto:${email}"
@@ -307,6 +317,7 @@ export async function sendInquiryEmails(
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Telefon
                   </div>
+
                   <div style="font-size:15px;font-weight:700;color:#111111;">
                     <a
                       href="tel:${phone.replace(/[^+\d]/g, "")}"
@@ -331,22 +342,37 @@ export async function sendInquiryEmails(
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Mecz
                   </div>
+
                   <div style="font-size:15px;font-weight:700;color:#111111;">
                     ${matchName}
                   </div>
                 </div>
-<div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
-  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
-    Wybrany pakiet
-  </div>
-  <div style="font-size:15px;font-weight:700;color:#111111;">
-    ${packageVariant}
-  </div>
-</div>
+
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Termin wyjazdu
+                  </div>
+
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${tripDate}
+                  </div>
+                </div>
+
+                <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
+                  <div style="margin-bottom:4px;font-size:12px;color:#888888;">
+                    Wybrany pakiet
+                  </div>
+
+                  <div style="font-size:15px;font-weight:700;color:#111111;">
+                    ${packageVariant}
+                  </div>
+                </div>
+
                 <div style="padding:16px 18px;border-bottom:1px solid #eeeeee;">
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Skąd wylot
                   </div>
+
                   <div style="font-size:15px;font-weight:700;color:#111111;">
                     ${departureCity}
                   </div>
@@ -356,6 +382,7 @@ export async function sendInquiryEmails(
                   <div style="margin-bottom:4px;font-size:12px;color:#888888;">
                     Liczba osób
                   </div>
+
                   <div style="font-size:15px;font-weight:700;color:#111111;">
                     ${inquiry.travelers}
                   </div>

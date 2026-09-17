@@ -1,10 +1,11 @@
 import type { Metadata } from "next"
-import Link from "next/link"
-import { ArrowLeft, ArrowRight, CalendarDays, Search } from "lucide-react"
+import Image from "next/image"
+import { ArrowRight, CalendarDays, Search } from "lucide-react"
 import { TripCalendar } from "@/components/trip-calendar"
 import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
+import { SiteHeader } from "@/components/site-header"
 import { getPublishedTrips } from "@/lib/trips"
 import { breadcrumbSchema } from "@/lib/seo"
 
@@ -46,25 +47,53 @@ export default async function TripsPage() {
           },
         ],
       }} />
-      <header className="border-b bg-foreground text-background">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 md:px-6">
-          <Button variant="ghost" className="text-background hover:bg-background/10 hover:text-background" nativeButton={false} render={<Link href="/" />}><ArrowLeft data-icon="inline-start" />Strona główna</Button>
-          <Link href="/" className="font-sans text-xl font-black uppercase">Let&apos;s Gol <span className="text-primary">/ Wyjazdy</span></Link>
-        </div>
-      </header>
-      <section className="relative overflow-hidden bg-foreground px-4 py-16 text-background md:px-6 md:py-20">
-        <div className="absolute -right-24 -top-28 size-80 rounded-full border-[55px] border-primary/10" />
-        <div className="relative mx-auto max-w-7xl">
-          <div className="flex max-w-4xl items-start gap-5">
-            <span className="hidden size-14 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground sm:flex"><CalendarDays className="size-7" /></span>
-            <div>
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-primary">Kalendarz wyjazdów</p>
-              <h1 className="mt-3 text-balance font-sans text-5xl font-black uppercase leading-[0.95] tracking-tight md:text-7xl">Twój następny mecz zaczyna się tutaj</h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-background/65 md:text-lg">Wybierz miesiąc i gotowy pakiet. My zajmiemy się biletem, lotem, hotelem oraz opieką na miejscu.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <SiteHeader />
+     <section className="relative isolate overflow-hidden bg-foreground pt-20 text-background">
+  <Image
+    src="/images/oferta.webp"
+    alt=""
+    fill
+    priority
+    className="object-cover opacity-25"
+    sizes="100vw"
+  />
+
+  <div className="absolute inset-0 bg-linear-to-r from-foreground via-foreground/95 to-foreground/55" />
+
+  <div className="relative mx-auto grid min-h-140 max-w-7xl items-center gap-12 px-4 py-16 md:px-6 lg:grid-cols-[1fr_0.5fr] lg:py-20">
+    <div className="max-w-4xl">
+      <p className="eyebrow eyebrow-on-dark">
+        Kalendarz wyjazdów
+      </p>
+
+      <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
+        Twój następny mecz zaczyna się tutaj
+      </h1>
+
+      <p className="mt-6 max-w-2xl text-lg leading-8 text-background/70">
+        Wybierz interesujący Cię mecz i sprawdź dostępne warianty
+        wyjazdu. Wszystkie aktualne terminy znajdziesz w kalendarzu
+        poniżej.
+      </p>
+    </div>
+
+    <div className="border-l-2 border-primary pl-6">
+      <CalendarDays
+        className="size-6 text-primary"
+        aria-hidden="true"
+      />
+
+      <p className="mt-4 font-sans text-2xl font-black uppercase">
+        Wybierz mecz i termin
+      </p>
+
+      <p className="mt-2 text-sm leading-6 text-background/60">
+        Sprawdź dostępne wyjazdy, zakres poszczególnych wariantów
+        oraz szczegóły każdego meczu.
+      </p>
+    </div>
+  </div>
+</section>
 
       <section className="px-4 py-12 md:px-6 md:py-16">
         <div className="mx-auto max-w-7xl">
@@ -80,7 +109,22 @@ export default async function TripsPage() {
                   <p className="mt-2 leading-7 text-background/60">Napisz do nas. Przygotujemy indywidualny wyjazd i sprawdzimy dostępność biletów.</p>
                 </div>
               </div>
-              <Button className="h-12 w-full shrink-0 px-6 md:w-auto" size="lg" nativeButton={false} render={<Link href="/#kontakt" />}>Wyceń indywidualnie swój wyjazd <ArrowRight data-icon="inline-end" /></Button>
+              <Button
+  className="h-12 w-full shrink-0 px-6 md:w-auto"
+  size="lg"
+  nativeButton={false}
+  render={
+    <button
+      type="button"
+      data-open-floating-contact
+    />
+  }
+>
+  <span className="inline-flex items-center gap-2">
+    Wyceń indywidualnie swój wyjazd
+    <ArrowRight className="size-4 shrink-0" />
+  </span>
+</Button>
             </div>
           </div>
         </div>
