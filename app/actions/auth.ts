@@ -71,23 +71,6 @@ export async function signInAdmin(
   redirect("/admin")
 }
 
-const setupAttempts = new Map<
-  string,
-  {
-    count: number
-    firstAttempt: number
-    lastSent: number
-  }
->()
-
-const SETUP_WINDOW_MS = 15 * 60 * 1000
-const MAX_SETUP_ATTEMPTS = 3
-const OTP_COOLDOWN_MS = 60 * 1000
-
-function getClientIp(formData: FormData) {
-
-  return String(formData.get("_setup_client") ?? "unknown")
-}
 export async function requestAdminSetupCode(
   _: AuthState,
   formData: FormData

@@ -41,6 +41,7 @@ export function ImageLightbox({
       : [{ src, alt, caption }]
 
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const [isOpen, setIsOpen] = useState(false)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -61,7 +62,7 @@ const nextImage = () => {
 }
 
 useEffect(() => {
-  if (!hasMultipleImages) return
+  if (!isOpen || !hasMultipleImages) return
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === "ArrowLeft") {
@@ -88,7 +89,7 @@ useEffect(() => {
   return () => {
     document.removeEventListener("keydown", handleKeyDown, true)
   }
-}, [hasMultipleImages, gallery.length])
+}, [isOpen, hasMultipleImages, gallery.length])
 
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
@@ -113,7 +114,13 @@ useEffect(() => {
   }
 
   return (
-    <Dialog>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open)
+        if (open) setCurrentIndex(initialIndex)
+      }}
+    >
       <DialogTrigger
         render={
           <button

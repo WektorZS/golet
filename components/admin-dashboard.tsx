@@ -42,7 +42,6 @@ import { toast } from "sonner"
 
 
 import {
-  archiveTestimonial,
   addGalleryItem,
   reorderGalleryItems,
     addYouTubeVideoToHomepage,
@@ -117,6 +116,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { DeleteTripDialog } from "@/components/delete-trip-dialog"
 import { getPackageVariants, packageFeatures, packageVariantOptions, parsePackageItems } from "@/lib/package-options"
+import type { YouTubeVideo } from "@/lib/content"
+import type {
+  adminActivity as adminActivityTable,
+  galleryItems as galleryItemsTable,
+  inquiries as inquiriesTable,
+  leagues as leaguesTable,
+  mediaAssets as mediaAssetsTable,
+  teamGalleryItems as teamGalleryItemsTable,
+  teams as teamsTable,
+  testimonials as testimonialsTable,
+  tripGalleryItems as tripGalleryItemsTable,
+  trips as tripsTable,
+} from "@/lib/db/schema"
 
 import {
   DndContext,
@@ -124,6 +136,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  type DragEndEvent,
 } from "@dnd-kit/core"
 
 import {
@@ -135,19 +148,38 @@ import {
 
 import { CSS } from "@dnd-kit/utilities"
 
+type Serialized<T> = T extends Date
+  ? string
+  : T extends (infer Item)[]
+    ? Serialized<Item>[]
+    : T extends object
+      ? { [Key in keyof T]: Serialized<T[Key]> }
+      : T
+
+type AdminTrip = Serialized<typeof tripsTable.$inferSelect>
+type AdminTeam = Serialized<typeof teamsTable.$inferSelect>
+type AdminLeague = Serialized<typeof leaguesTable.$inferSelect>
+type AdminInquiry = Serialized<typeof inquiriesTable.$inferSelect>
+type AdminTestimonial = Serialized<typeof testimonialsTable.$inferSelect>
+type AdminMedia = Serialized<typeof mediaAssetsTable.$inferSelect>
+type AdminGalleryItem = Serialized<typeof galleryItemsTable.$inferSelect>
+type AdminTripGalleryItem = Serialized<typeof tripGalleryItemsTable.$inferSelect>
+type AdminTeamGalleryItem = Serialized<typeof teamGalleryItemsTable.$inferSelect>
+type AdminActivity = Serialized<typeof adminActivityTable.$inferSelect>
+
 export type AdminData = {
-  trips: any[]
-  teams: any[]
-  leagues: any[]
-  inquiries: any[]
-  testimonials: any[]
-  media: any[]
-  gallery: any[]
-  tripGallery: any[]
-  teamGallery: any[]
+  trips: AdminTrip[]
+  teams: AdminTeam[]
+  leagues: AdminLeague[]
+  inquiries: AdminInquiry[]
+  testimonials: AdminTestimonial[]
+  media: AdminMedia[]
+  gallery: AdminGalleryItem[]
+  tripGallery: AdminTripGalleryItem[]
+  teamGallery: AdminTeamGalleryItem[]
   settings: Record<string, string>
-  activity: any[]
-  videos: any[]
+  activity: AdminActivity[]
+  videos: YouTubeVideo[]
   email: string
 }
 
@@ -408,7 +440,7 @@ const youtubeLibraryItems = useMemo(
     (item) => item.status === "new"
   ).length
 
-  const handleGalleryDragEnd = async (event: any) => {
+  const handleGalleryDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
 
     if (!over || active.id === over.id) return
@@ -451,7 +483,7 @@ const youtubeLibraryItems = useMemo(
     toast.success("Kolejność galerii została zapisana")
   }
 
-const handleYouTubeDragEnd = async (event: any) => {
+const handleYouTubeDragEnd = async (event: DragEndEvent) => {
   const { active, over } = event
 
   if (!over || active.id === over.id) return
@@ -483,12 +515,12 @@ const handleYouTubeDragEnd = async (event: any) => {
     reordered.map((video) => [video.id, video.sortOrder])
   )
 
-  setYoutubeItems((current: any[]) =>
+  setYoutubeItems((current) =>
     current.map((video) =>
       orderMap.has(video.id)
         ? {
             ...video,
-            sortOrder: orderMap.get(video.id),
+            sortOrder: orderMap.get(video.id) ?? video.sortOrder,
           }
         : video
     )
@@ -1252,7 +1284,7 @@ const handleYouTubeDragEnd = async (event: any) => {
                         </form>
 
                         <DeleteTripDialog
-                          tripId={trip.id}
+                          tripId={String(trip.id)}
                           tripTitle={trip.title}
                         />
                       </div>
@@ -2025,7 +2057,7 @@ const handleYouTubeDragEnd = async (event: any) => {
                                   formData
                                 )
 
-                                setYoutubeItems((current: any[]) =>
+                                setYoutubeItems((current) =>
                                   current.map((item) =>
                                     item.id === video.id
                                       ? {
@@ -2172,7 +2204,7 @@ const handleYouTubeDragEnd = async (event: any) => {
                             formData
                           )
 
-                          setYoutubeItems((current: any[]) =>
+                          setYoutubeItems((current) =>
                             current.map((item) =>
                               item.id === video.id
                                 ? {
@@ -2223,7 +2255,7 @@ const handleYouTubeDragEnd = async (event: any) => {
         ) + 1
       : 0
 
-  setYoutubeItems((current: any[]) =>
+  setYoutubeItems((current) =>
     current.map((item) =>
       item.id === video.id
         ? {
@@ -2910,7 +2942,7 @@ function Metric({
   )
 }
 
-function isTripExpired(trip: any) {
+function isTripExpired(trip: Pick<AdminTrip, "startDate">) {
   if (!trip?.startDate) return false
 
   const today = new Date()
@@ -3231,22 +3263,22 @@ function YouTubeSyncStatus({
     ? new Date(lastSyncedAt).getTime()
     : 0
 
-  const isStale =
-    !lastSyncTime ||
-    Date.now() - lastSyncTime >= 24 * 60 * 60 * 1000
-
   const lastAttemptFailed =
     lastSyncStatus?.startsWith("Błąd:") ?? false
 
   useEffect(() => {
     if (automaticSyncStarted.current) return
 
+    const isStale =
+      !lastSyncTime ||
+      Date.now() - lastSyncTime >= 24 * 60 * 60 * 1000
+
     if (!isStale && !lastAttemptFailed) return
 
     automaticSyncStarted.current = true
 
     formRef.current?.requestSubmit()
-  }, [isStale, lastAttemptFailed])
+  }, [lastSyncTime, lastAttemptFailed])
 
   const hasError =
     Boolean(state.error) || lastAttemptFailed
@@ -3610,7 +3642,7 @@ function ChangePasswordForm() {
 
 const initialTeamState: SaveTeamState = {}
 
-function TeamDialog({ team, trigger }: { team?: any; trigger: React.ReactNode }) {
+function TeamDialog({ team, trigger }: { team?: AdminTeam; trigger: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [state, action, pending] = useActionState(saveTeam, initialTeamState)
 
@@ -3640,7 +3672,7 @@ function TeamDialog({ team, trigger }: { team?: any; trigger: React.ReactNode })
   )
 }
 
-function TeamDeleteButton({ team }: { team: any }) {
+function TeamDeleteButton({ team }: { team: AdminTeam }) {
   const [state, action, pending] = useActionState(deleteTeam, initialTeamState)
   useEffect(() => {
     if (state.error) toast.error(state.error)
@@ -3651,14 +3683,14 @@ function TeamDeleteButton({ team }: { team: any }) {
 
 const initialLeagueState: SaveLeagueState = {}
 
-function LeagueDialog({ league, trigger }: { league?: any; trigger: React.ReactNode }) {
+function LeagueDialog({ league, trigger }: { league?: AdminLeague; trigger: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [state, action, pending] = useActionState(saveLeague, initialLeagueState)
   useEffect(() => { if (state.success) { toast.success(league ? "Liga została zaktualizowana." : "Liga została dodana."); setOpen(false) } }, [state.success, league])
   return <Dialog open={open} onOpenChange={setOpen}><DialogTrigger render={trigger as React.ReactElement} /><DialogContent><DialogHeader><DialogTitle>{league ? "Edytuj ligę" : "Nowa liga"}</DialogTitle><DialogDescription>Nazwa i logo będą widoczne przy przypisanych wyjazdach.</DialogDescription></DialogHeader><form action={action} className="grid gap-4">{league && <input type="hidden" name="id" value={league.id} />}<Field label="Nazwa ligi" hint="Np. LaLiga lub Premier League."><Input name="name" defaultValue={league?.name} required /></Field><Field label="Logo ligi" hint="Plik zostanie zoptymalizowany do niewielkiego formatu WebP."><ImageDropzone name="logoFile" accept="image/png,image/webp,image/jpeg" required={!league?.logo} currentImage={league?.logo} /></Field>{state.error && <p role="alert" className="text-sm text-destructive">{state.error}</p>}<DialogFooter><Button disabled={pending}>{pending ? "Zapisuję..." : "Zapisz ligę"}</Button></DialogFooter></form></DialogContent></Dialog>
 }
 
-function LeagueDeleteButton({ league }: { league: any }) {
+function LeagueDeleteButton({ league }: { league: AdminLeague }) {
   const [state, action, pending] = useActionState(deleteLeague, initialLeagueState)
   useEffect(() => { if (state.error) toast.error(state.error); if (state.success) toast.success("Liga została usunięta.") }, [state])
   return <form action={action}><input type="hidden" name="id" value={league.id} /><Button type="submit" size="icon-sm" variant="outline" disabled={pending}><XCircle /><span className="sr-only">Usuń ligę</span></Button></form>
@@ -3672,9 +3704,9 @@ function TripDialog({
   leagues,
   trigger,
 }: {
-  trip?: any
-  teams: any[]
-  leagues: any[]
+  trip?: AdminTrip
+  teams: AdminTeam[]
+  leagues: AdminLeague[]
   trigger: React.ReactNode
 }) {
   const [open, setOpen] =
@@ -3915,7 +3947,7 @@ function TripDialog({
               name="endDate"
               type="date"
               defaultValue={
-                trip?.endDate
+                trip?.endDate ?? ""
               }
             />
           </Field>
@@ -4130,263 +4162,6 @@ function TripDialog({
   )
 }
 
-function LegacyTripDialog({
-  trip,
-  trigger,
-}: {
-  trip?: any
-  trigger: React.ReactNode
-}) {
-  return (
-    <Dialog>
-      <DialogTrigger
-        render={
-          trigger as React.ReactElement
-        }
-      />
-
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>
-            {trip
-              ? "Edytuj wyjazd"
-              : "Nowy wyjazd"}
-          </DialogTitle>
-
-          <DialogDescription>
-            Uzupełnij informacje o wyjeździe,
-            termin, pakiet i ustawienia publikacji.
-          </DialogDescription>
-        </DialogHeader>
-
-        <form
-          action={async (formData) => {
-            await saveTrip({}, formData)
-          }}
-          className="grid gap-4 sm:grid-cols-2"
-        >
-          {trip && (
-            <input
-              type="hidden"
-              name="id"
-              value={trip.id}
-            />
-          )}
-
-          <Field label="Tytuł">
-            <Input
-              name="title"
-              defaultValue={
-                trip?.title
-              }
-              required
-            />
-          </Field>
-
-          <Field
-            label="Adres strony"
-            hint="Końcowa część adresu strony wyjazdu. Jeśli nie wiesz, co wpisać, pozostaw puste."
-          >
-            <Input
-              name="slug"
-              defaultValue={
-                trip?.slug
-              }
-              placeholder="Utworzy się automatycznie"
-            />
-          </Field>
-
-          <Field label="Przeciwnik / wydarzenie">
-            <Input
-              name="opponent"
-              defaultValue={
-                trip?.opponent
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Miasto">
-            <Input
-              name="city"
-              defaultValue={
-                trip?.city
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Kraj">
-            <Input
-              name="country"
-              defaultValue={
-                trip?.country
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Cena od (zł)">
-            <Input
-              name="price"
-              type="number"
-              min="0"
-              defaultValue={
-                trip?.price
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Data rozpoczęcia">
-            <Input
-              name="startDate"
-              type="date"
-              defaultValue={
-                trip?.startDate
-              }
-              required
-            />
-          </Field>
-
-          <Field label="Data zakończenia">
-            <Input
-              name="endDate"
-              type="date"
-              defaultValue={
-                trip?.endDate
-              }
-            />
-          </Field>
-
-          <Field
-            label="Widoczność wyjazdu"
-            hint="Szkic jest niewidoczny dla klientów. Opublikowany wyjazd jest widoczny na stronie."
-          >
-            <select
-              name="status"
-              defaultValue={
-                trip?.status ||
-                "draft"
-              }
-              className="h-9 rounded-lg border bg-background px-3"
-            >
-              <option value="draft">
-                Szkic - niewidoczny
-              </option>
-
-              <option value="published">
-                Opublikowany - widoczny
-              </option>
-
-              <option value="archived">
-                Archiwalny
-              </option>
-            </select>
-          </Field>
-
-          <Field
-            label="Kolejność"
-            hint="Niższa liczba oznacza wcześniejsze miejsce wyjazdu na stronie."
-          >
-            <Input
-              name="sortOrder"
-              type="number"
-              defaultValue={
-                trip?.sortOrder ||
-                0
-              }
-            />
-          </Field>
-
-          <div className="sm:col-span-2">
-            <Field
-              label="Adres zdjęcia głównego"
-              hint="Pole dla starszych zapisów. W przypadku nowego zdjęcia najlepiej użyć pola „Zdjęcie główne” w aktualnym formularzu."
-            >
-              <Input
-                name="image"
-                defaultValue={
-                  trip?.image
-                }
-                placeholder="/images/... lub /api/media/ID"
-              />
-            </Field>
-          </div>
-
-          <div className="sm:col-span-2">
-            <DescriptionEditor
-              name="description"
-              defaultValue={
-                trip?.description
-              }
-            />
-          </div>
-
-          <div className="sm:col-span-2">
-            <Field
-              label="Pakiet zawiera"
-              hint="Wpisz każdy element pakietu w osobnej linii."
-            >
-              <Textarea
-                name="includes"
-                defaultValue={
-                  trip?.includes?.join(
-                    "\n"
-                  )
-                }
-                rows={5}
-              />
-            </Field>
-          </div>
-
-          <Field
-            label="Tytuł strony w Google"
-            hint="Tytuł, który może pojawić się przy stronie w wynikach Google."
-          >
-            <Input
-              name="seoTitle"
-              defaultValue={
-                trip?.seoTitle
-              }
-            />
-          </Field>
-
-          <Field
-            label="Opis strony w Google"
-            hint="Krótki opis strony, który może pojawić się w wynikach Google."
-          >
-            <Input
-              name="seoDescription"
-              defaultValue={
-                trip?.seoDescription
-              }
-            />
-          </Field>
-
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              name="featured"
-              type="checkbox"
-              defaultChecked={
-                trip?.featured
-              }
-            />
-
-            Wyróżnij wyjazd
-          </label>
-
-          <DialogFooter className="sm:col-span-2">
-            <Button type="submit">
-              Zapisz wyjazd
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
 const initialGalleryState: AddGalleryItemState = {}
 
 async function updateTeamGalleryItem(formData: FormData) {
@@ -4398,9 +4173,9 @@ function GalleryDialog({
   trips,
   teams,
 }: {
-  asset: any
-  trips: any[]
-  teams: any[]
+  asset: AdminMedia
+  trips: AdminTrip[]
+  teams: AdminTeam[]
 }) {
   const [
     state,
@@ -4577,7 +4352,7 @@ const initialUpdateGalleryState: UpdateGalleryItemState = {}
 function EditGalleryItemDialog({
   item,
 }: {
-  item: any
+  item: AdminGalleryItem
 }) {
   const [
     state,
@@ -4687,7 +4462,7 @@ function EditTripGalleryItemDialog({
   item,
   city,
 }: {
-  item: any
+  item: AdminTripGalleryItem
   city: string
 }) {
   const [open, setOpen] =
@@ -4818,7 +4593,7 @@ function TestimonialDialog({
   item,
   trigger,
 }: {
-  item?: any
+  item?: AdminTestimonial
   trigger: React.ReactNode
 }) {
   return (

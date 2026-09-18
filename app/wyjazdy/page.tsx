@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { getPublishedTrips } from "@/lib/trips"
-import { breadcrumbSchema } from "@/lib/seo"
+import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
 
@@ -15,12 +15,11 @@ export const metadata: Metadata = {
   title: "Wyjazdy na mecze",
   description: "Aktualne pakiety na największe mecze piłkarskie w Europie: bilet, lot, hotel i opieka koordynatora.",
   alternates: { canonical: "/wyjazdy" },
-  openGraph: {
-    title: "Wyjazdy na mecze piłkarskie",
-    description: "Sprawdź aktualne terminy i pakiety wyjazdów na największe mecze w Europie.",
-    url: "/wyjazdy",
-    images: [{ url: "/images/og-image.webp", width: 1200, height: 630, alt: "Wyjazdy na mecze Let’s Gol" }],
-  },
+  ...socialMetadata(
+    "Wyjazdy na mecze piłkarskie",
+    "Sprawdź aktualne terminy i pakiety wyjazdów na największe mecze w Europie.",
+    "/wyjazdy"
+  ),
 }
 
 export default async function TripsPage() {

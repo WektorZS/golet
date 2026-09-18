@@ -13,7 +13,7 @@ import {
 import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
-import { breadcrumbSchema } from "@/lib/seo"
+import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
 
 export const metadata: Metadata = {
   title: "Warunki uczestnictwa",
@@ -22,12 +22,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/warunki-uczestnictwa",
   },
-  openGraph: {
-    title: "Warunki uczestnictwa | Let's Gol",
-    description:
-      "Zasady rezerwacji, płatności i udziału w wyjazdach organizowanych przez Let's Gol.",
-    url: "/warunki-uczestnictwa",
-  },
+  ...socialMetadata(
+    "Warunki uczestnictwa | Let's Gol",
+    "Zasady rezerwacji, płatności i udziału w wyjazdach organizowanych przez Let's Gol.",
+    "/warunki-uczestnictwa"
+  ),
 }
 
 const organizer = {

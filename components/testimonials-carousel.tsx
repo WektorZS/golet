@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
   ArrowRight,
   Star,
@@ -167,22 +167,28 @@ export function TestimonialsCarousel({
   const [activeIndex, setActiveIndex] = useState(0)
 
   const modalScrollRef = useRef<HTMLDivElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const openerRef = useRef<HTMLElement | null>(null)
 
   const [modalCanScroll, setModalCanScroll] = useState(false)
   const [modalAtBottom, setModalAtBottom] = useState(false)
 
-  const items = testimonials.length
-    ? testimonials.slice(0, 6)
-    : [
-        {
-          id: -1,
-          author: "Kamil",
-          tripName: "Barcelona",
-          content:
-            "Pierwszy wyjazd z Let’s Gol i na pewno nie ostatni. Wszystko dopięte, świetny hotel i koordynator zawsze pod telefonem. Polecam!",
-          rating: 5,
-        },
-      ]
+  const items = testimonials.slice(0, 6)
+
+  const openTestimonial = (item: Testimonial) => {
+    openerRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null
+    setTypedText("")
+    setModalCanScroll(false)
+    setModalAtBottom(false)
+    setSelected(item)
+  }
+
+  const closeTestimonial = useCallback(() => {
+    setSelected(null)
+    requestAnimationFrame(() => openerRef.current?.focus())
+  }, [])
 
   useEffect(() => {
     if (!api) return
@@ -203,18 +209,15 @@ export function TestimonialsCarousel({
   }, [api])
 
   useEffect(() => {
-    if (!selected) {
-      setTypedText("")
-      return
-    }
+    if (!selected) return
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches
 
     if (reducedMotion) {
-      setTypedText(selected.content)
-      return
+      const frame = requestAnimationFrame(() => setTypedText(selected.content))
+      return () => cancelAnimationFrame(frame)
     }
 
     let index = 0
@@ -243,7 +246,24 @@ export function TestimonialsCarousel({
       event: KeyboardEvent
     ) => {
       if (event.key === "Escape") {
-        setSelected(null)
+        closeTestimonial()
+      }
+
+      if (event.key === "Tab") {
+        const focusable = Array.from(
+          dialogRef.current?.querySelectorAll<HTMLButtonElement>("button:not(:disabled)") ?? []
+        )
+        if (!focusable.length) return
+
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (event.shiftKey && (document.activeElement === first || !dialogRef.current?.contains(document.activeElement))) {
+          event.preventDefault()
+          last.focus()
+        } else if (!event.shiftKey && (document.activeElement === last || !dialogRef.current?.contains(document.activeElement))) {
+          event.preventDefault()
+          first.focus()
+        }
       }
     }
 
@@ -251,6 +271,9 @@ export function TestimonialsCarousel({
       document.body.style.overflow
 
     document.body.style.overflow = "hidden"
+    const focusFrame = requestAnimationFrame(() => {
+      dialogRef.current?.querySelector<HTMLButtonElement>('[aria-label="Zamknij opinię"]')?.focus()
+    })
 
     window.addEventListener(
       "keydown",
@@ -258,6 +281,7 @@ export function TestimonialsCarousel({
     )
 
     return () => {
+      cancelAnimationFrame(focusFrame)
       document.body.style.overflow =
         previousOverflow
 
@@ -266,14 +290,10 @@ export function TestimonialsCarousel({
         handleKeyDown
       )
     }
-  }, [selected])
+  }, [selected, closeTestimonial])
 
   useEffect(() => {
-    if (!selected) {
-      setModalCanScroll(false)
-      setModalAtBottom(false)
-      return
-    }
+    if (!selected) return
 
     const element = modalScrollRef.current
 
@@ -318,6 +338,8 @@ export function TestimonialsCarousel({
     }
   }, [selected, typedText])
 
+  if (items.length === 0) return null
+
   return (
     <>
       <Carousel
@@ -356,9 +378,7 @@ export function TestimonialsCarousel({
                     <TestimonialCard
                       item={item}
                       isActive={isActive}
-                      onOpen={() =>
-                        setSelected(item)
-                      }
+                      onOpen={() => openTestimonial(item)}
                     />
                   </div>
                 </CarouselItem>
@@ -402,6 +422,7 @@ export function TestimonialsCarousel({
 
       {selected && (
         <div
+          ref={dialogRef}
           className="
             fixed inset-x-0 bottom-0 top-[80px] z-[100]
             bg-black/80 backdrop-blur-md
@@ -415,7 +436,7 @@ export function TestimonialsCarousel({
               event.target ===
               event.currentTarget
             ) {
-              setSelected(null)
+              closeTestimonial()
             }
           }}
         >
@@ -438,7 +459,7 @@ export function TestimonialsCarousel({
               <button
                 type="button"
                 onClick={() =>
-                  setSelected(null)
+                  closeTestimonial()
                 }
                 aria-label="Zamknij opinię"
                 className="
@@ -506,7 +527,9 @@ export function TestimonialsCarousel({
                     „{selected.content}”
                   </p>
 
-                  <p className="absolute inset-0 whitespace-pre-line text-[15px] font-medium leading-7 text-white/80 md:text-base md:leading-8">
+                  <p className="sr-only">„{selected.content}”</p>
+
+                  <p aria-hidden="true" className="absolute inset-0 whitespace-pre-line text-[15px] font-medium leading-7 text-white/80 md:text-base md:leading-8">
                     „{typedText}
 
                     <span
@@ -552,7 +575,7 @@ export function TestimonialsCarousel({
                   <button
                     type="button"
                     onClick={() =>
-                      setSelected(null)
+                      closeTestimonial()
                     }
                     className="ml-auto text-[11px] font-black uppercase tracking-[0.14em] text-primary transition-opacity hover:opacity-70"
                   >

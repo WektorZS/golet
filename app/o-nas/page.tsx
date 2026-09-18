@@ -4,13 +4,11 @@ import Link from "next/link"
 import {
   ArrowRight,
   CalendarCheck,
-  Check,
   Compass,
   Headphones,
   MapPinned,
   Plane,
   TicketCheck,
-  Users,
 } from "lucide-react"
 
 import { JsonLd } from "@/components/json-ld"
@@ -23,7 +21,7 @@ import {
   getSiteContent,
   type SiteContent,
 } from "@/lib/content"
-import { breadcrumbSchema } from "@/lib/seo"
+import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
 
@@ -34,12 +32,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/o-nas",
   },
-  openGraph: {
-    title: "O nas | Let's Gol",
-    description:
-      "Jeździmy na mecze i organizujemy wyjazdy dla tych, którzy chcą zobaczyć największe stadiony Europy na żywo.",
-    url: "/o-nas",
-  },
+  ...socialMetadata(
+    "O nas | Let's Gol",
+    "Jeździmy na mecze i organizujemy wyjazdy dla tych, którzy chcą zobaczyć największe stadiony Europy na żywo.",
+    "/o-nas"
+  ),
 }
 
 const processSteps = [

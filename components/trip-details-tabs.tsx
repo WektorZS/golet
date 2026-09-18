@@ -453,7 +453,7 @@ function TestimonialCard({
 export function TripDetailsTabs(
   props: TripDetailsTabsProps
 ) {
-  const [activeTab, setActiveTab] =
+  const [selectedTab, setActiveTab] =
     useState("opis")
 
   const [mobileTabsOpen, setMobileTabsOpen] =
@@ -627,20 +627,9 @@ useEffect(() => {
     },
   ]
 
-  useEffect(() => {
-    if (
-      !tabs.some(
-        (tab) => tab.id === activeTab
-      )
-    ) {
-      setActiveTab("opis")
-    }
-  }, [
-    activeTab,
-    hasLogistics,
-    props.gallery.length,
-    props.testimonials.length,
-  ])
+  const activeTab = tabs.some((tab) => tab.id === selectedTab)
+    ? selectedTab
+    : "opis"
 
   return (
     <section

@@ -11,7 +11,7 @@ import {
 import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
-import { breadcrumbSchema } from "@/lib/seo"
+import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
 
 export const metadata: Metadata = {
   title: "Polityka prywatności i cookies",
@@ -20,12 +20,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/polityka-prywatnosci",
   },
-  openGraph: {
-    title: "Polityka prywatności i cookies | Let's Gol",
-    description:
-      "Informacje o przetwarzaniu danych osobowych, prywatności i wykorzystywaniu plików cookies w serwisie Let's Gol.",
-    url: "/polityka-prywatnosci",
-  },
+  ...socialMetadata(
+    "Polityka prywatności i cookies | Let's Gol",
+    "Informacje o przetwarzaniu danych osobowych, prywatności i wykorzystywaniu plików cookies w serwisie Let's Gol.",
+    "/polityka-prywatnosci"
+  ),
 }
 
 const companyName = "LB Coaching Łukasz Borger"

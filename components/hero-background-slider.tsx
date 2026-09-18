@@ -97,14 +97,7 @@ export function HeroTypewriter({ eyebrow }: { eyebrow?: string }) {
   const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    if (reducedMotion) {
-      setTypedText(phrases[0])
-      setPhraseIndex(0)
-      setIsDeleting(false)
-      return
-    }
-
-    if (!isPageVisible) return
+    if (reducedMotion || !isPageVisible) return
 
     const phrase = phrases[phraseIndex]
     let delay = isDeleting ? 15 : 62
@@ -136,7 +129,7 @@ export function HeroTypewriter({ eyebrow }: { eyebrow?: string }) {
     <p className="min-h-10 max-w-2xl font-mono text-sm font-bold uppercase tracking-[0.2em] text-primary sm:min-h-5 sm:tracking-[0.25em]">
       <span className="sr-only">{phrases[0]}</span>
       <span aria-hidden="true">
-        {typedText}
+        {reducedMotion ? phrases[0] : typedText}
         <span className="ml-1 inline-block h-[1em] w-0.5 translate-y-[0.1em] animate-pulse bg-primary motion-reduce:hidden" />
       </span>
     </p>

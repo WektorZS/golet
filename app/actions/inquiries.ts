@@ -15,6 +15,7 @@ import {
   hmac,
 } from "@/lib/security"
 import { sendInquiryEmails } from "@/lib/email"
+import { isValidIsoDate, isValidTripDateRange } from "@/lib/inquiry-validation"
 
 const nameRegex =
   /^[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]+$/
@@ -30,8 +31,6 @@ const matchNameRegex =
 
 const messageRegex =
   /^[\p{L}\p{N}\s.,!?;:()"'’\-–—…\/%]+$/u
-
-const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/
 
 const inquirySchema = z.object({
   name: z
@@ -73,7 +72,7 @@ const inquirySchema = z.object({
     .string()
     .trim()
     .refine(
-      (value) => value === "" || isoDateRegex.test(value),
+      (value) => value === "" || isValidIsoDate(value),
       "Nieprawidłowa data rozpoczęcia wyjazdu."
     )
     .optional()
@@ -83,7 +82,7 @@ const inquirySchema = z.object({
     .string()
     .trim()
     .refine(
-      (value) => value === "" || isoDateRegex.test(value),
+      (value) => value === "" || isValidIsoDate(value),
       "Nieprawidłowa data zakończenia wyjazdu."
     )
     .optional()
@@ -140,7 +139,11 @@ const inquirySchema = z.object({
 
   privacyConsent:
     z.literal("on"),
-})
+}).refine(
+  ({ tripStartDate, tripEndDate }) =>
+    isValidTripDateRange(tripStartDate, tripEndDate),
+  { path: ["tripEndDate"], message: "Data zakończenia nie może być wcześniejsza niż data rozpoczęcia." }
+)
 
 export type InquiryState = {
   status:
@@ -348,12 +351,18 @@ export async function createInquiry(
       }
     }
 
-    const {
-      website,
-      formLoadedAt,
-      privacyConsent,
-      ...values
-    } = parsed.data
+    const values = {
+      name: parsed.data.name,
+      email: parsed.data.email,
+      phone: parsed.data.phone,
+      matchName: parsed.data.matchName,
+      tripStartDate: parsed.data.tripStartDate,
+      tripEndDate: parsed.data.tripEndDate,
+      packageVariant: parsed.data.packageVariant,
+      departureCity: parsed.data.departureCity,
+      travelers: parsed.data.travelers,
+      message: parsed.data.message,
+    }
 
     await db
       .insert(inquiries)

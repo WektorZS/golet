@@ -11,7 +11,7 @@ import {
   getPublishedGallery,
   getSiteContent,
 } from "@/lib/content"
-import { breadcrumbSchema } from "@/lib/seo"
+import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
 
@@ -22,20 +22,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/galeria",
   },
-  openGraph: {
-    title: "Galeria z wyjazdów Let’s Gol",
-    description:
-      "Zobacz stadiony, miasta i emocje z piłkarskich podróży Let’s Gol.",
-    url: "/galeria",
-    images: [
-      {
-        url: "/images/og-image.webp",
-        width: 1200,
-        height: 630,
-        alt: "Galeria wyjazdów Let’s Gol",
-      },
-    ],
-  },
+  ...socialMetadata(
+    "Galeria z wyjazdów Let’s Gol",
+    "Zobacz stadiony, miasta i emocje z piłkarskich podróży Let’s Gol.",
+    "/galeria"
+  ),
 }
 
 export default async function GalleryPage() {

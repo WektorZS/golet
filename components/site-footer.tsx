@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Mail, Phone, ArrowUpRight, MessageCircle } from "lucide-react"
+import { Mail, Phone, ArrowUpRight } from "lucide-react"
 import { Brand } from "@/components/site-header"
 import { SocialLinks } from "@/components/social-links"
 import type { SiteContent } from "@/lib/content"

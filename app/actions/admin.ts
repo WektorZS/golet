@@ -58,10 +58,30 @@ function mediaIdFromUrl(url: string) {
 
 async function deleteMediaAsset(mediaId: number) {
   const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, mediaId)).limit(1)
-  if (!asset) return
+  if (!asset || await mediaHasReferences(mediaId)) return
 
   await del(asset.pathname)
   await db.delete(mediaAssets).where(eq(mediaAssets.id, mediaId))
+}
+
+async function mediaHasReferences(mediaId: number): Promise<boolean> {
+  await ensureTripColumns()
+  const mediaUrl = `/api/media/${mediaId}`
+  const references = await Promise.all([
+    db.select({ id: galleryItems.id }).from(galleryItems).where(eq(galleryItems.mediaId, mediaId)).limit(1),
+    db.select({ id: tripGalleryItems.id }).from(tripGalleryItems).where(eq(tripGalleryItems.mediaId, mediaId)).limit(1),
+    db.select({ id: teamGalleryItems.id }).from(teamGalleryItems).where(eq(teamGalleryItems.mediaId, mediaId)).limit(1),
+    db.select({ id: trips.id }).from(trips).where(or(
+      eq(trips.image, mediaUrl),
+      eq(trips.homeLogo, mediaUrl),
+      eq(trips.awayLogo, mediaUrl),
+      eq(trips.leagueLogo, mediaUrl)
+    )).limit(1),
+    db.select({ id: teams.id }).from(teams).where(eq(teams.logo, mediaUrl)).limit(1),
+    db.select({ id: leagues.id }).from(leagues).where(eq(leagues.logo, mediaUrl)).limit(1),
+  ])
+
+  return references.some((rows) => rows.length > 0)
 }
 
 const tripSchema = z.object({
@@ -381,55 +401,7 @@ const coverMatch = trip.image?.match(/^\/api\/media\/(\d+)$/)
 
 
   for (const mediaId of mediaIds) {
-    const [globalUse, tripUse, coverUse, logoUse, teamLogoUse] = await Promise.all([
-      db
-        .select({ id: galleryItems.id })
-        .from(galleryItems)
-        .where(eq(galleryItems.mediaId, mediaId))
-        .limit(1),
-
-      db
-        .select({ id: tripGalleryItems.id })
-        .from(tripGalleryItems)
-        .where(eq(tripGalleryItems.mediaId, mediaId))
-        .limit(1),
-
-      db
-        .select({ id: trips.id })
-        .from(trips)
-        .where(eq(trips.image, `/api/media/${mediaId}`))
-        .limit(1),
-
-      db
-        .select({ id: trips.id })
-        .from(trips)
-        .where(or(eq(trips.homeLogo, `/api/media/${mediaId}`), eq(trips.awayLogo, `/api/media/${mediaId}`)))
-        .limit(1),
-
-      db
-        .select({ id: teams.id })
-        .from(teams)
-        .where(eq(teams.logo, `/api/media/${mediaId}`))
-        .limit(1),
-    ])
-
-    if (globalUse.length || tripUse.length || coverUse.length || logoUse.length || teamLogoUse.length) {
-      continue
-    }
-
-    const [asset] = await db
-      .select()
-      .from(mediaAssets)
-      .where(eq(mediaAssets.id, mediaId))
-      .limit(1)
-
-    if (!asset) continue
-
-    await del(asset.pathname)
-
-    await db
-      .delete(mediaAssets)
-      .where(eq(mediaAssets.id, mediaId))
+    await deleteMediaAsset(mediaId)
   }
 
   await logActivity(
@@ -620,16 +592,7 @@ export async function deleteMedia(formData: FormData) {
     throw new Error("Nie znaleziono zdjęcia")
   }
 
-  const mediaUrl = `/api/media/${id}`
-  const [globalUse, tripUse, teamGalleryUse, tripAssetUse, teamLogoUse, leagueLogoUse] = await Promise.all([
-    db.select({ id: galleryItems.id }).from(galleryItems).where(eq(galleryItems.mediaId, id)).limit(1),
-    db.select({ id: tripGalleryItems.id }).from(tripGalleryItems).where(eq(tripGalleryItems.mediaId, id)).limit(1),
-    db.select({ id: teamGalleryItems.id }).from(teamGalleryItems).where(eq(teamGalleryItems.mediaId, id)).limit(1),
-    db.select({ id: trips.id }).from(trips).where(or(eq(trips.image, mediaUrl), eq(trips.homeLogo, mediaUrl), eq(trips.awayLogo, mediaUrl), eq(trips.leagueLogo, mediaUrl))).limit(1),
-    db.select({ id: teams.id }).from(teams).where(eq(teams.logo, mediaUrl)).limit(1),
-    db.select({ id: leagues.id }).from(leagues).where(eq(leagues.logo, mediaUrl)).limit(1),
-  ])
-  if (globalUse.length || tripUse.length || teamGalleryUse.length || tripAssetUse.length || teamLogoUse.length || leagueLogoUse.length) {
+  if (await mediaHasReferences(id)) {
     throw new Error("Najpierw usuń wszystkie przypisania tego zdjęcia.")
   }
 

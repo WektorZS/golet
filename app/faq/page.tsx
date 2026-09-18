@@ -18,7 +18,7 @@ import {
   type SiteContent,
 } from "@/lib/content"
 import { faqCategories } from "@/lib/faq"
-import { breadcrumbSchema } from "@/lib/seo"
+import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
 
 export const revalidate = 300
 
@@ -29,12 +29,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/faq",
   },
-  openGraph: {
-    title: "FAQ o wyjazdach na mecze | Let's Gol",
-    description:
-      "Sprawdź najważniejsze informacje o rezerwacji, pakietach, biletach, transporcie i organizacji wyjazdów na mecze.",
-    url: "/faq",
-  },
+  ...socialMetadata(
+    "FAQ o wyjazdach na mecze | Let's Gol",
+    "Sprawdź najważniejsze informacje o rezerwacji, pakietach, biletach, transporcie i organizacji wyjazdów na mecze.",
+    "/faq"
+  ),
 }
 
 export default async function FaqPage() {

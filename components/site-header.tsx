@@ -19,7 +19,7 @@ const links = [
   ["KONTAKT", "/kontakt"],
 ] as const
 
-export function Brand() {
+export function Brand({ priority = false }: { priority?: boolean }) {
   return (
     <Link
       href="/"
@@ -33,7 +33,7 @@ export function Brand() {
           width={84}
           height={84}
           className="size-16 object-contain"
-          priority
+          priority={priority}
         />
       </span>
 
@@ -68,10 +68,6 @@ export function SiteHeader() {
   }, [])
 
   useEffect(() => {
-    setOpen(false)
-  }, [pathname])
-
-  useEffect(() => {
     document.body.style.overflow = open ? "hidden" : ""
 
     return () => {
@@ -89,7 +85,7 @@ export function SiteHeader() {
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 md:px-6">
         {/* LOGO */}
-        <Brand />
+        <Brand priority />
 
         <nav
           className="hidden items-center justify-center gap-7 lg:flex"

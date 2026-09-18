@@ -1,5 +1,6 @@
 import { asc, desc } from "drizzle-orm"
 import { redirect } from "next/navigation"
+import Link from "next/link"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { AdminDashboard, type AdminData } from "@/components/admin-dashboard"
@@ -40,6 +41,6 @@ export default async function AdminPage() {
 }
 
 function SetupRequired() {
-  return <main className="flex min-h-screen items-center justify-center bg-muted px-4"><div className="w-full max-w-xl"><Alert><AlertTitle>Panel oczekuje na aktywację logowania</AlertTitle><AlertDescription>Dodaj NEON_AUTH_COOKIE_SECRET o długości co najmniej 32 losowych znaków, a następnie utwórz administratora w Neon Auth.</AlertDescription></Alert><Button className="mt-5" nativeButton={false} render={<a href="/" />}>Wróć na stronę</Button></div></main>
+  return <main className="flex min-h-screen items-center justify-center bg-muted px-4"><div className="w-full max-w-xl"><Alert><AlertTitle>Panel oczekuje na aktywację logowania</AlertTitle><AlertDescription>Dodaj NEON_AUTH_COOKIE_SECRET o długości co najmniej 32 losowych znaków, a następnie utwórz administratora w Neon Auth.</AlertDescription></Alert><Button className="mt-5" nativeButton={false} render={<Link href="/" />}>Wróć na stronę</Button></div></main>
 }
 

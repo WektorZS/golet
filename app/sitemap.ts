@@ -7,33 +7,29 @@ import { getPublishedTrips } from "@/lib/trips"
 export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  let trips: Awaited<ReturnType<typeof getPublishedTrips>> = []
+  const staticUrls: MetadataRoute.Sitemap = [
+    { url: absoluteUrl() },
+    { url: absoluteUrl("/wyjazdy") },
+    { url: absoluteUrl("/galeria") },
+    { url: absoluteUrl("/o-nas") },
+    { url: absoluteUrl("/faq") },
+    { url: absoluteUrl("/kontakt") },
+    { url: absoluteUrl("/polityka-prywatnosci") },
+    { url: absoluteUrl("/warunki-uczestnictwa") },
+  ]
 
-  try {
-    trips = await getPublishedTrips()
-  } catch (error) {
-    console.error("Sitemap: nie udało się pobrać wyjazdów", error)
-  }
+  // Local builds without database credentials can still compile. When the
+  // database is configured, a query failure must fail the build or request
+  // instead of publishing a successful but incomplete production sitemap.
+  if (!process.env.DATABASE_URL) return staticUrls
+
+  const trips = await getPublishedTrips()
 
   return [
-    { url: absoluteUrl(), changeFrequency: "weekly", priority: 1 },
-    { url: absoluteUrl("/wyjazdy"), changeFrequency: "daily", priority: 0.9 },
-    { url: absoluteUrl("/galeria"), changeFrequency: "weekly", priority: 0.7 },
-    {
-      url: absoluteUrl("/polityka-prywatnosci"),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: absoluteUrl("/warunki-uczestnictwa"),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
+    ...staticUrls,
     ...trips.map((trip) => ({
       url: absoluteUrl(`/wyjazdy/${trip.slug}`),
       lastModified: trip.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
     })),
   ]
 }

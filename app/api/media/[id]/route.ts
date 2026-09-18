@@ -14,7 +14,7 @@ export async function GET(
   const { id: value } = await context.params
   const id = Number(value)
 
-  if (!Number.isInteger(id)) {
+  if (!Number.isSafeInteger(id) || id < 1) {
     return new NextResponse("Not found", { status: 404 })
   }
 
@@ -40,9 +40,8 @@ export async function GET(
     isAdmin = false
   }
 
-  if (!isAdmin) {
-    const [globalReference, tripReference, teamGalleryReference, tripImageReference, teamLogoReference, leagueLogoReference] =
-      await Promise.all([
+  const [globalReference, tripReference, teamGalleryReference, tripImageReference, teamLogoReference, leagueLogoReference] =
+    await Promise.all([
         db
           .select({ id: galleryItems.id })
           .from(galleryItems)
@@ -90,19 +89,26 @@ export async function GET(
           .where(eq(teams.logo, `/api/media/${id}`))
           .limit(1),
         db.select({ id: leagues.id }).from(leagues).where(eq(leagues.logo, `/api/media/${id}`)).limit(1),
-      ])
+    ])
 
-    if (
-      !globalReference.length &&
-      !tripReference.length &&
-      !teamGalleryReference.length &&
-      !tripImageReference.length &&
-      !teamLogoReference.length &&
-      !leagueLogoReference.length
-    ) {
-      return new NextResponse("Not found", { status: 404 })
-    }
+  const isPublic = Boolean(
+    globalReference.length ||
+      tripReference.length ||
+      teamGalleryReference.length ||
+      tripImageReference.length ||
+      teamLogoReference.length ||
+      leagueLogoReference.length
+  )
+
+  if (!isAdmin && !isPublic) {
+    return new NextResponse("Not found", { status: 404 })
   }
+
+  // Visibility can change when an admin unpublishes an item. Revalidate public
+  // media on each request and never cache admin-only assets in a shared cache.
+  const cacheControl = isPublic
+    ? "public, max-age=0, must-revalidate"
+    : "private, no-store"
 
   const result = await get(asset.pathname, {
     access: "private",
@@ -118,7 +124,7 @@ export async function GET(
       status: 304,
       headers: {
         ETag: result.blob.etag,
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Cache-Control": cacheControl,
       },
     })
   }
@@ -127,7 +133,7 @@ export async function GET(
     headers: {
       "Content-Type": result.blob.contentType,
       ETag: result.blob.etag,
-      "Cache-Control": "public, max-age=31536000, immutable",
+      "Cache-Control": cacheControl,
     },
   })
 }

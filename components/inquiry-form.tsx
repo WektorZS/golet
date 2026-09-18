@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useActionState, useEffect, useRef, useState } from "react"
-import type { FormEvent } from "react"
+import type { Dispatch, FormEvent, KeyboardEvent as ReactKeyboardEvent, SetStateAction } from "react"
 import {
   ArrowRight,
   Check,
@@ -14,6 +14,7 @@ import {
   createInquiry,
   type InquiryState,
 } from "@/app/actions/inquiries"
+import { selectInquiryTrip } from "@/lib/inquiry-validation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -76,6 +77,49 @@ function formatTripDateRange(
   return `${start} - ${end}`
 }
 
+function handleDropdownKeyDown(
+  event: ReactKeyboardEvent<HTMLDivElement>,
+  isOpen: boolean,
+  setOpen: Dispatch<SetStateAction<boolean>>
+) {
+  const container = event.currentTarget
+  const options = () =>
+    Array.from(container.querySelectorAll<HTMLButtonElement>('button[role="option"]'))
+
+  if (event.key === "Escape" && isOpen) {
+    event.preventDefault()
+    event.stopPropagation()
+    setOpen(false)
+    container.querySelector<HTMLButtonElement>('[aria-haspopup="listbox"]')?.focus()
+    return
+  }
+
+  if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return
+
+  event.preventDefault()
+  if (!isOpen) {
+    setOpen(true)
+    requestAnimationFrame(() => {
+      const items = options()
+      const index = event.key === "ArrowUp" || event.key === "End" ? items.length - 1 : 0
+      items[index]?.focus()
+    })
+    return
+  }
+
+  const items = options()
+  if (!items.length) return
+  const current = items.indexOf(document.activeElement as HTMLButtonElement)
+  const next = event.key === "Home"
+    ? 0
+    : event.key === "End"
+      ? items.length - 1
+      : event.key === "ArrowDown"
+        ? (current + 1) % items.length
+        : (current - 1 + items.length) % items.length
+  items[next]?.focus()
+}
+
 export function InquiryForm({
   matchName = "",
   trips = [],
@@ -135,9 +179,7 @@ useEffect(() => {
   }
 }, [])
 
-const selectedTrip = trips.find(
-  (trip) => trip.title === selectedMatch
-)
+const selectedTrip = selectInquiryTrip(trips, selectedMatch)
 const availablePackageVariants = hasSelectedTrip ? packageVariants : selectedTrip?.packageVariants || []
 
 const selectedTripLabel = selectedTrip
@@ -373,6 +415,7 @@ const selectedTripLabel = selectedTrip
     <div
       ref={matchDropdownRef}
       className="relative"
+      onKeyDown={(event) => handleDropdownKeyDown(event, matchDropdownOpen, setMatchDropdownOpen)}
     >
       <button
         id="matchSelection"
@@ -422,7 +465,7 @@ const selectedTripLabel = selectedTrip
               )
 
               const active =
-                selectedMatch === trip.title
+                selectedMatch === String(trip.id)
 
               return (
                 <button
@@ -431,9 +474,10 @@ const selectedTripLabel = selectedTrip
                   role="option"
                   aria-selected={active}
                   onClick={() => {
-                    setSelectedMatch(trip.title)
+                    setSelectedMatch(String(trip.id))
                     setSelectedPackageVariant(trip.packageVariants[0] || "")
                     setMatchDropdownOpen(false)
+                    matchDropdownRef.current?.querySelector<HTMLButtonElement>('[aria-haspopup="listbox"]')?.focus()
                   }}
                   className={`flex w-full items-center justify-between gap-4 rounded-md px-3 py-2.5 text-left text-sm transition-colors ${
                     active
@@ -466,6 +510,7 @@ const selectedTripLabel = selectedTrip
                 setSelectedMatch(OTHER_MATCH_VALUE)
                 setSelectedPackageVariant("")
                 setMatchDropdownOpen(false)
+                matchDropdownRef.current?.querySelector<HTMLButtonElement>('[aria-haspopup="listbox"]')?.focus()
               }}
               className={`w-full rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors ${
                 isOtherMatch
@@ -482,7 +527,7 @@ const selectedTripLabel = selectedTrip
   </Field>
 )}
 
-        {availablePackageVariants.length > 0 && <Field><FieldLabel id="packageVariantLabel" className="text-sm font-semibold text-white">Wariant pakietu</FieldLabel><div ref={packageDropdownRef} className="relative"><button id="packageVariant" type="button" aria-haspopup="listbox" aria-expanded={packageDropdownOpen} aria-labelledby="packageVariantLabel packageVariant" onClick={() => setPackageDropdownOpen((open) => !open)} className={`flex h-11 w-full items-center justify-between gap-3 rounded-lg border bg-white/1.5 px-3.5 text-left text-sm outline-none transition-all duration-200 ${packageDropdownOpen ? "border-primary ring-2 ring-primary/15" : "border-white/25 hover:border-white/40"}`}><span className={selectedPackageVariant ? "min-w-0 truncate text-white" : "min-w-0 truncate text-white/40"}>{selectedPackageVariant || "Wybierz wariant"}</span><ChevronDown aria-hidden="true" className={`size-4 shrink-0 text-white/50 transition-transform duration-200 ${packageDropdownOpen ? "rotate-180 text-primary" : ""}`} /></button>{packageDropdownOpen && <div role="listbox" aria-labelledby="packageVariantLabel" className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-lg border border-white/15 bg-[#151515] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55)]"><div className="max-h-64 overflow-y-auto">{availablePackageVariants.map((variant) => { const active = selectedPackageVariant === variant; return <button key={variant} type="button" role="option" aria-selected={active} onClick={() => { setSelectedPackageVariant(variant); setPackageDropdownOpen(false) }} className={`w-full rounded-md px-3 py-2.5 text-left text-sm transition-colors ${active ? "bg-primary/20 text-primary" : "text-white/80 hover:bg-primary/15 hover:text-primary"}`}>{variant}</button> })}</div></div>}</div></Field>}
+        {availablePackageVariants.length > 0 && <Field><FieldLabel id="packageVariantLabel" className="text-sm font-semibold text-white">Wariant pakietu</FieldLabel><div ref={packageDropdownRef} className="relative" onKeyDown={(event) => handleDropdownKeyDown(event, packageDropdownOpen, setPackageDropdownOpen)}><button id="packageVariant" type="button" aria-haspopup="listbox" aria-expanded={packageDropdownOpen} aria-labelledby="packageVariantLabel packageVariant" onClick={() => setPackageDropdownOpen((open) => !open)} className={`flex h-11 w-full items-center justify-between gap-3 rounded-lg border bg-white/1.5 px-3.5 text-left text-sm outline-none transition-all duration-200 ${packageDropdownOpen ? "border-primary ring-2 ring-primary/15" : "border-white/25 hover:border-white/40"}`}><span className={selectedPackageVariant ? "min-w-0 truncate text-white" : "min-w-0 truncate text-white/40"}>{selectedPackageVariant || "Wybierz wariant"}</span><ChevronDown aria-hidden="true" className={`size-4 shrink-0 text-white/50 transition-transform duration-200 ${packageDropdownOpen ? "rotate-180 text-primary" : ""}`} /></button>{packageDropdownOpen && <div role="listbox" aria-labelledby="packageVariantLabel" className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-lg border border-white/15 bg-[#151515] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55)]"><div className="max-h-64 overflow-y-auto">{availablePackageVariants.map((variant) => { const active = selectedPackageVariant === variant; return <button key={variant} type="button" role="option" aria-selected={active} onClick={() => { setSelectedPackageVariant(variant); setPackageDropdownOpen(false); packageDropdownRef.current?.querySelector<HTMLButtonElement>('[aria-haspopup="listbox"]')?.focus() }} className={`w-full rounded-md px-3 py-2.5 text-left text-sm transition-colors ${active ? "bg-primary/20 text-primary" : "text-white/80 hover:bg-primary/15 hover:text-primary"}`}>{variant}</button> })}</div></div>}</div></Field>}
 
         <Field>
           <FieldLabel

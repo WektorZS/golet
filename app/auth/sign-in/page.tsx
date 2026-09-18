@@ -4,7 +4,6 @@ import { ArrowLeft, KeyRound } from "lucide-react"
 import { AdminLoginForm } from "@/components/admin-login-form"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { isAdminEmail } from "@/lib/auth/admin"
 import { getAuth, isAuthConfigured } from "@/lib/auth/server"
 
 export const dynamic = "force-dynamic"

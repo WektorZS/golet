@@ -29,7 +29,7 @@ import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { Button } from "@/components/ui/button"
-import { breadcrumbSchema } from "@/lib/seo"
+import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
 const socialProfiles = [
@@ -70,12 +70,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/kontakt",
   },
-  openGraph: {
-    title: "Kontakt z Let's Gol",
-    description:
-      "Wybierz wygodny kanał i zapytaj o wyjazd na mecz.",
-    url: "/kontakt",
-  },
+  ...socialMetadata(
+    "Kontakt z Let's Gol",
+    "Wybierz wygodny kanał i zapytaj o wyjazd na mecz.",
+    "/kontakt"
+  ),
 }
 function WhatsAppIcon({ className = "" }: { className?: string }) {
   return (

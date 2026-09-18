@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { Analytics } from "@vercel/analytics/next"
 import { Check, Cookie, ShieldCheck } from "lucide-react"
 
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 
 const COOKIE_NAME = "letsgol_analytics_consent"
 const COOKIE_MAX_AGE = 31536000
+const CONSENT_EVENT = "letsgol-consent-change"
 
 type Consent = "accepted" | "rejected" | null
 
@@ -25,19 +26,59 @@ function readConsent(): Consent {
 
 function saveConsent(value: Exclude<Consent, null>) {
   document.cookie = `${COOKIE_NAME}=${value}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax; Secure`
+  window.dispatchEvent(new Event(CONSENT_EVENT))
+}
+
+function subscribeConsent(onChange: () => void) {
+  window.addEventListener(CONSENT_EVENT, onChange)
+  return () => window.removeEventListener(CONSENT_EVENT, onChange)
+}
+
+function subscribeHydration() {
+  return () => {}
 }
 
 export function CookieConsent() {
-  const [consent, setConsent] = useState<Consent>(null)
-  const [ready, setReady] = useState(false)
+  const consent = useSyncExternalStore(subscribeConsent, readConsent, () => null)
+  const ready = useSyncExternalStore(subscribeHydration, () => true, () => false)
   const [editing, setEditing] = useState(false)
   const [showFloatingButton, setShowFloatingButton] = useState(false)
   const [floatingButtonReady, setFloatingButtonReady] = useState(false)
+  const consentDialogRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setConsent(readConsent())
-    setReady(true)
-  }, [])
+    if (!ready || (consent !== null && !editing)) return
+
+    const previousFocus = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null
+    const focusable = () => Array.from(
+      consentDialogRef.current?.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input:not(:disabled)') ?? []
+    ).filter((element) => element.getClientRects().length > 0)
+
+    const frame = requestAnimationFrame(() => focusable()[0]?.focus())
+    const trapFocus = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") return
+      const items = focusable()
+      if (!items.length) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (event.shiftKey && (document.activeElement === first || !consentDialogRef.current?.contains(document.activeElement))) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && (document.activeElement === last || !consentDialogRef.current?.contains(document.activeElement))) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener("keydown", trapFocus)
+    return () => {
+      cancelAnimationFrame(frame)
+      document.removeEventListener("keydown", trapFocus)
+      previousFocus?.focus()
+    }
+  }, [ready, consent, editing])
 
   useEffect(() => {
     const updateVisibility = () => {
@@ -103,7 +144,6 @@ export function CookieConsent() {
 
   function choose(value: Exclude<Consent, null>) {
     saveConsent(value)
-    setConsent(value)
     setEditing(false)
   }
 
@@ -123,6 +163,7 @@ export function CookieConsent() {
     
       {firstVisit ? (
         <div
+          ref={consentDialogRef}
           className="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-black/55 p-3 backdrop-blur-sm sm:p-4"
           role="dialog"
           aria-modal="true"
@@ -252,6 +293,7 @@ export function CookieConsent() {
 
         /* USTAWIENIA COOKIES */
         <div
+          ref={consentDialogRef}
           className="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-black/45 p-3 backdrop-blur-sm sm:p-4"
           role="dialog"
           aria-modal="true"

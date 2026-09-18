@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, ArrowRight, CalendarDays, BedDouble,
+import { ArrowRight, CalendarDays, BedDouble,
 Check,
 Plane, Clock3, MapPin, MessageCircle, TicketCheck } from "lucide-react"
 
@@ -211,9 +211,12 @@ const includedItems: {
         { question: "Czy mogę wyjechać z innego lotniska?", answer: "Tak, sprawdzamy połączenia z lotniska najwygodniejszego dla uczestnika." },
       ]
 
+  const tripUrl = absoluteUrl(`/wyjazdy/${trip.slug}`)
+  const schemaDescription = stripHtml(trip.description).trim()
   const offerSchema = {
     "@type": "Offer",
-    url: absoluteUrl(`/wyjazdy/${trip.slug}`),
+    "@id": `${tripUrl}#offer`,
+    url: tripUrl,
     price: trip.price,
     priceCurrency: "PLN",
     availability: `https://schema.org/${status.schema}`,
@@ -221,32 +224,52 @@ const includedItems: {
   }
   const tripSchema = {
     "@type": "TouristTrip",
-    "@id": absoluteUrl(`/wyjazdy/${trip.slug}#trip`),
-    url: absoluteUrl(`/wyjazdy/${trip.slug}`),
+    "@id": `${tripUrl}#trip`,
+    url: tripUrl,
     name: `${homeTeam} - ${awayTeam}`,
-    description: stripHtml(trip.description),
+    ...(schemaDescription && { description: schemaDescription }),
     image: absoluteUrl(trip.image),
     touristType: "Kibice piłkarscy",
-    startDate: trip.startDate,
-    ...(trip.endDate && { endDate: trip.endDate }),
+    itinerary: {
+      "@type": "Place",
+      name: trip.city,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: trip.city,
+        addressCountry: trip.country,
+      },
+    },
+    mainEntityOfPage: { "@id": `${tripUrl}#webpage` },
     provider: { "@id": absoluteUrl("/#organization") },
-    offers: offerSchema,
+    offers: { "@id": offerSchema["@id"] },
   }
   const productSchema = {
     "@type": "Product",
-    "@id": absoluteUrl(`/wyjazdy/${trip.slug}#package`),
+    "@id": `${tripUrl}#package`,
     name: `Wyjazd na mecz ${homeTeam} - ${awayTeam}`,
-    description: stripHtml(trip.description),
+    ...(schemaDescription && { description: schemaDescription }),
     image: absoluteUrl(trip.image),
     category: "Pakiet turystyczny na mecz piłkarski",
     brand: { "@type": "Brand", name: "Let’s Gol" },
-    offers: offerSchema,
+    isRelatedTo: { "@id": tripSchema["@id"] },
+    offers: { "@id": offerSchema["@id"] },
   }
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${tripUrl}#webpage`,
+        url: tripUrl,
+        name: trip.seoTitle || trip.title,
+        ...(schemaDescription && { description: schemaDescription }),
+        isPartOf: { "@id": absoluteUrl("/#website") },
+        breadcrumb: { "@id": `${tripUrl}#breadcrumb` },
+        mainEntity: { "@id": tripSchema["@id"] },
+      },
       tripSchema,
       productSchema,
+      offerSchema,
       breadcrumbSchema([
         { name: "Strona główna", path: "/" },
         { name: "Wyjazdy", path: "/wyjazdy" },

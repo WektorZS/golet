@@ -1088,7 +1088,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           render={<Link href="/o-nas" />}
         >
           <span className="inline-flex items-center gap-2">
-  Poznaj Let's Gol
+  Poznaj Let&apos;s Gol
   <ArrowRight className="size-4 shrink-0" />
 </span>
         </Button>
