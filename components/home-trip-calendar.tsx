@@ -180,7 +180,7 @@ const calendarAnchorRef =
         <div
           role="tablist"
           aria-label="Miesiąc wyjazdu"
-          className="hidden items-stretch justify-center gap-2 px-3 py-3 md:flex"
+          className="hidden items-stretch justify-start gap-2 overflow-x-auto px-3 py-3 md:flex xl:justify-center"
         >
           {months.length >
           DESKTOP_MONTHS_VISIBLE ? (
@@ -203,7 +203,7 @@ const calendarAnchorRef =
             </button>
           ) : null}
 
-          <div className="flex min-w-0 items-stretch justify-center gap-2">
+          <div className="flex min-w-0 items-stretch justify-start gap-2 xl:justify-center">
             {visibleDesktopMonths.map(
               (month) => {
                 const active =
