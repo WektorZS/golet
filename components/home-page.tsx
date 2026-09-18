@@ -1038,7 +1038,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       <div className="mt-9 flex items-center justify-center gap-3">
         <div className="h-px w-8 bg-black/15" />
 
-        <span className="text-center font-mono text-xs font-bold uppercase tracking-[0.18em] text-black/40">
+        <span className="text-center font-mono text-xs font-bold uppercase tracking-[0.18em] text-black/65">
           Poczuj atmosferę przed swoim wyjazdem
         </span>
 
