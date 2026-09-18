@@ -392,7 +392,7 @@ const selectedTripLabel = selectedTrip
           className={`min-w-0 truncate ${
             selectedMatch
               ? "text-white"
-              : "text-white/40"
+              : "text-white/70"
           }`}
         >
           {selectedTripLabel}
@@ -446,7 +446,7 @@ const selectedTripLabel = selectedTrip
                   </span>
 
                   {formattedDate && (
-                    <span className="shrink-0 font-mono text-[13px] text-white/40">
+                    <span className="shrink-0 font-mono text-[13px] text-white/70">
   {formattedDate}
 </span>
                   )}
@@ -565,7 +565,7 @@ const selectedTripLabel = selectedTrip
             className={`font-mono text-[11px] ${
               messageLength >= MESSAGE_MAX_LENGTH
                 ? "text-red-400"
-                : "text-white/40"
+                : "text-white/70"
             }`}
             aria-live="polite"
           >
