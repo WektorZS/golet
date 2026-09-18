@@ -370,25 +370,31 @@ export function TestimonialsCarousel({
         <div className="mt-5 flex items-center justify-center gap-4">
           <CarouselPrevious className="static size-11 translate-x-0 translate-y-0 border-white/15 bg-white/[0.05] text-background transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground" />
 
-          <div className="flex items-center gap-2">
-            {items.map((item, index) => (
-              <button
-                key={item.id}
-                type="button"
-                aria-label={`Przejdź do opinii ${
-                  index + 1
-                }`}
-                onClick={() =>
-                  api?.scrollTo(index)
-                }
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === activeIndex
-                    ? "w-7 bg-primary"
-                    : "w-1.5 bg-white/20 hover:bg-white/40"
-                }`}
-              />
-            ))}
-          </div>
+      <div className="flex items-center">
+  {items.map((item, index) => {
+    const isActive = index === activeIndex
+
+    return (
+      <button
+        key={item.id}
+        type="button"
+        aria-label={`Przejdź do opinii ${index + 1}`}
+        aria-current={isActive ? "true" : undefined}
+        onClick={() => api?.scrollTo(index)}
+        className="group flex size-11 items-center justify-center"
+      >
+        <span
+          aria-hidden="true"
+          className={`block h-1.5 rounded-full transition-all duration-300 ${
+            isActive
+              ? "w-7 bg-primary"
+              : "w-1.5 bg-white/30 group-hover:bg-white/50"
+          }`}
+        />
+      </button>
+    )
+  })}
+</div>
 
           <CarouselNext className="static size-11 translate-x-0 translate-y-0 border-white/15 bg-white/[0.05] text-background transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground" />
         </div>
