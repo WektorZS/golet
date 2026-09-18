@@ -924,7 +924,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             {facebookReviewsAverage}/5 · {facebookReviewsCount} opinii
           </p>
 
-          <p className="mt-0.5 text-xs text-background/45">
+          <p className="mt-0.5 text-xs text-background/70">
             100% poleca nas na Facebooku
           </p>
         </div>
