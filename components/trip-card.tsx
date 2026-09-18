@@ -78,7 +78,7 @@ function formatStay(trip: Trip) {
 const availability = {
   available: {
     label: "Dostępne miejsca",
-    className: "bg-emerald-500 text-white",
+    className: "bg-emerald-700 text-white",
   },
   last_places: {
     label: "Ostatnie miejsca",

@@ -149,7 +149,7 @@ function TestimonialCard({
         )}
 
         {item.tripName && (
-          <p className="mt-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-background/45">
+          <p className="mt-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-background/60">
             {item.tripName}
           </p>
         )}

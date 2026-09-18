@@ -59,7 +59,7 @@ function PolicySection({
       className="scroll-mt-28"
     >
       <div className="flex items-start gap-4">
-        <span className="mt-1 font-mono text-xs font-black text-primary">
+        <span className="mt-1 font-mono text-xs font-black text-amber-800">
           {String(number).padStart(2, "0")}
         </span>
 

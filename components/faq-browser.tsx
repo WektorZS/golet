@@ -105,7 +105,7 @@ export function FaqBrowser() {
                 aria-labelledby={`${category.id}-title`}
               >
                 <div className="flex items-start gap-4 border-b border-foreground/12 pb-5">
-                  <span className="mt-1 font-mono text-xs font-black text-primary">
+                  <span className="mt-1 font-mono text-xs font-black text-amber-800">
                     {String(categoryIndex + 1).padStart(2, "0")}
                   </span>
                   <div className="min-w-0">

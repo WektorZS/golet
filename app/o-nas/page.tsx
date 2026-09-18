@@ -251,7 +251,7 @@ export default async function AboutPage() {
                   niż oferty zwykłych wakacji.
                 </p>
 
-                <span className="mt-8 w-fit border-t border-background/20 pt-3 text-xs text-background/40">
+                <span className="mt-8 w-fit border-t border-background/20 pt-3 text-xs text-background/60">
                   Let&apos;s Gol
                 </span>
               </div>
@@ -284,7 +284,7 @@ export default async function AboutPage() {
                   weekend zaczyna się od sprawdzenia, gdzie grają.
                 </p>
 
-                <span className="mt-8 w-fit border-t border-background/20 pt-3 text-xs text-background/40">
+                <span className="mt-8 w-fit border-t border-background/20 pt-3 text-xs text-background/60">
                   Let&apos;s Gol
                 </span>
               </div>

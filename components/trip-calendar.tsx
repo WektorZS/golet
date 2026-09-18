@@ -32,7 +32,7 @@ const dateFormatter = new Intl.DateTimeFormat("pl-PL", {
 const availability = {
   available: {
     label: "Dostępne miejsca",
-    className: "bg-emerald-500 text-white",
+    className: "bg-emerald-700 text-white",
   },
   last_places: {
     label: "Ostatnie miejsca",
@@ -173,7 +173,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
       <div className="sticky top-20 z-40 -mx-4 border-y border-foreground/10 bg-background/95 backdrop-blur-md md:mx-0">
         <nav
           aria-label="Miesiące wyjazdów"
-          className="hidden md:block"
+          className="hidden overflow-x-auto md:block"
         >
           <div className="flex items-stretch gap-2 px-3 py-3">
             {groups.length > DESKTOP_MONTHS_VISIBLE ? (
@@ -198,7 +198,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
               </button>
             ) : null}
 
-            <div className="flex min-w-0 flex-1 items-stretch justify-center gap-2">
+            <div className="flex min-w-0 flex-1 items-stretch justify-start gap-2 xl:justify-center">
               {visibleDesktopMonths.map((group) => {
                 const active =
                   group.key === selectedMonthKey
@@ -351,7 +351,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
           <section key={group.key} id={`miesiac-${group.key}`} className="scroll-mt-40">
             <div className="mb-4 flex items-end justify-between border-b-2 border-foreground pb-3">
               <div>
-                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Terminarz</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-amber-800">Terminarz</p>
                 <h2 className="font-sans text-3xl font-black uppercase md:text-4xl">{group.label}</h2>
               </div>
               <p className="hidden text-sm text-muted-foreground sm:block">{tripsCount(group.trips.length)}</p>
@@ -395,9 +395,18 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                         </div>
 
                         <dl className="grid content-center gap-3 text-sm">
-                          <div className="flex gap-3"><CalendarDays className="mt-0.5 size-4 shrink-0 text-primary" /><div><dt className="text-xs text-muted-foreground">Termin wyjazdu</dt><dd className="font-semibold">{formatDates(trip.startDate, trip.endDate)}</dd></div></div>
-                          <div className="flex gap-3"><MapPin className="mt-0.5 size-4 shrink-0 text-primary" /><div><dt className="text-xs text-muted-foreground">Stadion</dt><dd className="font-semibold">{trip.stadium || "Stadion gospodarza"}</dd></div></div>
-                          <div className="flex gap-3"><Clock3 className="mt-0.5 size-4 shrink-0 text-primary" /><div><dt className="text-xs text-muted-foreground">Pobyt</dt><dd className="font-semibold">{formatStay(stay.days, stay.nights)}</dd></div></div>
+                          <div className="relative pl-7">
+                            <dt className="text-xs text-muted-foreground"><CalendarDays aria-hidden="true" className="absolute left-0 top-0.5 size-4 text-primary" />Termin wyjazdu</dt>
+                            <dd className="font-semibold">{formatDates(trip.startDate, trip.endDate)}</dd>
+                          </div>
+                          <div className="relative pl-7">
+                            <dt className="text-xs text-muted-foreground"><MapPin aria-hidden="true" className="absolute left-0 top-0.5 size-4 text-primary" />Stadion</dt>
+                            <dd className="font-semibold">{trip.stadium || "Stadion gospodarza"}</dd>
+                          </div>
+                          <div className="relative pl-7">
+                            <dt className="text-xs text-muted-foreground"><Clock3 aria-hidden="true" className="absolute left-0 top-0.5 size-4 text-primary" />Pobyt</dt>
+                            <dd className="font-semibold">{formatStay(stay.days, stay.nights)}</dd>
+                          </div>
                         </dl>
                       </div>
 

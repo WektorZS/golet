@@ -22,7 +22,7 @@ import { getPublishedTrips, getTripBySlug, getTripGallery } from "@/lib/trips"
 export const dynamic = "force-dynamic"
 
 const availability = {
-  available: { label: "Dostępne miejsca", className: "bg-emerald-500 text-white", schema: "InStock" },
+  available: { label: "Dostępne miejsca", className: "bg-emerald-700 text-white", schema: "InStock" },
   last_places: { label: "Ostatnie miejsca", className: "bg-primary text-primary-foreground", schema: "LimitedAvailability" },
   sold_out: { label: "Wyprzedane", className: "bg-red-600 text-white", schema: "SoldOut" },
 } as const
@@ -344,7 +344,7 @@ const defaultPlan = [
 
       <section aria-labelledby="wariant-pakietu" className="border-b bg-secondary px-4 py-8 md:px-6 md:py-10">
         <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between"><div><p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Dopasuj ofertę</p><h2 id="wariant-pakietu" className="mt-1 font-sans text-2xl font-black uppercase md:text-3xl">Wybierz wariant pakietu</h2></div><p className="max-w-xl text-sm leading-6 text-muted-foreground">Niepełne pakiety wyceniamy indywidualnie według Twoich potrzeb. Zazwyczaj kosztują mniej niż pełny pakiet.</p></div>
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between"><div><p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-amber-800">Dopasuj ofertę</p><h2 id="wariant-pakietu" className="mt-1 font-sans text-2xl font-black uppercase md:text-3xl">Wybierz wariant pakietu</h2></div><p className="max-w-xl text-sm leading-6 text-muted-foreground">Niepełne pakiety wyceniamy indywidualnie według Twoich potrzeb. Zazwyczaj kosztują mniej niż pełny pakiet.</p></div>
          <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
   {orderedPackageVariants.map((variant) => {
     const VariantIcon =
@@ -463,10 +463,10 @@ const defaultPlan = [
                   ? "Na ten wyjazd nie przyjmujemy już rezerwacji. Wybierz inny dostępny mecz lub opisz wydarzenie, które mamy dla Ciebie wycenić."
                   : "Wyślij zapytanie. Sprawdzimy aktualną dostępność i przygotujemy konkretny wariant wyjazdu."}
               </p>
-              <div className="mt-7 flex items-center gap-3 opacity-90"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-lg font-black text-background/35">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
+              <div className="mt-7 flex items-center gap-3 opacity-90"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-lg font-black text-background/60">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
               <h3 className="mt-5 font-sans text-2xl font-black uppercase">{homeTeam} - {awayTeam}</h3>
               <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-background/65"><p className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" />{date}</p><p className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || trip.city}</p></div>
-              {!soldOut && <div className="mt-7 border-t border-background/10 pt-6"><p className="text-xs font-bold uppercase tracking-wider text-background/40">{fullPackageSelected ? "Cena od / osoba" : "Cena wariantu"}</p>{fullPackageSelected ? <p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p> : <><p className="mt-1 font-sans text-2xl font-black uppercase text-primary">Ustalana indywidualnie</p><p className="mt-2 max-w-sm text-xs leading-5 text-background/50">Cena zależy od wybranego zakresu i zazwyczaj jest niższa niż cena pełnego pakietu.</p></>}</div>}
+              {!soldOut && <div className="mt-7 border-t border-background/10 pt-6"><p className="text-xs font-bold uppercase tracking-wider text-background/60">{fullPackageSelected ? "Cena od / osoba" : "Cena wariantu"}</p>{fullPackageSelected ? <p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p> : <><p className="mt-1 font-sans text-2xl font-black uppercase text-primary">Ustalana indywidualnie</p><p className="mt-2 max-w-sm text-xs leading-5 text-background/50">Cena zależy od wybranego zakresu i zazwyczaj jest niższa niż cena pełnego pakietu.</p></>}</div>}
               <Button variant="outline" size="lg" className="mt-6 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white" nativeButton={false} render={<a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
             </div>
           </div>
