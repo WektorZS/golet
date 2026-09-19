@@ -24,12 +24,11 @@ export function Brand({ priority = false }: { priority?: boolean }) {
     <Link
       href="/"
       className="flex items-center gap-3 text-background"
-      aria-label="Let’s Gol - strona główna"
     >
       <span className="flex size-16 shrink-0 items-center justify-center">
         <Image
           src="/logo.webp"
-          alt="Let’s Gol"
+          alt=""
           width={84}
           height={84}
           className="size-16 object-contain"
