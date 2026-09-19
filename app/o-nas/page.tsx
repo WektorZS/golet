@@ -113,7 +113,7 @@ export default async function AboutPage() {
           <div className="lg:col-span-5">
             <p className="eyebrow">Blisko 20 lat razem</p>
             <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Znamy się jak łyse konie
+              Znamy się jak "łyse konie"
             </h2>
           </div>
 
