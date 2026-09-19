@@ -1,15 +1,7 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import {
-  ArrowRight,
-  CalendarCheck,
-  Compass,
-  Headphones,
-  MapPinned,
-  Plane,
-  TicketCheck,
-} from "lucide-react"
+import { ArrowRight } from "lucide-react"
 
 import { JsonLd } from "@/components/json-ld"
 import { SectionHeading } from "@/components/section-heading"
@@ -28,67 +20,16 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "O nas",
   description:
-    "Poznaj Let's Gol, Łukasza i Mateusza oraz sprawdź, jak organizujemy wyjazdy na mecze w Europie.",
+    "Poznaj historię Let's Gol, Łukasza i Mateusza oraz pasję, z której powstały nasze wyjazdy na największe stadiony Europy.",
   alternates: {
     canonical: "/o-nas",
   },
   ...socialMetadata(
     "O nas | Let's Gol",
-    "Jeździmy na mecze i organizujemy wyjazdy dla tych, którzy chcą zobaczyć największe stadiony Europy na żywo.",
+    "Dwie dekady przyjaźni, piłka, podróże i wyjazdy organizowane tak, jak sami chcielibyśmy pojechać na mecz.",
     "/o-nas"
   ),
 }
-
-const processSteps = [
-  [
-    Compass,
-    "Wybierasz mecz",
-    "Wybierasz jeden z dostępnych wyjazdów albo piszesz do nas z własnym pomysłem.",
-  ],
-  [
-    CalendarCheck,
-    "Ustalamy szczegóły",
-    "Sprawdzamy dostępność i ustalamy termin, wariant wyjazdu oraz najważniejsze szczegóły.",
-  ],
-  [
-    TicketCheck,
-    "Dostajesz ofertę",
-    "Przesyłamy konkretną ofertę z ceną i informacją, co dokładnie obejmuje.",
-  ],
-  [
-    Plane,
-    "Organizujemy wyjazd",
-    "Po rezerwacji zajmujemy się ustalonym zakresem wyjazdu i przekazujemy potrzebne informacje.",
-  ],
-  [
-    MapPinned,
-    "Lecisz na mecz",
-    "Na końcu zostaje już najważniejsze: wyjazd, stadion i mecz, dla którego to wszystko robimy.",
-  ],
-] as const
-
-const values = [
-  [
-    TicketCheck,
-    "Bilety na mecz",
-    "Organizujemy bilety zgodnie z kategorią i zakresem podanym w ofercie.",
-  ],
-  [
-    Plane,
-    "Lot i nocleg",
-    "W zależności od wybranego pakietu organizujemy lot oraz nocleg dopasowane do terminu meczu.",
-  ],
-  [
-    CalendarCheck,
-    "Plan wyjazdu",
-    "Przed podróżą dostajesz najważniejsze informacje dotyczące swojego wyjazdu w jednym miejscu.",
-  ],
-  [
-    Headphones,
-    "Kontakt z nami",
-    "Jeżeli przed wyjazdem pojawi się pytanie, nie szukasz odpowiedzi po omacku. Kontaktujesz się bezpośrednio z nami.",
-  ],
-] as const
 
 export default async function AboutPage() {
   const [content, gallery] = process.env.DATABASE_URL
@@ -120,6 +61,8 @@ export default async function AboutPage() {
               "@type": "AboutPage",
               name: "O Let's Gol",
               url: "https://letsgol.eu/o-nas",
+              description:
+                "Historia Łukasza i Mateusza, których przyjaźń, piłka nożna i wspólne podróże dały początek Let's Gol.",
               mainEntity: {
                 "@id": "https://letsgol.eu/#organization",
               },
@@ -130,260 +73,311 @@ export default async function AboutPage() {
 
       <SiteHeader />
 
-      <section className="relative isolate overflow-hidden bg-foreground pt-20 text-background">
+      <section className="relative isolate flex min-h-svh items-end overflow-hidden bg-foreground pt-20 text-white">
         <Image
-          src="/images/about-us.webp"
-          alt=""
+          src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
+          alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
           fill
           priority
-          className="object-cover opacity-25"
+          className="object-cover object-center"
           sizes="100vw"
         />
+        <div className="absolute inset-0 bg-black/35" />
+        <div className="absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-t from-black via-black/65 to-transparent" />
 
-        <div className="absolute inset-0 bg-linear-to-r from-foreground via-foreground/95 to-foreground/55" />
-
-        <div className="relative mx-auto grid min-h-140 max-w-7xl items-center gap-12 px-4 py-16 md:px-6 lg:grid-cols-[1fr_0.5fr] lg:py-20">
-          <div className="max-w-4xl">
-            <p className="eyebrow eyebrow-on-dark">
-              O nas
+        <div className="relative mx-auto w-full max-w-7xl px-4 pb-12 pt-28 md:px-6 md:pb-20 lg:pb-24">
+          <p className="eyebrow eyebrow-on-dark">Nasza historia</p>
+          <h1 className="mt-5 max-w-5xl text-balance font-sans text-5xl font-black uppercase leading-none tracking-tight sm:text-6xl lg:text-8xl">
+            Zaczęło się od przyjaźni i wspólnej pasji
+          </h1>
+          <div className="mt-6 flex max-w-3xl flex-col gap-6 border-l-4 border-primary pl-5 md:flex-row md:items-end md:justify-between md:pl-7">
+            <p className="text-lg leading-8 text-white/85 md:text-xl">
+              Dziś zabieramy Was na największe stadiony Europy.
             </p>
+            <Link
+              href="#nasza-historia"
+              className="group inline-flex w-fit items-center gap-2 text-sm font-bold uppercase tracking-wide text-primary"
+            >
+              Poznaj naszą historię
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-1"
+                aria-hidden="true"
+              />
+            </Link>
+          </div>
+        </div>
+      </section>
 
-            <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
-              Jeździmy na mecze. Teraz zabieramy na nie Was.
-            </h1>
+      <section id="nasza-historia" className="scroll-mt-20 py-16 md:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-6 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-5">
+            <p className="eyebrow">Blisko 20 lat razem</p>
+            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
+              Znamy się jak łyse konie
+            </h2>
+          </div>
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-background/70">
-              Let&apos;s Gol powstało z połączenia dwóch rzeczy, które
-              od lat są nam bliskie: piłki nożnej i podróży.
-              Organizujemy wyjazdy na mecze w Europie i zajmujemy się
-              tym, co potrzebne, żeby dostać się na trybuny.
+          <div className="space-y-6 text-base leading-8 text-muted-foreground md:text-lg lg:col-span-7 lg:pt-3">
+            <p>
+              Łączy nas przyjaźń, piłka nożna i ciągła potrzeba
+              przeżywania czegoś nowego. Przez lata odwiedziliśmy niejeden
+              stadion w Europie, zaliczyliśmy mnóstwo meczów i piłkarskich
+              podróży.
+            </p>
+            <p>
+              Lubimy dobrą atmosferę, poznawanie nowych miejsc i ludzi.
+              Nudy raczej nie tolerujemy.
+            </p>
+            <p className="font-sans text-2xl font-black uppercase leading-tight text-foreground md:text-3xl">
+              I właśnie z tego powstało Let&apos;s Gol.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="overflow-hidden bg-secondary/55 py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <div className="max-w-4xl">
+            <p className="eyebrow">Ta sama historia, kolejny rozdział</p>
+            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
+              Ta sama przyjaźń. Ta sama pasja.
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
+              Kiedyś jeździliśmy na mecze tylko dla siebie. Dziś zabieramy
+              na stadiony również innych.
             </p>
           </div>
 
-          <div className="border-l-2 border-primary pl-6">
-            <Compass
-              className="size-6 text-primary"
-              aria-hidden="true"
-            />
+          <div className="mt-12 grid items-start gap-6 md:grid-cols-12 md:gap-8">
+            <figure className="md:col-span-5">
+              <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted shadow-xl">
+                <Image
+                  src="/images/o-nas/lukasz-mateusz-archiwum.webp"
+                  alt="Łukasz i Mateusz jako młodzi kibice FC Barcelony"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 42vw"
+                />
+              </div>
+              <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
+                <span className="font-sans text-2xl font-black uppercase">
+                  Wtedy
+                </span>
+                <span className="text-right text-sm text-muted-foreground">
+                  Dwie koszulki, jeden szalik i plan na kolejne mecze
+                </span>
+              </figcaption>
+            </figure>
 
-            <p className="mt-4 font-sans text-2xl font-black uppercase">
-              Zaczęło się od własnych wyjazdów
-            </p>
-
-            <p className="mt-2 text-sm leading-6 text-background/60">
-              Najpierw sami planowaliśmy kolejne mecze i stadiony.
-              Z czasem postanowiliśmy wykorzystać to doświadczenie
-              i zacząć organizować takie wyjazdy dla innych.
-            </p>
+            <figure className="md:col-span-7 md:mt-24">
+              <div className="relative aspect-video overflow-hidden rounded-xl bg-muted shadow-xl">
+                <Image
+                  src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
+                  alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 58vw"
+                />
+              </div>
+              <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
+                <span className="font-sans text-2xl font-black uppercase">
+                  Dzisiaj
+                </span>
+                <span className="text-right text-sm text-muted-foreground">
+                  Nadal razem, teraz z ekipą Let&apos;s Gol
+                </span>
+              </figcaption>
+            </figure>
           </div>
         </div>
       </section>
 
       <section className="py-16 md:py-24">
-        <div className="mx-auto grid max-w-7xl items-start gap-12 px-4 md:px-6 lg:grid-cols-[0.65fr_1fr] lg:gap-20">
-          <div className="lg:sticky lg:top-28">
-            <p className="eyebrow">
-              Skąd ten pomysł?
-            </p>
-
-            <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Po prostu lubimy jeździć na mecze
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 md:px-6 lg:grid-cols-12 lg:gap-20">
+          <div className="lg:col-span-5">
+            <p className="eyebrow">Po co powstało Let&apos;s Gol?</p>
+            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
+              Żebyście mogli przeżywać mecz, a nie organizację
             </h2>
           </div>
 
-          <div className="space-y-6 text-lg leading-8 text-muted-foreground">
+          <div className="space-y-7 text-base leading-8 text-muted-foreground md:text-lg lg:col-span-7">
             <p>
-              Sami jesteśmy kibicami i dobrze wiemy, że wyjazd na mecz
-              nie zaczyna się przy wejściu na stadion. Trzeba znaleźć
-              bilety, lot, nocleg, sprawdzić dojazdy i poukładać
-              wszystko tak, żeby terminy się zgadzały.
+              Chcieliśmy stworzyć wyjazdy dla zwykłych kibiców, którzy marzą
+              o zobaczeniu swojej drużyny na żywo, ale niekoniecznie chcą
+              spędzać wieczory na szukaniu lotów, hoteli, biletów, transferów
+              i zastanawianiu się, czy wszystko na pewno się zgadza.
             </p>
-
+            <p className="font-sans text-3xl font-black uppercase text-foreground md:text-4xl">
+              Od tego jesteśmy my.
+            </p>
             <p>
-              Robiliśmy to wcześniej dla siebie. Dzisiaj robimy to
-              dla osób, które chcą zobaczyć mecz na żywo, ale
-              niekoniecznie chcą spędzić kilka wieczorów na
-              porównywaniu lotów, hoteli i biletów.
-            </p>
-
-            <p className="border-l-4 border-primary pl-6 font-sans text-2xl font-black uppercase leading-tight text-foreground md:text-3xl">
-              Ty wybierasz mecz. My zajmujemy się organizacją.
+              Zorganizujemy Wasz wyjazd od A do Z, zadbamy o szczegóły
+              i będziemy z Wami przed podróżą oraz podczas niej.
             </p>
           </div>
-        </div>
-      </section>
-
-      <section className="bg-secondary/60 py-16 md:py-24">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <SectionHeading
-            eyebrow="Kto za tym stoi?"
-            title="Łukasz i Mateusz"
-            intro="Za Let's Gol stoimy my, Łukasz i Mateusz. Łączy nas piłka, podróże i pomysł, żeby organizować wyjazdy, na które sami chcielibyśmy pojechać."
-            align="left"
-          />
-
-          <div className="mt-12 grid gap-5 lg:grid-cols-2">
-            <article className="group grid min-h-96 overflow-hidden rounded-xl bg-foreground text-background sm:grid-cols-[0.8fr_1fr]">
-              <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-primary text-primary-foreground">
-                <span
-                  className="font-sans text-[10rem] font-black leading-none opacity-90"
-                  aria-hidden="true"
-                >
-                  Ł
-                </span>
-
-                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/20 to-transparent" />
-              </div>
-
-              <div className="flex flex-col justify-end p-7 md:p-9">
-                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
-                  Współwłaściciel
-                </p>
-
-                <h3 className="mt-3 font-sans text-4xl font-black uppercase">
-                  Łukasz
-                </h3>
-
-                <p className="mt-4 text-sm leading-7 text-background/60">
-                  Na co dzień zajmuje się organizacją wyjazdów
-                  i kontaktem z klientami. Prywatnie kibic, który
-                  zdecydowanie częściej sprawdza terminarze meczów
-                  niż oferty zwykłych wakacji.
-                </p>
-
-                <span className="mt-8 w-fit border-t border-background/20 pt-3 text-xs text-background/60">
-                  Let&apos;s Gol
-                </span>
-              </div>
-            </article>
-
-            <article className="group grid min-h-96 overflow-hidden rounded-xl bg-foreground text-background sm:grid-cols-[0.8fr_1fr]">
-              <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-primary text-primary-foreground">
-                <span
-                  className="font-sans text-[10rem] font-black leading-none opacity-90"
-                  aria-hidden="true"
-                >
-                  M
-                </span>
-
-                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/20 to-transparent" />
-              </div>
-
-              <div className="flex flex-col justify-end p-7 md:p-9">
-                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-primary">
-                  Współwłaściciel
-                </p>
-
-                <h3 className="mt-3 font-sans text-4xl font-black uppercase">
-                  Mateusz
-                </h3>
-
-                <p className="mt-4 text-sm leading-7 text-background/60">
-                  Zajmuje się przygotowaniem wyjazdów i rozwojem
-                  Let&apos;s Gol. Tak samo jak Łukasz uważa, że dobry
-                  weekend zaczyna się od sprawdzenia, gdzie grają.
-                </p>
-
-                <span className="mt-8 w-fit border-t border-background/20 pt-3 text-xs text-background/60">
-                  Let&apos;s Gol
-                </span>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-background py-16 md:py-24">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <SectionHeading
-            eyebrow="Jak działamy"
-            title="Jak wygląda wyjazd z Let's Gol?"
-            intro="Bez komplikowania. Wybierasz mecz, ustalamy szczegóły i organizujemy wyjazd."
-          />
-
-          <ol className="mt-12 grid gap-0 border-y border-foreground/15 lg:grid-cols-5">
-            {processSteps.map(
-              ([Icon, title, description], index) => (
-                <li
-                  key={title}
-                  className="relative border-b border-foreground/15 p-6 last:border-b-0 lg:border-b-0 lg:border-r lg:last:border-r-0"
-                >
-                  <span className="font-mono text-[11px] font-black text-muted-foreground">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-
-                  <Icon
-                    className="mt-8 size-7 text-primary"
-                    aria-hidden="true"
-                  />
-
-                  <h3 className="mt-5 font-sans text-xl font-black uppercase">
-                    {title}
-                  </h3>
-
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                    {description}
-                  </p>
-                </li>
-              )
-            )}
-          </ol>
         </div>
       </section>
 
       <section className="bg-foreground py-16 text-background md:py-24">
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 md:px-6 lg:grid-cols-[0.75fr_1fr] lg:gap-20">
-          <div>
-            <p className="eyebrow eyebrow-on-dark">
-              Co bierzemy na siebie?
-            </p>
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <p className="eyebrow eyebrow-on-dark">Nasza zasada</p>
+          <blockquote className="mt-7 max-w-5xl text-balance font-sans text-4xl font-black uppercase leading-tight tracking-tight sm:text-5xl lg:text-7xl">
+            „Tak, jak sami chcielibyśmy pojechać na mecz.”
+          </blockquote>
+          <p className="mt-8 max-w-2xl text-base leading-7 text-background/65 md:text-lg">
+            To najprostsza miara każdej decyzji - od wyboru lotu i hotelu po
+            atmosferę na miejscu.
+          </p>
+        </div>
+      </section>
 
-            <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Nie musisz organizować wszystkiego sam
+      <section className="bg-secondary/35 py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <SectionHeading
+            eyebrow="Poznajcie nas"
+            title="Dwie twarze Let's Gol"
+            intro="Dwa różne charaktery i dwa uzupełniające się spojrzenia na dobry wyjazd. Każdy z nas odpowiada za inną część całości, ale obaj jedziemy w tym samym kierunku."
+            align="left"
+          />
+
+          <div className="mt-12 border-y border-foreground/20">
+            <article className="grid gap-8 py-10 md:py-14 lg:grid-cols-12 lg:gap-16">
+              <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted lg:col-span-5">
+                <Image
+                  src="/images/o-nas/mateusz-wspolzalozyciel.webp"
+                  alt="Mateusz, współzałożyciel i główny koordynator wyjazdów Let's Gol"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                />
+              </div>
+
+              <div className="flex flex-col justify-center lg:col-span-7">
+                <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
+                  Współzałożyciel Let&apos;s Gol
+                </p>
+                <h3 className="mt-2 font-sans text-5xl font-black uppercase leading-none md:text-7xl">
+                  Mateusz
+                </h3>
+                <p className="mt-4 font-sans text-xl font-black uppercase leading-tight text-amber-800 md:text-2xl">
+                  Główny koordynator wyjazdów
+                </p>
+
+                <div className="mt-8 space-y-5 text-base leading-7 text-muted-foreground">
+                  <p>
+                    Człowiek od zadań specjalnych i zdecydowanie ktoś,
+                    z kim trudno się nudzić. Do tańca i do różańca - gdy coś
+                    trzeba załatwić, znaleźć albo szybko ogarnąć, Mateusz
+                    prawdopodobnie już to robi.
+                  </p>
+                  <p>
+                    Jako główny koordynator dba przede wszystkim o Was na
+                    miejscu - atmosferę, organizację, wspólne zwiedzanie
+                    i komfort całej grupy.
+                  </p>
+                  <p>
+                    Szczególne miejsce zajmuje u niego Barcelona. Zna jej
+                    zakamarki jak mało kto, dlatego podczas naszych katalońskich
+                    wyjazdów możecie liczyć nie tylko na mecz, ale również na
+                    poznanie miasta od najlepszej strony.
+                  </p>
+                  <p className="font-bold text-foreground">
+                    Jego zadanie? Żebyście Wy mogli cieszyć się wyjazdem,
+                    a reszta była po naszej stronie.
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <article className="grid gap-8 border-t border-foreground/20 py-10 md:py-14 lg:grid-cols-12 lg:gap-16">
+              <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted lg:order-2 lg:col-span-5">
+                <Image
+                  src="/images/o-nas/lukasz-wspolzalozyciel.webp"
+                  alt="Łukasz, współzałożyciel i dyrektor organizacyjny Let's Gol"
+                  fill
+                  className="object-cover object-top"
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                />
+              </div>
+
+              <div className="flex flex-col justify-center lg:order-1 lg:col-span-7">
+                <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
+                  Współzałożyciel Let&apos;s Gol
+                </p>
+                <h3 className="mt-2 font-sans text-5xl font-black uppercase leading-none md:text-7xl">
+                  Łukasz
+                </h3>
+                <p className="mt-4 font-sans text-xl font-black uppercase leading-tight text-amber-800 md:text-2xl">
+                  Dyrektor organizacyjny
+                </p>
+
+                <div className="mt-8 space-y-5 text-base leading-7 text-muted-foreground">
+                  <p>
+                    Jeśli Mateusz jest człowiekiem od zadań specjalnych na
+                    miejscu, Łukasz pilnuje, żeby cała układanka zagrała jeszcze
+                    przed wylotem.
+                  </p>
+                  <p>
+                    Odpowiada za logistyczne i organizacyjne zabezpieczenie
+                    naszych wyjazdów - dobór lotów, sprawdzone noclegi, bilety
+                    i miejsca na stadionie oraz wszystkie elementy, które trzeba
+                    połączyć, żeby podróż przebiegła tak, jak powinna.
+                  </p>
+                  <p className="font-bold text-foreground">
+                    Krótko mówiąc: ma być dopięte od A do Z.
+                  </p>
+                  <p>
+                    Podczas wyjazdu również pozostaje do Waszej dyspozycji,
+                    a walizka koordynatora nie jest mu obca - regularnie możecie
+                    spotkać go razem z grupą na stadionach Europy.
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-primary py-16 text-primary-foreground md:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-6 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-5">
+            <p className="text-sm font-black uppercase tracking-widest">
+              Łukasz + Mateusz = Let&apos;s Gol
+            </p>
+            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
+              Dwa różne charaktery. Jedna wspólna zajawka.
             </h2>
-
-            <p className="mt-5 max-w-md leading-7 text-background/60">
-              Wyjazd na zagraniczny mecz to kilka osobnych rzeczy do
-              ogarnięcia. W zależności od wybranego pakietu możemy
-              zająć się nimi za Ciebie.
-            </p>
           </div>
 
-          <div className="grid gap-px overflow-hidden rounded-xl bg-background/12 sm:grid-cols-2">
-            {values.map(([Icon, title, description]) => (
-              <article
-                key={title}
-                className="bg-foreground p-6 md:p-8"
-              >
-                <Icon
-                  className="size-6 text-primary"
-                  aria-hidden="true"
-                />
-
-                <h3 className="mt-5 font-sans text-2xl font-black uppercase">
-                  {title}
-                </h3>
-
-                <p className="mt-3 text-sm leading-7 text-background/60">
-                  {description}
-                </p>
-              </article>
-            ))}
+          <div className="lg:col-span-7">
+            <p className="font-sans text-3xl font-black uppercase leading-tight md:text-5xl">
+              Piłka. Podróże. Ludzie. Emocje.
+            </p>
+            <div className="mt-8 space-y-5 text-base leading-8 md:text-lg">
+              <p>
+                Nie chcemy być firmą, która tylko sprzeda Ci wyjazd i powie
+                „do zobaczenia”. Chcemy, żebyś po powrocie pomyślał:
+              </p>
+              <blockquote className="border-l-4 border-foreground pl-5 font-sans text-3xl font-black uppercase leading-tight md:text-4xl">
+                „To było coś więcej niż mecz.”
+              </blockquote>
+              <p>Bo właśnie takie wyjazdy sami lubimy najbardziej.</p>
+            </div>
           </div>
         </div>
       </section>
 
       {galleryImages.length ? (
-        <section className="bg-secondary/55 py-16 md:py-24">
+        <section className="py-16 md:py-24">
           <div className="mx-auto max-w-7xl px-4 md:px-6">
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
               <SectionHeading
-                eyebrow="Nasze wyjazdy"
-                title="Kilka zdjęć"
-                intro="Stadiony, miasta i ludzie, z którymi mieliśmy okazję przeżyć te mecze."
+                eyebrow="Dalszy ciąg historii"
+                title="Teraz przeżywamy to razem"
+                intro="Stadiony, miasta i ludzie, z którymi dzielimy kolejne piłkarskie podróże."
                 align="left"
               />
-
               <Button
                 variant="outline"
                 size="lg"
@@ -395,14 +389,12 @@ export default async function AboutPage() {
               </Button>
             </div>
 
-            <div className="mt-10 grid gap-3 md:grid-cols-[1.25fr_0.75fr]">
+            <div className="mt-10 grid gap-3 md:grid-cols-12">
               {galleryImages.map((item, index) => (
                 <figure
                   key={item.id}
-                  className={`relative overflow-hidden rounded-xl ${
-                    index === 0
-                      ? "min-h-108 md:row-span-2"
-                      : "min-h-52"
+                  className={`relative min-h-72 overflow-hidden rounded-xl bg-muted ${
+                    index === 0 ? "md:col-span-6" : "md:col-span-3"
                   }`}
                 >
                   <Image
@@ -420,18 +412,14 @@ export default async function AboutPage() {
                     className="object-cover"
                     sizes={
                       index === 0
-                        ? "(max-width: 768px) 100vw, 65vw"
-                        : "(max-width: 768px) 100vw, 35vw"
+                        ? "(max-width: 768px) 100vw, 50vw"
+                        : "(max-width: 768px) 100vw, 25vw"
                     }
                   />
-
-                  <div className="absolute inset-0 bg-linear-to-t from-black/65 via-transparent to-transparent" />
-
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/75 to-transparent" />
                   {item.title || item.city ? (
                     <figcaption className="absolute inset-x-0 bottom-0 p-5 text-sm font-bold text-white">
-                      {[item.title, item.city]
-                        .filter(Boolean)
-                        .join(" · ")}
+                      {[item.title, item.city].filter(Boolean).join(" · ")}
                     </figcaption>
                   ) : null}
                 </figure>
@@ -441,43 +429,36 @@ export default async function AboutPage() {
         </section>
       ) : null}
 
-      <section className="bg-primary py-14 text-primary-foreground md:py-18">
-        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-7 px-4 md:flex-row md:items-center md:px-6">
-          <div>
-            <p className="font-mono text-[11px] font-black uppercase tracking-[0.16em]">
-              Masz już jakiś mecz na oku?
+      <section className="bg-foreground py-14 text-background md:py-20">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-4 md:flex-row md:items-center md:px-6">
+          <div className="max-w-3xl">
+            <p className="eyebrow eyebrow-on-dark">
+              Napiszmy kolejny rozdział razem
             </p>
-
-            <h2 className="mt-3 font-sans text-4xl font-black uppercase leading-none md:text-5xl">
-              To co, gdzie lecimy?
+            <h2 className="mt-4 text-balance font-sans text-4xl font-black uppercase leading-none md:text-6xl">
+              Jaki mecz chodzi Ci po głowie?
             </h2>
           </div>
 
           <div className="flex flex-wrap gap-3">
-         <Button
-  size="lg"
-  className="h-12 gap-3 bg-foreground pl-6 pr-5 text-background hover:bg-foreground/85"
-  nativeButton={false}
-  render={<Link href="/wyjazdy" />}
->
-  Zobacz najbliższe wyjazdy
-  <ArrowRight className="size-4 shrink-0" />
-</Button>
-
-     <Button
-  size="lg"
-  variant="outline"
-  className="h-12 border-foreground/30 bg-transparent px-6 hover:bg-foreground hover:text-background"
-  nativeButton={false}
-  render={
-    <button
-      type="button"
-      data-open-floating-contact
-    />
-  }
->
-  Skontaktuj się
-</Button>
+            <Button
+              size="lg"
+              className="h-12 gap-3 bg-primary px-6 text-primary-foreground hover:bg-primary/85"
+              nativeButton={false}
+              render={<Link href="/wyjazdy" />}
+            >
+              Zobacz wyjazdy
+              <ArrowRight className="size-4 shrink-0" aria-hidden="true" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-12 border-background/30 bg-transparent px-6 text-background hover:bg-background hover:text-foreground"
+              nativeButton={false}
+              render={<button type="button" data-open-floating-contact />}
+            >
+              Skontaktuj się
+            </Button>
           </div>
         </div>
       </section>

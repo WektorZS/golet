@@ -168,7 +168,7 @@ const whatsappHref = `https://wa.me/${whatsappNumber}`
   href={whatsappHref}
   target="_blank"
   rel="noopener noreferrer"
-  aria-label="Napisz do nas na WhatsApp"
+  aria-label="Kontakt WhatsApp - otwiera się w nowej karcie"
 >
   <WhatsAppIcon className="size-4 shrink-0 text-background/70 transition-colors group-hover:text-primary" />
 
