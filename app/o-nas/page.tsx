@@ -140,7 +140,7 @@ export default async function AboutPage() {
           <div className="max-w-4xl">
             <p className="eyebrow">Ta sama historia, kolejny rozdział</p>
             <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Ta sama przyjaźń. Ta sama pasja.
+              Jedna przyjaźń. Ta sama pasja.
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
               Kiedyś jeździliśmy na mecze tylko dla siebie. Dziś zabieramy
@@ -164,7 +164,7 @@ export default async function AboutPage() {
                   Wtedy
                 </span>
                 <span className="text-right text-sm text-muted-foreground">
-                  Dwie koszulki, jeden szalik i plan na kolejne mecze
+                 Wspólne zamiłowanie do piłki nożnej od dziecka
                 </span>
               </figcaption>
             </figure>
@@ -175,7 +175,7 @@ export default async function AboutPage() {
                   src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
                   alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
                   fill
-                  className="object-cover"
+                  className="object-cover object-center"
                   sizes="(max-width: 768px) 100vw, 58vw"
                 />
               </div>
