@@ -194,12 +194,12 @@ export default async function AboutPage() {
     />
 
     <Image
-      src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
-      alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
-      fill
-      className="hidden object-cover object-center md:block"
-      sizes="800px"
-    />
+  src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
+  alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
+  fill
+  className="hidden scale-280 object-cover object-center md:block"
+  sizes="800px"
+/>
   </div>
 
   <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
