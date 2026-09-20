@@ -73,40 +73,54 @@ export default async function AboutPage() {
 
       <SiteHeader />
 
-      <section className="relative isolate flex min-h-svh items-end overflow-hidden bg-foreground pt-20 text-white">
-        <Image
-          src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
-          alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
-          fill
-          priority
-          className="object-cover object-center"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-black/35" />
-        <div className="absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-t from-black via-black/65 to-transparent" />
+     <section className="relative isolate flex min-h-svh items-end overflow-hidden bg-foreground pt-20 text-white lg:min-h-180 xl:min-h-200">
+  <Image
+    src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
+    alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
+    fill
+    priority
+    className="object-cover object-[43%_35%] md:hidden"
+    sizes="100vw"
+  />
 
-        <div className="relative mx-auto w-full max-w-7xl px-4 pb-12 pt-28 md:px-6 md:pb-20 lg:pb-24">
-          <p className="eyebrow eyebrow-on-dark">Nasza historia</p>
-          <h1 className="mt-5 max-w-5xl text-balance font-sans text-5xl font-black uppercase leading-none tracking-tight sm:text-6xl lg:text-8xl">
-            Zaczęło się od przyjaźni i wspólnej pasji
-          </h1>
-          <div className="mt-6 flex max-w-3xl flex-col gap-6 border-l-4 border-primary pl-5 md:flex-row md:items-end md:justify-between md:pl-7">
-            <p className="text-lg leading-8 text-white/85 md:text-xl">
-              Dziś zabieramy Was na największe stadiony Europy.
-            </p>
-            <Link
-              href="#nasza-historia"
-              className="group inline-flex w-fit items-center gap-2 text-sm font-bold uppercase tracking-wide text-primary"
-            >
-              Poznaj naszą historię
-              <ArrowRight
-                className="size-4 transition-transform group-hover:translate-x-1"
-                aria-hidden="true"
-              />
-            </Link>
-          </div>
-        </div>
-      </section>
+  <Image
+    src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
+    alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
+    fill
+    priority
+    className="hidden object-cover object-center md:block"
+    sizes="100vw"
+  />
+
+  <div className="absolute inset-0 bg-black/35" />
+  <div className="absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-t from-black via-black/65 to-transparent" />
+
+  <div className="relative mx-auto w-full max-w-7xl px-4 pb-12 pt-28 md:px-6 md:pb-20 lg:pb-24">
+    <p className="eyebrow eyebrow-on-dark">Nasza historia</p>
+
+    <h1 className="mt-5 max-w-5xl text-balance font-sans text-5xl font-black uppercase leading-none tracking-tight sm:text-6xl lg:text-8xl">
+      Zaczęło się od przyjaźni i wspólnej pasji
+    </h1>
+
+    <div className="mt-6 flex max-w-3xl flex-col gap-6 border-l-4 border-primary pl-5 md:flex-row md:items-end md:justify-between md:pl-7">
+      <p className="text-lg leading-8 text-white/85 md:text-xl">
+        Dziś zabieramy Was na największe stadiony Europy.
+      </p>
+
+      <Link
+        href="#nasza-historia"
+        className="group inline-flex w-fit items-center gap-2 text-sm font-bold uppercase tracking-wide text-primary"
+      >
+        Poznaj naszą historię
+
+        <ArrowRight
+          className="size-4 transition-transform group-hover:translate-x-1"
+          aria-hidden="true"
+        />
+      </Link>
+    </div>
+  </div>
+</section>
 
       <section id="nasza-historia" className="scroll-mt-20 py-16 md:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-6 lg:grid-cols-12 lg:gap-16">
@@ -170,24 +184,34 @@ export default async function AboutPage() {
             </figure>
 
             <figure className="md:col-span-7 md:mt-24">
-              <div className="relative aspect-video overflow-hidden rounded-xl bg-muted shadow-xl">
-                <Image
-                  src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
-                  alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
-                  fill
-                  className="object-cover object-[50%_10%]"
-                  sizes="(max-width: 768px) 100vw, 58vw"
-                />
-              </div>
-              <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
-                <span className="font-sans text-2xl font-black uppercase">
-                  Dzisiaj
-                </span>
-                <span className="text-right text-sm text-muted-foreground">
-                  Nadal razem, teraz jako ekipa Let&apos;s Gol
-                </span>
-              </figcaption>
-            </figure>
+  <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted shadow-xl md:aspect-video">
+    <Image
+      src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
+      alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
+      fill
+      className="object-cover object-[43%_35%] md:hidden"
+      sizes="100vw"
+    />
+
+    <Image
+      src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
+      alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
+      fill
+      className="hidden object-cover object-center md:block"
+      sizes="(max-width: 768px) 100vw, 58vw"
+    />
+  </div>
+
+  <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
+    <span className="font-sans text-2xl font-black uppercase">
+      Dzisiaj
+    </span>
+
+    <span className="text-right text-sm text-muted-foreground">
+      Nadal razem, teraz jako ekipa Let&apos;s Gol
+    </span>
+  </figcaption>
+</figure>
           </div>
         </div>
       </section>
