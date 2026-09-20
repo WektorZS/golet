@@ -73,40 +73,43 @@ export default async function AboutPage() {
 
       <SiteHeader />
 
-     <section className="relative isolate flex min-h-svh items-end overflow-hidden bg-foreground pt-20 text-white lg:min-h-[50svh]">
-  <Image
-    src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
-    alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
-    fill
-    priority
-    className="object-cover object-[43%_35%] md:hidden"
-    sizes="100vw"
-  />
+     <section className="relative isolate flex min-h-svh items-end overflow-hidden bg-foreground pt-20 text-white lg:min-h-[100svh]">
+  <div className="absolute inset-x-0 bottom-0 top-20">
+    <Image
+      src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
+      alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
+      fill
+      priority
+      className="object-cover object-[43%_35%] md:hidden"
+      sizes="100vw"
+    />
 
-  <Image
-    src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
-    alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
-    fill
-    priority
-    className="hidden object-cover object-[23%_75%] md:block"
-    sizes="100vw"
-  />
+    <Image
+      src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
+      alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
+      fill
+      priority
+      className="hidden object-cover object-[23%_75%] md:block"
+      sizes="100vw"
+    />
 
-  <div className="absolute inset-0 bg-black/35" />
-  <div className="absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-t from-black via-black/65 to-transparent" />
+    <div className="absolute inset-0 bg-black/35" />
+    <div className="absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-t from-black via-black/65 to-transparent" />
+  </div>
 
   <div className="relative mx-auto w-full max-w-7xl px-4 pb-12 pt-28 md:px-6 md:pb-20 lg:pb-24">
-    <p className="eyebrow eyebrow-on-dark">Nasza historia</p>
+    <p className="eyebrow eyebrow-on-dark">
+      Nasza historia
+    </p>
 
-   <h1 className="mt-5 max-w-5xl text-balance font-sans text-4xl font-black uppercase leading-[1.2] tracking-normal sm:text-6xl lg:text-6xl lg:leading-none">
-  Zaczęło się od przyjaźni i wspólnej pasji
-</h1>
+    <h1 className="mt-5 max-w-5xl text-balance font-sans text-4xl font-black uppercase leading-[1.2] tracking-normal sm:text-6xl lg:text-6xl lg:leading-none">
+      Zaczęło się od przyjaźni i wspólnej pasji
+    </h1>
 
     <div className="mt-6 flex max-w-3xl flex-col gap-6 border-l-4 border-primary pl-5 md:flex-row md:items-end md:justify-between md:pl-7">
       <p className="text-lg leading-8 text-white/85 md:text-xl">
         Dziś zabieramy Was na największe stadiony Europy.
       </p>
-
     </div>
   </div>
 </section>
@@ -167,7 +170,7 @@ export default async function AboutPage() {
                   Kiedyś
                 </span>
                 <span className="text-right text-sm text-muted-foreground">
-                 Wspólne zamiłowanie do piłki nożnej od dziecka
+                 Zamiłowanie do piłki nożnej od dziecka
                 </span>
               </figcaption>
             </figure>
