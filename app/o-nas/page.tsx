@@ -73,7 +73,7 @@ export default async function AboutPage() {
 
       <SiteHeader />
 
-     <section className="relative isolate flex min-h-svh items-end overflow-hidden bg-foreground pt-20 text-white lg:min-h-180 xl:min-h-200">
+     <section className="relative isolate flex min-h-svh items-end overflow-hidden bg-foreground pt-20 text-white lg:min-h-[50svh]">
   <Image
     src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
     alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
