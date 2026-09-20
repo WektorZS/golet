@@ -1068,27 +1068,39 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 </span>
         </Button>
 
-        <div className="flex items-center gap-3">
-          <div className="flex -space-x-2">
-            <div className="flex size-10 items-center justify-center rounded-full border-2 border-secondary bg-foreground text-sm font-black text-primary">
-              Ł
-            </div>
+       <div className="flex items-center gap-3">
+  <div className="flex -space-x-2">
+    <div className="relative size-10 overflow-hidden rounded-full border-2 border-secondary bg-secondary">
+      <Image
+        src="/images/o-nas/lukasz-wspolzalozyciel.webp"
+        alt="Łukasz"
+        fill
+        sizes="40px"
+        className="object-cover"
+      />
+    </div>
 
-            <div className="flex size-10 items-center justify-center rounded-full border-2 border-secondary bg-primary text-sm font-black text-primary-foreground">
-              M
-            </div>
-          </div>
+    <div className="relative size-10 overflow-hidden rounded-full border-2 border-secondary bg-secondary">
+      <Image
+        src="/images/o-nas/mateusz-wspolzalozyciel.webp"
+        alt="Mateusz"
+        fill
+        sizes="40px"
+        className="object-cover"
+      />
+    </div>
+  </div>
 
-          <div>
-            <p className="text-sm font-bold text-foreground">
-              Łukasz & Mateusz
-            </p>
+  <div>
+    <p className="text-sm font-bold text-foreground">
+      Łukasz & Mateusz
+    </p>
 
-            <p className="text-xs text-muted-foreground">
-              współtwórcy Let&apos;s Gol
-            </p>
-          </div>
-        </div>
+    <p className="text-xs text-muted-foreground">
+      współtwórcy Let&apos;s Gol
+    </p>
+  </div>
+</div>
       </div>
     </div>
 
