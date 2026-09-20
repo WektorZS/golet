@@ -1094,15 +1094,27 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </Button>
 
         <div className="flex items-center gap-3">
-          <div className="flex -space-x-2">
-            <div className="flex size-10 items-center justify-center rounded-full border-2 border-secondary bg-foreground text-sm font-black text-primary">
-              Ł
-            </div>
+  <div className="flex -space-x-2">
+    <div className="relative size-10 overflow-hidden rounded-full border-2 border-secondary bg-muted">
+      <Image
+        src="/images/o-nas/lukasz-wspolzalozyciel.webp"
+        alt="Łukasz"
+        fill
+        className="object-cover object-top"
+        sizes="40px"
+      />
+    </div>
 
-            <div className="flex size-10 items-center justify-center rounded-full border-2 border-secondary bg-primary text-sm font-black text-primary-foreground">
-              M
-            </div>
-          </div>
+    <div className="relative size-10 overflow-hidden rounded-full border-2 border-secondary bg-muted">
+      <Image
+        src="/images/o-nas/mateusz-wspolzalozyciel.webp"
+        alt="Mateusz"
+        fill
+        className="object-cover object-center"
+        sizes="40px"
+      />
+    </div>
+  </div>
 
           <div>
             <p className="text-sm font-bold text-foreground">

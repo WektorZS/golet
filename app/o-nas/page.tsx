@@ -79,7 +79,7 @@ export default async function AboutPage() {
           alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
           fill
           priority
-          className="object-cover object-center"
+          className="object-cover object-[50%_10%]"
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-black/35" />
@@ -138,12 +138,12 @@ export default async function AboutPage() {
       <section className="overflow-hidden bg-secondary/55 py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="max-w-4xl">
-            <p className="eyebrow">Ta sama historia, kolejny rozdział</p>
+            <p className="eyebrow">Dwie osoby</p>
             <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
               Jedna przyjaźń. Ta sama pasja.
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-              Kiedyś jeździliśmy na mecze tylko dla siebie. Dziś zabieramy
+              Kiedyś jeździliśmy na mecze tylko dla siebie.<br /> Dziś zabieramy
               na stadiony również innych.
             </p>
           </div>
@@ -248,7 +248,7 @@ export default async function AboutPage() {
                   src="/images/o-nas/mateusz-wspolzalozyciel.webp"
                   alt="Mateusz, współzałożyciel i główny koordynator wyjazdów Let's Gol"
                   fill
-                  className="object-cover object-top"
+                  className="object-cover object-center"
                   sizes="(max-width: 1024px) 100vw, 42vw"
                 />
               </div>
