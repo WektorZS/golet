@@ -29,21 +29,21 @@ const quickLinks = [
 const documentLinks = [
   {
     label: "Gwarancja Turystyczna",
-    href: "/warunki-uczestnictwa",
+    href: "/dokumenty/gwarancja-turystyczna.pdf",
   },
   {
     label: "Ubezpieczenie",
-    href: "/polityka-prywatnosci",
+    href: "/dokumenty/ubezpieczenie.pdf",
   },
-    {
+  {
     label: "Wzór umowy",
-    href: "/polityka-prywatnosci",
+    href: "/dokumenty/wzor-umowy.pdf",
   },
-    {
+  {
     label: "Warunki Uczestnictwa",
     href: "/warunki-uczestnictwa",
   },
-    {
+  {
     label: "Polityka prywatności",
     href: "/polityka-prywatnosci",
   },
