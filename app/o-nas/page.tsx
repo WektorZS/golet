@@ -184,7 +184,7 @@ export default async function AboutPage() {
             </figure>
 
  <figure className="md:col-span-7 md:mt-24">
- <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted shadow-xl md:aspect-3/2">
+<div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted shadow-xl md:aspect-3/2">
   <Image
     src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
     alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
@@ -193,14 +193,19 @@ export default async function AboutPage() {
     sizes="100vw"
   />
 
-  <Image
-    src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
-    alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
-    width={1920}
-    height={1080}
-    className="absolute left-1/2 top-1/2 hidden h-[220%] w-[220%] max-w-none -translate-x-1/2 -translate-y-1/2 object-cover md:block"
-    sizes="(max-width: 1279px) 58vw, 720px"
-  />
+  <div className="absolute inset-0 hidden overflow-hidden md:block">
+    <Image
+      src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
+      alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
+      fill
+      quality={100}
+      className="object-cover object-center"
+      sizes="1920px"
+      style={{
+        transform: "scale(2.2)",
+      }}
+    />
+  </div>
 </div>
 
   <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
