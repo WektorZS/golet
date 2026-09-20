@@ -75,7 +75,7 @@ export const metadata: Metadata = {
 
   title: {
     default: "Let’s Gol - wyjazdy na mecze w Europie",
-    template: "%s | Let’s Gol",
+    template: "%s - Let’s Gol",
   },
 
   description:

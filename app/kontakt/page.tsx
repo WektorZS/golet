@@ -287,71 +287,6 @@ export default async function ContactPage() {
         </div>
       </section>
 
-    <section
-  id="formularz"
-  className="scroll-mt-20 bg-foreground px-4 py-16 text-background md:px-6 md:py-20"
-      >
-        <div className="site-container grid gap-12 py-16 md:py-20 lg:grid-cols-[0.65fr_1.15fr] lg:gap-20">
-          <div>
-            <p className="eyebrow eyebrow-on-dark">
-              Formularz
-            </p>
-
-            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Opisz swoją sprawę
-            </h2>
-
-            <p className="mt-5 max-w-md leading-7 text-background/65">
-              Podaj kontekst i najważniejsze szczegóły. Dzięki temu
-              pierwsza odpowiedź będzie bardziej konkretna.
-            </p>
-
-            <div className="mt-8 space-y-5 border-t border-background/15 pt-7">
-              <div className="flex gap-3">
-                <MessageCircle
-                  className="mt-0.5 size-5 shrink-0 text-primary"
-                  aria-hidden="true"
-                />
-
-                <p className="text-sm leading-6 text-background/60">
-                  Pytanie o wyjazd, rezerwację, grupę lub współpracę
-                  trafia przez ten sam bezpieczny formularz.
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <Users
-                  className="mt-0.5 size-5 shrink-0 text-primary"
-                  aria-hidden="true"
-                />
-
-                <p className="text-sm leading-6 text-background/60">
-                  Przy zapytaniu grupowym wpisz orientacyjną liczbę
-                  osób i interesujący termin w wiadomości.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <InquiryForm
-  trips={trips
-    .filter(
-      (trip) =>
-        trip.availabilityStatus !== "sold_out"
-    )
-    .map((trip) => ({
-      id: trip.id,
-      title: trip.title,
-      startDate: trip.startDate,
-      endDate: trip.endDate,
-      packageVariants: getPackageVariants(
-        trip.packageVariants,
-        trip.packageItems
-      ).map((variant) => variant.label),
-    }))}
-/>
-        </div>
-      </section>
 
      <section className="bg-secondary/55 px-4 py-16 md:px-6 md:py-24">
   <div className="mx-auto max-w-7xl">
@@ -428,6 +363,71 @@ export default async function ContactPage() {
     </a>
   ))}
 </div>
+        </div>
+      </section>
+      <section
+  id="formularz"
+  className="scroll-mt-20 bg-foreground px-4 py-16 text-background md:px-6 md:py-20"
+      >
+        <div className="site-container grid gap-12 py-16 md:py-20 lg:grid-cols-[0.65fr_1.15fr] lg:gap-20">
+          <div>
+            <p className="eyebrow eyebrow-on-dark">
+              Formularz
+            </p>
+
+            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
+              Opisz swoją sprawę
+            </h2>
+
+            <p className="mt-5 max-w-md leading-7 text-background/65">
+              Podaj kontekst i najważniejsze szczegóły. Dzięki temu
+              pierwsza odpowiedź będzie bardziej konkretna.
+            </p>
+
+            <div className="mt-8 space-y-5 border-t border-background/15 pt-7">
+              <div className="flex gap-3">
+                <MessageCircle
+                  className="mt-0.5 size-5 shrink-0 text-primary"
+                  aria-hidden="true"
+                />
+
+                <p className="text-sm leading-6 text-background/60">
+                  Pytanie o wyjazd, rezerwację, grupę lub współpracę
+                  trafia przez ten sam bezpieczny formularz.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <Users
+                  className="mt-0.5 size-5 shrink-0 text-primary"
+                  aria-hidden="true"
+                />
+
+                <p className="text-sm leading-6 text-background/60">
+                  Przy zapytaniu grupowym wpisz orientacyjną liczbę
+                  osób i interesujący termin w wiadomości.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <InquiryForm
+  trips={trips
+    .filter(
+      (trip) =>
+        trip.availabilityStatus !== "sold_out"
+    )
+    .map((trip) => ({
+      id: trip.id,
+      title: trip.title,
+      startDate: trip.startDate,
+      endDate: trip.endDate,
+      packageVariants: getPackageVariants(
+        trip.packageVariants,
+        trip.packageItems
+      ).map((variant) => variant.label),
+    }))}
+/>
         </div>
       </section>
 
