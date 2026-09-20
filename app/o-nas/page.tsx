@@ -164,7 +164,7 @@ export default async function AboutPage() {
               </div>
               <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
                 <span className="font-sans text-2xl font-black uppercase">
-                  Wtedy
+                  Kiedyś
                 </span>
                 <span className="text-right text-sm text-muted-foreground">
                  Wspólne zamiłowanie do piłki nożnej od dziecka
