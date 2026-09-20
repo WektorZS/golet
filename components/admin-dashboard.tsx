@@ -1363,7 +1363,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                 <CardTitle>Dodaj zdjęcie</CardTitle>
 
                 <CardDescription>
-                  JPEG, PNG, WebP lub AVIF, maksymalnie 15 MB.
+                  JPEG, PNG, WebP lub AVIF, maksymalnie 4 MB.
                   Zdjęcie zostanie automatycznie zoptymalizowane.
                 </CardDescription>
               </CardHeader>
@@ -2991,6 +2991,8 @@ function StatusBadge({
     </Badge>
   )
 }
+const MAX_UPLOAD_SIZE = 4 * 1024 * 1024
+
 function ImageDropzone({
   name,
   accept = "image/jpeg,image/png,image/webp,image/avif",
@@ -3005,18 +3007,36 @@ function ImageDropzone({
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [fileName, setFileName] = useState("")
+  const [fileSize, setFileSize] = useState("")
+  const [fileError, setFileError] = useState("")
+
   const setFiles = (files: FileList | null) => {
     if (!files || !files.length || !inputRef.current) return
 
     const file = files[0]
 
-    // Ustawiamy plik również w prawdziwym input[type=file],
-    // dzięki czemu zostanie wysłany normalnie przez FormData.
+    if (file.size > MAX_UPLOAD_SIZE) {
+      inputRef.current.value = ""
+
+      setFileName("")
+      setFileSize("")
+      setFileError(
+        `Plik jest za duży (${(file.size / 1024 / 1024).toFixed(
+          1
+        )} MB). Maksymalny rozmiar to 4 MB.`
+      )
+
+      return
+    }
+
+    setFileError("")
+
     const dataTransfer = new DataTransfer()
     dataTransfer.items.add(file)
     inputRef.current.files = dataTransfer.files
 
     setFileName(file.name)
+    setFileSize(`${(file.size / 1024 / 1024).toFixed(2)} MB`)
   }
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -3028,91 +3048,113 @@ function ImageDropzone({
   }
 
   return (
-    <div
-      onDragOver={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        setIsDragging(true)
-      }}
-      onDragEnter={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        setIsDragging(true)
-      }}
-      onDragLeave={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-
-        // Nie wyłączaj stanu przy przejściu między elementami wewnątrz dropzone.
-        if (event.currentTarget === event.target) {
-          setIsDragging(false)
-        }
-      }}
-      onDrop={handleDrop}
-      onClick={() => inputRef.current?.click()}
-      className={[
-        "relative flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-8 text-center transition-all",
-        isDragging
-          ? "border-primary bg-primary/10"
-          : "border-muted-foreground/25 bg-muted/20 hover:border-primary/50 hover:bg-muted/40",
-      ].join(" ")}
-    >
-      <input
-        ref={inputRef}
-        name={name}
-        type="file"
-        accept={accept}
-        required={required}
-        className="sr-only"
-        onChange={(event) => {
-          setFiles(event.target.files)
+    <div className="flex flex-col gap-2">
+      <div
+        onDragOver={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          setIsDragging(true)
         }}
-      />
+        onDragEnter={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          setIsDragging(true)
+        }}
+        onDragLeave={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
 
-      {currentImage && !fileName ? (
-        <div className="relative mb-4 aspect-video w-full max-w-xs overflow-hidden rounded-lg border bg-muted">
-          <Image
-            src={currentImage}
-            alt="Aktualne zdjęcie główne wyjazdu"
-            fill
-            sizes="320px"
-            className="object-cover"
-          />
-        </div>
-      ) : (
-        <Upload
-          className={[
-            "mb-3 size-8 transition-transform",
-            isDragging ? "scale-110 text-primary" : "text-muted-foreground",
-          ].join(" ")}
+          if (event.currentTarget === event.target) {
+            setIsDragging(false)
+          }
+        }}
+        onDrop={handleDrop}
+        onClick={() => inputRef.current?.click()}
+        className={[
+          "relative flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-8 text-center transition-all",
+          fileError
+            ? "border-destructive/50 bg-destructive/5"
+            : isDragging
+              ? "border-primary bg-primary/10"
+              : "border-muted-foreground/25 bg-muted/20 hover:border-primary/50 hover:bg-muted/40",
+        ].join(" ")}
+      >
+        <input
+          ref={inputRef}
+          name={name}
+          type="file"
+          accept={accept}
+          required={required}
+          className="sr-only"
+          onChange={(event) => {
+            setFiles(event.target.files)
+          }}
         />
-      )}
 
-      {fileName ? (
-        <>
-          <p className="font-medium">
-            {fileName}
-          </p>
+        {currentImage && !fileName ? (
+          <div className="relative mb-4 aspect-video w-full max-w-xs overflow-hidden rounded-lg border bg-muted">
+            <Image
+              src={currentImage}
+              alt="Aktualne zdjęcie"
+              fill
+              sizes="320px"
+              className="object-cover"
+            />
+          </div>
+        ) : (
+          <Upload
+            className={[
+              "mb-3 size-8 transition-transform",
+              fileError
+                ? "text-destructive"
+                : isDragging
+                  ? "scale-110 text-primary"
+                  : "text-muted-foreground",
+            ].join(" ")}
+          />
+        )}
 
-          <p className="mt-1 text-xs text-muted-foreground">
-            Kliknij lub upuść inne zdjęcie, aby je zmienić
-          </p>
-        </>
-      ) : (
-        <>
-          <p className="font-medium">
-            Przeciągnij i upuść zdjęcie tutaj
-          </p>
+        {fileName ? (
+          <>
+            <p className="max-w-full truncate font-medium">
+              {fileName}
+            </p>
 
-          <p className="mt-1 text-sm text-muted-foreground">
-            lub kliknij, aby wybrać plik z komputera
-          </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {fileSize}
+            </p>
 
-          <p className="mt-3 text-xs text-muted-foreground">
-            JPEG, PNG, WebP lub AVIF
-          </p>
-        </>
-      )}
+            <p className="mt-2 text-xs text-muted-foreground">
+              Kliknij lub upuść inne zdjęcie, aby je zmienić
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="font-medium">
+              Przeciągnij i upuść zdjęcie tutaj
+            </p>
+
+            <p className="mt-1 text-sm text-muted-foreground">
+              lub kliknij, aby wybrać plik z komputera
+            </p>
+
+            <p className="mt-3 text-xs font-medium text-muted-foreground">
+              JPEG, PNG, WebP lub AVIF · maks. 4 MB
+            </p>
+          </>
+        )}
+      </div>
+
+      {fileError ? (
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-sm text-destructive"
+        >
+          <AlertCircle className="mt-0.5 size-4 shrink-0" />
+
+          <p>{fileError}</p>
+        </div>
+      ) : null}
     </div>
   )
 }
