@@ -113,7 +113,7 @@ export default async function AboutPage() {
           <div className="lg:col-span-5">
             <p className="eyebrow">Blisko 20 lat razem</p>
             <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Znamy się jak łyse konie
+              Znamy się jak "łyse konie"
             </h2>
           </div>
 
@@ -140,7 +140,7 @@ export default async function AboutPage() {
           <div className="max-w-4xl">
             <p className="eyebrow">Ta sama historia, kolejny rozdział</p>
             <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Ta sama przyjaźń. Ta sama pasja.
+              Jedna przyjaźń. Ta sama pasja.
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
               Kiedyś jeździliśmy na mecze tylko dla siebie. Dziś zabieramy
@@ -155,7 +155,7 @@ export default async function AboutPage() {
                   src="/images/o-nas/lukasz-mateusz-archiwum.webp"
                   alt="Łukasz i Mateusz jako młodzi kibice FC Barcelony"
                   fill
-                  className="object-cover"
+                  className="object-cover object-[60%_10%]"
                   sizes="(max-width: 768px) 100vw, 42vw"
                 />
               </div>
@@ -164,7 +164,7 @@ export default async function AboutPage() {
                   Wtedy
                 </span>
                 <span className="text-right text-sm text-muted-foreground">
-                  Dwie koszulki, jeden szalik i plan na kolejne mecze
+                 Wspólne zamiłowanie do piłki nożnej od dziecka
                 </span>
               </figcaption>
             </figure>
@@ -175,7 +175,7 @@ export default async function AboutPage() {
                   src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
                   alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
                   fill
-                  className="object-cover"
+                  className="object-cover object-[50%_10%]"
                   sizes="(max-width: 768px) 100vw, 58vw"
                 />
               </div>
@@ -184,7 +184,7 @@ export default async function AboutPage() {
                   Dzisiaj
                 </span>
                 <span className="text-right text-sm text-muted-foreground">
-                  Nadal razem, teraz z ekipą Let&apos;s Gol
+                  Nadal razem, teraz jako ekipa Let&apos;s Gol
                 </span>
               </figcaption>
             </figure>
@@ -248,7 +248,7 @@ export default async function AboutPage() {
                   src="/images/o-nas/mateusz-wspolzalozyciel.webp"
                   alt="Mateusz, współzałożyciel i główny koordynator wyjazdów Let's Gol"
                   fill
-                  className="object-cover object-center"
+                  className="object-cover object-top"
                   sizes="(max-width: 1024px) 100vw, 42vw"
                 />
               </div>
@@ -362,7 +362,7 @@ export default async function AboutPage() {
               <blockquote className="border-l-4 border-foreground pl-5 font-sans text-3xl font-black uppercase leading-tight md:text-4xl">
                 „To było coś więcej niż mecz.”
               </blockquote>
-              <p>Bo właśnie takie wyjazdy sami lubimy najbardziej.</p>
+              <p>Bo właśnie takie wyjazdy lubimy najbardziej.</p>
             </div>
           </div>
         </div>
