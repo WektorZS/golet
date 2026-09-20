@@ -198,7 +198,7 @@ export default async function AboutPage() {
       alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
       fill
       className="hidden object-cover object-center md:block"
-      sizes="300px"
+      sizes="800px"
     />
   </div>
 
