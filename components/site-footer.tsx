@@ -295,10 +295,6 @@ export function SiteFooter({
               <p className="mt-2 text-sm font-semibold text-background">
                 COMPENSA TU S.A.
               </p>
-
-              <p className="mt-1 text-sm text-background/60">
-                Wpis ROT: 34/25
-              </p>
             </div>
           </div>
 
