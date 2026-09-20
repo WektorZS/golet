@@ -32,6 +32,7 @@ import { HomeTripCalendar } from "@/components/home-trip-calendar"
 import { SectionHeading } from "@/components/section-heading"
 import { InquiryForm } from "@/components/inquiry-form"
 import { ImageLightbox } from "@/components/image-lightbox"
+import { popularFaqs } from "@/lib/faq"
 import {
   HeroBackgroundSlider,
   HeroTypewriter,
@@ -121,32 +122,6 @@ const process = [
   ],
 ] as const
 
-const faqs = [
-  [
-    "Jak zarezerwować wyjazd?",
-    "Wybierz wyjazd z kalendarza i wyślij formularz albo skontaktuj się z nami, jeśli interesuje Cię inne wydarzenie. Po sprawdzeniu dostępności otrzymasz ofertę z zakresem pakietu, ceną i kolejnymi krokami.",
-  ],
-  [
-    "Kiedy rezerwacja jest potwierdzona?",
-    "Rezerwacja jest potwierdzona zgodnie z warunkami wskazanymi w przekazanej ofercie i umowie. Samo wysłanie formularza nie oznacza jeszcze rezerwacji miejsca.",
-  ],
-  [
-    "Czy bilet na mecz jest zawarty w cenie?",
-    "Zależy to od wybranego wariantu. Zakres każdego pakietu jest pokazany na stronie konkretnego wyjazdu i potwierdzony w ofercie oraz umowie.",
-  ],
-  [
-    "Skąd odbywa się wyjazd?",
-    "Lotnisko lub miejsce zbiórki zależy od konkretnego wyjazdu i wybranego wariantu. Przy ofercie indywidualnej sprawdzamy rozwiązania dogodne dla miejsca zamieszkania uczestników.",
-  ],
-  [
-    "Czy potrzebuję dowodu osobistego czy paszportu?",
-    "Wymagany dokument zależy od kraju, obywatelstwa i aktualnych przepisów. Przed podróżą sprawdź oficjalne wymagania dla kierunku oraz upewnij się, że dokument jest ważny przez wymagany okres.",
-  ],
-  [
-    "Czy godzina meczu może się zmienić?",
-    "Tak. Organizator rozgrywek, nadawca lub klub może zmienić godzinę spotkania także po opublikowaniu wstępnego terminarza. Warto zachować elastyczność przy planowaniu dodatkowych aktywności.",
-  ],
-] as const
 
 type GalleryItem = {
   id: number
@@ -421,7 +396,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
     <div>
       <p className="eyebrow">
-        Wyjazd indywidualny
+        Twój wyjazd
       </p>
 
       <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight md:text-6xl">
@@ -1172,20 +1147,20 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
       <div className="lg:pt-2">
         <Accordion className="border-t border-foreground/15">
-          {faqs.map(([question, answer]) => (
-            <AccordionItem
-              key={question}
-              className="border-b border-foreground/15"
-            >
-              <AccordionTrigger className="min-h-18 py-5 text-left text-base font-bold leading-6 hover:no-underline hover:text-primary">
-                {question}
-              </AccordionTrigger>
+         {popularFaqs.map((item) => (
+  <AccordionItem
+    key={item.question}
+    className="border-b border-foreground/15"
+  >
+    <AccordionTrigger className="min-h-18 py-5 text-left text-base font-bold leading-6 hover:no-underline hover:text-primary">
+      {item.question}
+    </AccordionTrigger>
 
-              <AccordionContent className="max-w-2xl pb-6 pr-8 text-[15px] leading-7 text-muted-foreground">
-                <p>{answer}</p>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+    <AccordionContent className="max-w-2xl whitespace-pre-line pb-6 pr-8 text-[15px] leading-7 text-muted-foreground">
+      <p>{item.answer}</p>
+    </AccordionContent>
+  </AccordionItem>
+))}
         </Accordion>
       </div>
     </div>

@@ -15,334 +15,124 @@ export const faqCategories: FaqCategory[] = [
   {
     id: "rezerwacja",
     title: "Rezerwacja i płatność",
-    description: "Jak wygląda rezerwacja od pierwszego zapytania do potwierdzenia wyjazdu.",
+    description:
+      "Najważniejsze informacje o rezerwacji wyjazdu, płatnościach i organizacji podróży.",
     items: [
       {
-        question: "Jak zarezerwować wyjazd?",
+        question: "Jak wygląda rezerwacja wyjazdu?",
         answer:
-          "Wybierz interesujący Cię wyjazd i wyślij formularz. Sprawdzimy dostępność, potwierdzimy szczegóły i prześlemy Ci ofertę. Jeżeli wszystko Ci odpowiada, przechodzimy do rezerwacji i podpisania umowy.",
-        popular: true,
+          "Wybierasz wyjazd lub wskazujesz mecz, na który chcesz pojechać. Ustalamy szczegóły, przedstawiamy ofertę, a następnie otrzymujesz umowę oraz informacje dotyczące płatności.\n\nPo potwierdzeniu rezerwacji zajmujemy się organizacją Twojego wyjazdu.",
       },
       {
-        question: "Czy wysłanie formularza oznacza rezerwację miejsca?",
+        question: "Czy trzeba zapłacić całą kwotę od razu?",
         answer:
-          "Nie. Formularz jest zapytaniem o wyjazd. Rezerwacja zostaje potwierdzona dopiero po zaakceptowaniu oferty i spełnieniu warunków wskazanych w umowie.",
-        popular: true,
+          "Nie zawsze. Przy naszych wyjazdach zazwyczaj obowiązuje zaliczka, a pozostała część ceny płatna jest w terminie wskazanym w umowie.\n\nDokładny harmonogram płatności otrzymujesz przed zawarciem umowy.",
       },
       {
-        question: "Co dzieje się po wysłaniu zapytania?",
+        question: "Czy mogę pojechać sam/sama?",
         answer:
-          "Sprawdzamy dostępność wybranego meczu i pakietu. Jeżeli potrzebujemy dodatkowych informacji, kontaktujemy się z Tobą. Następnie otrzymujesz konkretną ofertę z ceną, zakresem wyjazdu i kolejnymi krokami.",
-      },
-      {
-        question: "Jak wygląda płatność za wyjazd?",
-        answer:
-          "Warunki płatności otrzymujesz razem z ofertą. Przy części wyjazdów płatność może być podzielona na kilka etapów, ponieważ bilety, loty i noclegi mają różne terminy rezerwacji.",
-      },
-      {
-        question: "Czy można zapłacić za wyjazd w ratach?",
-        answer:
-          "W wielu przypadkach możemy podzielić płatność na etapy. Zależy to jednak od terminu wyjazdu i warunków konkretnej oferty. Najlepiej zapytać o to przed rezerwacją.",
-      },
-      {
-        question: "Czy mogę zarezerwować kilka miejsc jednocześnie?",
-        answer:
-          "Tak. W formularzu podaj liczbę osób, które chcą jechać. Sprawdzimy dostępność biletów i pozostałych elementów wyjazdu dla całej grupy.",
-      },
-      {
-        question: "Czy mogę zarezerwować wyjazd dla innej osoby?",
-        answer:
-          "Tak. Możesz wysłać zapytanie również dla innych uczestników. Przed finalizacją rezerwacji poprosimy o dane potrzebne do przygotowania dokumentów i rezerwacji.",
+          "Oczywiście. Na nasze wyjazdy regularnie zapisują się osoby podróżujące samodzielnie. W takim przypadku ustalamy dostępne opcje zakwaterowania i ewentualną dopłatę do pokoju jednoosobowego.",
       },
     ],
   },
-
   {
-    id: "pakiety",
-    title: "Pakiety i wyjazdy indywidualne",
-    description: "Co możesz zarezerwować i jak dopasować wyjazd do swoich potrzeb.",
+    id: "pakiet",
+    title: "Pakiet i organizacja wyjazdu",
+    description:
+      "Co może obejmować wyjazd z Let’s Gol i jak wygląda opieka podczas podróży.",
     items: [
       {
-        question: "Co zawiera pełny pakiet?",
+        question: "Co zawiera wyjazd z Let’s Gol?",
         answer:
-          "Zakres zależy od konkretnego wyjazdu, ale pełny pakiet może obejmować bilet na mecz, przelot, nocleg, lokalne transfery, plan podróży i opiekę organizacyjną. Dokładny zakres zawsze znajdziesz przy wybranym wyjeździe.",
+          "Zakres zależy od konkretnej oferty. Pełny pakiet może obejmować przelot, zakwaterowanie, bilet na mecz, ubezpieczenie, transport lokalny, plan podróży, wspólne zwiedzanie oraz opiekę koordynatora. Dokładny zakres zawsze znajdziesz w ofercie i umowie.",
         popular: true,
       },
       {
-        question: "Czy muszę kupować pełny pakiet?",
+        question: "Czy podczas wyjazdu jest z nami koordynator?",
         answer:
-          "Nie. Przy części wyjazdów dostępne są również inne warianty, na przykład sam bilet, bilet z lotem albo bilet z noclegiem. Dostępne opcje są pokazane na stronie konkretnego wyjazdu.",
-      },
-      {
-        question: "Czy możecie zorganizować wyjazd na mecz, którego nie ma w kalendarzu?",
-        answer:
-          "Tak. Jeżeli nie widzisz interesującego Cię meczu, napisz do nas. Sprawdzimy dostępność biletów, lotów i noclegów i przygotujemy indywidualną propozycję.",
+          "Opieka podczas wyjazdu może mieć charakter opieki na miejscu lub opieki zdalnej Organizatora – zależy to od wykupionego pakietu.\n\nW przypadku opieki na miejscu koordynator pomaga w organizacji pobytu, przemieszczaniu się po mieście, realizacji programu oraz w sprawach związanych z meczem. Przy opiece zdalnej pozostajemy w kontakcie z uczestnikami i zapewniamy wsparcie organizacyjne na odległość.",
         popular: true,
       },
       {
-        question: "Czy mogę wybrać inne lotnisko wylotu?",
+        question: "Czy muszę uczestniczyć we wspólnym zwiedzaniu?",
         answer:
-          "Przy wyjeździe indywidualnym możemy sprawdzić różne lotniska i dopasować wariant do Twojego miejsca zamieszkania. Przy gotowych wyjazdach miejsce wylotu zależy od konkretnej oferty.",
-      },
-      {
-        question: "Czy organizujecie wyjazdy dla grup?",
-        answer:
-          "Tak. Możemy przygotować wyjazd dla pary, rodziny, grupy znajomych, firmy, klubu lub większej grupy zorganizowanej.",
-      },
-      {
-        question: "Czy mogę poprosić o wycenę przed podjęciem decyzji?",
-        answer:
-          "Oczywiście. Wyślij zapytanie i napisz, jaki mecz Cię interesuje, ile osób jedzie i czego potrzebujesz. Sprawdzimy możliwości i przygotujemy propozycję.",
+          "Nie. Chcemy, żeby wyjazd był również czasem dla Ciebie. Wspólne zwiedzanie jest propozycją dla grupy, ale możesz wykorzystać czas wolny według własnego pomysłu, o ile nie koliduje to z realizacją kluczowych punktów programu.",
       },
     ],
   },
-
-  {
-    id: "bilety",
-    title: "Bilety na mecz",
-    description: "Informacje o biletach, miejscach na stadionie i sposobie ich przekazania.",
-    items: [
-      {
-        question: "Czy bilet na mecz jest zawarty w cenie?",
-        answer:
-          "To zależy od wybranego wariantu. Przy każdym wyjeździe pokazujemy, co dokładnie obejmuje dana opcja. Przed rezerwacją otrzymujesz również pełny zakres oferty.",
-        popular: true,
-      },
-      {
-        question: "Jak otrzymam bilet na mecz?",
-        answer:
-          "Sposób przekazania biletu zależy od klubu i systemu sprzedaży. Może to być bilet elektroniczny, bilet w aplikacji albo inna forma stosowana przy danym meczu. Wszystkie instrukcje otrzymasz przed spotkaniem.",
-      },
-      {
-        question: "Kiedy otrzymam bilet?",
-        answer:
-          "Kluby często udostępniają bilety dopiero przed meczem. Gdy tylko bilet będzie dostępny, przekażemy Ci go razem z potrzebnymi instrukcjami.",
-      },
-      {
-        question: "Czy miejsca na stadionie będą obok siebie?",
-        answer:
-          "Przy rezerwacji dla kilku osób zawsze sprawdzamy możliwość miejsc obok siebie. Ostateczny układ zależy jednak od dostępności przy konkretnym meczu.",
-      },
-      {
-        question: "Czy mogę wybrać kategorię biletu?",
-        answer:
-          "Jeżeli dostępnych jest kilka kategorii, pokażemy Ci możliwe warianty. Wybrana kategoria zostanie potwierdzona w ofercie.",
-      },
-      {
-        question: "Czy klub może zmienić przydzielone miejsca?",
-        answer:
-          "W wyjątkowych sytuacjach klub lub operator systemu biletowego może zmienić przydział miejsc. Jeżeli otrzymamy taką informację, od razu przekażemy Ci szczegóły.",
-      },
-    ],
-  },
-
   {
     id: "transport",
-    title: "Transport",
-    description: "Wylot, miejsce zbiórki, bagaż i informacje dotyczące podróży.",
+    title: "Transport i bagaż",
+    description:
+      "Informacje o lotniskach wylotu, bagażu i organizacji transportu.",
     items: [
       {
-        question: "Skąd odbywa się wyjazd?",
+        question: "Jaki bagaż jest w cenie wyjazdu?",
         answer:
-          "Miejsce wylotu lub zbiórki jest podane przy konkretnym wyjeździe. Przy wyjazdach indywidualnych możemy sprawdzić kilka możliwości i dopasować je do miejsca zamieszkania uczestników.",
+          "W cenie wyjazdu standardowo uwzględniony jest podstawowy bagaż podręczny o wymiarach do 40 × 30 × 20 cm, umieszczany pod siedzeniem przed pasażerem.\n\nJeżeli potrzebujesz większego bagażu podręcznego lub bagażu rejestrowanego, istnieje możliwość jego dokupienia za dodatkową opłatą.\n\nDokładny limit bagażu każdorazowo potwierdzamy przed wyjazdem zgodnie z warunkami przewoźnika.",
         popular: true,
       },
       {
-        question: "Kiedy poznam godzinę wylotu lub zbiórki?",
+        question: "Z jakich lotnisk organizujecie wyloty?",
         answer:
-          "Najważniejsze godziny przekazujemy przed wyjazdem razem z informacjami organizacyjnymi. Jeżeli przewoźnik zmieni rozkład, poinformujemy Cię o aktualizacji.",
-      },
-      {
-        question: "Czy wszystkie wyjazdy odbywają się samolotem?",
-        answer:
-          "Nie zawsze. Sposób podróży zależy od konkretnego meczu i wybranego wariantu. Przy każdym wyjeździe dokładnie pokazujemy, jaki transport obejmuje oferta.",
-      },
-      {
-        question: "Ile bagażu mogę zabrać?",
-        answer:
-          "Limit bagażu zależy od linii lotniczej i wybranej taryfy. Przed podróżą otrzymasz informację, jaki bagaż obejmuje Twoja rezerwacja.",
-      },
-      {
-        question: "Co się stanie, jeśli lot lub transport się opóźni?",
-        answer:
-          "W takiej sytuacji analizujemy aktualny plan podróży i przekazujemy uczestnikom informacje o dalszych krokach. Konkretne rozwiązanie zależy od rodzaju transportu i skali opóźnienia.",
-      },
-      {
-        question: "Czy mogę zmienić miejsce wylotu po rezerwacji?",
-        answer:
-          "Czasami jest to możliwe, ale zależy od etapu rezerwacji i warunków przewoźnika. Jeżeli chcesz coś zmienić, skontaktuj się z nami jak najwcześniej.",
+          "Dobieramy lotnisko do konkretnego wyjazdu i dostępności połączeń. Korzystamy m.in. z Warszawy, Krakowa, Wrocławia, Gdańska, Katowic czy Berlina. Przy indywidualnej wycenie możemy sprawdzić również inne lotnisko.",
+        popular: true,
       },
     ],
   },
-
   {
-    id: "noclegi",
-    title: "Noclegi",
-    description: "Hotel, pokoje i najważniejsze informacje dotyczące zakwaterowania.",
+    id: "bilety",
+    title: "Bilety i mecze",
+    description:
+      "Najważniejsze informacje o biletach, miejscach na stadionie i zmianach terminów spotkań.",
     items: [
       {
-        question: "Czy każdy wyjazd obejmuje nocleg?",
+        question: "Czy będziemy siedzieć razem na stadionie?",
         answer:
-          "Nie. Wszystko zależy od wybranego wariantu. Jeżeli pakiet obejmuje hotel, będzie to wyraźnie zaznaczone przy danym wyjeździe.",
+          "Staramy się zapewniać miejsca obok siebie lub możliwie blisko siebie. Ostateczny układ miejsc zależy jednak od dostępności i zasad dystrybucji biletów na konkretne wydarzenie. Jeśli określony układ miejsc jest gwarantowany, zaznaczamy to w ofercie.",
       },
       {
-        question: "Jaki jest standard hotelu?",
+        question: "Czy można wybrać lepsze miejsca na stadionie?",
         answer:
-          "Informacje o standardzie i lokalizacji podajemy przy konkretnej ofercie. Jeżeli hotel nie został jeszcze wskazany, otrzymasz jego dane po potwierdzeniu rezerwacji.",
+          "W przypadku wielu meczów możemy zaproponować kilka kategorii biletów, w tym miejsca o podwyższonym standardzie lub PREMIUM. Dostępność i ewentualną dopłatę ustalamy indywidualnie.",
       },
       {
-        question: "Czy mogę wybrać rodzaj pokoju?",
+        question: "Co się stanie, jeśli termin meczu zostanie zmieniony?",
         answer:
-          "Możesz podać swoje preferencje w zapytaniu. Dostępność pokoju jednoosobowego, dwuosobowego lub innej konfiguracji zależy od hotelu i konkretnego terminu.",
-      },
-      {
-        question: "Czy osoby jadące razem będą w tym samym pokoju?",
-        answer:
-          "Przygotowując rezerwację staramy się uwzględnić wspólne zakwaterowanie. Ostateczny układ pokojów zależy od liczby osób i dostępności hotelu.",
-      },
-      {
-        question: "Kiedy otrzymam dane hotelu?",
-        answer:
-          "Dane hotelu oraz informacje dotyczące zameldowania przekazujemy przed wyjazdem, gdy rezerwacja noclegu jest już potwierdzona.",
-      },
-    ],
-  },
-
-  {
-    id: "dokumenty",
-    title: "Dokumenty i podróż",
-    description: "Dokumenty, formalności i rzeczy, które warto sprawdzić przed wyjazdem.",
-    items: [
-      {
-        question: "Czy potrzebuję dowodu osobistego czy paszportu?",
-        answer:
-          "To zależy od kraju, do którego jedziesz, oraz Twojego obywatelstwa. Przed podróżą sprawdź aktualne wymagania wjazdowe i upewnij się, że Twój dokument jest ważny.",
+          "Terminy spotkań ustalane są przez ligi, kluby i organizatorów rozgrywek i mogą ulec zmianie. Jeżeli tak się stanie, informujemy uczestników i podejmujemy działania, aby odpowiednio dostosować organizację wyjazdu.\n\nJeżeli zmiana istotnie wpływa na warunki imprezy, dalsze postępowanie odbywa się zgodnie z umową i obowiązującymi przepisami.",
         popular: true,
       },
       {
-        question: "Kto odpowiada za ważność dokumentów?",
+        question: "Kiedy otrzymam bilet na mecz?",
         answer:
-          "Każdy uczestnik powinien przed wyjazdem sprawdzić ważność swoich dokumentów i wymagania dotyczące wjazdu do danego kraju.",
-      },
-      {
-        question: "Czy osoba niepełnoletnia może uczestniczyć w wyjeździe?",
-        answer:
-          "Takie wyjazdy są możliwe, ale potrzebne dokumenty i zgody zależą od wieku uczestnika, opiekuna, kierunku oraz przewoźnika. Najlepiej skontaktować się z nami przed rezerwacją.",
-      },
-      {
-        question: "Czy przy podróży zagranicznej mogą być potrzebne dodatkowe dokumenty?",
-        answer:
-          "Tak. W zależności od kraju mogą obowiązywać dodatkowe wymagania. Przed wyjazdem warto sprawdzić aktualne informacje na oficjalnych stronach rządowych.",
-      },
-      {
-        question: "Czy dane na bilecie muszą zgadzać się z dokumentem?",
-        answer:
-          "Jeżeli bilet lub rezerwacja wymaga danych uczestnika, powinny być one podane poprawnie. Jeżeli zauważysz błąd, skontaktuj się z nami od razu.",
+          "Termin i sposób przekazania zależą od zasad konkretnego klubu. Bilet może zostać przesłany w PDF, udostępniony w oficjalnej aplikacji klubu albo przekazany w innej wymaganej formie. Wszystkie niezbędne instrukcje otrzymasz przed meczem.",
       },
     ],
   },
-
   {
-    id: "zmiany",
-    title: "Zmiany terminu meczu",
-    description: "Co warto wiedzieć o godzinie i dacie spotkania.",
+    id: "indywidualne",
+    title: "Wyjazdy indywidualne i grupowe",
+    description:
+      "Wyjazdy na mecze spoza kalendarza oraz oferty przygotowywane dla grup, firm, szkół i klubów.",
     items: [
       {
-        question: "Czy godzina meczu może się zmienić?",
+        question:
+          "Czy organizujecie wyjazdy na mecze, których nie ma w kalendarzu?",
         answer:
-          "Tak. Godzina spotkania może zostać zmieniona przez ligę, klub lub nadawcę telewizyjnego. Dlatego przy planowaniu wyjazdu warto zachować trochę elastyczności.",
+          "Tak. W ramach „Twój Wyjazd” możesz wskazać interesujący Cię mecz, klub, termin oraz preferowane lotnisko. Przygotujemy indywidualną propozycję zgodnie z dostępnością.\n\nMożesz wybrać zakres: bilet / bilet + lot / bilet + lot + hotel. W tej formule możemy również zapewnić zdalne wsparcie Organizatora.",
         popular: true,
       },
       {
-        question: "Czy data meczu może zostać zmieniona?",
+        question:
+          "Czy organizujecie wyjazdy dla firm, szkół, klubów i większych grup?",
         answer:
-          "Tak. Zdarza się, że spotkanie zostaje przesunięte na inny dzień, szczególnie gdy początkowo podany termin nie był jeszcze ostatecznie potwierdzony.",
+          "Tak. Przygotowujemy indywidualne wyjazdy dla firm, szkół, akademii i klubów sportowych oraz grup prywatnych.\n\nZakres wyjazdu, transport, zakwaterowanie, bilety i program ustalamy indywidualnie, dopasowując ofertę do liczby uczestników i potrzeb grupy.",
       },
       {
-        question: "Skąd wiadomo, że termin meczu jest już potwierdzony?",
+        question:
+          "Czy Let’s Gol jest legalnym organizatorem turystyki i czy wyjazdy są ubezpieczone?",
         answer:
-          "Zależy to od ligi i rozgrywek. Przy konkretnym wyjeździe opieramy się na oficjalnych informacjach publikowanych przez organizatora rozgrywek i klub.",
-      },
-      {
-        question: "Co się dzieje, jeśli termin meczu zmieni się po rezerwacji?",
-        answer:
-          "Sprawdzamy, jak zmiana wpływa na lot, hotel i pozostałe elementy wyjazdu. Następnie kontaktujemy się z uczestnikami i przedstawiamy dostępne rozwiązania dla konkretnej rezerwacji.",
-      },
-      {
-        question: "Czy mogę samodzielnie dokupić dodatkowy transport?",
-        answer:
-          "Tak, ale jeżeli robisz to przed ostatecznym potwierdzeniem godziny meczu, warto wybierać elastyczne rezerwacje. Terminarz spotkania może jeszcze ulec zmianie.",
-      },
-    ],
-  },
-
-  {
-    id: "anulowanie",
-    title: "Rezygnacja i zmiany rezerwacji",
-    description: "Co zrobić, jeżeli po rezerwacji zmienią się Twoje plany.",
-    items: [
-      {
-        question: "Czy mogę zrezygnować z wyjazdu?",
-        answer:
-          "Tak, ale warunki i ewentualne koszty zależą od etapu realizacji oraz zasad określonych w umowie. Jeżeli musisz zrezygnować, skontaktuj się z nami jak najwcześniej.",
-      },
-      {
-        question: "Czy mogę zmienić uczestnika wyjazdu?",
-        answer:
-          "Czasami jest to możliwe. Wszystko zależy od tego, czy bilety, loty i nocleg zostały już wystawione na konkretną osobę. Im wcześniej zgłosisz zmianę, tym większa szansa na jej wprowadzenie.",
-      },
-      {
-        question: "Co zrobić, jeśli podałem błędne dane?",
-        answer:
-          "Napisz lub zadzwoń do nas od razu. Sprawdzimy, czy dane można jeszcze poprawić i czy zmiana wiąże się z dodatkowymi kosztami.",
-      },
-      {
-        question: "Czy mogę odstąpić od umowy?",
-        answer:
-          "Zasady odstąpienia i rezygnacji zależą od rodzaju rezerwacji oraz warunków zawartej umowy. Dokładne informacje znajdziesz w dokumentach otrzymanych przy rezerwacji.",
-      },
-      {
-        question: "Co się stanie, jeśli coś zmieni się po stronie organizatora?",
-        answer:
-          "Jeżeli zmiana wpływa na Twój wyjazd, poinformujemy Cię o niej i przedstawimy dalsze możliwości zgodnie z warunkami Twojej rezerwacji.",
-      },
-    ],
-  },
-
-  {
-    id: "wyjazd",
-    title: "Podczas wyjazdu",
-    description: "Praktyczne informacje przydatne przed podróżą i w dniu meczu.",
-    items: [
-      {
-        question: "Co zabrać ze sobą na wyjazd?",
-        answer:
-          "Przede wszystkim ważny dokument, telefon, dostęp do biletów i informacje organizacyjne. Warto też sprawdzić pogodę oraz regulamin stadionu dotyczący przedmiotów, które można wnieść na trybuny.",
-      },
-      {
-        question: "Ile wcześniej powinienem być na miejscu zbiórki?",
-        answer:
-          "Przyjedź na godzinę podaną w informacjach organizacyjnych. Przy lotach i przejazdach grupowych punktualność jest bardzo ważna.",
-      },
-      {
-        question: "Czy można zabrać jedzenie i napoje?",
-        answer:
-          "Podczas podróży obowiązują zasady danego przewoźnika, a na stadionie regulamin obiektu. To, co możesz zabrać do samolotu lub autokaru, nie zawsze można wnieść na stadion.",
-      },
-      {
-        question: "Jak będziemy się kontaktować podczas wyjazdu?",
-        answer:
-          "Przed podróżą otrzymasz informację, z jakiego kanału kontaktu korzystamy podczas wyjazdu. W razie ważnych zmian lub informacji będziemy przekazywać je właśnie tam.",
-      },
-      {
-        question: "Co zrobić, jeśli spóźnię się na zbiórkę?",
-        answer:
-          "Skontaktuj się z nami natychmiast. Sprawdzimy, jakie są możliwości, ale przy locie lub zorganizowanym transporcie nie zawsze będzie można czekać na spóźnioną osobę.",
-      },
-      {
-        question: "Jak wygląda powrót po meczu?",
-        answer:
-          "Przed meczem otrzymasz informacje dotyczące miejsca i godziny zbiórki po spotkaniu. Jeżeli coś się zmieni, przekażemy aktualne instrukcje.",
+          "Tak. Let’s Gol działa jako organizator turystyki i posiada wymagany wpis do rejestru oraz zabezpieczenie finansowe na wypadek niewypłacalności.\n\nNumer ewidencyjny organizatora: 42848.\n\nW przypadku wyjazdów, których pakiet obejmuje ubezpieczenie turystyczne, jego zakres określony jest w dokumentach dotyczących konkretnego wyjazdu.",
       },
     ],
   },
