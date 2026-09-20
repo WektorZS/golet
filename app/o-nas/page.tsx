@@ -88,7 +88,7 @@ export default async function AboutPage() {
     alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
     fill
     priority
-    className="hidden object-cover object-center md:block"
+    className="hidden object-cover object-[23%_75%] md:block"
     sizes="100vw"
   />
 
@@ -107,17 +107,6 @@ export default async function AboutPage() {
         Dziś zabieramy Was na największe stadiony Europy.
       </p>
 
-      <Link
-        href="#nasza-historia"
-        className="group inline-flex w-fit items-center gap-2 text-sm font-bold uppercase tracking-wide text-primary"
-      >
-        Poznaj naszą historię
-
-        <ArrowRight
-          className="size-4 transition-transform group-hover:translate-x-1"
-          aria-hidden="true"
-        />
-      </Link>
     </div>
   </div>
 </section>
