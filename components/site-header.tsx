@@ -144,16 +144,34 @@ export function SiteHeader() {
           className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 lg:hidden"
           aria-label="Menu mobilne"
         >
-          {links.map(([label, href]) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setOpen(false)}
-              className="rounded-md px-3 py-3 font-mono text-sm font-semibold uppercase tracking-wider text-background hover:bg-background/10 hover:text-primary"
-            >
-              {label}
-            </Link>
-          ))}
+        {links.map(([label, href]) => {
+  const route = href.split("#")[0] || "/"
+  const active = route !== "/" && pathname === route
+
+  return (
+    <Link
+      key={href}
+      href={href}
+      onClick={() => setOpen(false)}
+      aria-current={active ? "page" : undefined}
+      className={`group rounded-md px-3 py-3 font-mono text-sm font-semibold uppercase tracking-wider transition-colors ${
+        active
+          ? "text-primary"
+          : "text-background hover:bg-background/10 hover:text-primary"
+      }`}
+    >
+      <span
+        className={`relative inline-block pb-1 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-primary after:transition-transform ${
+          active
+            ? "after:scale-x-100"
+            : "after:scale-x-0"
+        }`}
+      >
+        {label}
+      </span>
+    </Link>
+  )
+})}
 
           <Button
             type="button"
