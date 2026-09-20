@@ -183,23 +183,23 @@ export default async function AboutPage() {
               </figcaption>
             </figure>
 
-            <figure className="md:col-span-7 md:mt-24">
+           <figure className="md:col-span-7 md:mt-24">
   <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted shadow-xl md:aspect-video">
     <Image
       src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
       alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
       fill
-      className="object-cover object-[43%_35%] md:hidden"
+      className="scale-110 object-cover object-[43%_35%] md:hidden"
       sizes="100vw"
     />
 
     <Image
-  src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
-  alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
-  fill
-  className="hidden scale-280 object-cover object-center md:block"
-  sizes="800px"
-/>
+      src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
+      alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
+      fill
+      className="hidden scale-270 object-cover object-center md:block"
+      sizes="(max-width: 1279px) 58vw, 720px"
+    />
   </div>
 
   <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
