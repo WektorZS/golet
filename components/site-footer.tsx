@@ -29,23 +29,28 @@ const quickLinks = [
 const documentLinks = [
   {
     label: "Gwarancja Turystyczna",
-    href: "/dokumenty/gwarancja-turystyczna.pdf",
+    href: "/dokumenty/Gwarancja-LB-Coaching%202026-2027.pdf",
+    pdf: true,
   },
   {
     label: "Ubezpieczenie",
-    href: "/dokumenty/ubezpieczenie.pdf",
+    href: "/dokumenty/Ubezpieczenie-Compensa.pdf",
+    pdf: true,
   },
   {
     label: "Wzór umowy",
-    href: "/dokumenty/wzor-umowy.pdf",
+    href: "/dokumenty/Lets_Gol_wzór-umowy-o-świadczenie-usług-turystycznych.pdf",
+    pdf: true,
   },
   {
     label: "Warunki Uczestnictwa",
     href: "/warunki-uczestnictwa",
+    pdf: false,
   },
   {
     label: "Polityka prywatności",
     href: "/polityka-prywatnosci",
+    pdf: false,
   },
 ] as const
 
@@ -204,18 +209,32 @@ export function SiteFooter({
               <div className="my-5 h-px bg-white/12" />
 
               <div>
-                <p className="text-background/65">
-                  Nr wpisu do rejestru
-                </p>
+  <p className="text-background/65">
+    Nr wpisu do rejestru
+  </p>
 
-                <p className="text-background/65">
-                  organizatorów turystyki:
-                </p>
+  <p className="text-background/65">
+    organizatorów turystyki:
+  </p>
 
-                <p className="mt-1 text-xl font-black text-primary">
-                  42848
-                </p>
-              </div>
+  <a
+    href="/dokumenty/Wpis-do-rejestru-organizatorów-turystyki-LB-Coaching.pdf"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="group mt-1 inline-flex items-center gap-2 text-xl font-black text-primary transition-colors hover:text-background"
+  >
+    42848
+
+    <ArrowUpRight
+      className="size-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+      aria-hidden="true"
+    />
+  </a>
+
+  <p className="mt-1 text-xs text-background/45">
+    Sprawdź wpis w oficjalnym rejestrze
+  </p>
+</div>
             </div>
           </div>
 
@@ -225,21 +244,46 @@ export function SiteFooter({
             </FooterHeading>
 
             <div className="mt-6 flex flex-col gap-3">
-              {documentLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="group flex w-fit items-center gap-3 text-sm font-medium text-background/72 transition-colors hover:text-background"
-                >
-                  <ChevronRight
-                    className="size-4 shrink-0 text-primary transition-transform duration-200 group-hover:translate-x-1"
-                    strokeWidth={3}
-                    aria-hidden="true"
-                  />
+              {documentLinks.map((link) => {
+                const className =
+                  "group flex w-fit items-center gap-3 text-sm font-medium text-background/72 transition-colors hover:text-background"
 
-                  {link.label}
-                </Link>
-              ))}
+                const content = (
+                  <>
+                    <ChevronRight
+                      className="size-4 shrink-0 text-primary transition-transform duration-200 group-hover:translate-x-1"
+                      strokeWidth={3}
+                      aria-hidden="true"
+                    />
+
+                    <span>{link.label}</span>
+                  </>
+                )
+
+                if (link.pdf) {
+                  return (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={className}
+                    >
+                      {content}
+                    </a>
+                  )
+                }
+
+                return (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className={className}
+                  >
+                    {content}
+                  </Link>
+                )
+              })}
             </div>
 
             <div className="mt-6 border-t border-white/10 pt-5">
@@ -416,34 +460,20 @@ export function SiteFooter({
             </p>
 
             <div className="flex flex-wrap gap-x-5 gap-y-2">
-              <Link
-                href="/polityka-prywatnosci"
-                className="transition-colors hover:text-background"
-              >
-                Polityka prywatności i cookies
-              </Link>
+  <a
+    href="https://share.google/kRvcJRnquoIaDz3YT"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center gap-1.5 transition-colors hover:text-background"
+  >
+    Profil firmy w Google
 
-              <Link
-                href="/warunki-uczestnictwa"
-                className="transition-colors hover:text-background"
-              >
-                Warunki uczestnictwa
-              </Link>
-
-              <a
-                href="https://share.google/kRvcJRnquoIaDz3YT"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 transition-colors hover:text-background"
-              >
-                Profil firmy w Google
-
-                <ArrowUpRight
-                  className="size-3"
-                  aria-hidden="true"
-                />
-              </a>
-            </div>
+    <ArrowUpRight
+      className="size-3"
+      aria-hidden="true"
+    />
+  </a>
+</div>
           </div>
         </div>
       </div>
