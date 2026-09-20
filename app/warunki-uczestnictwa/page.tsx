@@ -40,24 +40,6 @@ const organizer = {
   phoneHref: "+48501465318",
 }
 
-const sectionLinks = [
-  ["Organizator", "organizator"],
-  ["Rezerwacja i umowa", "rezerwacja"],
-  ["Zakres wyjazdu", "zakres-wyjazdu"],
-  ["Cena i płatności", "platnosci"],
-  ["Bilety", "bilety"],
-  ["Termin meczu", "termin-meczu"],
-  ["Transport", "transport"],
-  ["Zakwaterowanie", "zakwaterowanie"],
-  ["Dokumenty", "dokumenty-podrozy"],
-  ["Zmiana uczestnika", "zmiana-uczestnika"],
-  ["Rezygnacja", "rezygnacja"],
-  ["Obowiązki", "obowiazki"],
-  ["Opieka", "opieka"],
-  ["Reklamacje", "reklamacje"],
-  ["Postanowienia końcowe", "postanowienia-koncowe"],
-] as const
-
 function TermsSection({
   id,
   number,
