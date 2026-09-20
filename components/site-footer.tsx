@@ -1,5 +1,18 @@
+import Image from "next/image"
 import Link from "next/link"
-import { Mail, Phone, ArrowUpRight } from "lucide-react"
+import {
+  ArrowUpRight,
+  Building2,
+  ChevronRight,
+  FileText,
+  Mail,
+  MessageCircle,
+  Navigation,
+  Phone,
+  ShieldCheck,
+  Users,
+} from "lucide-react"
+
 import { Brand } from "@/components/site-header"
 import { SocialLinks } from "@/components/social-links"
 import type { SiteContent } from "@/lib/content"
@@ -13,7 +26,34 @@ const quickLinks = [
   { label: "Kontakt", href: "/kontakt" },
 ] as const
 
-function WhatsAppIcon({ className = "" }: { className?: string }) {
+const documentLinks = [
+  {
+    label: "Gwarancja Turystyczna",
+    href: "/warunki-uczestnictwa",
+  },
+  {
+    label: "Ubezpieczenie",
+    href: "/polityka-prywatnosci",
+  },
+    {
+    label: "Wzór umowy",
+    href: "/polityka-prywatnosci",
+  },
+    {
+    label: "Warunki Uczestnictwa",
+    href: "/warunki-uczestnictwa",
+  },
+    {
+    label: "Polityka prywatności",
+    href: "/polityka-prywatnosci",
+  },
+] as const
+
+function WhatsAppIcon({
+  className = "",
+}: {
+  className?: string
+}) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -21,7 +61,6 @@ function WhatsAppIcon({ className = "" }: { className?: string }) {
       className={className}
       aria-hidden="true"
     >
-    
       <path
         d="M20.5 11.5a8.5 8.5 0 0 1-12.6 7.45L3.5 20.5l1.55-4.4A8.5 8.5 0 1 1 20.5 11.5Z"
         stroke="currentColor"
@@ -30,7 +69,6 @@ function WhatsAppIcon({ className = "" }: { className?: string }) {
         strokeLinejoin="round"
       />
 
-      {/* Słuchawka */}
       <path
         d="M8.15 7.8c.2-.45.42-.46.65-.47h.55c.17 0 .36.06.46.31l.85 2.05c.08.2.04.4-.1.57l-.7.84c-.12.14-.1.34-.02.49.53 1.03 1.57 2.04 2.62 2.55.16.08.35.1.49-.03l.82-.75c.16-.15.37-.19.57-.1l1.96.93c.23.11.3.3.3.48 0 .2-.1 1.1-.7 1.66-.54.51-1.27.72-1.98.62-1.04-.15-2.56-.7-4.18-2.17-1.34-1.22-2.26-2.72-2.58-3.82-.3-1.02-.15-2.22.3-2.86.22-.31.45-.3.69-.3Z"
         fill="currentColor"
@@ -38,192 +76,377 @@ function WhatsAppIcon({ className = "" }: { className?: string }) {
     </svg>
   )
 }
-export function SiteFooter({ content = {} }: { content?: SiteContent }) {
+
+function FooterHeading({
+  icon: Icon,
+  children,
+}: {
+  icon: typeof Navigation
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <Icon
+        className="size-5 shrink-0 text-primary"
+        strokeWidth={2.3}
+        aria-hidden="true"
+      />
+
+      <h2 className="font-sans text-sm font-black uppercase tracking-wide text-primary">
+        {children}
+      </h2>
+    </div>
+  )
+}
+
+export function SiteFooter({
+  content = {},
+}: {
+  content?: SiteContent
+}) {
   const phone = content.contactPhone || "+48 501 465 318"
   const phoneHref = `tel:${phone.replace(/[^+\d]/g, "")}`
-  const email = content.contactEmail || "kontakt.letsgol@gmail.com"
-const whatsappNumber = "48501465318"
-const whatsappHref = `https://wa.me/${whatsappNumber}`
+
+  const email =
+    content.contactEmail || "kontakt.letsgol@gmail.com"
+
+  const whatsappNumber = "48501465318"
+  const whatsappHref = `https://wa.me/${whatsappNumber}`
+
   return (
-    <footer className="bg-foreground text-background">
-      {/* GŁÓWNA CZĘŚĆ FOOTERA */}
-      <div className="mx-auto grid max-w-7xl gap-x-8 gap-y-10 px-4 py-10 sm:grid-cols-2 md:px-6 lg:grid-cols-[1.05fr_0.72fr_1.22fr_1.05fr_1.5fr]">
-        {/* MARKA */}
-        <div className="flex flex-col items-start gap-4">
-          <Brand />
+    <footer className="relative overflow-hidden bg-foreground text-background">
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden="true"
+      >
+        <Image
+          src="/images/hero-stadium.webp"
+          alt=""
+          fill
+          className="object-cover object-center opacity-20"
+          sizes="100vw"
+        />
 
-          <p className="max-w-57.5 text-sm leading-relaxed text-background/60">
-            {content.footerText ||
-              "Piłkarskie podróże, które pamięta się dłużej niż wynik."}
-          </p>
-        </div>
+        <div className="absolute inset-0 bg-foreground/86" />
 
-        {/* SZYBKIE LINKI */}
-        <nav
-          className="flex flex-col gap-4 text-sm"
-          aria-label="Szybkie linki"
-        >
-          <h2 className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
-            Szybkie linki
-          </h2>
+        <div className="absolute inset-0 bg-linear-to-r from-foreground via-foreground/95 to-foreground/80" />
 
-          <div className="flex flex-col items-start gap-2.5">
-            {quickLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="group inline-flex items-center gap-1.5 text-background/65 transition-colors duration-200 hover:text-background"
-              >
-                <span>{link.label}</span>
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-linear-to-t from-foreground via-foreground/90 to-transparent" />
 
-                <ArrowUpRight
-                  className="size-3.5 text-primary opacity-0 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
-                  aria-hidden="true"
-                />
-              </Link>
-            ))}
-          </div>
-        </nav>
-
-        {/* DANE FIRMY */}
-        <div className="flex flex-col gap-4 text-sm">
-          <h2 className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
-            Dane firmy
-          </h2>
-
-          <div className="flex flex-col gap-2.5">
-            <p className="font-medium text-background">
-              {content.companyName || "LB Coaching Łukasz Borger"}
-            </p>
-
-            <p className="max-w-57.5 leading-relaxed text-background/65">
-              {content.companyAddress ||
-                "ul. Stefana Roweckiego 1/2, 72-010 Police"}
-            </p>
-
-           <p className="text-background/65">
-  NIP: {content.companyNip || "8512915273"}
-</p>
-
-<p className="text-background/65">
-  REGON: 520474445
-</p>
-          </div>
-        </div>
-
-        {/* GWARANCJA */}
-        <div className="flex flex-col gap-4 text-sm">
-          <h2 className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
-            Gwarancja turystyczna
-          </h2>
-
-          <div className="flex flex-col gap-2.5 text-background/65">
-            <p>COMPENSA TU S.A</p>
-
-            <p>Wpis ROT: 34/25</p>
-
-            <p>Nr ewidencyjny UFG: 42848</p>
-
-            <Link
-              href="/warunki-uczestnictwa"
-              className="w-fit text-background underline decoration-background/40 underline-offset-4 transition-colors duration-200 hover:text-primary"
-            >
-              Warunki uczestnictwa
-            </Link>
-          </div>
-        </div>
-
-        {/* KONTAKT I SOCIAL MEDIA */}
-        <div className="flex min-w-0 flex-col gap-4 text-sm">
-          <h2 className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
-            Kontakt i social media
-          </h2>
-
-          <div className="flex flex-col gap-3">
-            <a
-              className="group flex w-fit items-center gap-2.5 transition-colors duration-200 hover:text-primary"
-              href={phoneHref}
-            >
-              <Phone
-                className="size-4 shrink-0 text-background/70 transition-colors group-hover:text-primary"
-                aria-hidden="true"
-              />
-
-              <span>{phone}</span>
-            </a>
-
-            <a
-              className="group flex w-fit items-center gap-2.5 transition-colors duration-200 hover:text-primary"
-              href={`mailto:${email}`}
-            >
-              <Mail
-                className="size-4 shrink-0 text-background/70 transition-colors group-hover:text-primary"
-                aria-hidden="true"
-              />
-
-              <span>{email}</span>
-            </a>
-           <a
-  className="group flex w-fit items-center gap-2.5 transition-colors duration-200 hover:text-primary"
-  href={whatsappHref}
-  target="_blank"
-  rel="noopener noreferrer"
-  aria-label="Kontakt WhatsApp - otwiera się w nowej karcie"
->
-  <WhatsAppIcon className="size-4 shrink-0 text-background/70 transition-colors group-hover:text-primary" />
-
-  <span>Kontakt WhatsApp</span>
-</a>
-          </div>
-
-          <a
-            href="https://share.google/kRvcJRnquoIaDz3YT"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group mt-1 inline-flex w-fit items-center gap-2 text-background/65 transition-colors duration-200 hover:text-background"
-            aria-label="Profil naszej firmy w Google"
-          >
-            <span className="font-medium">
-              Profil naszej firmy w Google
-            </span>
-
-            <ArrowUpRight
-              className="size-4 shrink-0 text-primary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-              aria-hidden="true"
-            />
-          </a>
-
-          <div className="pt-0.5">
-            <SocialLinks />
-          </div>
-        </div>
+        <div className="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-foreground to-transparent" />
       </div>
 
-      {/* DOLNY PASEK */}
-      <div className="border-t border-background/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-xs text-background/50 md:flex-row md:items-center md:justify-between md:px-6">
-          <p>
-            © 2026 Let&apos;s Gol. Wszystkie prawa zastrzeżone.
-          </p>
+      <div className="relative mx-auto max-w-screen-2xl px-4 md:px-6 lg:px-10 xl:px-12">
+        <div className="grid gap-y-12 py-12 sm:grid-cols-2 lg:grid-cols-[1.12fr_0.8fr_1.05fr_1.05fr_1.3fr] lg:gap-0 lg:py-16">
+          <div className="pr-0 sm:pr-8 lg:pr-10">
+            <Brand />
 
-          <div className="flex flex-wrap gap-x-5 gap-y-2">
-            <Link
-              href="/polityka-prywatnosci"
-              className="transition-colors duration-200 hover:text-background"
-            >
-              Polityka prywatności i cookies
-            </Link>
+            <p className="mt-6 max-w-60 text-[15px] leading-6 text-background/70">
+              {content.footerText ||
+                "Razem tworzymy niezapomniane piłkarskie doświadczenia."}
+            </p>
 
-            <Link
-              href="/warunki-uczestnictwa"
-              className="transition-colors duration-200 hover:text-background"
-            >
-              Warunki uczestnictwa
-            </Link>
+            <p className="mt-7 max-w-56 -rotate-2 font-serif text-xl italic leading-tight text-background/90">
+              Do zobaczenia
+              <br />
+              na stadionach!
+            </p>
+
+            <div className="mt-4 h-1 w-16 -rotate-6 rounded-full bg-primary" />
+          </div>
+
+          <nav
+            aria-label="Nawigacja w stopce"
+            className="border-white/10 sm:border-l sm:pl-8 lg:px-8"
+          >
+            <FooterHeading icon={Navigation}>
+              Nawigacja
+            </FooterHeading>
+
+            <div className="mt-6 flex flex-col gap-3">
+              {quickLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="group flex w-fit items-center gap-3 text-sm font-medium text-background/72 transition-colors duration-200 hover:text-background"
+                >
+                  <ChevronRight
+                    className="size-4 shrink-0 text-primary transition-transform duration-200 group-hover:translate-x-1"
+                    strokeWidth={3}
+                    aria-hidden="true"
+                  />
+
+                  <span>{link.label}</span>
+                </Link>
+              ))}
+            </div>
+          </nav>
+
+          <div className="border-white/10 sm:border-l sm:pl-8 lg:px-8">
+            <FooterHeading icon={Building2}>
+              Dane firmy
+            </FooterHeading>
+
+            <div className="mt-6 space-y-3 text-sm leading-6">
+              <p className="font-bold text-background">
+                {content.companyName ||
+                  "LB Coaching Łukasz Borger"}
+              </p>
+
+              <p className="text-background/70">
+                NIP: {content.companyNip || "8512915273"}
+              </p>
+
+              <p className="text-background/70">
+                REGON: 520474445
+              </p>
+
+              <div className="my-5 h-px bg-white/12" />
+
+              <div>
+                <p className="text-background/65">
+                  Nr wpisu do rejestru
+                </p>
+
+                <p className="text-background/65">
+                  organizatorów turystyki:
+                </p>
+
+                <p className="mt-1 text-xl font-black text-primary">
+                  42848
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-white/10 sm:border-l sm:pl-8 lg:px-8">
+            <FooterHeading icon={FileText}>
+              Dokumenty
+            </FooterHeading>
+
+            <div className="mt-6 flex flex-col gap-3">
+              {documentLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="group flex w-fit items-center gap-3 text-sm font-medium text-background/72 transition-colors hover:text-background"
+                >
+                  <ChevronRight
+                    className="size-4 shrink-0 text-primary transition-transform duration-200 group-hover:translate-x-1"
+                    strokeWidth={3}
+                    aria-hidden="true"
+                  />
+
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-6 border-t border-white/10 pt-5">
+              <p className="text-xs font-bold uppercase tracking-wider text-background/40">
+                Gwarancja turystyczna
+              </p>
+
+              <p className="mt-2 text-sm font-semibold text-background">
+                COMPENSA TU S.A.
+              </p>
+
+              <p className="mt-1 text-sm text-background/60">
+                Wpis ROT: 34/25
+              </p>
+            </div>
+          </div>
+
+          <div className="border-white/10 sm:border-l sm:pl-8 lg:pl-8">
+            <FooterHeading icon={MessageCircle}>
+              Kontakt
+            </FooterHeading>
+
+            <div className="mt-6 space-y-5">
+              <a
+                href={phoneHref}
+                className="group flex items-start gap-4"
+              >
+                <Phone
+                  className="mt-0.5 size-5 shrink-0 text-primary"
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                />
+
+                <div>
+                  <p className="font-bold text-background transition-colors group-hover:text-primary">
+                    {phone}
+                  </p>
+
+                  <p className="mt-1 text-xs text-background/45">
+                    Pon – Pt 9:00 – 18:00
+                  </p>
+                </div>
+              </a>
+
+              <a
+                href={`mailto:${email}`}
+                className="group flex items-start gap-4"
+              >
+                <Mail
+                  className="mt-0.5 size-5 shrink-0 text-primary"
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                />
+
+                <div className="min-w-0">
+                  <p className="break-all font-bold text-background transition-colors group-hover:text-primary">
+                    {email}
+                  </p>
+
+                  <p className="mt-1 text-xs text-background/45">
+                    Odpowiadamy na wszystkie wiadomości
+                  </p>
+                </div>
+              </a>
+
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-4"
+              >
+                <WhatsAppIcon className="mt-0.5 size-5 shrink-0 text-green-500" />
+
+                <div>
+                  <p className="font-bold text-background transition-colors group-hover:text-primary">
+                    Napisz na WhatsApp
+                  </p>
+
+                  <p className="mt-1 text-xs text-background/45">
+                    Szybki kontakt
+                  </p>
+                </div>
+              </a>
+            </div>
+
+            <div className="mt-7 border-t border-white/12 pt-6">
+              <p className="mb-4 text-sm font-black uppercase tracking-wide text-primary">
+                Śledź nas
+              </p>
+
+              <SocialLinks />
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-primary/55">
+          <div className="grid gap-5 py-7 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0">
+            <div className="flex items-center gap-4 lg:pr-6">
+              <ShieldCheck
+                className="size-9 shrink-0 text-primary"
+                strokeWidth={2}
+                aria-hidden="true"
+              />
+
+              <div>
+                <p className="text-sm font-black text-background">
+                  Legalny organizator turystyki
+                </p>
+
+                <p className="mt-1 text-xs text-background/50">
+                  Nr wpisu: 42848
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 border-white/10 lg:border-l lg:px-7">
+              <div className="font-sans text-3xl font-black tracking-tight text-background">
+                TFG
+              </div>
+
+              <div>
+                <p className="text-sm font-bold text-background">
+                  Turystyczny
+                </p>
+
+                <p className="text-xs text-background/50">
+                  Fundusz Gwarancyjny
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 border-white/10 lg:border-l lg:px-7">
+              <ShieldCheck
+                className="size-8 shrink-0 text-primary"
+                aria-hidden="true"
+              />
+
+              <div>
+                <p className="text-sm font-black text-background">
+                  Ubezpieczenie podróżne
+                </p>
+
+                <p className="mt-1 text-xs text-background/50">
+                  Bezpieczne wyjazdy
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 border-white/10 lg:border-l lg:pl-7">
+              <Users
+                className="size-9 shrink-0 text-primary"
+                aria-hidden="true"
+              />
+
+              <div>
+                <p className="text-sm font-black text-background">
+                  Sprawdzone hotele
+                  <br />
+                  i pewne bilety
+                </p>
+
+                <p className="mt-1 text-xs text-background/50">
+                  Twój komfort to nasz priorytet
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-white/10">
+          <div className="flex flex-col gap-4 py-5 text-xs text-background/45 md:flex-row md:items-center md:justify-between">
+            <p>
+              © 2026 Let&apos;s Gol. Wszystkie prawa zastrzeżone.
+            </p>
+
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
+              <Link
+                href="/polityka-prywatnosci"
+                className="transition-colors hover:text-background"
+              >
+                Polityka prywatności i cookies
+              </Link>
+
+              <Link
+                href="/warunki-uczestnictwa"
+                className="transition-colors hover:text-background"
+              >
+                Warunki uczestnictwa
+              </Link>
+
+              <a
+                href="https://share.google/kRvcJRnquoIaDz3YT"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 transition-colors hover:text-background"
+              >
+                Profil firmy w Google
+
+                <ArrowUpRight
+                  className="size-3"
+                  aria-hidden="true"
+                />
+              </a>
+            </div>
           </div>
         </div>
       </div>
     </footer>
   )
 }
-
