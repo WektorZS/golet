@@ -115,9 +115,9 @@ export default async function AboutPage() {
         <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-6 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <p className="eyebrow">Blisko 20 lat razem</p>
-            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Znamy się jak "łyse konie"
-            </h2>
+           <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[1.1] tracking-tight md:text-6xl md:leading-[1.1]">
+  Znamy się jak "łyse konie"
+</h2>
           </div>
 
           <div className="space-y-6 text-base leading-8 text-muted-foreground md:text-lg lg:col-span-7 lg:pt-3">
@@ -164,7 +164,7 @@ export default async function AboutPage() {
               </div>
               <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
                 <span className="font-sans text-2xl font-black uppercase">
-                  Wtedy
+                  Kiedyś
                 </span>
                 <span className="text-right text-sm text-muted-foreground">
                  Wspólne zamiłowanie do piłki nożnej od dziecka
@@ -215,9 +215,9 @@ export default async function AboutPage() {
         <div className="mx-auto grid max-w-7xl gap-12 px-4 md:px-6 lg:grid-cols-12 lg:gap-20">
           <div className="lg:col-span-5">
             <p className="eyebrow">Po co powstało Let&apos;s Gol?</p>
-            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Żebyście mogli przeżywać mecz, a nie organizację
-            </h2>
+            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[1.1] tracking-tight md:text-6xl md:leading-[1.1]">
+  Żebyście mogli przeżywać mecz, a nie organizację
+</h2>
           </div>
 
           <div className="space-y-7 text-base leading-8 text-muted-foreground md:text-lg lg:col-span-7">
@@ -364,9 +364,9 @@ export default async function AboutPage() {
             <p className="text-sm font-black uppercase tracking-widest">
               Łukasz + Mateusz = Let&apos;s Gol
             </p>
-            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Dwa różne charaktery. Jedna wspólna zajawka.
-            </h2>
+            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[1.1] tracking-tight md:text-6xl md:leading-[1.1]">
+  Dwa różne charaktery. Jedna wspólna zajawka.
+</h2>
           </div>
 
           <div className="lg:col-span-7">
