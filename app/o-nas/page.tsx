@@ -75,14 +75,15 @@ export default async function AboutPage() {
 
      <section className="relative isolate flex min-h-svh items-end overflow-hidden bg-foreground pt-20 text-white lg:min-h-[100svh]">
   <div className="absolute inset-x-0 bottom-0 top-20">
-    <Image
-      src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
-      alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
-      fill
-      priority
-      className="object-cover object-[43%_35%] md:hidden"
-      sizes="100vw"
-    />
+  <Image
+    src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
+    alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
+    fill
+    priority
+    quality={90}
+    className="object-cover object-[43%_35%] md:hidden"
+    sizes="100vw"
+  />
 
     <Image
       src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
