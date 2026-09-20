@@ -98,9 +98,9 @@ export default async function AboutPage() {
   <div className="relative mx-auto w-full max-w-7xl px-4 pb-12 pt-28 md:px-6 md:pb-20 lg:pb-24">
     <p className="eyebrow eyebrow-on-dark">Nasza historia</p>
 
-    <h1 className="mt-5 max-w-5xl text-balance font-sans text-5xl font-black uppercase leading-none tracking-tight sm:text-6xl lg:text-8xl">
-      Zaczęło się od przyjaźni i wspólnej pasji
-    </h1>
+   <h1 className="mt-5 max-w-5xl text-balance font-sans text-4xl font-black uppercase leading-[1.2] tracking-normal sm:text-6xl lg:text-6xl lg:leading-none">
+  Zaczęło się od przyjaźni i wspólnej pasji
+</h1>
 
     <div className="mt-6 flex max-w-3xl flex-col gap-6 border-l-4 border-primary pl-5 md:flex-row md:items-end md:justify-between md:pl-7">
       <p className="text-lg leading-8 text-white/85 md:text-xl">
