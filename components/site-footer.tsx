@@ -279,7 +279,7 @@ export function SiteFooter({
                   </p>
 
                   <p className="mt-1 text-xs text-background/45">
-                    Pon – Pt 9:00 – 18:00
+                    Pon - Pt 9:00 - 18:00
                   </p>
                 </div>
               </a>
