@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import {
   ArrowUpRight,
+  BadgeCheck,
   Building2,
   ChevronRight,
   FileText,
@@ -379,79 +380,95 @@ export function SiteFooter({
           </div>
         </div>
 
-        <div className="border-t border-primary/55">
-          <div className="grid gap-5 py-7 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0">
-            <div className="flex items-center gap-4 lg:pr-6">
-              <ShieldCheck
-                className="size-9 shrink-0 text-primary"
-                strokeWidth={2}
-                aria-hidden="true"
-              />
+       <div className="border-t border-primary/55">
+  <div className="grid gap-y-6 py-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 xl:gap-0">
+    <div className="flex min-w-0 items-center gap-3 xl:pr-5">
+      <BadgeCheck
+        className="size-8 shrink-0 text-primary"
+        strokeWidth={2}
+        aria-hidden="true"
+      />
 
-              <div>
-                <p className="text-sm font-black text-background">
-                  Legalny organizator turystyki
-                </p>
+      <div className="min-w-0">
+        <p className="text-sm font-black leading-tight text-background">
+          Legalny organizator turystyki
+        </p>
 
-                <p className="mt-1 text-xs text-background/50">
-                  Nr wpisu: 42848
-                </p>
-              </div>
-            </div>
+        <p className="mt-1 text-xs text-background/50">
+          Nr wpisu: 42848
+        </p>
+      </div>
+    </div>
 
-            <div className="flex items-center gap-4 border-white/10 lg:border-l lg:px-7">
-              <div className="font-sans text-3xl font-black tracking-tight text-background">
-                TFG
-              </div>
+    <div className="flex min-w-0 items-center gap-3 border-white/10 xl:border-l xl:px-5">
+      <div className="shrink-0 font-sans text-2xl font-black tracking-tight text-primary">
+        TFG
+      </div>
 
-              <div>
-                <p className="text-sm font-bold text-background">
-                  Turystyczny
-                </p>
+      <div className="min-w-0">
+        <p className="text-sm font-bold leading-tight text-background">
+          Turystyczny Fundusz
+        </p>
 
-                <p className="text-xs text-background/50">
-                  Fundusz Gwarancyjny
-                </p>
-              </div>
-            </div>
+        <p className="mt-1 text-xs leading-tight text-background/50">
+          Gwarancyjny
+        </p>
+      </div>
+    </div>
 
-            <div className="flex items-center gap-4 border-white/10 lg:border-l lg:px-7">
-              <ShieldCheck
-                className="size-8 shrink-0 text-primary"
-                aria-hidden="true"
-              />
+    <div className="flex min-w-0 items-center gap-3 border-white/10 xl:border-l xl:px-5">
+      <div className="shrink-0 font-sans text-2xl font-black tracking-tight text-primary">
+        TFP
+      </div>
 
-              <div>
-                <p className="text-sm font-black text-background">
-                  Ubezpieczenie podróżne
-                </p>
+      <div className="min-w-0">
+        <p className="text-sm font-bold leading-tight text-background">
+          Turystyczny Fundusz
+        </p>
 
-                <p className="mt-1 text-xs text-background/50">
-                  Bezpieczne wyjazdy
-                </p>
-              </div>
-            </div>
+        <p className="mt-1 text-xs leading-tight text-background/50">
+          Pomocowy
+        </p>
+      </div>
+    </div>
 
-            <div className="flex items-center gap-4 border-white/10 lg:border-l lg:pl-7">
-              <Users
-                className="size-9 shrink-0 text-primary"
-                aria-hidden="true"
-              />
+    <div className="flex min-w-0 items-center gap-3 border-white/10 xl:border-l xl:px-5">
+      <ShieldCheck
+        className="size-8 shrink-0 text-primary"
+        aria-hidden="true"
+      />
 
-              <div>
-                <p className="text-sm font-black text-background">
-                  Sprawdzone hotele
-                  <br />
-                  i pewne bilety
-                </p>
+      <div className="min-w-0">
+        <p className="text-sm font-black leading-tight text-background">
+          Ubezpieczenie podróżne
+        </p>
 
-                <p className="mt-1 text-xs text-background/50">
-                  Twój komfort to nasz priorytet
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <p className="mt-1 text-xs leading-tight text-background/50">
+          Vienna Insurance Group
+        </p>
+      </div>
+    </div>
+
+    <div className="flex min-w-0 items-center gap-3 border-white/10 xl:border-l xl:pl-5">
+      <Users
+        className="size-8 shrink-0 text-primary"
+        aria-hidden="true"
+      />
+
+      <div className="min-w-0">
+        <p className="text-sm font-black leading-tight text-background">
+          Sprawdzone hotele
+          <br />
+          i pewne bilety
+        </p>
+
+        <p className="mt-1 text-xs leading-tight text-background/50">
+          Twój komfort to nasz priorytet
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 
         <div className="border-t border-white/10">
           <div className="flex flex-col gap-4 py-5 text-xs text-background/45 md:flex-row md:items-center md:justify-between">
