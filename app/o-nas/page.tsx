@@ -81,7 +81,7 @@ export default async function AboutPage() {
     fill
     priority
     quality={90}
-    className="object-cover object-[43%_35%] md:hidden"
+    className="object-cover object-[33%_35%] md:hidden"
     sizes="100vw"
   />
 
