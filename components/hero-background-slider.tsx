@@ -4,9 +4,21 @@ import Image from "next/image"
 import { useEffect, useMemo, useState } from "react"
 
 const slides = [
-  { src: "/images/hero-stadium.webp", position: "object-center" },
-  { src: "/images/barcelona-trip.webp", position: "object-center" },
-  { src: "/images/madrid-trip.webp", position: "object-center" },
+  {
+    src: "/images/hero-stadium.webp",
+    mobileX: 55,
+    mobileY: 50,
+  },
+  {
+    src: "/images/madryt-hero.webp",
+    mobileX: 60,
+    mobileY: 100,
+  },
+  {
+    src: "/images/barcelonavsreal-hero.webp",
+    mobileX: 45,
+    mobileY: 40,
+  },
 ] as const
 
 const fallbackEyebrow = "Nie oglądaj wielkich meczów tylko na ekranie"
@@ -68,20 +80,25 @@ export function HeroBackgroundSlider() {
         const isActive = reducedMotion ? index === 0 : index === activeSlide
 
         return (
-          <Image
-            key={slide.src}
-            src={slide.src}
-            alt=""
-            fill
-            priority={index === 0}
-            fetchPriority={index === 0 ? "high" : "auto"}
-            sizes="100vw"
-            className={`object-cover ${slide.position} transition-opacity duration-[1600ms] ease-in-out motion-reduce:transition-none ${
-  isActive ? "opacity-100" : "opacity-0"
-}`}
-          />
+      <Image
+  key={slide.src}
+  src={slide.src}
+  alt=""
+  fill
+  priority={index === 0}
+  fetchPriority={index === 0 ? "high" : "auto"}
+  sizes="100vw"
+  style={{
+    objectPosition: `${slide.mobileX}% ${slide.mobileY}%`,
+  }}
+  className={`object-cover md:object-center transition-opacity duration-[1600ms] ease-in-out motion-reduce:transition-none ${
+    isActive ? "opacity-100" : "opacity-0"
+  }`}
+/>
         )
       })}
+
+      <div className="absolute inset-0 bg-black/40 md:bg-transparent" />
     </div>
   )
 }
