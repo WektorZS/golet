@@ -14,6 +14,7 @@ import {
   type SiteContent,
 } from "@/lib/content"
 import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
+import { AboutStorySlider } from "@/components/about-story-slider"
 
 export const dynamic = "force-dynamic"
 
@@ -147,124 +148,51 @@ export default async function AboutPage() {
 
       <section className="overflow-hidden bg-secondary/55 py-16 md:py-24">
   <div className="mx-auto max-w-7xl px-4 md:px-6">
-    <div className="max-w-4xl">
-      <p className="eyebrow">Ta sama historia, kolejny rozdział</p>
+    <div className="grid gap-10 lg:grid-cols-12 lg:items-end lg:gap-16">
+      <div className="lg:col-span-7">
+        <p className="eyebrow">Ta sama historia, kolejny rozdział</p>
 
-      <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-        Jedna przyjaźń. Ta sama pasja.
-      </h2>
-
-      <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-        Kiedyś jeździliśmy na mecze tylko dla siebie. Dziś zabieramy
-        na stadiony również innych.
-      </p>
-    </div>
-
-    <div className="relative mt-14 md:mt-20">
-      <div className="absolute left-1/2 top-10 hidden h-[calc(100%-5rem)] w-px -translate-x-1/2 bg-foreground/15 md:block" />
-
-      <div className="absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary px-4 py-2 md:flex">
-        <span className="text-xs font-black uppercase tracking-[0.18em] text-primary-foreground">
-          wtedy → dziś
-        </span>
+        <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
+          Jedna przyjaźń.
+          <br />
+          Ta sama pasja.
+        </h2>
       </div>
 
-      <div className="grid gap-12 md:grid-cols-2 md:gap-16">
-        <figure className="relative md:pr-10">
-          <div className="mb-5 flex items-center gap-3">
-            <span className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground">
-              01
-            </span>
+      <div className="lg:col-span-5 lg:pb-1">
+        <p className="max-w-xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
+          Piłka i wspólne wyjazdy były z nami na długo przed powstaniem
+          Let&apos;s Gol. Zmieniło się jedno - dziś te emocje przeżywamy razem
+          z Wami.
+        </p>
+      </div>
+    </div>
 
-            <div className="h-px flex-1 bg-foreground/15" />
+    <div className="mt-10 md:mt-14">
+      <AboutStorySlider />
+    </div>
 
-            <span className="font-sans text-2xl font-black uppercase">
-              Kiedyś
-            </span>
-          </div>
+    <div className="mt-8 grid gap-6 border-t border-foreground/15 pt-7 md:grid-cols-2 md:gap-12">
+      <div>
+        <p className="font-sans text-xl font-black uppercase md:text-2xl">
+          Zaczęło się dużo wcześniej
+        </p>
 
-          <div className="group relative">
-            <div className="absolute -inset-3 -z-10 translate-x-3 translate-y-3 rounded-xl border border-foreground/10 bg-background/35" />
+        <p className="mt-3 max-w-lg text-sm leading-6 text-muted-foreground md:text-base md:leading-7">
+          Pierwsze mecze, stadiony i wspólne podróże. Bez planu na firmę,
+          po prostu z zajawki, która została z nami na lata.
+        </p>
+      </div>
 
-            <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted shadow-xl">
-              <Image
-                src="/images/o-nas/lukasz-mateusz-archiwum.webp"
-                alt="Łukasz i Mateusz jako młodzi kibice FC Barcelony"
-                fill
-                className="object-cover object-[60%_10%] grayscale-[15%] transition duration-500 group-hover:grayscale-0 group-hover:scale-[1.02]"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
+      <div className="md:text-right">
+        <p className="font-sans text-xl font-black uppercase md:text-2xl">
+          Dzisiaj robimy to dalej
+        </p>
 
-              <div className="absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-black/5" />
-
-              <div className="absolute bottom-4 left-4">
-                <span className="inline-flex rounded-full bg-black/65 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
-                  początki
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <p className="mt-6 max-w-sm text-sm leading-6 text-muted-foreground">
-            Zamiłowanie do piłki nożnej od dziecka. Pierwsze stadiony,
-            pierwsze wyjazdy i emocje, które zostały z nami na lata.
-          </p>
-        </figure>
-
-        <figure className="relative md:mt-28 md:pl-10">
-          <div className="mb-5 flex items-center gap-3 md:flex-row-reverse">
-            <span className="text-sm font-black uppercase tracking-[0.2em] text-primary">
-              02
-            </span>
-
-            <div className="h-px flex-1 bg-foreground/15" />
-
-            <span className="font-sans text-2xl font-black uppercase">
-              Dzisiaj
-            </span>
-          </div>
-
-          <div className="group relative">
-            <div className="absolute -inset-3 -z-10 -translate-x-3 translate-y-3 rounded-xl bg-primary/12" />
-
-            <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted shadow-2xl md:aspect-3/2">
-              <Image
-                src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
-                alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
-                fill
-                className="object-cover object-[43%_35%] transition duration-500 group-hover:scale-[1.02] md:hidden"
-                sizes="100vw"
-              />
-
-              <div className="absolute inset-0 hidden overflow-hidden md:block">
-                <Image
-                  src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
-                  alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
-                  fill
-                  quality={100}
-                  className="object-cover object-center transition duration-500 group-hover:scale-[2.24]"
-                  sizes="60vw"
-                  style={{
-                    transform: "scale(2.2)",
-                  }}
-                />
-              </div>
-
-              <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
-
-              <div className="absolute bottom-4 left-4">
-                <span className="inline-flex rounded-full bg-primary px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-primary-foreground">
-                  Let&apos;s Gol
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <p className="mt-6 max-w-lg text-sm leading-6 text-muted-foreground">
-            Nadal razem i nadal na stadionach. Dziś doświadczenie z własnych
-            podróży wykorzystujemy, organizując wyjazdy dla innych kibiców.
-          </p>
-        </figure>
+        <p className="mt-3 ml-auto max-w-lg text-sm leading-6 text-muted-foreground md:text-base md:leading-7">
+          Nadal jeździmy na stadiony. Tyle że dziś wykorzystujemy własne
+          doświadczenie, żeby zabierać tam również innych kibiców.
+        </p>
       </div>
     </div>
   </div>
