@@ -248,7 +248,7 @@ Let’s Gol pilnuje szczegółów - Ty tylko przeżywasz mecz.
                   src="/images/o-nas/mateusz-wspolzalozyciel.webp"
                   alt="Mateusz, współzałożyciel i główny koordynator wyjazdów Let's Gol"
                   fill
-                  className="object-cover object-top"
+                  className="object-cover object-center"
                   sizes="(max-width: 1024px) 100vw, 42vw"
                 />
               </div>
