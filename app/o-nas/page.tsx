@@ -14,6 +14,7 @@ import {
   type SiteContent,
 } from "@/lib/content"
 import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
+import { AboutStorySlider } from "@/components/about-story-slider"
 
 export const dynamic = "force-dynamic"
 
@@ -75,26 +76,29 @@ export default async function AboutPage() {
 
      <section className="relative isolate flex min-h-svh items-end overflow-hidden bg-foreground pt-20 text-white lg:min-h-[100svh]">
   <div className="absolute inset-x-0 bottom-0 top-20">
-  <Image
-    src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
-    alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
-    fill
-    priority
-    quality={90}
-    className="object-cover object-[33%_35%] md:hidden"
-    sizes="100vw"
-  />
+    <Image
+      src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
+      alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
+      fill
+      priority
+      quality={90}
+      className="object-cover object-[33%_35%] md:hidden"
+      sizes="100vw"
+    />
 
     <Image
       src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
       alt="Łukasz i Mateusz na trybunach stadionu w Barcelonie"
       fill
       priority
-      className="hidden object-cover object-[23%_75%] md:block"
+      className="hidden object-cover object-[50%_100%] md:block"
       sizes="100vw"
     />
 
-    <div className="absolute inset-0 bg-black/35" />
+    <div className="absolute inset-0 bg-black/20" />
+
+    
+
     <div className="absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-t from-black via-black/65 to-transparent" />
   </div>
 
@@ -109,7 +113,7 @@ export default async function AboutPage() {
 
     <div className="mt-6 flex max-w-3xl flex-col gap-6 border-l-4 border-primary pl-5 md:flex-row md:items-end md:justify-between md:pl-7">
       <p className="text-lg leading-8 text-white/85 md:text-xl">
-        Dziś zabieramy Was na największe stadiony Europy.
+        Kiedyś jeździliśmy na mecze, spełniając własne marzenia. <br /> Dziś zabieramy Was, żebyście mogli spełniać swoje.
       </p>
     </div>
   </div>
@@ -126,94 +130,69 @@ export default async function AboutPage() {
 
           <div className="space-y-6 text-base leading-8 text-muted-foreground md:text-lg lg:col-span-7 lg:pt-3">
             <p>
-              Łączy nas przyjaźń, piłka nożna i ciągła potrzeba
-              przeżywania czegoś nowego. Przez lata odwiedziliśmy niejeden
-              stadion w Europie, zaliczyliśmy mnóstwo meczów i piłkarskich
-              podróży.
+             Łączy nas wieloletnia przyjaźń, piłka nożna i pasja do podróżowania. Przez lata odwiedziliśmy dziesiątki stadionów, przeżyliśmy setki piłkarskich emocji i przekonaliśmy się, że najlepsze wspomnienia powstają wtedy, kiedy dzieli się je z innymi.
             </p>
             <p>
-              Lubimy dobrą atmosferę, poznawanie nowych miejsc i ludzi.
-              Nudy raczej nie tolerujemy.
+              Lubimy dobrą atmosferę, poznawanie nowych miejsc i ludzi. Każdy wyjazd traktujemy jak kolejną historię, którą warto zapamiętać.
             </p>
             <p className="font-sans text-2xl font-black uppercase leading-tight text-foreground md:text-3xl">
-              I właśnie z tego powstało Let&apos;s Gol.
+              I właśnie z tej pasji powstało Let&apos;s Gol.
             </p>
           </div>
         </div>
       </section>
 
       <section className="overflow-hidden bg-secondary/55 py-16 md:py-24">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <div className="max-w-4xl">
-            <p className="eyebrow">Ta sama historia, kolejny rozdział</p>
-            <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Jedna przyjaźń. Ta sama pasja.
-            </h2>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-              Kiedyś jeździliśmy na mecze tylko dla siebie. Dziś zabieramy
-              na stadiony również innych.
-            </p>
-          </div>
+  <div className="mx-auto max-w-7xl px-4 md:px-6">
+    <div className="grid gap-10 lg:grid-cols-12 lg:items-end lg:gap-16">
+      <div className="lg:col-span-7">
+        <p className="eyebrow">Zaczęło się od marzenia</p>
 
-          <div className="mt-12 grid items-start gap-6 md:grid-cols-12 md:gap-8">
-            <figure className="md:col-span-5">
-              <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted shadow-xl">
-                <Image
-                  src="/images/o-nas/lukasz-mateusz-archiwum.webp"
-                  alt="Łukasz i Mateusz jako młodzi kibice FC Barcelony"
-                  fill
-                  className="object-cover object-[60%_10%]"
-                  sizes="(max-width: 768px) 100vw, 42vw"
-                />
-              </div>
-              <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
-                <span className="font-sans text-2xl font-black uppercase">
-                  Kiedyś
-                </span>
-                <span className="text-right text-sm text-muted-foreground">
-                 Zamiłowanie do piłki nożnej od dziecka
-                </span>
-              </figcaption>
-            </figure>
+        <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
+          Dziś spełniamy je
+          <br />
+          Razem z wami
+        </h2>
+      </div>
 
- <figure className="md:col-span-7 md:mt-24">
-<div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted shadow-xl md:aspect-3/2">
-  <Image
-    src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
-    alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
-    fill
-    className="object-cover object-[43%_35%] md:hidden"
-    sizes="100vw"
-  />
+      <div className="lg:col-span-5 lg:pb-1">
+        <p className="max-w-xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
+          Piłka i wspólne wyjazdy były z nami na długo przed powstaniem
+          Let&apos;s Gol. Zmieniło się jedno - dziś te emocje przeżywamy razem
+          z Wami.
+        </p>
+      </div>
+    </div>
 
-  <div className="absolute inset-0 hidden overflow-hidden md:block">
-    <Image
-      src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
-      alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
-      fill
-      quality={100}
-      className="object-cover object-center"
-      sizes="1920px"
-      style={{
-        transform: "scale(2.2)",
-      }}
-    />
+    <div className="mt-10 md:mt-14">
+      <AboutStorySlider />
+    </div>
+
+    <div className="mt-8 grid gap-6 border-t border-foreground/15 pt-7 md:grid-cols-2 md:gap-12">
+      <div>
+        <p className="font-sans text-xl font-black uppercase md:text-2xl">
+          Zaczęło się dużo wcześniej
+        </p>
+
+        <p className="mt-3 max-w-lg text-sm leading-6 text-muted-foreground md:text-base md:leading-7">
+          Pierwsze mecze, stadiony i wspólne podróże. Bez planu na firmę,
+          po prostu z zajawki, która została z nami na lata.
+        </p>
+      </div>
+
+      <div className="md:text-right">
+        <p className="font-sans text-xl font-black uppercase md:text-2xl">
+          Dzisiaj robimy to dalej
+        </p>
+
+        <p className="mt-3 ml-auto max-w-lg text-sm leading-6 text-muted-foreground md:text-base md:leading-7">
+          Nadal jeździmy na stadiony. Tyle że dziś wykorzystujemy własne
+          doświadczenie, żeby zabierać tam również innych kibiców.
+        </p>
+      </div>
+    </div>
   </div>
-</div>
-
-  <figcaption className="mt-4 flex items-baseline justify-between gap-4 border-t border-foreground/20 pt-3">
-    <span className="font-sans text-2xl font-black uppercase">
-      Dzisiaj
-    </span>
-
-    <span className="text-right text-sm text-muted-foreground">
-      Nadal razem, teraz jako ekipa Let&apos;s Gol
-    </span>
-  </figcaption>
-</figure>
-          </div>
-        </div>
-      </section>
+</section>
 
       <section className="py-16 md:py-24">
         <div className="mx-auto grid max-w-7xl gap-12 px-4 md:px-6 lg:grid-cols-12 lg:gap-20">
@@ -226,17 +205,16 @@ export default async function AboutPage() {
 
           <div className="space-y-7 text-base leading-8 text-muted-foreground md:text-lg lg:col-span-7">
             <p>
-              Chcieliśmy stworzyć wyjazdy dla zwykłych kibiców, którzy marzą
-              o zobaczeniu swojej drużyny na żywo, ale niekoniecznie chcą
-              spędzać wieczory na szukaniu lotów, hoteli, biletów, transferów
-              i zastanawianiu się, czy wszystko na pewno się zgadza.
+              Wiemy, ile emocji daje wyjazd na mecz ukochanej drużyny. <br />Wiemy też, ile czasu i nerwów potrafi kosztować jego organizacja.
+<br />Dlatego stworzyliśmy Let’s Gol - żebyście mogli skupić się na tym, co najważniejsze: emocjach, atmosferze stadionu i spełnianiu piłkarskich marzeń.
             </p>
             <p className="font-sans text-3xl font-black uppercase text-foreground md:text-4xl">
               Od tego jesteśmy my.
             </p>
             <p>
-              Zorganizujemy Wasz wyjazd od A do Z, zadbamy o szczegóły
-              i będziemy z Wami przed podróżą oraz podczas niej.
+              Zadbamy o Wasz wyjazd od A do Z. Przelot, nocleg, bilety i wszystkie najważniejsze szczegóły. 
+Od pierwszych przygotowań aż po ostatni gwizdek, ciągle jesteśmy z Wami.
+Let’s Gol pilnuje szczegółów - Ty tylko przeżywasz mecz.
             </p>
           </div>
         </div>
@@ -249,8 +227,7 @@ export default async function AboutPage() {
             „Tak, jak sami chcielibyśmy pojechać na mecz.”
           </blockquote>
           <p className="mt-8 max-w-2xl text-base leading-7 text-background/65 md:text-lg">
-            To najprostsza miara każdej decyzji - od wyboru lotu i hotelu po
-            atmosferę na miejscu.
+            Nie proponujemy Wam niczego, czego sami byśmy nie wybrali. Prosta zasada, której trzymamy się przy każdym wyjeździe.
           </p>
         </div>
       </section>
@@ -260,7 +237,7 @@ export default async function AboutPage() {
           <SectionHeading
             eyebrow="Poznajcie nas"
             title="Dwie twarze Let's Gol"
-            intro="Dwa różne charaktery i dwa uzupełniające się spojrzenia na dobry wyjazd. Każdy z nas odpowiada za inną część całości, ale obaj jedziemy w tym samym kierunku."
+            intro="Dwie osoby, różne zadania, jednen wspólny cel - zabierać Was tam, gdzie piłkarskie emocje przeżywa się naprawdę. Każdy z nas odpowiada za inną część wyjazdu, a razem tworzymy Let’s Gol."
             align="left"
           />
 
@@ -283,33 +260,34 @@ export default async function AboutPage() {
                 <h3 className="mt-2 font-sans text-5xl font-black uppercase leading-none md:text-7xl">
                   Mateusz
                 </h3>
-                <p className="mt-4 font-sans text-xl font-black uppercase leading-tight text-amber-800 md:text-2xl">
-                  Główny koordynator wyjazdów
-                </p>
+               <p className="mt-4 font-sans text-xl font-black uppercase leading-tight text-amber-800 md:text-2xl">
+  Główny koordynator wyjazdów
+</p>
 
-                <div className="mt-8 space-y-5 text-base leading-7 text-muted-foreground">
-                  <p>
-                    Człowiek od zadań specjalnych i zdecydowanie ktoś,
-                    z kim trudno się nudzić. Do tańca i do różańca - gdy coś
-                    trzeba załatwić, znaleźć albo szybko ogarnąć, Mateusz
-                    prawdopodobnie już to robi.
-                  </p>
-                  <p>
-                    Jako główny koordynator dba przede wszystkim o Was na
-                    miejscu - atmosferę, organizację, wspólne zwiedzanie
-                    i komfort całej grupy.
-                  </p>
-                  <p>
-                    Szczególne miejsce zajmuje u niego Barcelona. Zna jej
-                    zakamarki jak mało kto, dlatego podczas naszych katalońskich
-                    wyjazdów możecie liczyć nie tylko na mecz, ale również na
-                    poznanie miasta od najlepszej strony.
-                  </p>
-                  <p className="font-bold text-foreground">
-                    Jego zadanie? Żebyście Wy mogli cieszyć się wyjazdem,
-                    a reszta była po naszej stronie.
-                  </p>
-                </div>
+<div className="mt-8 space-y-5 text-base leading-7 text-muted-foreground">
+  <p>
+    Do tańca i do różańca. Gdy trzeba coś załatwić, znaleźć rozwiązanie
+    albo szybko zareagować - Mateusz prawdopodobnie już to robi.
+  </p>
+
+  <p>
+    Podczas wyjazdów odpowiada przede wszystkim za Was na miejscu,
+    organizację, wspólne zwiedzanie, dobrą atmosferę i to, żebyście mogli
+    skupić się na tym, po co przyjechaliście: emocjach i spełnianiu
+    piłkarskich marzeń.
+  </p>
+
+  <p>
+    Szczególne miejsce zajmuje u niego Barcelona. Po latach regularnych
+    podróży zna ją od podszewki i chętnie pokaże Wam miejsca, których nie
+    znajdziecie w pierwszym lepszym przewodniku.
+  </p>
+
+  <p className="font-bold text-foreground">
+    Jego zadanie? Sprawić, żeby wyjazd, na który czekaliście miesiącami,
+    stał się wspomnieniem, do którego będziecie wracać przez lata.
+  </p>
+</div>
               </div>
             </article>
 
@@ -336,25 +314,32 @@ export default async function AboutPage() {
                 </p>
 
                 <div className="mt-8 space-y-5 text-base leading-7 text-muted-foreground">
-                  <p>
-                    Jeśli Mateusz jest człowiekiem od zadań specjalnych na
-                    miejscu, Łukasz pilnuje, żeby cała układanka zagrała jeszcze
-                    przed wylotem.
-                  </p>
-                  <p>
-                    Odpowiada za logistyczne i organizacyjne zabezpieczenie
-                    naszych wyjazdów - dobór lotów, sprawdzone noclegi, bilety
-                    i miejsca na stadionie oraz wszystkie elementy, które trzeba
-                    połączyć, żeby podróż przebiegła tak, jak powinna.
-                  </p>
-                  <p className="font-bold text-foreground">
-                    Krótko mówiąc: ma być dopięte od A do Z.
-                  </p>
-                  <p>
-                    Podczas wyjazdu również pozostaje do Waszej dyspozycji,
-                    a walizka koordynatora nie jest mu obca - regularnie możecie
-                    spotkać go razem z grupą na stadionach Europy.
-                  </p>
+                <p>
+  Jeśli Mateusz dba o to, żebyście przeżywali wyjazd, Łukasz dba o to,
+  żeby wszystko, co do niego prowadzi, było dopięte na ostatni guzik.
+</p>
+
+<p>
+  To on odpowiada za loty, sprawdzone noclegi, bilety, miejsca na stadionie
+  i wszystkie szczegóły, które zamieniają plan wyjazdu w spełnione
+  piłkarskie marzenie.
+</p>
+
+<p className="font-bold text-foreground">
+  Krótko mówiąc: zanim Wy zaczniecie odliczać dni do wyjazdu, Łukasz już
+  pilnuje, żeby wszystko było gotowe.
+</p>
+
+<p>
+  A kiedy przychodzi dzień meczu, nie zostaje za biurkiem. Regularnie rusza
+  z nami na stadiony Europy i razem z Mateuszem jest do Waszej dyspozycji
+  również na miejscu.
+</p>
+
+<p className="font-bold text-foreground">
+  Jego zadanie? Dopiąć każdy szczegół, żeby między Wami a wymarzonym meczem
+  zostało już tylko odliczanie dni do wyjazdu.
+</p>
                 </div>
               </div>
             </article>
