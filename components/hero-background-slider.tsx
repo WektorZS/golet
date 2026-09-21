@@ -12,7 +12,7 @@ const slides = [
   {
     src: "/images/madryt-hero.webp",
     mobileX: 60,
-    mobileY: 100,
+    mobileY: 10,
   },
   {
     src: "/images/barcelonavsreal-hero.webp",
