@@ -100,17 +100,18 @@ export function HeroBackgroundSlider() {
       }`}
     />
 
-    <Image
-      src={slide.src}
-      alt=""
-      fill
-      priority={index === 0}
-      fetchPriority={index === 0 ? "high" : "auto"}
-      sizes="100vw"
-      className={`hidden object-cover object-center transition-opacity duration-[1600ms] ease-in-out md:block motion-reduce:transition-none ${
-        isActive ? "opacity-100" : "opacity-0"
-      }`}
-    />
+   <Image
+  src={slide.src}
+  alt=""
+  fill
+  priority={index === 0}
+  fetchPriority={index === 0 ? "high" : "auto"}
+  quality={index === 0 ? 75 : 65}
+  sizes="(max-width: 768px) 100vw, 1350px"
+  className={`hidden object-cover object-center transition-opacity duration-[1600ms] ease-in-out md:block motion-reduce:transition-none ${
+    isActive ? "opacity-100" : "opacity-0"
+  }`}
+/>
   </div>
 )
       })}
