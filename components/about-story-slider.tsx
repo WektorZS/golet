@@ -35,7 +35,7 @@ export function AboutStorySlider() {
           />
 
           <Image
-            src="/images/o-nas/lukasz-mateusz-na-stadionie.webp"
+            src="/images/o-nas/lukasz-mateusz-nowe.webp"
             alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
             fill
             quality={100}
