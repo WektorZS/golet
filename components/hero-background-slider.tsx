@@ -5,8 +5,10 @@ import { useEffect, useMemo, useState } from "react"
 
 const slides = [
   { src: "/images/hero-stadium.webp", position: "object-center" },
+  { src: "/images/madryt-hero.webp", position: "object-center" },
   { src: "/images/barcelona-trip.webp", position: "object-center" },
   { src: "/images/madrid-trip.webp", position: "object-center" },
+  { src: "/images/barcelonavsreal-hero.webp", position: "object-center" },
 ] as const
 
 const fallbackEyebrow = "Nie oglądaj wielkich meczów tylko na ekranie"
