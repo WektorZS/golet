@@ -11,12 +11,20 @@ export function AboutStorySlider() {
     <div className="relative">
       <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-foreground shadow-2xl md:aspect-video">
         <Image
-          src="/images/o-nas/lukasz-mateusz-archiwum.webp"
-          alt="Łukasz i Mateusz jako młodzi kibice FC Barcelony"
-          fill
-          className="object-cover object-[60%_10%]"
-          sizes="(max-width: 768px) 100vw, 1280px"
-        />
+  src="/images/o-nas/lukasz-mateusz-archiwum-mobile.webp"
+  alt="Łukasz i Mateusz jako młodzi kibice FC Barcelony"
+  fill
+  className="object-cover object-center md:hidden"
+  sizes="100vw"
+/>
+
+<Image
+  src="/images/o-nas/lukasz-mateusz-archiwum.webp"
+  alt="Łukasz i Mateusz jako młodzi kibice FC Barcelony"
+  fill
+  className="hidden object-cover object-center md:block"
+  sizes="1280px"
+/>
 
         <div className="absolute inset-0 bg-black/10" />
 
@@ -27,7 +35,7 @@ export function AboutStorySlider() {
           }}
         >
           <Image
-            src="/images/o-nas/lukasz-mateusz-na-stadionie-mobile.webp"
+            src="/images/o-nas/lukasz-mateusz-slider-mobile.webp"
             alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
             fill
             className="object-cover object-[43%_35%] md:hidden"
