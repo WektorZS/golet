@@ -82,7 +82,7 @@ export function AboutStorySlider() {
         <div className="pointer-events-none absolute inset-x-0 bottom-5 z-20 flex justify-center">
           <div className="flex items-center gap-2 rounded-full bg-black/55 px-4 py-2 text-xs font-bold text-white backdrop-blur-md md:text-sm">
             <ArrowLeftRight className="size-4" />
-            Przesuń, żeby zobaczyć historię
+            Przesuń
           </div>
         </div>
       </div>
