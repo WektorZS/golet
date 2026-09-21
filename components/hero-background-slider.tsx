@@ -12,7 +12,7 @@ const slides = [
   {
     src: "/images/madryt-hero.webp",
     mobileX: 60,
-    mobileY: 10,
+    mobileY: 100,
   },
   {
     src: "/images/barcelonavsreal-hero.webp",
@@ -80,7 +80,7 @@ export function HeroBackgroundSlider() {
         const isActive = reducedMotion ? index === 0 : index === activeSlide
 
         return (
-       <Image
+      <Image
   key={slide.src}
   src={slide.src}
   alt=""
@@ -88,13 +88,10 @@ export function HeroBackgroundSlider() {
   priority={index === 0}
   fetchPriority={index === 0 ? "high" : "auto"}
   sizes="100vw"
-  style={
-    {
-      "--mobile-x": `${slide.mobileX}%`,
-      "--mobile-y": `${slide.mobileY}%`,
-    } as React.CSSProperties
-  }
-  className={`object-cover object-[var(--mobile-x)_var(--mobile-y)] md:object-center transition-opacity duration-[1600ms] ease-in-out motion-reduce:transition-none ${
+  style={{
+    objectPosition: `${slide.mobileX}% ${slide.mobileY}%`,
+  }}
+  className={`object-cover md:object-center transition-opacity duration-[1600ms] ease-in-out motion-reduce:transition-none ${
     isActive ? "opacity-100" : "opacity-0"
   }`}
 />
