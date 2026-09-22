@@ -145,6 +145,13 @@ export function InquiryForm({
   const [privacyConsent, setPrivacyConsent] = useState(false)
   const [selectedMatch, setSelectedMatch] = useState("")
   const [selectedPackageVariant, setSelectedPackageVariant] = useState(defaultPackageVariant || packageVariants[0] || "")
+  useEffect(() => {
+  setSelectedPackageVariant(
+    defaultPackageVariant ||
+      packageVariants[0] ||
+      ""
+  )
+}, [defaultPackageVariant, packageVariants])
   const [matchDropdownOpen, setMatchDropdownOpen] = useState(false)
   const [packageDropdownOpen, setPackageDropdownOpen] = useState(false)
 const matchDropdownRef = useRef<HTMLDivElement>(null)

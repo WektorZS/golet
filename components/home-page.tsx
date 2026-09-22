@@ -1105,14 +1105,14 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </div>
 
     <div className="relative">
-      <div className="relative min-h-110 overflow-hidden rounded-xl md:min-h-130">
+      <div className="relative min-h-90 overflow-hidden rounded-xl md:min-h-120">
         <Image
-          src="/images/about-us.webp"
-          alt="Atmosfera wspólnego wyjazdu na mecz"
-          fill
-          className="object-cover"
-          sizes="(max-width: 1024px) 100vw, 55vw"
-        />
+  src="/images/droga.webp"
+  alt="Atmosfera wspólnego wyjazdu na mecz"
+  fill
+  className="object-cover object-bottom"
+  sizes="(max-width: 1024px) 100vw, 55vw"
+/>
 
         <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/10 to-transparent" />
 
