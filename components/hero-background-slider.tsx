@@ -21,8 +21,8 @@ const slides = [
   {
     src: "/images/barcelonavsreal-hero.webp",
     mobileSrc: "/images/barcelonavsreal-hero-mobile.webp",
-    mobileX: 50,
-    mobileY: 0,
+    mobileX: 40,
+    mobileY: -10,
     mobileScale: 1,
   },
 ] as const
