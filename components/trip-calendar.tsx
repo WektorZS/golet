@@ -9,13 +9,11 @@ import {
   ChevronDown,
   Clock3,
   MapPin,
-  Star,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { getPackageVariants, packageSummary, parsePackageItems } from "@/lib/package-options"
 import type { Trip } from "@/lib/trips"
 
 const monthFormatter = new Intl.DateTimeFormat("pl-PL", {
@@ -362,8 +360,8 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                 const status = availability[trip.availabilityStatus as keyof typeof availability] || availability.available
                 const { homeTeam, awayTeam } = getTeams(trip)
                 const stay = getStay(trip)
-                const packageOptions = parsePackageItems(trip.packageItems)
-                const variants = getPackageVariants(trip.packageVariants, trip.packageItems)
+        
+      
 
                 return (
                   <article key={trip.id} className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:border-primary/60 hover:shadow-lg">
@@ -380,62 +378,124 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                         <p className="absolute inset-x-3 bottom-3 text-center font-mono text-[10px] font-bold uppercase tracking-wider text-white/75">{trip.city}, {trip.country}</p>
                       </div>
 
-                      <div className="grid gap-5 p-5 md:grid-cols-[1.2fr_1fr]">
-                        <div>
-                          {(trip.leagueName || trip.leagueLogo) && <div className="mb-2 flex items-center gap-2 text-[12px] font-bold uppercase tracking-wider text-muted-foreground">{trip.leagueLogo && <span className="relative size-7"><Image src={trip.leagueLogo} alt={`Logo ${trip.leagueName}`} fill className="object-contain" sizes="28px" /></span>}<span>{trip.leagueName}</span></div>}
-                          <h3 className="mt-1 font-sans text-2xl font-black uppercase leading-tight">{homeTeam} - {awayTeam}</h3>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            <span className="rounded-md bg-foreground px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-background">{packageSummary(trip.packageItems)}</span>
-                            {packageOptions.flight === "excluded" && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">Bez przelotu</span>}
-                            {packageOptions.hotel === "excluded" && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">Bez hotelu</span>}
-                            {trip.hotelStars > 0 && packageOptions.hotel !== "excluded" && <span className="inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"><Star className="size-3 fill-primary text-primary" />Hotel {trip.hotelStars}*</span>}
-                            {trip.ticketCategory && <span className="rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">{trip.ticketCategory}</span>}
-                          </div>
-                          <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1">{variants.map((variant, index) => <span key={variant.key} className="text-xs font-semibold">{index > 0 && <span className="mr-2 text-primary">/</span>}{variant.shortLabel}</span>)}</div>
-                        </div>
+                     <div className="flex min-w-0 flex-col justify-between p-5 md:px-6 md:py-5">
+  <div>
+    {(trip.leagueName || trip.leagueLogo) && (
+      <div className="flex min-w-0 items-center gap-2.5">
+        {trip.leagueLogo && (
+          <span className="relative size-7 shrink-0">
+            <Image
+              src={trip.leagueLogo}
+              alt={`Logo ${trip.leagueName}`}
+              fill
+              className="object-contain"
+              sizes="28px"
+            />
+          </span>
+        )}
 
-                        <dl className="grid content-center gap-3 text-sm">
-                          <div className="relative pl-7">
-                            <dt className="text-xs text-muted-foreground"><CalendarDays aria-hidden="true" className="absolute left-0 top-0.5 size-4 text-primary" />Termin wyjazdu</dt>
-                            <dd className="font-semibold">{formatDates(trip.startDate, trip.endDate)}</dd>
-                          </div>
-                          <div className="relative pl-7">
-                            <dt className="text-xs text-muted-foreground"><MapPin aria-hidden="true" className="absolute left-0 top-0.5 size-4 text-primary" />Stadion</dt>
-                            <dd className="font-semibold">{trip.stadium || "Stadion gospodarza"}</dd>
-                          </div>
-                          <div className="relative pl-7">
-                            <dt className="text-xs text-muted-foreground"><Clock3 aria-hidden="true" className="absolute left-0 top-0.5 size-4 text-primary" />Pobyt</dt>
-                            <dd className="font-semibold">{formatStay(stay.days, stay.nights)}</dd>
-                          </div>
-                        </dl>
-                      </div>
+        <span className="truncate font-mono text-[10px] font-black uppercase tracking-[0.14em] text-muted-foreground">
+          {trip.leagueName}
+        </span>
+      </div>
+    )}
 
-                     <div className="grid gap-4 border-t bg-secondary/45 p-4 sm:grid-cols-[auto_1fr] sm:items-center lg:w-48 lg:grid-cols-1 lg:items-stretch lg:justify-center lg:gap-3 lg:border-l lg:border-t-0">
-  <div className="flex items-center justify-between gap-4 sm:contents lg:block lg:text-center">
-  <span
-    className={`w-fit rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wide lg:mx-auto ${status.className}`}
+    <h3 className="mt-3 max-w-3xl font-sans text-2xl font-black uppercase leading-[1.02] tracking-tight lg:text-[27px]">
+      {homeTeam} - {awayTeam}
+    </h3>
+  </div>
+
+  <div className="mt-6 grid gap-4 border-t border-foreground/10 pt-4 sm:grid-cols-3">
+    <div className="flex min-w-0 items-center gap-3">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/15">
+        <CalendarDays
+          className="size-4 text-foreground"
+          aria-hidden="true"
+        />
+      </span>
+
+      <div className="min-w-0">
+        <p className="font-mono text-[9px] font-black uppercase tracking-[0.14em] text-muted-foreground">
+          Termin
+        </p>
+
+        <p className="mt-0.5 text-sm font-semibold text-foreground">
+          {formatDates(trip.startDate, trip.endDate)}
+        </p>
+      </div>
+    </div>
+
+    <div className="flex min-w-0 items-center gap-3">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/15">
+        <MapPin
+          className="size-4 text-foreground"
+          aria-hidden="true"
+        />
+      </span>
+
+      <div className="min-w-0">
+        <p className="font-mono text-[9px] font-black uppercase tracking-[0.14em] text-muted-foreground">
+          Stadion
+        </p>
+
+        <p className="mt-0.5 truncate text-sm font-semibold text-foreground">
+          {trip.stadium || "Stadion gospodarza"}
+        </p>
+      </div>
+    </div>
+
+    <div className="flex min-w-0 items-center gap-3">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/15">
+        <Clock3
+          className="size-4 text-foreground"
+          aria-hidden="true"
+        />
+      </span>
+
+      <div className="min-w-0">
+        <p className="font-mono text-[9px] font-black uppercase tracking-[0.14em] text-muted-foreground">
+          Pobyt
+        </p>
+
+        <p className="mt-0.5 text-sm font-semibold text-foreground">
+          {formatStay(stay.days, stay.nights)}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+                     <div className="relative flex items-center justify-between gap-4 border-t bg-secondary/35 px-5 pb-5 pt-12 lg:w-48 lg:flex-col lg:items-stretch lg:justify-center lg:border-l lg:border-foreground/10 lg:border-t-0">
+  <div
+    className={`absolute inset-x-0 top-0 flex h-7 items-center justify-center border-b text-[9px] font-black uppercase tracking-[0.14em] lg:border-r lg:border-t lg:rounded-tr-xl ${
+        trip.availabilityStatus === "available"
+      ? "border-emerald-700 bg-emerald-700 text-white"
+      : trip.availabilityStatus === "last_places"
+        ? "border-primary bg-primary text-primary-foreground"
+        : "border-red-600 bg-red-600 text-white"
+    }`}
   >
     {status.label}
-  </span>
+  </div>
 
-  <div className="text-right sm:text-left lg:mt-3 lg:text-center">
-    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+  <div>
+    <p className="font-mono text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground">
       Cena od / osoba
     </p>
 
-    <p className="font-sans text-2xl font-black leading-none">
+    <p className="mt-1 font-sans text-3xl font-black leading-none tracking-tight text-foreground">
       {trip.price.toLocaleString("pl-PL")} zł
     </p>
   </div>
-</div>
 
   <Button
     nativeButton={false}
     render={<Link href={`/wyjazdy/${trip.slug}`} />}
-    className="h-11 w-full shrink-0 px-5 text-sm font-bold sm:col-span-2 lg:col-span-1"
+    aria-label={`Szczegóły wyjazdu ${trip.title}`}
+    className="h-10 shrink-0 px-5"
   >
     Szczegóły
-    <ArrowRight className="size-4.5" data-icon="inline-end" />
+    <ArrowRight data-icon="inline-end" />
   </Button>
 </div>
                     </div>

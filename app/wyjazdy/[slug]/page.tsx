@@ -344,7 +344,7 @@ const defaultPlan = [
 
       <section aria-labelledby="wariant-pakietu" className="border-b bg-secondary px-4 py-8 md:px-6 md:py-10">
         <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between"><div><p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-amber-800">Dopasuj ofertę</p><h2 id="wariant-pakietu" className="mt-1 font-sans text-2xl font-black uppercase md:text-3xl">Wybierz wariant pakietu</h2></div><p className="max-w-xl text-sm leading-6 text-muted-foreground">Niepełne pakiety wyceniamy indywidualnie według Twoich potrzeb. Zazwyczaj kosztują mniej niż pełny pakiet.</p></div>
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between"><div><p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-amber-800">Dopasuj ofertę</p><h2 id="wariant-pakietu" className="mt-1 font-sans text-2xl font-black uppercase md:text-3xl">Wybierz wariant pakietu</h2></div><p className="max-w-xl text-sm leading-6 text-muted-foreground">Niepełne pakiety wyceniamy indywidualnie według Twoich potrzeb.</p></div>
          <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
   {orderedPackageVariants.map((variant) => {
     const VariantIcon =
