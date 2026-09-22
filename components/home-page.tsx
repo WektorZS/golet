@@ -143,9 +143,19 @@ type Testimonial = {
 function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
   const items = gallery.slice(0, 8)
 
+  const lightboxImages = items.map((item) => ({
+    src: item.mediaId
+      ? `/api/media/${item.mediaId}`
+      : item.image,
+    alt:
+      item.alt ||
+      item.title ||
+      "Zdjęcie z wyjazdu Let's Gol",
+  }))
+
   return (
     <div className="mt-10 grid grid-cols-2 gap-3 lg:grid-cols-4">
-      {items.map((item) => {
+      {items.map((item, index) => {
         const src = item.mediaId
           ? `/api/media/${item.mediaId}`
           : item.image
@@ -157,20 +167,26 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
           >
             <ImageLightbox
               src={src}
-              alt={item.alt || item.title}
-              caption={[item.title, item.city]
-                .filter(Boolean)
-                .join(" · ")}
+              alt={
+                item.alt ||
+                item.title ||
+                "Zdjęcie z wyjazdu Let's Gol"
+              }
+              images={lightboxImages}
+              initialIndex={index}
+              priority={index < 4}
             >
               <Image
                 src={src}
-                alt={item.alt || item.title}
+                alt={
+                  item.alt ||
+                  item.title ||
+                  "Zdjęcie z wyjazdu Let's Gol"
+                }
                 fill
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 sizes="(max-width: 768px) 50vw, 25vw"
               />
-
-              <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/5 to-transparent opacity-35 transition-opacity duration-300 group-hover:opacity-75" />
             </ImageLightbox>
           </figure>
         )

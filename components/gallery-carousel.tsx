@@ -106,28 +106,39 @@ useEffect(() => {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="relative aspect-4/3 bg-foreground md:aspect-video md:min-h-125">
-          <ImageLightbox
-            src={currentItem.src}
-            alt={currentItem.alt}
-            images={items.map((item) => ({
-              src: item.src,
-              alt: item.alt,
-            }))}
-            initialIndex={activeIndex}
-            priority
-          >
-            <Image
-  key={currentItem.src}
-  src={currentItem.src}
-  alt={currentItem.alt}
-  fill
-  priority
-  className="object-contain object-center transition-transform duration-700 ease-out md:object-cover md:object-bottom md:group-hover:scale-[1.015]"
-  sizes="(max-width: 768px) 100vw, 80vw"
-/>
-          </ImageLightbox>
-        </div>
+        <div className="relative aspect-4/3 overflow-hidden rounded-2xl bg-foreground sm:aspect-video lg:h-[68vh] lg:max-h-175 lg:aspect-auto">
+  <Image
+    src={currentItem.src}
+    alt=""
+    fill
+    aria-hidden="true"
+    className="scale-110 object-cover opacity-25 blur-2xl"
+    sizes="100vw"
+  />
+
+  <div className="absolute inset-0 bg-black/20" />
+
+  <ImageLightbox
+    src={currentItem.src}
+    alt={currentItem.alt}
+    images={items.map((item) => ({
+      src: item.src,
+      alt: item.alt,
+    }))}
+    initialIndex={activeIndex}
+    priority
+  >
+    <Image
+      key={currentItem.src}
+      src={currentItem.src}
+      alt={currentItem.alt}
+      fill
+      priority
+      className="relative z-10 object-contain object-center"
+      sizes="(max-width: 768px) 100vw, 90vw"
+    />
+  </ImageLightbox>
+</div>
 
         {items.length > 1 && (
           <>
