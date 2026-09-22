@@ -172,22 +172,6 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
 
               <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/5 to-transparent opacity-35 transition-opacity duration-300 group-hover:opacity-75" />
             </ImageLightbox>
-
-            {(item.title || item.city) && (
-              <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-2 p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                {item.title && (
-                  <p className="text-sm font-bold text-white">
-                    {item.title}
-                  </p>
-                )}
-
-                {item.city && (
-                  <p className="mt-1 text-xs text-white/70">
-                    {item.city}
-                  </p>
-                )}
-              </figcaption>
-            )}
           </figure>
         )
       })}
