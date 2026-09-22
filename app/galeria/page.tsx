@@ -6,6 +6,7 @@ import { ImageLightbox } from "@/components/image-lightbox"
 import { JsonLd } from "@/components/json-ld"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { GalleryCarousel } from "@/components/gallery-carousel"
 
 import {
   getPublishedGallery,
@@ -29,12 +30,32 @@ export const metadata: Metadata = {
   ),
 }
 
+const galleryLayout = [
+  "col-span-2 sm:col-span-6 lg:col-span-12 aspect-[16/7]",
+  "col-span-1 sm:col-span-3 lg:col-span-4 aspect-[3/4]",
+  "col-span-1 sm:col-span-3 lg:col-span-4 aspect-[3/4]",
+  "col-span-2 sm:col-span-6 lg:col-span-4 aspect-[4/3]",
+  "col-span-1 sm:col-span-3 lg:col-span-5 aspect-[4/5]",
+  "col-span-1 sm:col-span-3 lg:col-span-7 aspect-[16/9]",
+  "col-span-2 sm:col-span-6 lg:col-span-7 aspect-[16/9]",
+  "col-span-1 sm:col-span-3 lg:col-span-5 aspect-[4/5]",
+] as const
+
 export default async function GalleryPage() {
   const [gallery, content] = await Promise.all([
     getPublishedGallery(),
     getSiteContent(),
   ])
-
+const carouselItems = gallery.map((item) => ({
+  id: item.id,
+  src: item.mediaId
+    ? `/api/media/${item.mediaId}`
+    : item.image,
+  alt:
+    item.alt ||
+    item.title ||
+    "Zdjęcie z wyjazdu Let's Gol",
+}))
   const lightboxImages = gallery.map((item) => ({
     src: item.mediaId
       ? `/api/media/${item.mediaId}`
@@ -43,9 +64,6 @@ export default async function GalleryPage() {
       item.alt ||
       item.title ||
       "Zdjęcie z wyjazdu Let's Gol",
-    caption: [item.title, item.city]
-      .filter(Boolean)
-      .join(" · "),
   }))
 
   return (
@@ -71,14 +89,22 @@ export default async function GalleryPage() {
                   content.galleryTitle ||
                   "Galeria z wyjazdów",
                 url: "https://letsgol.eu/galeria",
-                image: lightboxImages.map((item) => ({
-                  "@type": "ImageObject",
-                  contentUrl: new URL(
-                    item.src,
-                    "https://letsgol.eu"
-                  ).toString(),
-                  caption: item.caption,
-                })),
+                image: gallery.map((item) => {
+                  const src = item.mediaId
+                    ? `/api/media/${item.mediaId}`
+                    : item.image
+
+                  return {
+                    "@type": "ImageObject",
+                    contentUrl: new URL(
+                      src,
+                      "https://letsgol.eu"
+                    ).toString(),
+                    caption: [item.title, item.city]
+                      .filter(Boolean)
+                      .join(" · "),
+                  }
+                }),
               },
             ],
           }}
@@ -134,59 +160,32 @@ export default async function GalleryPage() {
           </div>
         </section>
 
-        <section className="px-4 py-16 md:px-6 md:py-20">
-          <div className="mx-auto max-w-7xl">
-            {gallery.length ? (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {gallery.map((item, index) => (
-                  <figure
-                    key={item.id}
-                    className="group overflow-hidden rounded-xl border bg-card"
-                  >
-                    <div className="relative aspect-4/3 overflow-hidden">
-                      <ImageLightbox
-                        src={
-                          item.mediaId
-                            ? `/api/media/${item.mediaId}`
-                            : item.image
-                        }
-                        alt={
-                          item.alt ||
-                          item.title ||
-                          "Zdjęcie z wyjazdu Let's Gol"
-                        }
-                        caption={[item.title, item.city]
-                          .filter(Boolean)
-                          .join(" · ")}
-                        images={lightboxImages}
-                        initialIndex={index}
-                        priority={index < 3}
-                      />
-                    </div>
+        <section className="relative overflow-hidden bg-section-light px-4 py-16 md:px-6 md:py-24">
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0"
+  >
+    <div className="absolute -right-40 top-10 size-105 rounded-full bg-primary/5 blur-[120px]" />
+    <div className="absolute -left-40 bottom-0 size-105 rounded-full bg-black/2.5 blur-[120px]" />
+  </div>
 
-                    {(item.title || item.city) && (
-                      <figcaption className="flex flex-col gap-1 p-4">
-                        {item.title && (
-                          <strong>{item.title}</strong>
-                        )}
+  <div className="relative">
+    {carouselItems.length ? (
+      <GalleryCarousel items={carouselItems} />
+    ) : (
+      <div className="mx-auto max-w-7xl py-20 text-center">
+        <Images
+          className="mx-auto size-8 text-muted-foreground/40"
+          aria-hidden="true"
+        />
 
-                        {item.city && (
-                          <span className="text-sm text-muted-foreground">
-                            {item.city}
-                          </span>
-                        )}
-                      </figcaption>
-                    )}
-                  </figure>
-                ))}
-              </div>
-            ) : (
-              <p className="rounded-xl border p-8 text-center text-muted-foreground">
-                Galeria zostanie uzupełniona wkrótce.
-              </p>
-            )}
-          </div>
-        </section>
+        <p className="mt-4 text-muted-foreground">
+          Galeria zostanie uzupełniona wkrótce.
+        </p>
+      </div>
+    )}
+  </div>
+</section>
       </main>
 
       <SiteFooter content={content} />

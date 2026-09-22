@@ -211,11 +211,7 @@ useEffect(() => {
           )}
         </div>
 
-        {currentImage.caption ? (
-          <p className="shrink-0 px-2 pb-1 text-sm text-background/80">
-            {currentImage.caption}
-          </p>
-        ) : null}
+      
       </DialogContent>
     </Dialog>
   )
