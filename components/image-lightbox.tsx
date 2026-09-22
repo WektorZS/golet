@@ -165,17 +165,16 @@ useEffect(() => {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-        <Image
-  key={currentImage.src}
-  src={currentImage.src}
-  alt={currentImage.alt}
-  width={2400}
-  height={1800}
-  quality={95}
-  sizes="(max-width: 768px) 100vw, 90vw"
-  className="max-h-[calc(100dvh-8rem)] h-auto w-auto max-w-full object-contain"
-  priority
-/>
+          <Image
+            key={currentImage.src}
+            src={currentImage.src}
+            alt={currentImage.alt}
+            width={1600}
+            height={1200}
+            sizes="calc(100vw - 1rem)"
+            className="max-h-full max-w-full object-contain"
+            priority
+          />
 
           {hasMultipleImages && (
             <>
