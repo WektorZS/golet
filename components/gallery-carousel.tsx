@@ -1,10 +1,17 @@
 "use client"
 
 import Image from "next/image"
-import { useEffect, useRef, useState } from "react"
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import {
   ChevronLeft,
   ChevronRight,
+  Pause,
+  Play,
 } from "lucide-react"
 
 import { ImageLightbox } from "@/components/image-lightbox"
@@ -15,24 +22,40 @@ type GalleryCarouselItem = {
   alt: string
 }
 
+const AUTOPLAY_DURATION = 7000
+const IMAGE_TRANSITION_DURATION = 700
+
 export function GalleryCarousel({
   items,
 }: {
   items: GalleryCarouselItem[]
 }) {
   const [activeIndex, setActiveIndex] = useState(0)
-  const [showLeftFade, setShowLeftFade] = useState(false)
-  const [showRightFade, setShowRightFade] = useState(false)
+  const [previousIndex, setPreviousIndex] = useState<number | null>(
+    null
+  )
+  const [transitionActive, setTransitionActive] = useState(false)
+
+  const [autoplayEnabled, setAutoplayEnabled] = useState(true)
+  const [progress, setProgress] = useState(0)
+
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  const [reducedMotion, setReducedMotion] = useState(false)
 
   const touchStartX = useRef<number | null>(null)
+
   const thumbnailsRef = useRef<HTMLDivElement>(null)
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([])
 
-  if (!items.length) return null
+  const transitionTimeoutRef = useRef<number | null>(null)
+  const progressFrameRef = useRef<number | null>(null)
+  const autoplayStartedAtRef = useRef<number | null>(null)
 
-  const currentItem = items[activeIndex]
+  const itemCount = items.length
 
-  const updateThumbnailFades = () => {
+  const updateThumbnailOverflow = useCallback(() => {
     const container = thumbnailsRef.current
 
     if (!container) return
@@ -40,18 +63,202 @@ export function GalleryCarousel({
     const maxScroll =
       container.scrollWidth - container.clientWidth
 
-    setShowLeftFade(container.scrollLeft > 4)
-    setShowRightFade(
-      container.scrollLeft < maxScroll - 4
+    setCanScrollLeft(container.scrollLeft > 4)
+
+    setCanScrollRight(
+      maxScroll > 4 &&
+        container.scrollLeft < maxScroll - 4
     )
-  }
+  }, [])
+
+  const changeImage = useCallback(
+    (nextIndex: number) => {
+      if (
+        itemCount <= 1 ||
+        nextIndex === activeIndex ||
+        nextIndex < 0 ||
+        nextIndex >= itemCount
+      ) {
+        return
+      }
+
+      if (transitionTimeoutRef.current !== null) {
+        window.clearTimeout(
+          transitionTimeoutRef.current
+        )
+      }
+
+      setPreviousIndex(activeIndex)
+      setActiveIndex(nextIndex)
+      setProgress(0)
+
+      if (reducedMotion) {
+        setPreviousIndex(null)
+        setTransitionActive(false)
+        return
+      }
+
+      setTransitionActive(false)
+
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          setTransitionActive(true)
+        })
+      })
+
+      transitionTimeoutRef.current =
+        window.setTimeout(() => {
+          setPreviousIndex(null)
+          setTransitionActive(false)
+          transitionTimeoutRef.current = null
+        }, IMAGE_TRANSITION_DURATION)
+    },
+    [
+      activeIndex,
+      itemCount,
+      reducedMotion,
+    ]
+  )
+
+  const previous = useCallback(() => {
+    if (!itemCount) return
+
+    changeImage(
+      activeIndex === 0
+        ? itemCount - 1
+        : activeIndex - 1
+    )
+  }, [
+    activeIndex,
+    changeImage,
+    itemCount,
+  ])
+
+  const next = useCallback(() => {
+    if (!itemCount) return
+
+    changeImage(
+      activeIndex === itemCount - 1
+        ? 0
+        : activeIndex + 1
+    )
+  }, [
+    activeIndex,
+    changeImage,
+    itemCount,
+  ])
 
   useEffect(() => {
-    const container = thumbnailsRef.current
+    const media = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    )
+
+    const updatePreference = () => {
+      setReducedMotion(media.matches)
+    }
+
+    updatePreference()
+
+    media.addEventListener(
+      "change",
+      updatePreference
+    )
+
+    return () => {
+      media.removeEventListener(
+        "change",
+        updatePreference
+      )
+    }
+  }, [])
+
+  useEffect(() => {
+    if (
+      !autoplayEnabled ||
+      reducedMotion ||
+      itemCount <= 1
+    ) {
+      setProgress(0)
+      return
+    }
+
+    autoplayStartedAtRef.current =
+      performance.now()
+
+    const updateProgress = (
+      currentTime: number
+    ) => {
+      if (
+        autoplayStartedAtRef.current === null
+      ) {
+        autoplayStartedAtRef.current =
+          currentTime
+      }
+
+      const elapsed =
+        currentTime -
+        autoplayStartedAtRef.current
+
+      const nextProgress = Math.min(
+        (elapsed / AUTOPLAY_DURATION) * 100,
+        100
+      )
+
+      setProgress(nextProgress)
+
+      if (nextProgress >= 100) {
+        const nextIndex =
+          activeIndex === itemCount - 1
+            ? 0
+            : activeIndex + 1
+
+        changeImage(nextIndex)
+        return
+      }
+
+      progressFrameRef.current =
+        window.requestAnimationFrame(
+          updateProgress
+        )
+    }
+
+    progressFrameRef.current =
+      window.requestAnimationFrame(
+        updateProgress
+      )
+
+    return () => {
+      if (
+        progressFrameRef.current !== null
+      ) {
+        window.cancelAnimationFrame(
+          progressFrameRef.current
+        )
+      }
+
+      progressFrameRef.current = null
+    }
+  }, [
+    activeIndex,
+    autoplayEnabled,
+    changeImage,
+    itemCount,
+    reducedMotion,
+  ])
+
+  useEffect(() => {
+    const container =
+      thumbnailsRef.current
+
     const activeThumbnail =
       thumbnailRefs.current[activeIndex]
 
-    if (!container || !activeThumbnail) return
+    if (
+      !container ||
+      !activeThumbnail
+    ) {
+      return
+    }
 
     const target =
       activeThumbnail.offsetLeft -
@@ -67,59 +274,116 @@ export function GalleryCarousel({
         0,
         Math.min(target, maxScroll)
       ),
-      behavior: "smooth",
+      behavior: reducedMotion
+        ? "auto"
+        : "smooth",
     })
-  }, [activeIndex])
+  }, [
+    activeIndex,
+    reducedMotion,
+  ])
 
   useEffect(() => {
-    const container = thumbnailsRef.current
+    const container =
+      thumbnailsRef.current
 
     if (!container) return
 
-    updateThumbnailFades()
+    updateThumbnailOverflow()
 
     container.addEventListener(
       "scroll",
-      updateThumbnailFades,
-      { passive: true }
+      updateThumbnailOverflow,
+      {
+        passive: true,
+      }
     )
 
     window.addEventListener(
       "resize",
-      updateThumbnailFades
+      updateThumbnailOverflow
     )
 
     return () => {
       container.removeEventListener(
         "scroll",
-        updateThumbnailFades
+        updateThumbnailOverflow
       )
 
       window.removeEventListener(
         "resize",
-        updateThumbnailFades
+        updateThumbnailOverflow
       )
     }
-  }, [items.length])
+  }, [
+    itemCount,
+    updateThumbnailOverflow,
+  ])
 
-  const previous = () => {
-    setActiveIndex((current) =>
-      current === 0
-        ? items.length - 1
-        : current - 1
+  useEffect(() => {
+    const handleKeyboard = (
+      event: KeyboardEvent
+    ) => {
+      const target =
+        event.target as HTMLElement | null
+
+      if (
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable
+      ) {
+        return
+      }
+
+      if (event.key === "ArrowLeft") {
+        previous()
+      }
+
+      if (event.key === "ArrowRight") {
+        next()
+      }
+    }
+
+    window.addEventListener(
+      "keydown",
+      handleKeyboard
     )
-  }
 
-  const next = () => {
-    setActiveIndex((current) =>
-      current === items.length - 1
-        ? 0
-        : current + 1
-    )
-  }
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        handleKeyboard
+      )
+    }
+  }, [
+    next,
+    previous,
+  ])
 
-  const selectImage = (index: number) => {
-    setActiveIndex(index)
+  useEffect(() => {
+    return () => {
+      if (
+        transitionTimeoutRef.current !== null
+      ) {
+        window.clearTimeout(
+          transitionTimeoutRef.current
+        )
+      }
+
+      if (
+        progressFrameRef.current !== null
+      ) {
+        window.cancelAnimationFrame(
+          progressFrameRef.current
+        )
+      }
+    }
+  }, [])
+
+  const selectImage = (
+    index: number
+  ) => {
+    changeImage(index)
   }
 
   const handleTouchStart = (
@@ -132,16 +396,20 @@ export function GalleryCarousel({
   const handleTouchEnd = (
     event: React.TouchEvent<HTMLDivElement>
   ) => {
-    if (touchStartX.current === null) return
+    if (
+      touchStartX.current === null
+    ) {
+      return
+    }
 
-    const touchEndX =
+    const endX =
       event.changedTouches[0].clientX
 
-    const difference =
-      touchStartX.current - touchEndX
+    const distance =
+      touchStartX.current - endX
 
-    if (Math.abs(difference) > 50) {
-      if (difference > 0) {
+    if (Math.abs(distance) > 50) {
+      if (distance > 0) {
         next()
       } else {
         previous()
@@ -160,44 +428,73 @@ export function GalleryCarousel({
     if (!container) return
 
     const distance =
-      container.clientWidth * 0.7
+      container.clientWidth * 0.65
 
-    const target =
-      direction === "left"
-        ? container.scrollLeft - distance
-        : container.scrollLeft + distance
-
-    const maxScroll =
-      container.scrollWidth -
-      container.clientWidth
-
-    container.scrollTo({
-      left: Math.max(
-        0,
-        Math.min(target, maxScroll)
-      ),
-      behavior: "smooth",
+    container.scrollBy({
+      left:
+        direction === "left"
+          ? -distance
+          : distance,
+      behavior: reducedMotion
+        ? "auto"
+        : "smooth",
     })
   }
+
+  if (!itemCount) return null
+
+  const currentItem =
+    items[activeIndex]
+
+  const previousItem =
+    previousIndex !== null
+      ? items[previousIndex]
+      : null
 
   return (
     <div className="mx-auto max-w-7xl">
       <div
-        className="group relative overflow-hidden rounded-2xl bg-foreground"
+        className="group relative isolate overflow-hidden rounded-2xl bg-foreground shadow-[0_24px_80px_rgba(0,0,0,0.16)]"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="relative aspect-4/3 overflow-hidden rounded-2xl bg-foreground sm:aspect-video lg:h-[68vh] lg:max-h-175 lg:aspect-auto">
+        <div className="relative aspect-4/3 overflow-hidden bg-foreground sm:aspect-video lg:h-[68vh] lg:max-h-175 lg:aspect-auto">
+          {previousItem && (
+            <Image
+              src={previousItem.src}
+              alt=""
+              fill
+              aria-hidden="true"
+              className="scale-110 object-cover blur-3xl"
+              sizes="100vw"
+              style={{
+                opacity:
+                  transitionActive
+                    ? 0
+                    : 0.28,
+                transition: `opacity ${IMAGE_TRANSITION_DURATION}ms ease`,
+              }}
+            />
+          )}
+
           <Image
             src={currentItem.src}
             alt=""
             fill
             aria-hidden="true"
-            className="scale-110 object-cover opacity-25 blur-2xl"
+            className="scale-110 object-cover blur-3xl"
             sizes="100vw"
+            style={{
+              opacity:
+                previousItem &&
+                !transitionActive
+                  ? 0
+                  : 0.28,
+              transition: `opacity ${IMAGE_TRANSITION_DURATION}ms ease`,
+            }}
           />
 
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 z-1 bg-black/30" />
 
           <ImageLightbox
             src={currentItem.src}
@@ -209,120 +506,237 @@ export function GalleryCarousel({
             initialIndex={activeIndex}
             priority
           >
-            <Image
-              key={currentItem.src}
-              src={currentItem.src}
-              alt={currentItem.alt}
-              fill
-              priority
-              className="relative z-10 object-contain object-center"
-              sizes="(max-width: 768px) 100vw, 90vw"
-            />
-          </ImageLightbox>
-        </div>
+            <div className="relative size-full overflow-hidden">
+              {previousItem && (
+                <Image
+                  src={previousItem.src}
+                  alt=""
+                  fill
+                  aria-hidden="true"
+                  className="object-contain object-center"
+                  sizes="(max-width: 768px) 100vw, 90vw"
+                  style={{
+                    opacity:
+                      transitionActive
+                        ? 0
+                        : 1,
+                    transform:
+                      transitionActive
+                        ? "scale(1.015)"
+                        : "scale(1)",
+                    transition: `opacity ${IMAGE_TRANSITION_DURATION}ms ease, transform ${IMAGE_TRANSITION_DURATION}ms ease`,
+                  }}
+                />
+              )}
 
-        {items.length > 1 && (
-          <>
-            <button
-              type="button"
-              onClick={previous}
-              className="absolute left-3 top-1/2 z-20 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg backdrop-blur-md transition hover:bg-background md:left-5 md:size-12"
-              aria-label="Poprzednie zdjęcie"
-            >
-              <ChevronLeft className="size-5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={next}
-              className="absolute right-3 top-1/2 z-20 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg backdrop-blur-md transition hover:bg-background md:right-5 md:size-12"
-              aria-label="Następne zdjęcie"
-            >
-              <ChevronRight className="size-5" />
-            </button>
-
-            <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full bg-black/65 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
-              {activeIndex + 1} / {items.length}
+              <Image
+                key={currentItem.src}
+                src={currentItem.src}
+                alt={currentItem.alt}
+                fill
+                priority
+                className="object-contain object-center"
+                sizes="(max-width: 768px) 100vw, 90vw"
+                style={{
+                  opacity:
+                    previousItem &&
+                    !transitionActive
+                      ? 0
+                      : 1,
+                  transform:
+                    previousItem &&
+                    !transitionActive
+                      ? "scale(1.015)"
+                      : "scale(1)",
+                  transition: `opacity ${IMAGE_TRANSITION_DURATION}ms ease, transform ${IMAGE_TRANSITION_DURATION}ms ease`,
+                }}
+              />
             </div>
-          </>
-        )}
-      </div>
+          </ImageLightbox>
 
-      {items.length > 1 && (
-        <div className="relative mt-4">
-          <div className="relative mx-10 overflow-hidden md:mx-12">
-            <div
-              ref={thumbnailsRef}
-              className="flex gap-3 overflow-x-auto scroll-smooth px-1 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            >
-              {items.map((item, index) => {
-                const isActive =
-                  index === activeIndex
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-32 bg-linear-to-t from-black/45 to-transparent" />
 
-                return (
+          {itemCount > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={previous}
+                className="absolute left-3 top-1/2 z-20 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/35 text-white shadow-xl backdrop-blur-xl transition duration-300 hover:scale-105 hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:left-5 md:size-12"
+                aria-label="Poprzednie zdjęcie"
+              >
+                <ChevronLeft className="size-5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={next}
+                className="absolute right-3 top-1/2 z-20 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/35 text-white shadow-xl backdrop-blur-xl transition duration-300 hover:scale-105 hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:right-5 md:size-12"
+                aria-label="Następne zdjęcie"
+              >
+                <ChevronRight className="size-5" />
+              </button>
+
+              <div className="absolute bottom-4 left-1/2 z-20 w-36 -translate-x-1/2 overflow-hidden rounded-full border border-white/10 bg-black/55 text-white shadow-xl backdrop-blur-xl md:bottom-5">
+                <div className="flex h-10 items-center">
                   <button
-                    key={item.id}
-                    ref={(element) => {
-                      thumbnailRefs.current[index] =
-                        element
-                    }}
                     type="button"
                     onClick={() =>
-                      selectImage(index)
+                      setAutoplayEnabled(
+                        (current) => !current
+                      )
                     }
-                    className={`relative aspect-4/3 w-28 shrink-0 overflow-hidden rounded-lg transition md:w-36 ${
-                      isActive
-                        ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
-                        : "opacity-65 hover:opacity-100"
-                    }`}
-                    aria-label={`Pokaż zdjęcie ${
-                      index + 1
-                    }`}
+                    className="flex size-10 shrink-0 items-center justify-center border-r border-white/10 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+                    aria-label={
+                      autoplayEnabled
+                        ? "Zatrzymaj automatyczne przewijanie"
+                        : "Włącz automatyczne przewijanie"
+                    }
                   >
-                    <Image
-                      src={item.src}
-                      alt=""
-                      fill
-                      className="object-cover object-bottom"
-                      sizes="144px"
-                    />
+                    {autoplayEnabled ? (
+                      <Pause className="size-3.5" />
+                    ) : (
+                      <Play className="ml-0.5 size-3.5" />
+                    )}
                   </button>
-                )
-              })}
-            </div>
 
-            {showLeftFade && (
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-linear-to-r from-section-light via-section-light/70 to-transparent"
-              />
-            )}
+                  <div className="flex min-w-0 flex-1 items-center justify-center gap-1 font-mono text-[11px] font-bold tracking-wide">
+                    <span>
+                      {String(
+                        activeIndex + 1
+                      ).padStart(2, "0")}
+                    </span>
 
-            {showRightFade && (
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-linear-to-l from-section-light via-section-light/70 to-transparent"
-              />
-            )}
-          </div>
+                    <span className="text-white/35">
+                      /
+                    </span>
 
+                    <span className="text-white/55">
+                      {String(
+                        itemCount
+                      ).padStart(2, "0")}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="h-0.5 bg-white/10">
+                  <div
+                    className="h-full bg-primary"
+                    style={{
+                      width: autoplayEnabled
+                        ? `${progress}%`
+                        : "0%",
+                    }}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {itemCount > 1 && (
+        <div className="mt-5 flex items-center gap-3">
           <button
             type="button"
             onClick={() =>
               scrollThumbnails("left")
             }
-            className="absolute left-0 top-1/2 z-20 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-lg transition hover:bg-secondary md:flex"
+            disabled={!canScrollLeft}
+            className="hidden size-10 shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-background text-foreground shadow-sm transition hover:border-foreground/20 hover:bg-secondary disabled:pointer-events-none disabled:opacity-25 md:flex"
             aria-label="Przewiń miniatury w lewo"
           >
             <ChevronLeft className="size-4" />
           </button>
+
+          <div className="relative min-w-0 flex-1 overflow-hidden">
+            <div
+  ref={thumbnailsRef}
+  className="flex gap-3 overflow-x-auto px-1 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+  style={{
+    WebkitMaskImage:
+      canScrollLeft && canScrollRight
+        ? "linear-gradient(to right, transparent 0, black 36px, black calc(100% - 36px), transparent 100%)"
+        : canScrollLeft
+          ? "linear-gradient(to right, transparent 0, black 36px, black 100%)"
+          : canScrollRight
+            ? "linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%)"
+            : "none",
+    maskImage:
+      canScrollLeft && canScrollRight
+        ? "linear-gradient(to right, transparent 0, black 36px, black calc(100% - 36px), transparent 100%)"
+        : canScrollLeft
+          ? "linear-gradient(to right, transparent 0, black 36px, black 100%)"
+          : canScrollRight
+            ? "linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%)"
+            : "none",
+  }}
+>
+              {items.map(
+                (item, index) => {
+                  const isActive =
+                    index === activeIndex
+
+                  return (
+                    <button
+                      key={item.id}
+                      ref={(element) => {
+                        thumbnailRefs.current[
+                          index
+                        ] = element
+                      }}
+                      type="button"
+                      onClick={() =>
+                        selectImage(index)
+                      }
+                      className={`group/thumb relative aspect-4/3 w-27 shrink-0 overflow-hidden rounded-xl bg-foreground transition duration-300 md:w-34 lg:w-36 ${
+                        isActive
+                          ? "-translate-y-0.5 ring-2 ring-primary ring-offset-2 ring-offset-section-light"
+                          : "opacity-55 hover:-translate-y-0.5 hover:opacity-100"
+                      }`}
+                      aria-current={
+                        isActive
+                          ? "true"
+                          : undefined
+                      }
+                      aria-label={`Pokaż zdjęcie ${
+                        index + 1
+                      }`}
+                    >
+                      <Image
+                        src={item.src}
+                        alt=""
+                        fill
+                        className={`object-cover object-center transition duration-500 ${
+                          isActive
+                            ? "scale-100"
+                            : "scale-105 group-hover/thumb:scale-100"
+                        }`}
+                        sizes="144px"
+                      />
+
+                      <div
+                        className={`absolute inset-0 transition ${
+                          isActive
+                            ? "bg-transparent"
+                            : "bg-black/10 group-hover/thumb:bg-transparent"
+                        }`}
+                      />
+                    </button>
+                  )
+                }
+              )}
+            </div>
+
+        
+          </div>
 
           <button
             type="button"
             onClick={() =>
               scrollThumbnails("right")
             }
-            className="absolute right-0 top-1/2 z-20 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-lg transition hover:bg-secondary md:flex"
+            disabled={!canScrollRight}
+            className="hidden size-10 shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-background text-foreground shadow-sm transition hover:border-foreground/20 hover:bg-secondary disabled:pointer-events-none disabled:opacity-25 md:flex"
             aria-label="Przewiń miniatury w prawo"
           >
             <ChevronRight className="size-4" />
