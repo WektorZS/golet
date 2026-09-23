@@ -300,176 +300,320 @@ const defaultPlan = [
 
       <SiteHeader />
 
-    <section className="relative isolate overflow-hidden bg-foreground pt-20 text-background">
+    <section className="relative isolate overflow-hidden bg-foreground pt-20 text-white">
   <Image
     src={trip.image}
     alt={`Stadion ${trip.stadium || trip.city}`}
     fill
     preload
-    className="object-cover"
+    className="object-cover object-[center_35%] brightness-75 md:object-center md:brightness-100"
     sizes="100vw"
   />
 
-  <div className="absolute inset-0 bg-black/15" />
+  {/* MOBILE */}
+  <div className="absolute inset-0 bg-black/40 md:hidden" />
 
-  <div className="absolute inset-y-0 left-0 w-[62%] bg-linear-to-r from-black/95 via-black/70 to-transparent" />
+  <div className="absolute inset-0 bg-linear-to-b from-black/25 via-black/45 to-black/90 md:hidden" />
 
-  <div className="absolute inset-y-0 right-0 w-[42%] bg-linear-to-l from-black/80 via-black/45 to-transparent" />
+  <div className="absolute inset-x-0 bottom-0 h-[72%] bg-linear-to-t from-black/95 via-black/70 to-transparent md:hidden" />
 
-  <div className="absolute inset-x-0 bottom-0 h-[55%] bg-linear-to-t from-black/75 via-black/25 to-transparent" />
+  {/* DESKTOP */}
+  <div className="absolute inset-0 hidden bg-black/15 md:block" />
 
-  <div className="relative mx-auto grid min-h-140 max-w-7xl items-center gap-12 px-4 py-16 md:px-6 lg:grid-cols-[1fr_0.5fr] lg:py-20">
-    <div className="max-w-4xl">
-      <div className="flex flex-wrap items-center gap-3">
-        <span
-          className={`inline-flex rounded-md px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.16em] shadow-sm ${status.className}`}
-        >
-          {status.label}
-        </span>
+  <div className="absolute inset-0 hidden bg-linear-to-r from-black/85 via-black/35 to-black/25 md:block" />
 
-        {(trip.leagueName || trip.leagueLogo) && (
+  <div className="absolute inset-x-0 bottom-0 hidden h-[72%] bg-linear-to-t from-black/90 via-black/45 to-transparent md:block" />
+
+  <div className="absolute inset-x-0 top-0 hidden h-32 bg-linear-to-b from-black/45 to-transparent md:block" />
+
+  <div className="relative mx-auto flex min-h-150 max-w-7xl items-end px-4 pb-8 pt-10 md:px-6 md:pb-14 md:pt-16 lg:min-h-145 lg:pb-16">
+    <div className="grid w-full items-end gap-7 md:gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-14">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-3">
+          <span
+            className={`inline-flex min-h-7 items-center rounded-md px-3 font-mono text-[9px] font-black uppercase leading-none tracking-[0.16em] ${status.className}`}
+          >
+            {status.label}
+          </span>
+
+          {(trip.leagueName || trip.leagueLogo) && (
+            <div className="flex items-center gap-2.5">
+              {trip.leagueLogo && (
+                <span className="relative size-7 shrink-0 overflow-hidden rounded-md bg-white shadow-sm">
+                  <Image
+                    src={trip.leagueLogo}
+                    alt={`Logo ${trip.leagueName}`}
+                    fill
+                    className="object-contain p-1"
+                    sizes="28px"
+                  />
+                </span>
+              )}
+
+              {trip.leagueName && (
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white/90 md:text-white/75">
+                  {trip.leagueName}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-5 flex items-center gap-4 md:mt-7">
+          <TeamLogo
+            src={trip.homeLogo}
+            name={homeTeam}
+          />
+
+          <span className="font-mono text-[11px] font-black uppercase tracking-[0.14em] text-white/60 md:text-white/40">
+            VS
+          </span>
+
+          <TeamLogo
+            src={trip.awayLogo}
+            name={awayTeam}
+          />
+        </div>
+
+        <div className="mt-5 md:mt-7">
+          <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+            {trip.city}, {trip.country}
+          </p>
+
+          {/* MOBILE */}
+<h1 className="mt-4 md:hidden">
+  <span className="block font-sans text-[38px] font-black uppercase leading-[0.88] tracking-[-0.045em] text-white drop-shadow-[0_3px_12px_rgba(0,0,0,0.65)]">
+    {homeTeam}
+  </span>
+
+  <span className="my-2 flex items-center gap-3">
+    <span className="h-px w-6 bg-primary/70" />
+
+    <span className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-primary">
+      VS.
+    </span>
+
+    <span className="h-px w-6 bg-primary/70" />
+  </span>
+
+  <span className="block font-sans text-[38px] font-black uppercase leading-[0.88] tracking-[-0.045em] text-white drop-shadow-[0_3px_12px_rgba(0,0,0,0.65)]">
+    {awayTeam}
+  </span>
+</h1>
+
+{/* TABLET / DESKTOP */}
+<h1 className="mt-3 hidden max-w-5xl font-sans font-black uppercase tracking-[-0.045em] text-white md:block md:text-6xl md:leading-[0.88] lg:text-[clamp(54px,4.3vw,72px)] xl:whitespace-nowrap">
+  {homeTeam} - {awayTeam}
+</h1>
+        </div>
+
+        {/* MOBILE */}
+        <div className="mt-7 grid grid-cols-2 gap-x-5 gap-y-5 border-t border-white/20 pt-5 md:hidden">
+          <div className="col-span-2 flex items-start gap-2.5">
+            <CalendarDays
+              className="mt-0.5 size-4 shrink-0 text-primary"
+              aria-hidden="true"
+            />
+
+            <div className="min-w-0">
+              <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-white/60">
+                Termin wyjazdu
+              </p>
+
+              <p className="mt-1 text-sm font-semibold leading-5 text-white">
+                {date}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex min-w-0 items-start gap-2.5">
+            <MapPin
+              className="mt-0.5 size-4 shrink-0 text-primary"
+              aria-hidden="true"
+            />
+
+            <div className="min-w-0">
+              <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-white/60">
+                Stadion
+              </p>
+
+              <p className="mt-1 text-sm font-semibold leading-5 text-white">
+                {trip.stadium || `Stadion w ${trip.city}`}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex min-w-0 items-start gap-2.5">
+            <Clock3
+              className="mt-0.5 size-4 shrink-0 text-primary"
+              aria-hidden="true"
+            />
+
+            <div className="min-w-0">
+              <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-white/60">
+                Pobyt
+              </p>
+
+              <p className="mt-1 text-sm font-semibold leading-5 text-white">
+                {formatStay(
+                  computedDays,
+                  computedNights
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* DESKTOP */}
+        <div className="mt-8 hidden flex-wrap gap-x-6 gap-y-4 border-t border-white/15 pt-5 md:flex">
           <div className="flex items-center gap-2.5">
-            {trip.leagueLogo && (
-              <span className="relative size-7 shrink-0 overflow-hidden rounded-md bg-white p-1 shadow-sm">
-                <Image
-                  src={trip.leagueLogo}
-                  alt={`Logo ${trip.leagueName}`}
-                  fill
-                  className="object-contain p-1"
-                  sizes="28px"
-                />
-              </span>
+            <CalendarDays
+              className="size-4 shrink-0 text-primary"
+              aria-hidden="true"
+            />
+
+            <div>
+              <p className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white/40">
+                Termin wyjazdu
+              </p>
+
+              <p className="mt-0.5 text-base font-semibold text-white/90">
+                {date}
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden h-9 w-px bg-white/15 sm:block" />
+
+          <div className="flex items-center gap-2.5">
+            <MapPin
+              className="size-4 shrink-0 text-primary"
+              aria-hidden="true"
+            />
+
+            <div>
+              <p className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white/40">
+                Stadion
+              </p>
+
+              <p className="mt-0.5 text-base font-semibold text-white/90">
+                {trip.stadium || `Stadion w ${trip.city}`}
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden h-9 w-px bg-white/15 sm:block" />
+
+          <div className="flex items-center gap-2.5">
+            <Clock3
+              className="size-4 shrink-0 text-primary"
+              aria-hidden="true"
+            />
+
+            <div>
+              <p className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white/40">
+                Pobyt
+              </p>
+
+              <p className="mt-0.5 text-base font-semibold text-white/90">
+                {formatStay(
+                  computedDays,
+                  computedNights
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CENA */}
+      <div className="w-full lg:justify-self-end">
+        <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-black/60 p-5 shadow-2xl backdrop-blur-xl md:bg-black/55 md:p-7">
+          <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/5 via-transparent to-transparent" />
+
+          <div className="relative">
+            <p className="font-mono text-[10px] font-black uppercase tracking-[0.17em] text-white/80">
+              {fullPackageSelected
+                ? "Cena od / osoba"
+                : "Cena wybranego wariantu"}
+            </p>
+
+            {fullPackageSelected ? (
+  <div className="mt-2 flex items-end gap-1.5">
+    <p className="font-sans text-4xl font-black leading-none tracking-[-0.04em] text-primary md:text-5xl">
+      {trip.price.toLocaleString("pl-PL")}
+    </p>
+
+    <span className="pb-0.5 font-sans text-lg font-black text-primary md:text-2xl">
+      zł
+    </span>
+  </div>
+) : (
+  <p className="mt-3 font-sans text-xl font-black uppercase leading-[0.95] tracking-tight text-primary md:text-3xl">
+    Ustalana
+    <br />
+    indywidualnie
+  </p>
+)}
+
+            {partialPackageSelected && (
+              <p className="mt-3 text-[11px] leading-5 text-white/50 md:mt-4 md:text-xs">
+                Cena zależy od wybranego zakresu i zazwyczaj
+                jest niższa niż cena pełnego pakietu.
+              </p>
             )}
 
-            {trip.leagueName && (
-              <span className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white/80">
-                {trip.leagueName}
-              </span>
+            <div className="mt-5 grid gap-3 md:mt-7">
+              {soldOut ? (
+                <Button
+                  disabled
+                  size="lg"
+                  className="h-11 w-full rounded-xl md:h-12"
+                >
+                  Wyprzedane
+                </Button>
+              ) : (
+                <Button
+  size="lg"
+  nativeButton={false}
+  render={
+    <button
+      type="button"
+      data-open-floating-contact
+    />
+  }
+  className="h-11 w-full rounded-xl font-semibold md:h-12"
+>
+  Rezerwuj miejsce
+  <ArrowRight data-icon="inline-end" />
+</Button>
+              )}
+
+              <Button
+                variant="outline"
+                size="lg"
+                nativeButton={false}
+                render={
+                  <a
+                    href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  />
+                }
+                className="h-11 w-full rounded-xl border-white/20 bg-white/5 font-semibold text-white hover:border-white/30 hover:bg-white/10 hover:text-white md:h-12"
+              >
+                <MessageCircle data-icon="inline-start" />
+                Napisz na WhatsApp
+              </Button>
+            </div>
+
+            {!soldOut && (
+              <p className="mt-3 text-center text-[11px] leading-4 text-white/45 md:mt-4 md:text-xs">
+                Wyślij zapytanie - skontaktujemy się z Tobą
+              </p>
             )}
           </div>
-        )}
-      </div>
-
-      <div className="mt-6 flex items-center gap-4">
-        <TeamLogo
-          src={trip.homeLogo}
-          name={homeTeam}
-        />
-
-        <span className="font-sans text-xl font-black text-white/50">
-          VS
-        </span>
-
-        <TeamLogo
-          src={trip.awayLogo}
-          name={awayTeam}
-        />
-      </div>
-
-      <p className="mt-6 font-mono text-[11px] font-black uppercase tracking-[0.2em] text-primary">
-        {trip.city}, {trip.country}
-      </p>
-
-      <h1 className="mt-3 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] text-white sm:text-6xl lg:text-[72px]">
-        {homeTeam} - {awayTeam}
-      </h1>
-
-      <div className="mt-7 flex flex-wrap gap-x-7 gap-y-3 text-sm font-semibold text-white/90">
-        <span className="flex items-center gap-2">
-          <CalendarDays
-            className="size-4 text-primary"
-            aria-hidden="true"
-          />
-
-          {matchDate}
-        </span>
-
-        <span className="flex items-center gap-2">
-          <MapPin
-            className="size-4 text-primary"
-            aria-hidden="true"
-          />
-
-          {trip.stadium || `Stadion w ${trip.city}`}
-        </span>
-
-        <span className="flex items-center gap-2">
-          <Clock3
-            className="size-4 text-primary"
-            aria-hidden="true"
-          />
-
-          {formatStay(
-            computedDays,
-            computedNights
-          )}
-        </span>
-      </div>
-    </div>
-
-    <div className="border-l-2 border-primary bg-black/20 px-6 py-6 backdrop-blur-[2px] md:px-8">
-      <p className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-white/65">
-        {fullPackageSelected
-          ? "Cena od / osoba"
-          : "Cena wybranego wariantu"}
-      </p>
-
-      {fullPackageSelected ? (
-        <p className="mt-3 font-sans text-5xl font-black leading-none tracking-tight text-primary">
-          {trip.price.toLocaleString("pl-PL")} zł
-        </p>
-      ) : (
-        <p className="mt-3 max-w-sm font-sans text-3xl font-black uppercase leading-none tracking-tight text-primary">
-          Ustalana indywidualnie
-        </p>
-      )}
-
-      {partialPackageSelected && (
-        <p className="mt-4 max-w-sm text-sm leading-6 text-white/60">
-          Cena zależy od wybranego zakresu i zazwyczaj
-          jest niższa niż cena pełnego pakietu.
-        </p>
-      )}
-
-      <div className="mt-7 grid gap-3 sm:max-w-80">
-        {soldOut ? (
-          <Button
-            disabled
-            size="lg"
-            className="w-full"
-          >
-            Wyprzedane
-          </Button>
-        ) : (
-          <Button
-            size="lg"
-            nativeButton={false}
-            render={<a href="#rezerwacja" />}
-            className="w-full"
-          >
-            Rezerwuj miejsce
-
-            <ArrowRight data-icon="inline-end" />
-          </Button>
-        )}
-
-        <Button
-          variant="outline"
-          size="lg"
-          nativeButton={false}
-          render={
-            <a
-              href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`}
-              target="_blank"
-              rel="noreferrer"
-            />
-          }
-          className="w-full border-white/20 bg-black/25 text-white hover:bg-black/40 hover:text-white"
-        >
-          <MessageCircle data-icon="inline-start" />
-
-          Napisz na WhatsApp
-        </Button>
+        </div>
       </div>
     </div>
   </div>
@@ -634,73 +778,92 @@ const defaultPlan = [
           />
         </div>
 
-        <h3 className="mt-5 font-sans text-2xl font-black uppercase">
-          {homeTeam} - {awayTeam}
-        </h3>
+       <h3 className="mt-5 font-sans text-2xl font-black uppercase">
+  {homeTeam} - {awayTeam}
+</h3>
 
-          <div className="w-full rounded-2xl border border-white/15 bg-black/80 p-6 shadow-2xl backdrop-blur-sm lg:w-88">
-  <p className="font-mono text-[10px] font-black uppercase tracking-[0.14em] text-white/55">
-    {fullPackageSelected
-      ? "Cena od / osoba"
-      : "Cena wybranego wariantu"}
-  </p>
+<div className="relative mt-8">
+            <p className="font-mono text-[10px] font-black uppercase tracking-[0.17em] text-white/80">
+              {fullPackageSelected
+                ? "Cena od / osoba"
+                : "Cena wybranego wariantu"}
+            </p>
 
-  {fullPackageSelected ? (
-    <p className="mt-2 font-sans text-5xl font-black leading-none tracking-tight text-primary">
-      {trip.price.toLocaleString("pl-PL")} zł
+            {fullPackageSelected ? (
+  <div className="mt-2 flex items-end gap-1.5">
+    <p className="font-sans text-4xl font-black leading-none tracking-[-0.04em] text-primary md:text-5xl">
+      {trip.price.toLocaleString("pl-PL")}
     </p>
-  ) : (
-    <p className="mt-3 font-sans text-3xl font-black uppercase leading-tight text-primary">
-      Ustalana indywidualnie
-    </p>
-  )}
 
-  {partialPackageSelected && (
-    <p className="mt-3 text-sm leading-6 text-white/55">
-      Cena zależy od wybranego zakresu i zazwyczaj jest niższa niż cena
-      pełnego pakietu.
-    </p>
-  )}
-
-  <div className="mt-6 grid gap-3">
-    {soldOut ? (
-      <Button
-        disabled
-        size="lg"
-        className="h-11 w-full rounded-xl"
-      >
-        Wyprzedane
-      </Button>
-    ) : (
-      <Button
-        size="lg"
-        nativeButton={false}
-        render={<a href="#rezerwacja" />}
-        className="h-11 w-full rounded-xl text-sm font-semibold"
-      >
-        Rezerwuj miejsce
-        <ArrowRight data-icon="inline-end" />
-      </Button>
-    )}
-
-    <Button
-      variant="outline"
-      size="lg"
-      nativeButton={false}
-      render={
-        <a
-          href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`}
-          target="_blank"
-          rel="noreferrer"
-        />
-      }
-      className="h-11 w-full rounded-xl border-white/20 bg-white/5 text-sm font-semibold text-white hover:bg-white/10 hover:text-white"
-    >
-      <MessageCircle data-icon="inline-start" />
-      Napisz na WhatsApp
-    </Button>
+    <span className="pb-0.5 font-sans text-lg font-black text-primary md:text-2xl">
+      zł
+    </span>
   </div>
-</div>
+) : (
+  <p className="mt-3 font-sans text-xl font-black uppercase leading-[0.95] tracking-tight text-primary md:text-3xl">
+    Ustalana
+    <br />
+    indywidualnie
+  </p>
+)}
+
+            {partialPackageSelected && (
+              <p className="mt-3 text-[11px] leading-5 text-white/50 md:mt-4 md:text-xs">
+                Cena zależy od wybranego zakresu i zazwyczaj
+                jest niższa niż cena pełnego pakietu.
+              </p>
+            )}
+
+            <div className="mt-5 grid gap-3 md:mt-7">
+              {soldOut ? (
+                <Button
+                  disabled
+                  size="lg"
+                  className="h-11 w-full rounded-xl md:h-12"
+                >
+                  Wyprzedane
+                </Button>
+              ) : (
+                <Button
+  size="lg"
+  nativeButton={false}
+  render={
+    <button
+      type="button"
+      data-open-floating-contact
+    />
+  }
+  className="h-11 w-full rounded-xl font-semibold md:h-12"
+>
+  Rezerwuj miejsce
+  <ArrowRight data-icon="inline-end" />
+</Button>
+              )}
+
+              <Button
+                variant="outline"
+                size="lg"
+                nativeButton={false}
+                render={
+                  <a
+                    href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  />
+                }
+                className="h-11 w-full rounded-xl border-white/20 bg-white/5 font-semibold text-white hover:border-white/30 hover:bg-white/10 hover:text-white md:h-12"
+              >
+                <MessageCircle data-icon="inline-start" />
+                Napisz na WhatsApp
+              </Button>
+            </div>
+
+            {!soldOut && (
+              <p className="mt-3 text-center text-[11px] leading-4 text-white/45 md:mt-4 md:text-xs">
+                Wyślij zapytanie - skontaktujemy się z Tobą
+              </p>
+            )}
+          </div>
       </div>
     </div>
 
