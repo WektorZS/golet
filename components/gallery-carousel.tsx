@@ -21,6 +21,9 @@ export function GalleryCarousel({
   items: GalleryCarouselItem[]
 }) {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [showLeftFade, setShowLeftFade] = useState(false)
+  const [showRightFade, setShowRightFade] = useState(false)
+
   const touchStartX = useRef<number | null>(null)
   const thumbnailsRef = useRef<HTMLDivElement>(null)
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([])
@@ -29,35 +32,89 @@ export function GalleryCarousel({
 
   const currentItem = items[activeIndex]
 
-useEffect(() => {
-  const container = thumbnailsRef.current
-  const activeThumbnail = thumbnailRefs.current[activeIndex]
+  const updateThumbnailFades = () => {
+    const container = thumbnailsRef.current
 
-  if (!container || !activeThumbnail) return
+    if (!container) return
 
-  const target =
-    activeThumbnail.offsetLeft -
-    container.clientWidth / 2 +
-    activeThumbnail.offsetWidth / 2
+    const maxScroll =
+      container.scrollWidth - container.clientWidth
 
-  const maxScroll =
-    container.scrollWidth - container.clientWidth
+    setShowLeftFade(container.scrollLeft > 4)
+    setShowRightFade(
+      container.scrollLeft < maxScroll - 4
+    )
+  }
 
-  container.scrollTo({
-    left: Math.max(0, Math.min(target, maxScroll)),
-    behavior: "smooth",
-  })
-}, [activeIndex])
+  useEffect(() => {
+    const container = thumbnailsRef.current
+    const activeThumbnail =
+      thumbnailRefs.current[activeIndex]
+
+    if (!container || !activeThumbnail) return
+
+    const target =
+      activeThumbnail.offsetLeft -
+      container.clientWidth / 2 +
+      activeThumbnail.offsetWidth / 2
+
+    const maxScroll =
+      container.scrollWidth -
+      container.clientWidth
+
+    container.scrollTo({
+      left: Math.max(
+        0,
+        Math.min(target, maxScroll)
+      ),
+      behavior: "smooth",
+    })
+  }, [activeIndex])
+
+  useEffect(() => {
+    const container = thumbnailsRef.current
+
+    if (!container) return
+
+    updateThumbnailFades()
+
+    container.addEventListener(
+      "scroll",
+      updateThumbnailFades,
+      { passive: true }
+    )
+
+    window.addEventListener(
+      "resize",
+      updateThumbnailFades
+    )
+
+    return () => {
+      container.removeEventListener(
+        "scroll",
+        updateThumbnailFades
+      )
+
+      window.removeEventListener(
+        "resize",
+        updateThumbnailFades
+      )
+    }
+  }, [items.length])
 
   const previous = () => {
     setActiveIndex((current) =>
-      current === 0 ? items.length - 1 : current - 1
+      current === 0
+        ? items.length - 1
+        : current - 1
     )
   }
 
   const next = () => {
     setActiveIndex((current) =>
-      current === items.length - 1 ? 0 : current + 1
+      current === items.length - 1
+        ? 0
+        : current + 1
     )
   }
 
@@ -68,7 +125,8 @@ useEffect(() => {
   const handleTouchStart = (
     event: React.TouchEvent<HTMLDivElement>
   ) => {
-    touchStartX.current = event.touches[0].clientX
+    touchStartX.current =
+      event.touches[0].clientX
   }
 
   const handleTouchEnd = (
@@ -76,8 +134,11 @@ useEffect(() => {
   ) => {
     if (touchStartX.current === null) return
 
-    const touchEndX = event.changedTouches[0].clientX
-    const difference = touchStartX.current - touchEndX
+    const touchEndX =
+      event.changedTouches[0].clientX
+
+    const difference =
+      touchStartX.current - touchEndX
 
     if (Math.abs(difference) > 50) {
       if (difference > 0) {
@@ -93,8 +154,28 @@ useEffect(() => {
   const scrollThumbnails = (
     direction: "left" | "right"
   ) => {
-    thumbnailsRef.current?.scrollBy({
-      left: direction === "left" ? -240 : 240,
+    const container =
+      thumbnailsRef.current
+
+    if (!container) return
+
+    const distance =
+      container.clientWidth * 0.7
+
+    const target =
+      direction === "left"
+        ? container.scrollLeft - distance
+        : container.scrollLeft + distance
+
+    const maxScroll =
+      container.scrollWidth -
+      container.clientWidth
+
+    container.scrollTo({
+      left: Math.max(
+        0,
+        Math.min(target, maxScroll)
+      ),
       behavior: "smooth",
     })
   }
@@ -107,38 +188,38 @@ useEffect(() => {
         onTouchEnd={handleTouchEnd}
       >
         <div className="relative aspect-4/3 overflow-hidden rounded-2xl bg-foreground sm:aspect-video lg:h-[68vh] lg:max-h-175 lg:aspect-auto">
-  <Image
-    src={currentItem.src}
-    alt=""
-    fill
-    aria-hidden="true"
-    className="scale-110 object-cover opacity-25 blur-2xl"
-    sizes="100vw"
-  />
+          <Image
+            src={currentItem.src}
+            alt=""
+            fill
+            aria-hidden="true"
+            className="scale-110 object-cover opacity-25 blur-2xl"
+            sizes="100vw"
+          />
 
-  <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-black/20" />
 
-  <ImageLightbox
-    src={currentItem.src}
-    alt={currentItem.alt}
-    images={items.map((item) => ({
-      src: item.src,
-      alt: item.alt,
-    }))}
-    initialIndex={activeIndex}
-    priority
-  >
-    <Image
-      key={currentItem.src}
-      src={currentItem.src}
-      alt={currentItem.alt}
-      fill
-      priority
-      className="relative z-10 object-contain object-center"
-      sizes="(max-width: 768px) 100vw, 90vw"
-    />
-  </ImageLightbox>
-</div>
+          <ImageLightbox
+            src={currentItem.src}
+            alt={currentItem.alt}
+            images={items.map((item) => ({
+              src: item.src,
+              alt: item.alt,
+            }))}
+            initialIndex={activeIndex}
+            priority
+          >
+            <Image
+              key={currentItem.src}
+              src={currentItem.src}
+              alt={currentItem.alt}
+              fill
+              priority
+              className="relative z-10 object-contain object-center"
+              sizes="(max-width: 768px) 100vw, 90vw"
+            />
+          </ImageLightbox>
+        </div>
 
         {items.length > 1 && (
           <>
@@ -169,44 +250,68 @@ useEffect(() => {
 
       {items.length > 1 && (
         <div className="relative mt-4">
-          <div
-            ref={thumbnailsRef}
-            className="flex snap-x gap-3 overflow-x-auto scroll-smooth pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            {items.map((item, index) => {
-              const isActive = index === activeIndex
+          <div className="relative mx-10 overflow-hidden md:mx-12">
+            <div
+              ref={thumbnailsRef}
+              className="flex gap-3 overflow-x-auto scroll-smooth px-1 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {items.map((item, index) => {
+                const isActive =
+                  index === activeIndex
 
-              return (
-                <button
-                  key={item.id}
-                  ref={(element) => {
-                    thumbnailRefs.current[index] = element
-                  }}
-                  type="button"
-                  onClick={() => selectImage(index)}
-                  className={`relative aspect-4/3 w-28 shrink-0 snap-center overflow-hidden rounded-lg transition md:w-36 ${
-                    isActive
-                      ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
-                      : "opacity-65 hover:opacity-100"
-                  }`}
-                  aria-label={`Pokaż zdjęcie ${index + 1}`}
-                >
-                  <Image
-                    src={item.src}
-                    alt=""
-                    fill
-                    className="object-cover object-bottom"
-                    sizes="144px"
-                  />
-                </button>
-              )
-            })}
+                return (
+                  <button
+                    key={item.id}
+                    ref={(element) => {
+                      thumbnailRefs.current[index] =
+                        element
+                    }}
+                    type="button"
+                    onClick={() =>
+                      selectImage(index)
+                    }
+                    className={`relative aspect-4/3 w-28 shrink-0 overflow-hidden rounded-lg transition md:w-36 ${
+                      isActive
+                        ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                        : "opacity-65 hover:opacity-100"
+                    }`}
+                    aria-label={`Pokaż zdjęcie ${
+                      index + 1
+                    }`}
+                  >
+                    <Image
+                      src={item.src}
+                      alt=""
+                      fill
+                      className="object-cover object-bottom"
+                      sizes="144px"
+                    />
+                  </button>
+                )
+              })}
+            </div>
+
+            {showLeftFade && (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-linear-to-r from-section-light via-section-light/70 to-transparent"
+              />
+            )}
+
+            {showRightFade && (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-linear-to-l from-section-light via-section-light/70 to-transparent"
+              />
+            )}
           </div>
 
           <button
             type="button"
-            onClick={() => scrollThumbnails("left")}
-            className="absolute -left-3 top-1/2 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-lg md:flex"
+            onClick={() =>
+              scrollThumbnails("left")
+            }
+            className="absolute left-0 top-1/2 z-20 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-lg transition hover:bg-secondary md:flex"
             aria-label="Przewiń miniatury w lewo"
           >
             <ChevronLeft className="size-4" />
@@ -214,8 +319,10 @@ useEffect(() => {
 
           <button
             type="button"
-            onClick={() => scrollThumbnails("right")}
-            className="absolute -right-3 top-1/2 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-lg md:flex"
+            onClick={() =>
+              scrollThumbnails("right")
+            }
+            className="absolute right-0 top-1/2 z-20 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-lg transition hover:bg-secondary md:flex"
             aria-label="Przewiń miniatury w prawo"
           >
             <ChevronRight className="size-4" />
