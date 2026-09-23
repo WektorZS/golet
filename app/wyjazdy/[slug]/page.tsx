@@ -638,26 +638,37 @@ const defaultPlan = [
           {homeTeam} - {awayTeam}
         </h3>
 
-          <div className="w-full rounded-2xl border border-white/15 bg-black/55 p-5 shadow-2xl backdrop-blur-md lg:w-80">
-  <p className="text-xs font-bold uppercase tracking-wider text-white/50">
+          <div className="w-full rounded-2xl border border-white/15 bg-black/80 p-6 shadow-2xl backdrop-blur-sm lg:w-88">
+  <p className="font-mono text-[10px] font-black uppercase tracking-[0.14em] text-white/55">
     {fullPackageSelected
       ? "Cena od / osoba"
       : "Cena wybranego wariantu"}
   </p>
 
   {fullPackageSelected ? (
-    <p className="mt-1 font-sans text-4xl font-black text-primary">
+    <p className="mt-2 font-sans text-5xl font-black leading-none tracking-tight text-primary">
       {trip.price.toLocaleString("pl-PL")} zł
     </p>
   ) : (
-    <p className="mt-2 font-sans text-2xl font-black uppercase leading-tight text-primary">
+    <p className="mt-3 font-sans text-3xl font-black uppercase leading-tight text-primary">
       Ustalana indywidualnie
     </p>
   )}
 
-  <div className="mt-5 grid gap-3">
+  {partialPackageSelected && (
+    <p className="mt-3 text-sm leading-6 text-white/55">
+      Cena zależy od wybranego zakresu i zazwyczaj jest niższa niż cena
+      pełnego pakietu.
+    </p>
+  )}
+
+  <div className="mt-6 grid gap-3">
     {soldOut ? (
-      <Button disabled size="lg">
+      <Button
+        disabled
+        size="lg"
+        className="h-11 w-full rounded-xl"
+      >
         Wyprzedane
       </Button>
     ) : (
@@ -665,6 +676,7 @@ const defaultPlan = [
         size="lg"
         nativeButton={false}
         render={<a href="#rezerwacja" />}
+        className="h-11 w-full rounded-xl text-sm font-semibold"
       >
         Rezerwuj miejsce
         <ArrowRight data-icon="inline-end" />
@@ -674,7 +686,6 @@ const defaultPlan = [
     <Button
       variant="outline"
       size="lg"
-      className="border-white/25 bg-white/5 text-white hover:bg-white/15 hover:text-white"
       nativeButton={false}
       render={
         <a
@@ -683,6 +694,7 @@ const defaultPlan = [
           rel="noreferrer"
         />
       }
+      className="h-11 w-full rounded-xl border-white/20 bg-white/5 text-sm font-semibold text-white hover:bg-white/10 hover:text-white"
     >
       <MessageCircle data-icon="inline-start" />
       Napisz na WhatsApp
