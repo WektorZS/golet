@@ -300,7 +300,7 @@ const defaultPlan = [
 
       <SiteHeader />
 
-      <section className="relative isolate min-h-155 overflow-hidden bg-foreground pt-20 text-background lg:min-h-135">
+    <section className="relative isolate overflow-hidden bg-foreground pt-20 text-background">
   <Image
     src={trip.image}
     alt={`Stadion ${trip.stadium || trip.city}`}
@@ -310,37 +310,170 @@ const defaultPlan = [
     sizes="100vw"
   />
 
-  <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-black/30" />
-  <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/50" />
+  <div className="absolute inset-0 bg-black/15" />
 
-  <div className="relative mx-auto flex min-h-135 max-w-7xl flex-col px-4 py-6 md:px-6 md:py-8 lg:min-h-115">
+  <div className="absolute inset-y-0 left-0 w-[62%] bg-linear-to-r from-black/95 via-black/70 to-transparent" />
 
+  <div className="absolute inset-y-0 right-0 w-[42%] bg-linear-to-l from-black/80 via-black/45 to-transparent" />
 
-          <div className="mt-auto grid items-end gap-10 pb-6 lg:grid-cols-[1fr_auto]">
-            <div className="max-w-4xl">
-              <span className={`inline-flex rounded-md px-3 py-1.5 font-mono text-[11px] font-black uppercase tracking-wider shadow ${status.className}`}>{status.label}</span>
-              {(trip.leagueName || trip.leagueLogo) && <div className="mt-5 flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-white/90">{trip.leagueLogo && <span className="relative size-8 shrink-0 overflow-hidden rounded-md border border-white/80 bg-white p-1 shadow-[0_5px_18px_rgba(0,0,0,0.35)]"><Image src={trip.leagueLogo} alt={`Logo ${trip.leagueName}`} fill className="object-contain p-1" sizes="32px" /></span>}<span>{trip.leagueName}</span></div>}
-              <div className="mt-6 flex items-center gap-4"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-2xl font-black text-white/50">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
-              <p className="mt-6 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">{trip.city}, {trip.country}</p>
-              <h1 className="mt-2 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-tight md:text-7xl">{homeTeam} - {awayTeam}</h1>
-              <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-white/85">
-                <span className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" />{matchDate}</span>
-                <span className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || `Stadion w ${trip.city}`}</span>
-                <span className="flex items-center gap-2"><Clock3 className="size-4 text-primary" />{formatStay(computedDays, computedNights)}</span>
-              </div>
-            </div>
+  <div className="absolute inset-x-0 bottom-0 h-[55%] bg-linear-to-t from-black/75 via-black/25 to-transparent" />
 
-            <div className="w-full rounded-2xl border border-white/15 bg-black/55 p-5 shadow-2xl backdrop-blur-md lg:w-80">
-              <p className="text-xs font-bold uppercase tracking-wider text-white/50">{fullPackageSelected ? "Cena od / osoba" : "Cena wybranego wariantu"}</p>
-              {fullPackageSelected ? <p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p> : <p className="mt-2 font-sans text-2xl font-black uppercase leading-tight text-primary">Ustalana indywidualnie</p>}
-              <div className="mt-5 grid gap-3">
-                {soldOut ? <Button disabled size="lg">Wyprzedane</Button> : <Button size="lg" nativeButton={false} render={<a href="#rezerwacja" />}>Rezerwuj miejsce<ArrowRight data-icon="inline-end" /></Button>}
-                <Button variant="outline" size="lg" className="border-white/25 bg-white/5 text-white hover:bg-white/15 hover:text-white" nativeButton={false} render={<a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
-              </div>
-            </div>
+  <div className="relative mx-auto grid min-h-140 max-w-7xl items-center gap-12 px-4 py-16 md:px-6 lg:grid-cols-[1fr_0.5fr] lg:py-20">
+    <div className="max-w-4xl">
+      <div className="flex flex-wrap items-center gap-3">
+        <span
+          className={`inline-flex rounded-md px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.16em] shadow-sm ${status.className}`}
+        >
+          {status.label}
+        </span>
+
+        {(trip.leagueName || trip.leagueLogo) && (
+          <div className="flex items-center gap-2.5">
+            {trip.leagueLogo && (
+              <span className="relative size-7 shrink-0 overflow-hidden rounded-md bg-white p-1 shadow-sm">
+                <Image
+                  src={trip.leagueLogo}
+                  alt={`Logo ${trip.leagueName}`}
+                  fill
+                  className="object-contain p-1"
+                  sizes="28px"
+                />
+              </span>
+            )}
+
+            {trip.leagueName && (
+              <span className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white/80">
+                {trip.leagueName}
+              </span>
+            )}
           </div>
-        </div>
-      </section>
+        )}
+      </div>
+
+      <div className="mt-6 flex items-center gap-4">
+        <TeamLogo
+          src={trip.homeLogo}
+          name={homeTeam}
+        />
+
+        <span className="font-sans text-xl font-black text-white/50">
+          VS
+        </span>
+
+        <TeamLogo
+          src={trip.awayLogo}
+          name={awayTeam}
+        />
+      </div>
+
+      <p className="mt-6 font-mono text-[11px] font-black uppercase tracking-[0.2em] text-primary">
+        {trip.city}, {trip.country}
+      </p>
+
+      <h1 className="mt-3 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] text-white sm:text-6xl lg:text-[72px]">
+        {homeTeam} - {awayTeam}
+      </h1>
+
+      <div className="mt-7 flex flex-wrap gap-x-7 gap-y-3 text-sm font-semibold text-white/90">
+        <span className="flex items-center gap-2">
+          <CalendarDays
+            className="size-4 text-primary"
+            aria-hidden="true"
+          />
+
+          {matchDate}
+        </span>
+
+        <span className="flex items-center gap-2">
+          <MapPin
+            className="size-4 text-primary"
+            aria-hidden="true"
+          />
+
+          {trip.stadium || `Stadion w ${trip.city}`}
+        </span>
+
+        <span className="flex items-center gap-2">
+          <Clock3
+            className="size-4 text-primary"
+            aria-hidden="true"
+          />
+
+          {formatStay(
+            computedDays,
+            computedNights
+          )}
+        </span>
+      </div>
+    </div>
+
+    <div className="border-l-2 border-primary bg-black/20 px-6 py-6 backdrop-blur-[2px] md:px-8">
+      <p className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-white/65">
+        {fullPackageSelected
+          ? "Cena od / osoba"
+          : "Cena wybranego wariantu"}
+      </p>
+
+      {fullPackageSelected ? (
+        <p className="mt-3 font-sans text-5xl font-black leading-none tracking-tight text-primary">
+          {trip.price.toLocaleString("pl-PL")} zł
+        </p>
+      ) : (
+        <p className="mt-3 max-w-sm font-sans text-3xl font-black uppercase leading-none tracking-tight text-primary">
+          Ustalana indywidualnie
+        </p>
+      )}
+
+      {partialPackageSelected && (
+        <p className="mt-4 max-w-sm text-sm leading-6 text-white/60">
+          Cena zależy od wybranego zakresu i zazwyczaj
+          jest niższa niż cena pełnego pakietu.
+        </p>
+      )}
+
+      <div className="mt-7 grid gap-3 sm:max-w-80">
+        {soldOut ? (
+          <Button
+            disabled
+            size="lg"
+            className="w-full"
+          >
+            Wyprzedane
+          </Button>
+        ) : (
+          <Button
+            size="lg"
+            nativeButton={false}
+            render={<a href="#rezerwacja" />}
+            className="w-full"
+          >
+            Rezerwuj miejsce
+
+            <ArrowRight data-icon="inline-end" />
+          </Button>
+        )}
+
+        <Button
+          variant="outline"
+          size="lg"
+          nativeButton={false}
+          render={
+            <a
+              href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`}
+              target="_blank"
+              rel="noreferrer"
+            />
+          }
+          className="w-full border-white/20 bg-black/25 text-white hover:bg-black/40 hover:text-white"
+        >
+          <MessageCircle data-icon="inline-start" />
+
+          Napisz na WhatsApp
+        </Button>
+      </div>
+    </div>
+  </div>
+</section>
 
       <section aria-labelledby="wariant-pakietu" className="border-b bg-secondary px-4 py-8 md:px-6 md:py-10">
         <div className="mx-auto max-w-7xl">
@@ -444,32 +577,120 @@ const defaultPlan = [
         </div>
       </section>
 
-      <section id="rezerwacja" className="scroll-mt-24 border-y border-white/10 bg-foreground px-4 text-background md:px-6">
-        <div className="mx-auto grid max-w-7xl lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="relative overflow-hidden border-b border-background/10 py-10 md:py-14 lg:border-b-0 lg:border-r lg:pr-12">
-            <div className={`absolute -right-20 -top-20 size-72 rounded-full blur-3xl ${soldOut ? "bg-red-500/10" : "bg-primary/15"}`} />
-            <div className="relative">
-              <div className="flex items-center gap-3">
-                <TicketCheck className={`size-6 ${soldOut ? "text-red-400" : "text-primary"}`} />
-                <p className={`font-mono text-xs font-bold uppercase tracking-[0.2em] ${soldOut ? "text-red-400" : "text-primary"}`}>
-                  {soldOut ? "Brak miejsc" : "Rezerwacja"}
-                </p>
-              </div>
-              <h2 className="mt-4 max-w-lg font-sans text-4xl font-black uppercase leading-none md:text-5xl">
-                {soldOut ? "Ten wyjazd jest już wyprzedany" : "Zarezerwuj miejsce"}
-              </h2>
-              <p className="mt-4 max-w-lg text-sm leading-6 text-background/60">
-                {soldOut
-                  ? "Na ten wyjazd nie przyjmujemy już rezerwacji. Wybierz inny dostępny mecz lub opisz wydarzenie, które mamy dla Ciebie wycenić."
-                  : "Wyślij zapytanie. Sprawdzimy aktualną dostępność i przygotujemy konkretny wariant wyjazdu."}
-              </p>
-              <div className="mt-7 flex items-center gap-3 opacity-90"><TeamLogo src={trip.homeLogo} name={homeTeam} /><span className="font-sans text-lg font-black text-background/60">VS</span><TeamLogo src={trip.awayLogo} name={awayTeam} /></div>
-              <h3 className="mt-5 font-sans text-2xl font-black uppercase">{homeTeam} - {awayTeam}</h3>
-              <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-background/65"><p className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" />{date}</p><p className="flex items-center gap-2"><MapPin className="size-4 text-primary" />{trip.stadium || trip.city}</p></div>
-              {!soldOut && <div className="mt-7 border-t border-background/10 pt-6"><p className="text-xs font-bold uppercase tracking-wider text-background/60">{fullPackageSelected ? "Cena od / osoba" : "Cena wariantu"}</p>{fullPackageSelected ? <p className="mt-1 font-sans text-4xl font-black text-primary">{trip.price.toLocaleString("pl-PL")} zł</p> : <><p className="mt-1 font-sans text-2xl font-black uppercase text-primary">Ustalana indywidualnie</p><p className="mt-2 max-w-sm text-xs leading-5 text-background/50">Cena zależy od wybranego zakresu i zazwyczaj jest niższa niż cena pełnego pakietu.</p></>}</div>}
-              <Button variant="outline" size="lg" className="mt-6 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white" nativeButton={false} render={<a href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank" rel="noreferrer" />}><MessageCircle data-icon="inline-start" />Napisz na WhatsApp</Button>
-            </div>
-          </div>
+      <section
+  id="rezerwacja"
+  className="scroll-mt-24 border-y border-white/10 bg-foreground px-4 text-background md:px-6"
+>
+  <div className="mx-auto grid max-w-7xl lg:grid-cols-[0.8fr_1.2fr]">
+    <div className="relative overflow-hidden border-b border-background/10 py-10 md:py-14 lg:border-b-0 lg:border-r lg:pr-12">
+      <div
+        className={`absolute -right-20 -top-20 size-72 rounded-full blur-3xl ${
+          soldOut ? "bg-red-500/10" : "bg-primary/15"
+        }`}
+      />
+
+      <div className="relative">
+        <div className="flex items-center gap-3">
+          <TicketCheck
+            className={`size-6 ${
+              soldOut ? "text-red-400" : "text-primary"
+            }`}
+          />
+
+          <p
+            className={`font-mono text-xs font-bold uppercase tracking-[0.2em] ${
+              soldOut ? "text-red-400" : "text-primary"
+            }`}
+          >
+            {soldOut ? "Brak miejsc" : "Rezerwacja"}
+          </p>
+        </div>
+
+        <h2 className="mt-4 max-w-lg font-sans text-4xl font-black uppercase leading-none md:text-5xl">
+          {soldOut
+            ? "Ten wyjazd jest już wyprzedany"
+            : "Zarezerwuj miejsce"}
+        </h2>
+
+        <p className="mt-4 max-w-lg text-sm leading-6 text-background/60">
+          {soldOut
+            ? "Na ten wyjazd nie przyjmujemy już rezerwacji. Wybierz inny dostępny mecz lub opisz wydarzenie, które mamy dla Ciebie wycenić."
+            : "Wyślij zapytanie. Sprawdzimy aktualną dostępność i przygotujemy konkretny wariant wyjazdu."}
+        </p>
+
+        <div className="mt-7 flex items-center gap-3 opacity-90">
+          <TeamLogo
+            src={trip.homeLogo}
+            name={homeTeam}
+          />
+
+          <span className="font-sans text-lg font-black text-background/60">
+            VS
+          </span>
+
+          <TeamLogo
+            src={trip.awayLogo}
+            name={awayTeam}
+          />
+        </div>
+
+        <h3 className="mt-5 font-sans text-2xl font-black uppercase">
+          {homeTeam} - {awayTeam}
+        </h3>
+
+          <div className="w-full rounded-2xl border border-white/15 bg-black/55 p-5 shadow-2xl backdrop-blur-md lg:w-80">
+  <p className="text-xs font-bold uppercase tracking-wider text-white/50">
+    {fullPackageSelected
+      ? "Cena od / osoba"
+      : "Cena wybranego wariantu"}
+  </p>
+
+  {fullPackageSelected ? (
+    <p className="mt-1 font-sans text-4xl font-black text-primary">
+      {trip.price.toLocaleString("pl-PL")} zł
+    </p>
+  ) : (
+    <p className="mt-2 font-sans text-2xl font-black uppercase leading-tight text-primary">
+      Ustalana indywidualnie
+    </p>
+  )}
+
+  <div className="mt-5 grid gap-3">
+    {soldOut ? (
+      <Button disabled size="lg">
+        Wyprzedane
+      </Button>
+    ) : (
+      <Button
+        size="lg"
+        nativeButton={false}
+        render={<a href="#rezerwacja" />}
+      >
+        Rezerwuj miejsce
+        <ArrowRight data-icon="inline-end" />
+      </Button>
+    )}
+
+    <Button
+      variant="outline"
+      size="lg"
+      className="border-white/25 bg-white/5 text-white hover:bg-white/15 hover:text-white"
+      nativeButton={false}
+      render={
+        <a
+          href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`}
+          target="_blank"
+          rel="noreferrer"
+        />
+      }
+    >
+      <MessageCircle data-icon="inline-start" />
+      Napisz na WhatsApp
+    </Button>
+  </div>
+</div>
+      </div>
+    </div>
 
           <div className="py-10 md:py-14 lg:pl-12">
             <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Formularz zapytania</p>
