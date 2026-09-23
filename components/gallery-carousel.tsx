@@ -91,13 +91,27 @@ useEffect(() => {
   }
 
   const scrollThumbnails = (
-    direction: "left" | "right"
-  ) => {
-    thumbnailsRef.current?.scrollBy({
-      left: direction === "left" ? -240 : 240,
-      behavior: "smooth",
-    })
-  }
+  direction: "left" | "right"
+) => {
+  const container = thumbnailsRef.current
+
+  if (!container) return
+
+  const distance = container.clientWidth * 0.7
+
+  const target =
+    direction === "left"
+      ? container.scrollLeft - distance
+      : container.scrollLeft + distance
+
+  const maxScroll =
+    container.scrollWidth - container.clientWidth
+
+  container.scrollTo({
+    left: Math.max(0, Math.min(target, maxScroll)),
+    behavior: "smooth",
+  })
+}
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -167,61 +181,63 @@ useEffect(() => {
         )}
       </div>
 
-      {items.length > 1 && (
-        <div className="relative mt-4">
-          <div
-            ref={thumbnailsRef}
-            className="flex snap-x gap-3 overflow-x-auto scroll-smooth pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            {items.map((item, index) => {
-              const isActive = index === activeIndex
+    {items.length > 1 && (
+  <div className="relative mt-4">
+    <div className="mx-10 overflow-hidden md:mx-12">
+      <div
+        ref={thumbnailsRef}
+        className="flex gap-3 overflow-x-auto scroll-smooth px-1 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {items.map((item, index) => {
+          const isActive = index === activeIndex
 
-              return (
-                <button
-                  key={item.id}
-                  ref={(element) => {
-                    thumbnailRefs.current[index] = element
-                  }}
-                  type="button"
-                  onClick={() => selectImage(index)}
-                  className={`relative aspect-4/3 w-28 shrink-0 snap-center overflow-hidden rounded-lg transition md:w-36 ${
-                    isActive
-                      ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
-                      : "opacity-65 hover:opacity-100"
-                  }`}
-                  aria-label={`Pokaż zdjęcie ${index + 1}`}
-                >
-                  <Image
-                    src={item.src}
-                    alt=""
-                    fill
-                    className="object-cover object-bottom"
-                    sizes="144px"
-                  />
-                </button>
-              )
-            })}
-          </div>
+          return (
+            <button
+              key={item.id}
+              ref={(element) => {
+                thumbnailRefs.current[index] = element
+              }}
+              type="button"
+              onClick={() => selectImage(index)}
+              className={`relative aspect-4/3 w-28 shrink-0 overflow-hidden rounded-lg transition md:w-36 ${
+                isActive
+                  ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                  : "opacity-65 hover:opacity-100"
+              }`}
+              aria-label={`Pokaż zdjęcie ${index + 1}`}
+            >
+              <Image
+                src={item.src}
+                alt=""
+                fill
+                className="object-cover object-bottom"
+                sizes="144px"
+              />
+            </button>
+          )
+        })}
+      </div>
+    </div>
 
-          <button
-            type="button"
-            onClick={() => scrollThumbnails("left")}
-            className="absolute -left-3 top-1/2 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-lg md:flex"
-            aria-label="Przewiń miniatury w lewo"
-          >
-            <ChevronLeft className="size-4" />
-          </button>
+    <button
+      type="button"
+      onClick={() => scrollThumbnails("left")}
+      className="absolute left-0 top-1/2 z-20 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-lg transition hover:bg-secondary md:flex"
+      aria-label="Przewiń miniatury w lewo"
+    >
+      <ChevronLeft className="size-4" />
+    </button>
 
-          <button
-            type="button"
-            onClick={() => scrollThumbnails("right")}
-            className="absolute -right-3 top-1/2 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-lg md:flex"
-            aria-label="Przewiń miniatury w prawo"
-          >
-            <ChevronRight className="size-4" />
-          </button>
-        </div>
-      )}
+    <button
+      type="button"
+      onClick={() => scrollThumbnails("right")}
+      className="absolute right-0 top-1/2 z-20 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-lg transition hover:bg-secondary md:flex"
+      aria-label="Przewiń miniatury w prawo"
+    >
+      <ChevronRight className="size-4" />
+    </button>
+  </div>
+)}
     </div>
   )
 }
