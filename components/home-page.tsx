@@ -372,7 +372,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
     <div className="relative min-h-105 overflow-hidden rounded-xl">
       <Image
-        src="/images/about-us.webp"
+        src="/images/indywidualny.webp"
         alt="Podróż kibiców na mecz"
         fill
         className="object-cover"
@@ -404,16 +404,15 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       </h2>
 
       <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
-        Napisz, dokąd chcesz jechać i czego potrzebujesz. Sprawdzimy
-        dostępność i przygotujemy zakres dopasowany do Twojego planu.
+        Masz wymarzony mecz, na który chcesz pojechać? Napisz nam jaki - przygotujemy wyjazd dopasowany do Ciebie.
       </p>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         {[
-          "Dowolny klub i liga",
-          "Dogodne miejsce startu",
-          "Wybrany standard noclegu",
-          "Zakres od biletu po pełny pakiet",
+          "Dowolny klub i rozgrywki",
+          "Wylot z dowolnego lotniska",
+          "Hotel dopasowany do Ciebie",
+          "Od samego biletu po pełny wyjazd",
         ].map((item) => (
           <div
             key={item}
@@ -444,7 +443,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   }
 >
  <span className="inline-flex items-center gap-2">
-  Opisz swój wyjazd
+  Chcę pojechać na mecz
   <ArrowRight className="size-4 shrink-0" />
 </span>
 </Button>
@@ -642,25 +641,24 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </p>
 
         <h3 className="mt-5 font-sans text-3xl font-black uppercase leading-[0.98] tracking-tight text-foreground md:text-4xl">
-          Wszystkie najważniejsze elementy jednej podróży.
+          Co otrzymujesz w cenie pełnego wyjazdu?
         </h3>
 
         <p className="mt-5 text-base leading-7 text-muted-foreground">
-          Zakres konkretnego wyjazdu może się różnić, ale pełny wariant
-          łączy najważniejsze elementy organizacji w jednej ofercie.
+          Nie musisz osobno szukać lotów, hotelu, biletu na mecz ani planować całego wyjazdu. Zajmiemy się wszystkim za Ciebie - od wylotu aż do powrotu do domu.
         </p>
       </div>
 
       <div className="grid gap-x-10 gap-y-0 sm:grid-cols-2">
         {[
-          [Plane, "Przelot", "Transport dopasowany do terminu meczu."],
-          [TicketCheck, "Bilet na mecz", "Miejsce na stadionie w wybranej kategorii."],
-          [Building2, "Sprawdzony hotel", "Nocleg dopasowany do charakteru wyjazdu."],
-          [Headphones, "Opieka koordynatora", "Wsparcie organizacyjne przed i w trakcie podróży."],
-          [MapPinned, "Transfery lokalne", "Przejazdy pomiędzy kluczowymi punktami wyjazdu."],
-          [ShieldCheck, "Ubezpieczenie", "Ochrona podróży zgodnie z zakresem oferty."],
-          [CalendarCheck, "Plan podróży", "Najważniejsze informacje i ustalenia przed wyjazdem."],
-          [Landmark, "Zwiedzanie miasta", "Czas na poznanie miasta poza stadionem."],
+          [Plane, "Przelot", "Lot w obie strony z wybranego lotniska."],
+          [TicketCheck, "Bilet na mecz", "Pewny bilet na mecz w wybranej kategorii."],
+          [Building2, "Sprawdzony hotel", "Sprawdzony nocleg w dobrej lokalizacji."],
+          [Headphones, "Opieka koordynatora", "Jesteśmy z Wami przed wyjazdem i podczas pobytu."],
+          [MapPinned, "Transfery lokalne", "Zapewniamy transport z i na lotnisko oraz podczas wspólnego zwiedzania."],
+          [ShieldCheck, "Ubezpieczenie", "Ubezpieczenie turystyczne na czas wyjazdu."],
+          [CalendarCheck, "Plan podróży", "Przed wyjazdem dostajesz od nas wszystkie najważniejsze informacje."],
+          [Landmark, "Zwiedzanie miasta", "Wspólnie odkrywamy najciekawsze miejsca poza stadionem."],
         ].map(([Icon, title, description]) => {
           const I = Icon as typeof Plane
 
