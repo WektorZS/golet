@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import {
-  ArrowUpRight,
+  ArrowRight,
   CalendarDays,
   Clock3,
   MapPin,
@@ -292,8 +292,8 @@ export function TripCard({
           </div>
 
         <div className="relative flex items-center justify-between gap-4 border-t bg-secondary/35 px-5 pb-5 pt-12 lg:flex-col lg:items-stretch lg:justify-center lg:border-l lg:border-foreground/10 lg:border-t-0">
- <div
-  className={`absolute inset-x-0 top-0 flex h-7 items-center justify-center border-b text-[9px] font-black uppercase tracking-[0.14em] lg:border-r lg:border-t lg:rounded-tr-xl ${
+<div
+  className={`absolute inset-x-0 top-0 flex h-7 items-center justify-center border-b pt-px font-mono text-[9px] font-black uppercase leading-none tracking-[0.14em] lg:border-r lg:border-t lg:rounded-tr-xl ${
     trip.availabilityStatus === "available"
       ? "border-emerald-700 bg-emerald-700 text-white"
       : trip.availabilityStatus === "last_places"
@@ -321,7 +321,7 @@ export function TripCard({
     className="h-10 shrink-0 px-5"
   >
     Szczegóły
-    <ArrowUpRight data-icon="inline-end" />
+    <ArrowRight data-icon="inline-end" />
   </Button>
 </div>
         </div>

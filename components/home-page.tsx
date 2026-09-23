@@ -370,29 +370,30 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   className="scroll-mt-20 bg-secondary/60 px-4 py-16 md:px-6 md:py-20"
 >
   <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-    <div className="relative min-h-105 overflow-hidden rounded-xl">
-      <Image
-        src="/images/indywidualny.webp"
-        alt="Podróż kibiców na mecz"
-        fill
-        className="object-cover"
-        sizes="(max-width: 1024px) 100vw, 45vw"
-      />
+   <div className="relative min-h-105 overflow-hidden rounded-xl">
+  <Image
+    src="/images/indywidualny.webp"
+    alt="Podróż kibiców na mecz"
+    fill
+    className="object-cover"
+    sizes="(max-width: 1024px) 100vw, 45vw"
+  />
 
-      <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/5 to-transparent" />
+  <div className="absolute inset-0 bg-black/15" />
+  <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/20 to-transparent" />
 
-      <div className="absolute bottom-5 left-5 right-5 text-white md:bottom-6 md:left-6 md:right-6">
-        <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white/65">
-          Let&apos;s Gol
-        </p>
+  <div className="absolute bottom-5 left-5 right-5 text-white md:bottom-6 md:left-6 md:right-6">
+    <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-white/65">
+      Let&apos;s Gol
+    </p>
 
-        <p className="mt-1.5 max-w-md text-xl font-black uppercase leading-[1.05] tracking-[-0.02em] text-white md:text-2xl">
-          Ty wybierasz mecz.
-          <br />
-          My organizujemy wyjazd.
-        </p>
-      </div>
-    </div>
+    <p className="mt-1.5 max-w-md text-xl font-black uppercase leading-[1.05] tracking-[-0.02em] text-white md:text-2xl">
+      Ty wybierasz mecz.
+      <br />
+      My organizujemy wyjazd.
+    </p>
+  </div>
+</div>
 
     <div>
       <p className="eyebrow">
@@ -1108,7 +1109,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   src="/images/droga.webp"
   alt="Atmosfera wspólnego wyjazdu na mecz"
   fill
-  className="object-cover object-bottom"
+  className="object-cover object-top"
   sizes="(max-width: 1024px) 100vw, 55vw"
 />
 

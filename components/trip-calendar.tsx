@@ -465,18 +465,20 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
   </div>
 </div>
 
-                     <div className="relative flex items-center justify-between gap-4 border-t bg-secondary/35 px-5 pb-5 pt-12 lg:w-48 lg:flex-col lg:items-stretch lg:justify-center lg:border-l lg:border-foreground/10 lg:border-t-0">
-  <div
-    className={`absolute inset-x-0 top-0 flex h-7 items-center justify-center border-b text-[9px] font-black uppercase tracking-[0.14em] lg:border-r lg:border-t lg:rounded-tr-xl ${
-        trip.availabilityStatus === "available"
+                     <div className="relative flex items-center justify-between gap-4 border-t bg-secondary/35 px-5 pb-5 pt-12 lg:flex-col lg:items-stretch lg:justify-center lg:border-l lg:border-foreground/10 lg:border-t-0">
+ <div
+  className={`absolute inset-x-0 top-0 grid h-7 place-items-center border-b lg:border-r lg:border-t lg:rounded-tr-xl ${
+     trip.availabilityStatus === "available"
       ? "border-emerald-700 bg-emerald-700 text-white"
       : trip.availabilityStatus === "last_places"
         ? "border-primary bg-primary text-primary-foreground"
         : "border-red-600 bg-red-600 text-white"
-    }`}
-  >
+  }`}
+>
+  <span className="block translate-y-px font-mono text-[9px] font-black uppercase leading-none tracking-[0.14em]">
     {status.label}
-  </div>
+  </span>
+</div>
 
   <div>
     <p className="font-mono text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground">
