@@ -7,7 +7,9 @@ import { ensureTripColumns } from "@/lib/db/ensure-trip-columns"
 import { type Locale } from "@/lib/i18n"
 import { localizeTrip } from "@/lib/i18n-content"
 
-export type Trip = typeof trips.$inferSelect
+export type Trip = typeof trips.$inferSelect & {
+  thumbnailImage?: string
+}
 
 async function resolveTripImages(rows: Trip[], locale: Locale) {
   const teamIds = [...new Set(rows.flatMap((trip) => [trip.homeTeamId, trip.awayTeamId]).filter((id): id is number => Boolean(id)))]
@@ -15,6 +17,7 @@ async function resolveTripImages(rows: Trip[], locale: Locale) {
     ? await db.select({
         id: teams.id,
         tripImageMediaId: teams.tripImageMediaId,
+        tripThumbnailMediaId: teams.tripThumbnailMediaId,
         nameEn: teams.nameEn,
         cityEn: teams.cityEn,
         countryEn: teams.countryEn,
@@ -28,7 +31,12 @@ async function resolveTripImages(rows: Trip[], locale: Locale) {
     const awayTeam = trip.awayTeamId ? teamById.get(trip.awayTeamId) : undefined
     const inheritedMediaId = homeTeam?.tripImageMediaId
     const mediaId = trip.coverMediaId || inheritedMediaId
-    const imageResolved = mediaId ? { ...trip, image: `/api/media/${mediaId}` } : trip
+    const thumbnailMediaId = trip.thumbnailMediaId || homeTeam?.tripThumbnailMediaId || mediaId
+    const imageResolved = {
+      ...trip,
+      ...(mediaId ? { image: `/api/media/${mediaId}` } : {}),
+      thumbnailImage: thumbnailMediaId ? `/api/media/${thumbnailMediaId}` : trip.image,
+    }
 
     if (locale === "pl") return imageResolved
 

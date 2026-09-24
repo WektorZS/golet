@@ -16,6 +16,7 @@ export function ensureTripColumns() {
           stadium text NOT NULL,
           logo text NOT NULL,
           trip_image_media_id integer,
+          trip_thumbnail_media_id integer,
           name_en text NOT NULL DEFAULT '',
           city_en text NOT NULL DEFAULT '',
           country_en text NOT NULL DEFAULT '',
@@ -27,6 +28,7 @@ export function ensureTripColumns() {
       await db.execute(sql`
         ALTER TABLE teams
           ADD COLUMN IF NOT EXISTS trip_image_media_id integer,
+          ADD COLUMN IF NOT EXISTS trip_thumbnail_media_id integer,
           ADD COLUMN IF NOT EXISTS name_en text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS city_en text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS country_en text NOT NULL DEFAULT '',
@@ -86,6 +88,7 @@ export function ensureTripColumns() {
           ADD COLUMN IF NOT EXISTS ticket_category text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS seating_info text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS cover_media_id integer,
+          ADD COLUMN IF NOT EXISTS thumbnail_media_id integer,
           ADD COLUMN IF NOT EXISTS title_en text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS city_en text NOT NULL DEFAULT '',
           ADD COLUMN IF NOT EXISTS country_en text NOT NULL DEFAULT '',
@@ -133,7 +136,9 @@ export function ensureTripColumns() {
           ADD COLUMN IF NOT EXISTS alt_en text NOT NULL DEFAULT ''
       `)
       await db.execute(sql`CREATE INDEX IF NOT EXISTS teams_trip_image_media_id_idx ON teams (trip_image_media_id)`)
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS teams_trip_thumbnail_media_id_idx ON teams (trip_thumbnail_media_id)`)
       await db.execute(sql`CREATE INDEX IF NOT EXISTS trips_cover_media_id_idx ON trips (cover_media_id)`)
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS trips_thumbnail_media_id_idx ON trips (thumbnail_media_id)`)
       await db.execute(sql`
         UPDATE trips
         SET cover_media_id = NULLIF(substring(image FROM '^/api/media/([0-9]+)$'), '')::integer
@@ -154,6 +159,12 @@ export function ensureTripColumns() {
         ) AS source
         WHERE team.id = source.home_team_id
           AND team.trip_image_media_id IS NULL
+      `)
+      await db.execute(sql`
+        UPDATE teams
+        SET trip_thumbnail_media_id = trip_image_media_id
+        WHERE trip_thumbnail_media_id IS NULL
+          AND trip_image_media_id IS NOT NULL
       `)
     })().catch((error) => {
       schemaPromise = null

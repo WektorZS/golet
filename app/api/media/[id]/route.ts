@@ -75,6 +75,7 @@ export async function GET(
             and(
               or(
                 eq(trips.coverMediaId, id),
+                eq(trips.thumbnailMediaId, id),
                 eq(trips.image, `/api/media/${id}`),
                 eq(trips.homeLogo, `/api/media/${id}`),
                 eq(trips.awayLogo, `/api/media/${id}`)
@@ -90,7 +91,8 @@ export async function GET(
           .where(
             or(
               eq(teams.logo, `/api/media/${id}`),
-              eq(teams.tripImageMediaId, id)
+              eq(teams.tripImageMediaId, id),
+              eq(teams.tripThumbnailMediaId, id)
             )
           )
           .limit(1),

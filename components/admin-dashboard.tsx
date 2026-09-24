@@ -1331,12 +1331,13 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
               <CardContent className="pt-6">
                 <div className="overflow-x-auto">
                   <Table>
-                    <TableHeader><TableRow><TableHead>Drużyna</TableHead><TableHead>Zdjęcie wyjazdów</TableHead><TableHead>Stadion</TableHead><TableHead>Lokalizacja</TableHead><TableHead className="text-right">Operacje</TableHead></TableRow></TableHeader>
+                    <TableHeader><TableRow><TableHead>Drużyna</TableHead><TableHead>Zdjęcie główne</TableHead><TableHead>Miniatura</TableHead><TableHead>Stadion</TableHead><TableHead>Lokalizacja</TableHead><TableHead className="text-right">Operacje</TableHead></TableRow></TableHeader>
                     <TableBody>
                       {data.teams.map((team) => (
                         <TableRow key={team.id}>
                           <TableCell><div className="flex items-center gap-3"><span className="relative block size-12 shrink-0 rounded-lg bg-secondary p-1"><Image src={team.logo} alt={`Herb ${team.name}`} fill className="object-contain p-1" sizes="48px" /></span><strong>{team.name}</strong></div></TableCell>
                           <TableCell>{team.tripImageMediaId ? <img src={`/api/media/${team.tripImageMediaId}`} alt="" className="h-12 w-20 rounded-md object-cover" /> : <Badge variant="outline">Brak zdjęcia</Badge>}</TableCell>
+                          <TableCell>{team.tripThumbnailMediaId ? <img src={`/api/media/${team.tripThumbnailMediaId}`} alt="" className="h-12 w-20 rounded-md object-cover" /> : <Badge variant="outline">Brak miniatury</Badge>}</TableCell>
                           <TableCell>{team.stadium}</TableCell>
                           <TableCell>{team.city}, {team.country}</TableCell>
                           <TableCell><div className="flex justify-end gap-2"><TeamDialog team={team} media={data.media} trigger={<Button size="icon-sm" variant="outline" title="Edytuj drużynę"><Pencil /><span className="sr-only">Edytuj</span></Button>} /><TeamDeleteButton team={team} /></div></TableCell>
@@ -3769,8 +3770,8 @@ function TeamDialog({ team, media = [], trigger }: { team?: AdminTeam; media?: A
           <div className="sm:col-span-2"><Field label="Stadion" hint="Domyślny stadion gospodarza."><Input name="stadium" defaultValue={team?.stadium} required /></Field></div>
           <div className="sm:col-span-2"><Field label="Herb" hint="Plik zostanie zmniejszony do maksymalnie 128 x 128 px i zapisany jako WebP."><ImageDropzone name="logoFile" accept="image/png,image/webp,image/jpeg,image/avif" required={!team?.logo} currentImage={team?.logo} /></Field></div>
           <div className="rounded-xl border bg-muted/25 p-4 sm:col-span-2">
-            <h3 className="font-sans text-lg font-black uppercase">Zdjęcie główne wyjazdów</h3>
-            <p className="mt-1 text-sm text-muted-foreground">To zdjęcie będzie automatycznie używane na kartach i stronach nowych wyjazdów tej drużyny. W konkretnym wyjeździe nadal można ustawić wyjątek.</p>
+            <h3 className="font-sans text-lg font-black uppercase">Zdjęcie główne wyjazdu</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Duże zdjęcie wyświetlane w nagłówku strony szczegółów wyjazdu. W konkretnym wyjeździe nadal można ustawić wyjątek.</p>
             {team?.tripImageMediaId ? <img src={`/api/media/${team.tripImageMediaId}`} alt={`Aktualne zdjęcie główne wyjazdów ${team.name}`} className="mt-4 aspect-video w-full max-w-md rounded-lg object-cover" /> : null}
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <Field label="Wybierz z biblioteki" hint="Możesz ponownie użyć zdjęcia, które już zostało przesłane.">
@@ -3781,6 +3782,22 @@ function TeamDialog({ team, media = [], trigger }: { team?: AdminTeam; media?: A
               </Field>
               <Field label="Albo prześlij nowe" hint="Nowy plik zostanie dodany także do biblioteki mediów.">
                 <ImageDropzone name="tripImageFile" accept="image/png,image/webp,image/jpeg,image/avif" required={!team?.tripImageMediaId && media.length === 0} />
+              </Field>
+            </div>
+          </div>
+          <div className="rounded-xl border bg-muted/25 p-4 sm:col-span-2">
+            <h3 className="font-sans text-lg font-black uppercase">Miniatura wyjazdu</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Mniejsze zdjęcie używane w kalendarzu i na kartach wyjazdów. Powinno różnić się od zdjęcia głównego.</p>
+            {team?.tripThumbnailMediaId ? <img src={`/api/media/${team.tripThumbnailMediaId}`} alt={`Aktualna miniatura wyjazdów ${team.name}`} className="mt-4 aspect-video w-full max-w-md rounded-lg object-cover" /> : null}
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <Field label="Wybierz z biblioteki" hint="Możesz ponownie użyć zdjęcia, które już zostało przesłane.">
+                <select name="tripThumbnailMediaId" defaultValue={team?.tripThumbnailMediaId || ""} className="h-10 w-full rounded-lg border bg-background px-3">
+                  <option value="">Wybierz miniaturę</option>
+                  {media.filter((asset) => asset.category !== "logo").map((asset) => <option key={asset.id} value={asset.id}>{asset.originalName || `Zdjęcie #${asset.id}`}</option>)}
+                </select>
+              </Field>
+              <Field label="Albo prześlij nową" hint="Nowy plik zostanie dodany także do biblioteki mediów.">
+                <ImageDropzone name="tripThumbnailFile" accept="image/png,image/webp,image/jpeg,image/avif" required={!team?.tripThumbnailMediaId && media.length === 0} />
               </Field>
             </div>
           </div>
@@ -3858,6 +3875,7 @@ function TripDialog({
   const [country, setCountry] = useState(trip?.country || "")
   const [stadium, setStadium] = useState(trip?.stadium || "")
   const [coverMode, setCoverMode] = useState(trip?.coverMediaId ? "override" : "team")
+  const [thumbnailMode, setThumbnailMode] = useState(trip?.thumbnailMediaId ? "override" : "team")
   const [translating, setTranslating] = useState(false)
   const [translationRevision, setTranslationRevision] = useState(0)
   const [englishFields, setEnglishFields] = useState<TripTranslationFields>(() => ({
@@ -4217,6 +4235,38 @@ function TripDialog({
               </div>
             )}
             {trip?.image ? <input type="hidden" name="image" value={trip.image} /> : null}
+          </div>
+
+          <div className="rounded-xl border bg-muted/25 p-4 sm:col-span-2">
+            <h3 className="font-sans text-lg font-black uppercase">Miniatura wyjazdu</h3>
+            <p className="mt-1 text-sm text-muted-foreground">To zdjęcie pojawi się w kalendarzu i na kartach wyjazdów. Domyślnie jest pobierane z drużyny gospodarza.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <label className={`cursor-pointer rounded-lg border p-4 ${thumbnailMode === "team" ? "border-primary bg-primary/5" : "bg-background"}`}>
+                <input type="radio" name="thumbnailMode" value="team" checked={thumbnailMode === "team"} onChange={() => setThumbnailMode("team")} className="mr-2" />
+                <strong>Użyj miniatury drużyny</strong>
+                <span className="mt-1 block text-xs text-muted-foreground">Zmiana miniatury w drużynie zaktualizuje również ten wyjazd.</span>
+              </label>
+              <label className={`cursor-pointer rounded-lg border p-4 ${thumbnailMode === "override" ? "border-primary bg-primary/5" : "bg-background"}`}>
+                <input type="radio" name="thumbnailMode" value="override" checked={thumbnailMode === "override"} onChange={() => setThumbnailMode("override")} className="mr-2" />
+                <strong>Ustaw inną miniaturę</strong>
+                <span className="mt-1 block text-xs text-muted-foreground">Opcjonalne nadpisanie dla pojedynczego wyjazdu.</span>
+              </label>
+            </div>
+            {thumbnailMode === "team" ? (
+              selectedHomeTeam?.tripThumbnailMediaId || selectedHomeTeam?.tripImageMediaId ? <img src={`/api/media/${selectedHomeTeam.tripThumbnailMediaId || selectedHomeTeam.tripImageMediaId}`} alt="Podgląd miniatury drużyny" className="mt-4 aspect-video w-full max-w-lg rounded-lg object-cover" /> : <p className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">Wybrana drużyna nie ma jeszcze miniatury wyjazdów. Dodaj ją w sekcji Drużyny.</p>
+            ) : (
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <Field label="Wybierz z biblioteki" hint="Ponownie użyj istniejącego zdjęcia.">
+                  <select name="thumbnailMediaId" defaultValue={trip?.thumbnailMediaId || ""} className="h-10 w-full rounded-lg border bg-background px-3">
+                    <option value="">Wybierz miniaturę</option>
+                    {media.filter((asset) => asset.category !== "logo").map((asset) => <option key={asset.id} value={asset.id}>{asset.originalName || `Zdjęcie #${asset.id}`}</option>)}
+                  </select>
+                </Field>
+                <Field label="Albo prześlij nową" hint="Plik zostanie zapisany w bibliotece.">
+                  <ImageDropzone name="thumbnailFile" accept="image/jpeg,image/png,image/webp,image/avif" currentImage={trip?.thumbnailMediaId ? `/api/media/${trip.thumbnailMediaId}` : undefined} />
+                </Field>
+              </div>
+            )}
           </div>
 
           <div className="sm:col-span-2">

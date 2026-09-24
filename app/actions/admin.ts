@@ -76,12 +76,13 @@ async function mediaHasReferences(mediaId: number): Promise<boolean> {
     db.select({ id: teamGalleryItems.id }).from(teamGalleryItems).where(eq(teamGalleryItems.mediaId, mediaId)).limit(1),
     db.select({ id: trips.id }).from(trips).where(or(
       eq(trips.coverMediaId, mediaId),
+      eq(trips.thumbnailMediaId, mediaId),
       eq(trips.image, mediaUrl),
       eq(trips.homeLogo, mediaUrl),
       eq(trips.awayLogo, mediaUrl),
       eq(trips.leagueLogo, mediaUrl)
     )).limit(1),
-    db.select({ id: teams.id }).from(teams).where(or(eq(teams.logo, mediaUrl), eq(teams.tripImageMediaId, mediaId))).limit(1),
+    db.select({ id: teams.id }).from(teams).where(or(eq(teams.logo, mediaUrl), eq(teams.tripImageMediaId, mediaId), eq(teams.tripThumbnailMediaId, mediaId))).limit(1),
     db.select({ id: leagues.id }).from(leagues).where(eq(leagues.logo, mediaUrl)).limit(1),
   ])
 
@@ -183,7 +184,32 @@ export async function saveTeam(_: SaveTeamState, formData: FormData): Promise<Sa
   }
   if (!tripImageMediaId) return { error: "Dodaj zdjęcie główne wyjazdów albo wybierz je z biblioteki." }
 
-  const values = { ...parsed.data, logo, tripImageMediaId, updatedAt: new Date() }
+  let tripThumbnailMediaId = Number(formData.get("tripThumbnailMediaId")) || existing?.tripThumbnailMediaId || null
+  const tripThumbnailFile = formData.get("tripThumbnailFile")
+  if (tripThumbnailFile instanceof File && tripThumbnailFile.size > 0) {
+    try {
+      const optimized = await optimizeUploadedImage(tripThumbnailFile)
+      const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
+      const [asset] = await db.insert(mediaAssets).values({
+        pathname: blob.pathname,
+        contentType: optimized.contentType,
+        size: optimized.size,
+        width: optimized.width,
+        height: optimized.height,
+        alt: `${parsed.data.name} - miniatura wyjazdów`,
+        altEn: `${parsed.data.nameEn || parsed.data.name} - trip thumbnail`,
+        originalName: tripThumbnailFile.name,
+        category: "team",
+        createdBy: user.id,
+      }).returning({ id: mediaAssets.id })
+      tripThumbnailMediaId = asset.id
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : "Nie udało się zapisać miniatury wyjazdów." }
+    }
+  }
+  if (!tripThumbnailMediaId) return { error: "Dodaj miniaturę wyjazdów albo wybierz ją z biblioteki." }
+
+  const values = { ...parsed.data, logo, tripImageMediaId, tripThumbnailMediaId, updatedAt: new Date() }
   if (existing) {
     await db.update(teams).set(values).where(eq(teams.id, id))
     await db.update(trips).set({
@@ -227,6 +253,7 @@ export async function deleteTeam(_: SaveTeamState, formData: FormData): Promise<
   const logoId = mediaIdFromUrl(team.logo)
   if (logoId) await deleteMediaAsset(logoId).catch(() => undefined)
   if (team.tripImageMediaId) await deleteMediaAsset(team.tripImageMediaId).catch(() => undefined)
+  if (team.tripThumbnailMediaId && team.tripThumbnailMediaId !== team.tripImageMediaId) await deleteMediaAsset(team.tripThumbnailMediaId).catch(() => undefined)
   await logActivity(user.id, "deleted", "team", String(id), team.name)
   revalidatePath("/admin")
   return { success: true }
@@ -324,7 +351,7 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
 
   const isEditing = Number.isInteger(id) && id > 0
   const [existingTrip] = isEditing
-    ? await db.select({ image: trips.image, coverMediaId: trips.coverMediaId, homeLogo: trips.homeLogo, awayLogo: trips.awayLogo }).from(trips).where(eq(trips.id, id)).limit(1)
+    ? await db.select({ image: trips.image, coverMediaId: trips.coverMediaId, thumbnailMediaId: trips.thumbnailMediaId, homeLogo: trips.homeLogo, awayLogo: trips.awayLogo }).from(trips).where(eq(trips.id, id)).limit(1)
     : []
   const coverMode = clean(formData.get("coverMode")) || (existingTrip?.coverMediaId ? "override" : "team")
   let coverMediaId = coverMode === "override"
@@ -335,14 +362,18 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
     : homeTeamRecord.tripImageMediaId
       ? `/api/media/${homeTeamRecord.tripImageMediaId}`
       : clean(formData.get("image")) || existingTrip?.image || ""
+  const thumbnailMode = clean(formData.get("thumbnailMode")) || (existingTrip?.thumbnailMediaId ? "override" : "team")
+  let thumbnailMediaId = thumbnailMode === "override"
+    ? Number(formData.get("thumbnailMediaId")) || existingTrip?.thumbnailMediaId || null
+    : null
   let homeLogo = homeTeamRecord.logo || clean(formData.get("homeLogo")) || existingTrip?.homeLogo || ""
   let awayLogo = awayTeamRecord.logo || clean(formData.get("awayLogo")) || existingTrip?.awayLogo || ""
 
-  async function uploadTripImage(file: FormDataEntryValue | null, alt: string, kind: "cover" | "logo" = "cover") {
+  async function uploadTripImage(file: FormDataEntryValue | null, alt: string, kind: "cover" | "thumbnail" | "logo" = "cover") {
     if (!(file instanceof File) || file.size === 0) return ""
     const optimized = kind === "logo" ? await optimizeTeamLogo(file) : await optimizeUploadedImage(file)
     const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
-    const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt, originalName: file.name, category: kind === "cover" ? "trip" : "logo", createdBy: user.id }).returning({ id: mediaAssets.id })
+    const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt, originalName: file.name, category: kind === "logo" ? "logo" : "trip", createdBy: user.id }).returning({ id: mediaAssets.id })
     return `/api/media/${asset.id}`
   }
 
@@ -365,10 +396,21 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
     }
   }
 
-  if (!image || !homeLogo || !awayLogo) return { error: "Drużyna gospodarza musi mieć zdjęcie główne wyjazdów oraz oba zespoły muszą mieć herby." }
+  const thumbnailFile = formData.get("thumbnailFile")
+  if (thumbnailFile instanceof File && thumbnailFile.size > 0) {
+    try {
+      const thumbnailUrl = await uploadTripImage(thumbnailFile, `Miniatura - ${parsed.data.title}`, "thumbnail")
+      thumbnailMediaId = mediaIdFromUrl(thumbnailUrl)
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : "Nie udało się zapisać miniatury wyjazdu." }
+    }
+  }
+
+  const resolvedThumbnailMediaId = thumbnailMediaId || homeTeamRecord.tripThumbnailMediaId || homeTeamRecord.tripImageMediaId
+  if (!image || !resolvedThumbnailMediaId || !homeLogo || !awayLogo) return { error: "Drużyna gospodarza musi mieć zdjęcie główne i miniaturę wyjazdów, a oba zespoły muszą mieć herby." }
 
   const values = {
-    ...parsed.data, homeTeam: homeTeamRecord.name, awayTeam: awayTeamRecord.name, opponent: awayTeamRecord.name, slug, endDate: parsed.data.endDate || null, matchDate: parsed.data.matchDate || null, image, coverMediaId, homeLogo, awayLogo,
+    ...parsed.data, homeTeam: homeTeamRecord.name, awayTeam: awayTeamRecord.name, opponent: awayTeamRecord.name, slug, endDate: parsed.data.endDate || null, matchDate: parsed.data.matchDate || null, image, coverMediaId, thumbnailMediaId, homeLogo, awayLogo,
     leagueId, leagueName: league?.name || "", leagueLogo: league?.logo || "",
     featured: formData.get("featured") === "on", includes: clean(formData.get("includes")).split("\n").map((item) => item.trim()).filter(Boolean),
     includesEn: clean(formData.get("includesEn")).split("\n").map((item) => item.trim()).filter(Boolean),
@@ -468,6 +510,7 @@ const coverMatch = trip.image?.match(/^\/api\/media\/(\d+)$/)
   for (const mediaId of mediaIds) {
     await deleteMediaAsset(mediaId)
   }
+  if (trip.thumbnailMediaId) mediaIds.add(trip.thumbnailMediaId)
 
   await logActivity(
     user.id,

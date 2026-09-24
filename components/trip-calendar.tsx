@@ -360,7 +360,7 @@ export function TripCalendar({ trips, locale = "pl" }: { trips: Trip[]; locale?:
                   <article key={trip.id} className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:border-primary/60 hover:shadow-lg">
                     <div className="grid lg:grid-cols-[210px_1fr_auto]">
                       <div className="relative min-h-40 overflow-hidden bg-foreground lg:min-h-full">
-                        <Image src={trip.image} alt={`Stadion ${trip.stadium || trip.city}`} fill className="scale-[1.04] object-cover blur-[1.5px] transition-all duration-500 group-hover:scale-[1.09] group-hover:blur-[0.5px]" sizes="(max-width: 1024px) 100vw, 210px" />
+                        <Image src={trip.thumbnailImage || trip.image} alt={`Stadion ${trip.stadium || trip.city}`} fill className="scale-[1.04] object-cover blur-[1.5px] transition-all duration-500 group-hover:scale-[1.09] group-hover:blur-[0.5px]" sizes="(max-width: 1024px) 100vw, 210px" />
                         <div className="absolute inset-0 bg-black/45" />
                         <div className="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-black/25" />
                                                <div className="absolute inset-0 flex items-center justify-center gap-3 pt-3">

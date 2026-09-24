@@ -193,7 +193,7 @@ export function TripCard({
         <div className="grid md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[260px_minmax(0,1fr)_190px]">
           <div className="relative min-h-48 overflow-hidden bg-foreground md:min-h-full">
             <Image
-              src={trip.image}
+              src={trip.thumbnailImage || trip.image}
               alt={locale === "en" ? `Stadium in ${trip.city}` : `Stadion w mieście ${trip.city}`}
               fill
               className="scale-[1.02] object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"

@@ -35,16 +35,20 @@ export default async function AdminPage() {
     db.select().from(adminActivity).orderBy(desc(adminActivity.createdAt)).limit(10),
   ])
   const settings = Object.fromEntries(rawSettings.map((item) => [item.key, item.value]))
+  const teamNames = new Map(allTeams.map((team) => [team.id, team.name]))
+  const tripTitles = new Map(allTrips.map((trip) => [trip.id, trip.title]))
   const mediaWithUsage = media.map((asset) => {
     const mediaUrl = `/api/media/${asset.id}`
     const usage = [
       ...allTeams.filter((team) => team.tripImageMediaId === asset.id).map((team) => `Zdjęcie główne wyjazdów: ${team.name}`),
+      ...allTeams.filter((team) => team.tripThumbnailMediaId === asset.id).map((team) => `Miniatura wyjazdów: ${team.name}`),
       ...allTeams.filter((team) => team.logo === mediaUrl).map((team) => `Herb drużyny: ${team.name}`),
       ...allLeagues.filter((league) => league.logo === mediaUrl).map((league) => `Logo ligi: ${league.name}`),
       ...allTrips.filter((trip) => trip.coverMediaId === asset.id || trip.image === mediaUrl).map((trip) => `Zdjęcie wyjazdu: ${trip.title}`),
+      ...allTrips.filter((trip) => trip.thumbnailMediaId === asset.id).map((trip) => `Miniatura wyjazdu: ${trip.title}`),
       ...gallery.filter((item) => item.mediaId === asset.id).map(() => "Galeria główna"),
-      ...tripGallery.filter((item) => item.mediaId === asset.id).map((item) => `Galeria wyjazdu #${item.tripId}`),
-      ...teamGallery.filter((item) => item.mediaId === asset.id).map((item) => `Galeria drużyny #${item.teamId}`),
+      ...tripGallery.filter((item) => item.mediaId === asset.id).map((item) => `Galeria wyjazdu: ${tripTitles.get(item.tripId) || `wyjazd #${item.tripId}`}`),
+      ...teamGallery.filter((item) => item.mediaId === asset.id).map((item) => `Galeria drużyny: ${teamNames.get(item.teamId) || `drużyna #${item.teamId}`}`),
     ]
     return { ...asset, usage: [...new Set(usage)] }
   })
