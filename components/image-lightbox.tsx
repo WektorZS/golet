@@ -494,7 +494,26 @@ export function ImageLightbox({
       ? "Expanded photo. Use the arrows or swipe to move between photos."
       : "Powiększone zdjęcie. Użyj strzałek, aby przechodzić między zdjęciami lub przesuń zdjęcie palcem."}
   </DialogDescription>
-
+<button
+  type="button"
+  onClick={(event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setIsOpen(false)
+  }}
+  className="fixed right-4 top-4 z-[99999] flex size-12 items-center justify-center rounded-full bg-white text-black shadow-2xl transition-transform duration-200 hover:scale-105 sm:right-6 sm:top-6"
+  aria-label={
+    isEn
+      ? "Close photo"
+      : "Zamknij zdjęcie"
+  }
+>
+  <X
+    className="size-6"
+    strokeWidth={2.5}
+    aria-hidden="true"
+  />
+</button>
   <div
     className="relative size-full min-h-0 overflow-hidden bg-black"
     onTouchStart={handleTouchStart}
