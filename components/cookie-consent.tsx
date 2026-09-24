@@ -203,10 +203,19 @@ export function CookieConsent() {
                 </div>
 
                 
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {dictionary.cookies.choosePrompt}
-                </p>
-                <div><LanguageSwitcher /></div>
+                <div>
+  <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+    {localeFromPathname(pathname) === "en"
+      ? "Choose language"
+      : "Wybierz język"}
+  </p>
+
+  <LanguageSwitcher />
+</div>
+
+<p className="text-sm leading-relaxed text-muted-foreground">
+  {dictionary.cookies.choosePrompt}
+</p>
 
               
                 <div className="grid gap-3">
