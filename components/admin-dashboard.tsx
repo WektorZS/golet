@@ -4474,7 +4474,7 @@ function TripDialog({
               <div className="sm:col-span-2"><Field label="Bagaż po angielsku" hint=""><Input name="baggageInfoEn" value={englishFields.baggageInfoEn} onChange={(event) => updateEnglishField("baggageInfoEn", event.target.value)} /></Field></div>
               <div className="sm:col-span-2"><Field label="FAQ po angielsku" hint="Pytanie i odpowiedź oddziel znakiem |. Każda para w osobnej linii."><Textarea name="faqEn" value={englishFields.faqEn} onChange={(event) => updateEnglishField("faqEn", event.target.value)} rows={5} /></Field></div>
               <Field label="Tytuł SEO po angielsku" hint="Najlepiej 50-60 znaków."><Input name="seoTitleEn" value={englishFields.seoTitleEn} onChange={(event) => updateEnglishField("seoTitleEn", event.target.value)} maxLength={70} /></Field>
-              <Field label="Opis SEO po angielsku" hint="Naturalny opis oferty w wynikach wyszukiwania."><Textarea name="seoDescriptionEn" value={englishFields.seoDescriptionEn} onChange={(event) => updateEnglishField("seoDescriptionEn", event.target.value)} rows={3} maxLength={180} /></Field>
+              <Field label="Opis SEO po angielsku" hint="Naturalny i unikalny opis oferty. Zwykle najlepiej około 140-160 znaków."><Textarea name="seoDescriptionEn" value={englishFields.seoDescriptionEn} onChange={(event) => updateEnglishField("seoDescriptionEn", event.target.value)} rows={3} maxLength={180} /></Field>
             </div>
           </details>
 
@@ -4493,7 +4493,7 @@ function TripDialog({
 
           <Field
             label="Opis strony w Google"
-            hint="Krótki opis, który może pojawić się pod tytułem strony w Google. Najlepiej napisać 1-2 zdania zachęcające do wyjazdu."
+            hint="Naturalny i unikalny opis oferty, który może pojawić się w Google. Zwykle najlepiej około 140-160 znaków."
           >
             <Textarea
               name="seoDescription"
@@ -5284,13 +5284,13 @@ function SettingsForm({
       "seoTitle",
       "Tytuł strony w Google",
       "Tytuł, który może pojawić się przy stronie w wynikach Google.",
-      "Let’s Gol - wyjazdy na mecze piłkarskie",
+      "Let’s Gol | Wyjazdy na mecze piłkarskie",
     ],
     [
       "seoDescription",
       "Opis strony w Google",
       "Krótki opis strony, który może pojawić się pod tytułem w wynikach Google.",
-      "Kompleksowe wyjazdy na największe mecze w Europie: bilety, lot, hotel i opieka koordynatora.",
+      "Wyjazdy na mecze piłkarskie w Europie z biletem, lotem, hotelem i opieką koordynatora. Wybierz gotowy pakiet lub poproś o indywidualną ofertę.",
     ],
     [
       "heroEyebrow",
@@ -5441,8 +5441,8 @@ function SettingsForm({
     fields.find((field) => field[0] === key)
 
   const englishFallbacks: Record<string, string> = {
-    seoTitle: "Let’s Gol - football match trips across Europe",
-    seoDescription: "Complete football match trips with tickets, flights, hotels and on-site support.",
+    seoTitle: "Let’s Gol | Football Match Trips Across Europe",
+    seoDescription: "Travel to Europe’s biggest football matches with tickets, flights, hotels and coordinator support included. Choose a package or request a custom trip.",
     heroEyebrow: "Trips to Europe’s biggest football matches",
     heroTitle: "You choose the match. We organise the rest.",
     heroDescription: "Tickets, flights, hotels and coordinator support in one complete package.",

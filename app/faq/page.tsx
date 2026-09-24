@@ -21,13 +21,13 @@ import { getFaqCategories } from "@/lib/faq"
 import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
 import { getRequestLocale } from "@/lib/i18n-request"
 import { routeFor } from "@/lib/i18n"
+import { getSeoCopy } from "@/lib/seo-copy"
 
 export const revalidate = 300
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
-  const title = locale === "en" ? "Football trip FAQ" : "FAQ o wyjazdach na mecze"
-  const description = locale === "en" ? "Answers about booking, packages, tickets, transport, accommodation and how Let's Gol football trips work." : "Odpowiedzi na najczęstsze pytania o rezerwację, pakiety, bilety, transport, noclegi, dokumenty i organizację wyjazdów na mecze."
+  const { title, description } = getSeoCopy("faq", locale)
   return { title, description, alternates: localizedAlternates("/faq", locale), ...socialMetadata(title, description, routeFor(locale, "/faq"), locale) }
 }
 

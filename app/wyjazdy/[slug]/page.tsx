@@ -20,6 +20,7 @@ import { absoluteUrl } from "@/lib/site"
 import { getPublishedTrips, getTripBySlug, getTripGallery } from "@/lib/trips"
 import { getRequestLocale } from "@/lib/i18n-request"
 import { formatPrice, localeTags, pluralizeDuration, routeFor } from "@/lib/i18n"
+import { buildTripSeoDescription } from "@/lib/seo-copy"
 
 export const dynamic = "force-dynamic"
 
@@ -53,17 +54,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const trip = await getTripBySlug(slug, locale)
   if (!trip) return { title: isEn ? "Trip unavailable" : "Wyjazd niedostępny" }
 
-  const description = trip.seoDescription || `${stripHtml(trip.description)} ${isEn ? "Packages from" : "Pakiet od"} ${formatPrice(trip.price, locale)} ${isEn ? "PLN" : "zł"}.`
+  const description = buildTripSeoDescription({
+    title: trip.title,
+    price: trip.price,
+    locale,
+    customDescription: trip.seoDescription,
+  })
   const title = trip.seoTitle || trip.title
-  const summary = description.slice(0, 160)
   const polishPath = `/wyjazdy/${trip.slug}`
   const canonical = routeFor(locale, "/wyjazdy") + `/${trip.slug}`
   return {
     title,
-    description: summary,
+    description,
     alternates: localizedAlternates(polishPath, locale),
-    openGraph: { title, description: summary, type: "website", url: canonical, locale: isEn ? "en_GB" : "pl_PL", images: [{ url: trip.image, alt: isEn ? `Football match trip to ${trip.city}: ${trip.title}` : `Wyjazd na mecz ${trip.title} w ${trip.city}` }] },
-    twitter: { card: "summary_large_image", title, description: summary, images: [trip.image] },
+    openGraph: { title, description, type: "website", url: canonical, locale: isEn ? "en_GB" : "pl_PL", images: [{ url: trip.image, alt: isEn ? `Football match trip to ${trip.city}: ${trip.title}` : `Wyjazd na mecz ${trip.title} w ${trip.city}` }] },
+    twitter: { card: "summary_large_image", title, description, images: [trip.image] },
   }
 }
 

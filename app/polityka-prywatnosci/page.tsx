@@ -12,15 +12,17 @@ import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
+import { seoCopy } from "@/lib/seo-copy"
+
+const seo = seoCopy.privacy.pl
 
 export const metadata: Metadata = {
-  title: "Polityka prywatności i cookies",
-  description:
-    "Polityka prywatności i cookies Let's Gol. Informacje o przetwarzaniu danych osobowych, prawach użytkowników oraz wykorzystywaniu plików cookies.",
+  title: seo.title,
+  description: seo.description,
   alternates: localizedAlternates("/polityka-prywatnosci", "pl"),
   ...socialMetadata(
-    "Polityka prywatności i cookies | Let's Gol",
-    "Informacje o przetwarzaniu danych osobowych, prywatności i wykorzystywaniu plików cookies w serwisie Let's Gol.",
+    seo.title,
+    seo.description,
     "/polityka-prywatnosci"
   ),
 }

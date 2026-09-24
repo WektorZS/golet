@@ -7,6 +7,7 @@ import { FloatingContact } from "@/components/floating-contact"
 import { JsonLd } from "@/components/json-ld"
 import { absoluteUrl, siteUrl } from "@/lib/site"
 import { getRequestLocale } from "@/lib/i18n-request"
+import { seoCopy } from "@/lib/seo-copy"
 import "./globals.css"
 
 const geist = Geist({
@@ -70,16 +71,15 @@ export const metadata: Metadata = {
   },
 
   title: {
-    default: "Let’s Gol - wyjazdy na mecze w Europie",
+    default: seoCopy.home.pl.title,
     template: "%s - Let’s Gol",
   },
 
-  description:
-    "Kompleksowe wyjazdy na największe mecze w Europie. Bilety, lot, hotel i opieka koordynatora w jednym pakiecie.",
+  description: seoCopy.home.pl.description,
 
   openGraph: {
-    title: "Let’s Gol - wyjazdy na mecze",
-    description: "Ty wybierasz mecz. My organizujemy całą podróż.",
+    title: seoCopy.home.pl.title,
+    description: seoCopy.home.pl.description,
     siteName: "Let’s Gol",
     locale: "pl_PL",
     type: "website",
@@ -95,8 +95,8 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Let’s Gol - wyjazdy na mecze",
-    description: "Ty wybierasz mecz. My organizujemy całą podróż.",
+    title: seoCopy.home.pl.title,
+    description: seoCopy.home.pl.description,
     images: ["/images/og-image.webp"],
   },
 

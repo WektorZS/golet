@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button"
 import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
 import { getRequestLocale } from "@/lib/i18n-request"
 import { routeFor } from "@/lib/i18n"
+import { getSeoCopy } from "@/lib/seo-copy"
 
 export const dynamic = "force-dynamic"
 const socialProfiles = [
@@ -71,8 +72,7 @@ const socialProfiles = [
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
-  const title = locale === "en" ? "Contact" : "Kontakt"
-  const description = locale === "en" ? "Contact Let's Gol about a football trip, booking, group offer or partnership." : "Skontaktuj się z Let's Gol w sprawie wyjazdu na mecz, rezerwacji, oferty grupowej lub współpracy."
+  const { title, description } = getSeoCopy("contact", locale)
   return { title, description, alternates: localizedAlternates("/kontakt", locale), ...socialMetadata(title, description, routeFor(locale, "/kontakt"), locale) }
 }
 function WhatsAppIcon({ className = "" }: { className?: string }) {

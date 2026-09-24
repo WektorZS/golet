@@ -1,12 +1,15 @@
 import type { Metadata } from "next"
 import { EnglishLegalPage } from "@/components/english-legal-page"
 import { localizedAlternates, socialMetadata } from "@/lib/seo"
+import { seoCopy } from "@/lib/seo-copy"
+
+const seo = seoCopy.terms.en
 
 export const metadata: Metadata = {
-  title: "Terms and conditions",
-  description: "Terms that apply when booking and taking part in a Let's Gol football trip.",
+  title: seo.title,
+  description: seo.description,
   alternates: localizedAlternates("/warunki-uczestnictwa", "en"),
-  ...socialMetadata("Terms and conditions", "Terms that apply to Let's Gol football match trips.", "/en/terms-and-conditions", "en"),
+  ...socialMetadata(seo.title, seo.description, "/en/terms-and-conditions", "en"),
 }
 
 export default function TermsAndConditionsPage() {

@@ -15,13 +15,13 @@ import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo
 import { getRequestLocale } from "@/lib/i18n-request"
 import { localizedSetting } from "@/lib/i18n-content"
 import { routeFor } from "@/lib/i18n"
+import { getSeoCopy } from "@/lib/seo-copy"
 
 export const dynamic = "force-dynamic"
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
-  const title = locale === "en" ? "Football trip gallery" : "Galeria z wyjazdów"
-  const description = locale === "en" ? "See stadiums, cities and match-day memories from Let's Gol football trips." : "Zobacz zdjęcia z piłkarskich wyjazdów organizowanych przez Let's Gol."
+  const { title, description } = getSeoCopy("gallery", locale)
   const path = routeFor(locale, "/galeria")
   return { title, description, alternates: localizedAlternates("/galeria", locale), ...socialMetadata(title, description, path, locale) }
 }

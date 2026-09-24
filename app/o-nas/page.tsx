@@ -17,13 +17,13 @@ import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo
 import { AboutStorySlider } from "@/components/about-story-slider"
 import { getRequestLocale } from "@/lib/i18n-request"
 import { routeFor } from "@/lib/i18n"
+import { getSeoCopy } from "@/lib/seo-copy"
 
 export const dynamic = "force-dynamic"
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
-  const title = locale === "en" ? "About us" : "O nas"
-  const description = locale === "en" ? "Meet Lukasz and Mateusz and discover the friendship, football and travel experience behind Let's Gol." : "Poznaj historię Let's Gol, Łukasza i Mateusza oraz pasję, z której powstały nasze wyjazdy na największe stadiony Europy."
+  const { title, description } = getSeoCopy("about", locale)
   return { title, description, alternates: localizedAlternates("/o-nas", locale), ...socialMetadata(title, description, routeFor(locale, "/o-nas"), locale) }
 }
 

@@ -15,15 +15,17 @@ import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
+import { seoCopy } from "@/lib/seo-copy"
+
+const seo = seoCopy.terms.pl
 
 export const metadata: Metadata = {
-  title: "Warunki uczestnictwa",
-  description:
-    "Warunki uczestnictwa w wyjazdach organizowanych przez Let's Gol na wydarzenia sportowe w Polsce i Europie.",
+  title: seo.title,
+  description: seo.description,
   alternates: localizedAlternates("/warunki-uczestnictwa", "pl"),
   ...socialMetadata(
-    "Warunki uczestnictwa | Let's Gol",
-    "Zasady rezerwacji, płatności i udziału w wyjazdach organizowanych przez Let's Gol.",
+    seo.title,
+    seo.description,
     "/warunki-uczestnictwa"
   ),
 }

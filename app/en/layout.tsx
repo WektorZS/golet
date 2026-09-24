@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
+import { seoCopy } from "@/lib/seo-copy"
 
 export const metadata: Metadata = {
   title: {
-    default: "Let’s Gol - football match trips across Europe",
+    default: seoCopy.home.en.title,
     template: "%s - Let’s Gol",
   },
-  description:
-    "Complete football match trips across Europe with tickets, flights, hotels and on-site support.",
+  description: seoCopy.home.en.description,
   openGraph: {
     siteName: "Let’s Gol",
     locale: "en_GB",

@@ -6,17 +6,20 @@ import { localizedAlternates, socialMetadata } from "@/lib/seo"
 import { getRequestLocale } from "@/lib/i18n-request"
 import { localizedSetting } from "@/lib/i18n-content"
 import { routeFor } from "@/lib/i18n"
+import { getSeoCopy } from "@/lib/seo-copy"
 
 export const dynamic = "force-dynamic"
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getSiteContent()
   const locale = await getRequestLocale()
-  const title = localizedSetting(content, "seoTitle", locale, locale === "en" ? "Let's Gol - football match trips" : "Let’s Gol - wyjazdy na mecze piłkarskie")
-  const description = localizedSetting(content, "seoDescription", locale, locale === "en" ? "Complete trips to Europe's biggest football matches, including tickets, flights, hotels and coordinator support." : "Kompleksowe wyjazdy na największe mecze w Europie: bilety, lot, hotel i opieka koordynatora.")
+  const seo = getSeoCopy("home", locale)
+  const title = localizedSetting(content, "seoTitle", locale, seo.title)
+  const configuredDescription = localizedSetting(content, "seoDescription", locale, "").trim()
+  const description = configuredDescription.length >= 120 ? configuredDescription : seo.description
   const path = routeFor(locale, "/")
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: localizedAlternates("/", locale),
     ...socialMetadata(title, description, path, locale),

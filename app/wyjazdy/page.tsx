@@ -10,16 +10,13 @@ import { getPublishedTrips } from "@/lib/trips"
 import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
 import { getRequestLocale } from "@/lib/i18n-request"
 import { routeFor } from "@/lib/i18n"
+import { getSeoCopy } from "@/lib/seo-copy"
 
 export const dynamic = "force-dynamic"
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
-  const isEn = locale === "en"
-  const title = isEn ? "Football match trips" : "Wyjazdy na mecze"
-  const description = isEn
-    ? "Current packages for Europe's biggest football matches, including tickets, flights, hotels and coordinator support."
-    : "Aktualne pakiety na największe mecze piłkarskie w Europie: bilet, lot, hotel i opieka koordynatora."
+  const { title, description } = getSeoCopy("trips", locale)
   const path = routeFor(locale, "/wyjazdy")
   return { title, description, alternates: localizedAlternates("/wyjazdy", locale), ...socialMetadata(title, description, path, locale) }
 }
