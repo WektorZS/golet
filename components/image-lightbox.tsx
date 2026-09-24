@@ -384,12 +384,18 @@ export function ImageLightbox({
           />
         )}
 
-        <span className="absolute bottom-3 right-3 flex size-9 items-center justify-center rounded-full bg-foreground/75 text-background opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-          <Maximize2
-            className="size-4"
-            aria-hidden="true"
-          />
-        </span>
+        <span className="pointer-events-none absolute bottom-3 right-3 z-10 hidden translate-y-1 items-center gap-2 rounded-full border border-white/15 bg-black/75 px-3.5 py-2 text-white opacity-0 shadow-lg backdrop-blur-md transition-[opacity,transform,background-color] duration-300 group-hover:translate-y-0 group-hover:bg-black/90 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 lg:flex">
+  <Maximize2
+    className="size-3.5 shrink-0"
+    aria-hidden="true"
+  />
+
+  <span className="whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-wider">
+    {isEn
+      ? "Click to enlarge"
+      : "Kliknij, aby powiększyć"}
+  </span>
+</span>
       </DialogTrigger>
 
       <DialogContent
