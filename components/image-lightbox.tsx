@@ -433,7 +433,7 @@ export function ImageLightbox({
 
     setIsOpen(false)
   }}
-  className="absolute right-4 top-4 z-[70] flex size-10 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md transition-[background-color,transform,border-color] duration-200 hover:scale-105 hover:border-white/25 hover:bg-black/75 sm:right-6 sm:top-6 sm:size-11"
+  className="absolute right-4 top-4 z-[70] flex size-10 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md transition-[background-color,transform,border-color] duration-200 hover:scale-105 hover:border-white/25 hover:bg-black/75 sm:right-10 sm:top-6 sm:size-11 lg:right-14"
   aria-label={
     isEn
       ? "Close photo"
