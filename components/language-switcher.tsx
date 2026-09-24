@@ -84,8 +84,9 @@ export function LanguageSwitcher({
       const destination = localizedPath(pathname, nextLocale)
 
       router.push(
-        `${destination}${window.location.search}${window.location.hash}`,
-      )
+  `${destination}${window.location.search}${window.location.hash}`,
+  { scroll: false },
+)
     })
   }
 
