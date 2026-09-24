@@ -1,7 +1,14 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import Image from "next/image"
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
+import Image, {
+  getImageProps,
+} from "next/image"
 import { usePathname } from "next/navigation"
 import {
   ChevronLeft,
@@ -25,6 +32,75 @@ type LightboxImage = {
   caption?: string
 }
 
+const LIGHTBOX_QUALITY = 90
+
+const LIGHTBOX_SIZES =
+  "(max-width: 640px) calc(100vw - 1rem), 1024px"
+
+const preloadCache = new Map<
+  string,
+  HTMLImageElement
+>()
+
+function preloadLightboxImage(
+  src: string,
+  priority: "high" | "low" = "low",
+) {
+  if (
+    typeof window === "undefined" ||
+    !src
+  ) {
+    return
+  }
+
+  const cached =
+    preloadCache.get(src)
+
+  if (cached) {
+    if (priority === "high") {
+      cached.setAttribute(
+        "fetchpriority",
+        "high",
+      )
+    }
+
+    return
+  }
+
+  const { props } = getImageProps({
+    src,
+    alt: "",
+    fill: true,
+    sizes: LIGHTBOX_SIZES,
+    quality: LIGHTBOX_QUALITY,
+  })
+
+  const image =
+    new window.Image()
+
+  image.decoding = "async"
+  image.sizes =
+    props.sizes ??
+    LIGHTBOX_SIZES
+
+  if (props.srcSet) {
+    image.srcset =
+      props.srcSet
+  }
+
+  image.setAttribute(
+    "fetchpriority",
+    priority,
+  )
+
+  image.src = props.src
+
+  preloadCache.set(
+    src,
+    image,
+  )
+}
+
 export function ImageLightbox({
   src,
   alt,
@@ -42,25 +118,65 @@ export function ImageLightbox({
   children?: React.ReactNode
   priority?: boolean
 }) {
+  const pathname =
+    usePathname()
+
   const isEn =
-    localeFromPathname(usePathname()) === "en"
+    localeFromPathname(
+      pathname,
+    ) === "en"
 
-  const gallery =
-    images && images.length > 0
-      ? images
-      : [{ src, alt, caption }]
+  const gallery = useMemo(
+    () =>
+      images &&
+      images.length > 0
+        ? images
+        : [
+            {
+              src,
+              alt,
+              caption,
+            },
+          ],
+    [
+      images,
+      src,
+      alt,
+      caption,
+    ],
+  )
 
-  const [currentIndex, setCurrentIndex] =
-    useState(initialIndex)
+  const [
+    currentIndex,
+    setCurrentIndex,
+  ] = useState(initialIndex)
 
-  const [isOpen, setIsOpen] =
-    useState(false)
+  const [
+    isOpen,
+    setIsOpen,
+  ] = useState(false)
 
-  const [touchStartX, setTouchStartX] =
-    useState<number | null>(null)
+  const [
+    touchStartX,
+    setTouchStartX,
+  ] = useState<
+    number | null
+  >(null)
+
+  const [
+    imageLoaded,
+    setImageLoaded,
+  ] = useState(false)
 
   const contentRef =
-    useRef<HTMLDivElement>(null)
+    useRef<HTMLDivElement>(
+      null,
+    )
+
+  const triggerRef =
+    useRef<HTMLButtonElement>(
+      null,
+    )
 
   const currentImage =
     gallery[currentIndex]
@@ -68,21 +184,136 @@ export function ImageLightbox({
   const hasMultipleImages =
     gallery.length > 1
 
-  const previousImage = () => {
-    setCurrentIndex((current) =>
-      current === 0
-        ? gallery.length - 1
-        : current - 1,
+  const previousImage =
+    () => {
+      setCurrentIndex(
+        (current) =>
+          current === 0
+            ? gallery.length -
+              1
+            : current - 1,
+      )
+    }
+
+  const nextImage = () => {
+    setCurrentIndex(
+      (current) =>
+        current ===
+        gallery.length - 1
+          ? 0
+          : current + 1,
     )
   }
 
-  const nextImage = () => {
-    setCurrentIndex((current) =>
-      current === gallery.length - 1
-        ? 0
-        : current + 1,
+  useEffect(() => {
+    const trigger =
+      triggerRef.current
+
+    if (
+      !trigger ||
+      typeof IntersectionObserver ===
+        "undefined"
+    ) {
+      return
+    }
+
+    let preloadTimer:
+      | ReturnType<
+          typeof setTimeout
+        >
+      | undefined
+
+    const observer =
+      new IntersectionObserver(
+        ([entry]) => {
+          if (
+            !entry?.isIntersecting
+          ) {
+            return
+          }
+
+          preloadTimer =
+            setTimeout(() => {
+              preloadLightboxImage(
+                src,
+                priority
+                  ? "high"
+                  : "low",
+              )
+            }, 200)
+
+          observer.disconnect()
+        },
+        {
+          rootMargin:
+            "300px 0px",
+        },
+      )
+
+    observer.observe(trigger)
+
+    return () => {
+      observer.disconnect()
+
+      if (preloadTimer) {
+        clearTimeout(
+          preloadTimer,
+        )
+      }
+    }
+  }, [src, priority])
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    preloadLightboxImage(
+      currentImage.src,
+      "high",
     )
-  }
+
+    if (
+      !hasMultipleImages
+    ) {
+      return
+    }
+
+    const previousIndex =
+      currentIndex === 0
+        ? gallery.length - 1
+        : currentIndex - 1
+
+    const nextIndex =
+      currentIndex ===
+      gallery.length - 1
+        ? 0
+        : currentIndex + 1
+
+    preloadLightboxImage(
+      gallery[
+        previousIndex
+      ].src,
+      "low",
+    )
+
+    preloadLightboxImage(
+      gallery[nextIndex].src,
+      "low",
+    )
+  }, [
+    isOpen,
+    currentIndex,
+    currentImage.src,
+    gallery,
+    hasMultipleImages,
+  ])
+
+  useEffect(() => {
+    setImageLoaded(false)
+  }, [
+    currentImage.src,
+  ])
 
   useEffect(() => {
     if (
@@ -95,26 +326,35 @@ export function ImageLightbox({
     const handleKeyDown = (
       event: KeyboardEvent,
     ) => {
-      if (event.key === "ArrowLeft") {
+      if (
+        event.key ===
+        "ArrowLeft"
+      ) {
         event.preventDefault()
         event.stopPropagation()
 
-        setCurrentIndex((current) =>
-          current === 0
-            ? gallery.length - 1
-            : current - 1,
+        setCurrentIndex(
+          (current) =>
+            current === 0
+              ? gallery.length -
+                1
+              : current - 1,
         )
       }
 
-      if (event.key === "ArrowRight") {
+      if (
+        event.key ===
+        "ArrowRight"
+      ) {
         event.preventDefault()
         event.stopPropagation()
 
-        setCurrentIndex((current) =>
-          current ===
-          gallery.length - 1
-            ? 0
-            : current + 1,
+        setCurrentIndex(
+          (current) =>
+            current ===
+            gallery.length - 1
+              ? 0
+              : current + 1,
         )
       }
     }
@@ -142,7 +382,8 @@ export function ImageLightbox({
     event: React.TouchEvent<HTMLDivElement>,
   ) => {
     setTouchStartX(
-      event.touches[0].clientX,
+      event.touches[0]
+        .clientX,
     )
   }
 
@@ -150,22 +391,29 @@ export function ImageLightbox({
     event: React.TouchEvent<HTMLDivElement>,
   ) => {
     if (
-      touchStartX === null ||
+      touchStartX ===
+        null ||
       !hasMultipleImages
     ) {
       return
     }
 
     const touchEndX =
-      event.changedTouches[0].clientX
+      event.changedTouches[0]
+        .clientX
 
     const difference =
-      touchStartX - touchEndX
+      touchStartX -
+      touchEndX
 
     if (
-      Math.abs(difference) > 50
+      Math.abs(
+        difference,
+      ) > 50
     ) {
-      if (difference > 0) {
+      if (
+        difference > 0
+      ) {
         nextImage()
       } else {
         previousImage()
@@ -175,15 +423,30 @@ export function ImageLightbox({
     setTouchStartX(null)
   }
 
+  const prepareCurrentImage =
+    () => {
+      preloadLightboxImage(
+        src,
+        "high",
+      )
+    }
+
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={(open) => {
+      onOpenChange={(
+        open,
+      ) => {
         setIsOpen(open)
 
         if (open) {
           setCurrentIndex(
             initialIndex,
+          )
+
+          preloadLightboxImage(
+            src,
+            "high",
           )
         }
       }}
@@ -191,7 +454,19 @@ export function ImageLightbox({
       <DialogTrigger
         render={
           <button
+            ref={
+              triggerRef
+            }
             type="button"
+            onMouseEnter={
+              prepareCurrentImage
+            }
+            onFocus={
+              prepareCurrentImage
+            }
+            onPointerDown={
+              prepareCurrentImage
+            }
             className="group relative block size-full cursor-zoom-in overflow-hidden text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             aria-label={
               isEn
@@ -208,7 +483,9 @@ export function ImageLightbox({
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, 33vw"
-            priority={priority}
+            priority={
+              priority
+            }
           />
         )}
 
@@ -221,7 +498,9 @@ export function ImageLightbox({
       </DialogTrigger>
 
       <DialogContent
-        ref={contentRef}
+        ref={
+          contentRef
+        }
         className="top-[calc(50%+2.5rem)] flex h-[calc(100dvh-6rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col gap-0 overflow-hidden border-black/40 bg-black p-0 text-white shadow-2xl sm:w-[calc(100vw-2rem)] sm:max-w-6xl"
         showCloseButton
       >
@@ -252,30 +531,59 @@ export function ImageLightbox({
             aria-hidden="true"
           >
             <Image
-              src={currentImage.src}
+              src={
+                currentImage.src
+              }
               alt=""
               fill
-              sizes="100vw"
-              quality={90}
+              sizes={
+                LIGHTBOX_SIZES
+              }
+              quality={
+                LIGHTBOX_QUALITY
+              }
               className="scale-110 object-cover blur-3xl"
             />
 
             <div className="absolute inset-0 bg-black/55" />
           </div>
 
+          {!imageLoaded && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center">
+              <span className="size-7 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
+            </div>
+          )}
+
           <div className="absolute inset-0 z-10 p-2 sm:p-4">
             <div className="relative size-full">
               <Image
-                key={currentImage.src}
-                src={currentImage.src}
+                key={
+                  currentImage.src
+                }
+                src={
+                  currentImage.src
+                }
                 alt={
                   currentImage.alt
                 }
                 fill
-                sizes="(max-width: 640px) calc(100vw - 1rem), min(1152px, calc(100vw - 2rem))"
-                quality={95}
-                priority
-                className="object-contain"
+                sizes={
+                  LIGHTBOX_SIZES
+                }
+                quality={
+                  LIGHTBOX_QUALITY
+                }
+                loading="eager"
+                onLoad={() =>
+                  setImageLoaded(
+                    true,
+                  )
+                }
+                className={`object-contain transition-opacity duration-200 ${
+                  imageLoaded
+                    ? "opacity-100"
+                    : "opacity-0"
+                }`}
               />
             </div>
           </div>
@@ -284,9 +592,12 @@ export function ImageLightbox({
             <>
               <button
                 type="button"
-                onClick={(event) => {
+                onClick={(
+                  event,
+                ) => {
                   event.preventDefault()
                   event.stopPropagation()
+
                   previousImage()
                 }}
                 className="absolute left-2 top-1/2 z-20 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:left-4 sm:size-11"
@@ -301,9 +612,12 @@ export function ImageLightbox({
 
               <button
                 type="button"
-                onClick={(event) => {
+                onClick={(
+                  event,
+                ) => {
                   event.preventDefault()
                   event.stopPropagation()
+
                   nextImage()
                 }}
                 className="absolute right-2 top-1/2 z-20 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:right-4 sm:size-11"
@@ -317,8 +631,12 @@ export function ImageLightbox({
               </button>
 
               <div className="absolute bottom-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-black/65 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md sm:bottom-4">
-                {currentIndex + 1} /{" "}
-                {gallery.length}
+                {currentIndex +
+                  1}{" "}
+                /{" "}
+                {
+                  gallery.length
+                }
               </div>
             </>
           )}
