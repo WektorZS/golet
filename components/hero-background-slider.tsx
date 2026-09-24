@@ -39,11 +39,11 @@ const slides = [
 
     desktopX: 50,
     desktopY: 100,
-    desktopScale: 1.5,
+    desktopScale: 1.0,
   },
   {
-    src: "/images/sagradafamilia-hero.webp",
-    mobileSrc: "/images/sagradafamilia-mobile.webp",
+    src: "/images/wembley-hero.webp",
+    mobileSrc: "/images/wembley-hero-mobile.webp",
 
     mobileX: 50,
     mobileY: -10,
