@@ -18,26 +18,32 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
     router.push(`${destination}${window.location.search}${window.location.hash}`)
   }
 
+  const languages = [
+    { value: "pl", flag: "🇵🇱" },
+    { value: "en", flag: "🇬🇧" },
+  ] as const
+
   return (
     <div
       className="inline-flex items-center gap-1 rounded-lg border border-current/20 bg-black/10 p-1"
       role="group"
       aria-label={dictionary.language.label}
     >
-      {(["pl", "en"] as const).map((value) => (
+      {languages.map(({ value, flag }) => (
         <button
           key={value}
           type="button"
           onClick={() => changeLocale(value)}
           aria-pressed={locale === value}
           title={value === "pl" ? dictionary.language.polish : dictionary.language.english}
-          className={`rounded-md px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider transition-colors ${
+          className={`inline-flex items-center justify-center gap-1.5 rounded-md px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider transition-colors ${
             locale === value
               ? "bg-primary text-black"
               : "text-current/70 hover:text-current"
-          } ${compact ? "min-w-8" : "min-w-9"}`}
+          } ${compact ? "min-w-12" : "min-w-14"}`}
         >
-          {value.toUpperCase()}
+          <span aria-hidden="true" className="font-sans text-sm leading-none">{flag}</span>
+          <span>{value.toUpperCase()}</span>
         </button>
       ))}
     </div>

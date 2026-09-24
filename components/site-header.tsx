@@ -117,7 +117,7 @@ export function SiteHeader() {
         </nav>
 
         {/* DESKTOP CTA */}
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-3 text-background lg:flex">
           <LanguageSwitcher compact />
         <Button
           type="button"
