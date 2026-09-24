@@ -4,18 +4,31 @@ import Image from "next/image"
 import { useEffect, useMemo, useState } from "react"
 
 const slides = [
-  {
-    src: "/images/hero-stadium.webp",
-    mobileSrc: "/images/hero-stadium.webp",
+    {
+    src: "/images/barcelonavsreal-hero.webp",
+    mobileSrc: "/images/barcelonavsreal-hero-mobile.webp",
 
-    mobileX: 55,
-    mobileY: -6,
-    mobileScale: 1.15,
+    mobileX: 40,
+    mobileY: -10,
+    mobileScale: 1,
 
     desktopX: 50,
     desktopY: 50,
     desktopScale: 1,
   },
+   {
+    src: "/images/san-siro.webp",
+    mobileSrc: "/images/san-siro-mobile.webp",
+
+    mobileX: 15,
+    mobileY: -20,
+    mobileScale: 1,
+
+    desktopX: 50,
+    desktopY: 100,
+    desktopScale: 1,
+  },
+
   {
     src: "/images/madryt-hero.webp",
     mobileSrc: "/images/madryt-hero-mobile.webp",
@@ -26,7 +39,7 @@ const slides = [
 
     desktopX: 50,
     desktopY: 100,
-    desktopScale: 1,
+    desktopScale: 1.5,
   },
   {
     src: "/images/sagradafamilia-hero.webp",
@@ -40,30 +53,19 @@ const slides = [
     desktopY: 100,
     desktopScale: 1,
   },
-  {
-    src: "/images/barcelonavsreal-hero.webp",
-    mobileSrc: "/images/barcelonavsreal-hero-mobile.webp",
+    {
+    src: "/images/hero-stadium.webp",
+    mobileSrc: "/images/hero-stadium.webp",
 
-    mobileX: 40,
-    mobileY: -10,
-    mobileScale: 1,
+    mobileX: 55,
+    mobileY: -6,
+    mobileScale: 1.15,
 
     desktopX: 50,
     desktopY: 50,
     desktopScale: 1,
   },
-  {
-    src: "/images/san-siro.webp",
-    mobileSrc: "/images/san-siro-mobile.webp",
-
-    mobileX: 15,
-    mobileY: -20,
-    mobileScale: 1,
-
-    desktopX: 50,
-    desktopY: 100,
-    desktopScale: 1,
-  },
+ 
 ] as const
 
 const fallbackEyebrow =
