@@ -3,9 +3,13 @@
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react"
-import { localeFromPathname } from "@/lib/i18n"
+import {
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+} from "lucide-react"
 
+import { localeFromPathname } from "@/lib/i18n"
 
 import {
   Dialog,
@@ -14,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+
 type LightboxImage = {
   src: string
   alt: string
@@ -37,75 +42,129 @@ export function ImageLightbox({
   children?: React.ReactNode
   priority?: boolean
 }) {
-  const isEn = localeFromPathname(usePathname()) === "en"
+  const isEn =
+    localeFromPathname(usePathname()) === "en"
+
   const gallery =
     images && images.length > 0
       ? images
       : [{ src, alt, caption }]
 
-  const [currentIndex, setCurrentIndex] = useState(initialIndex)
-  const [isOpen, setIsOpen] = useState(false)
-  const [touchStartX, setTouchStartX] = useState<number | null>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
+  const [currentIndex, setCurrentIndex] =
+    useState(initialIndex)
 
-  const currentImage = gallery[currentIndex]
-  const hasMultipleImages = gallery.length > 1
+  const [isOpen, setIsOpen] =
+    useState(false)
 
+  const [touchStartX, setTouchStartX] =
+    useState<number | null>(null)
 
-const previousImage = () => {
-  setCurrentIndex((current) =>
-    current === 0 ? gallery.length - 1 : current - 1
-  )
-}
+  const contentRef =
+    useRef<HTMLDivElement>(null)
 
-const nextImage = () => {
-  setCurrentIndex((current) =>
-    current === gallery.length - 1 ? 0 : current + 1
-  )
-}
+  const currentImage =
+    gallery[currentIndex]
 
-useEffect(() => {
-  if (!isOpen || !hasMultipleImages) return
+  const hasMultipleImages =
+    gallery.length > 1
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "ArrowLeft") {
-      event.preventDefault()
-      event.stopPropagation()
+  const previousImage = () => {
+    setCurrentIndex((current) =>
+      current === 0
+        ? gallery.length - 1
+        : current - 1,
+    )
+  }
 
-      setCurrentIndex((current) =>
-        current === 0 ? gallery.length - 1 : current - 1
-      )
+  const nextImage = () => {
+    setCurrentIndex((current) =>
+      current === gallery.length - 1
+        ? 0
+        : current + 1,
+    )
+  }
+
+  useEffect(() => {
+    if (
+      !isOpen ||
+      !hasMultipleImages
+    ) {
+      return
     }
 
-    if (event.key === "ArrowRight") {
-      event.preventDefault()
-      event.stopPropagation()
+    const handleKeyDown = (
+      event: KeyboardEvent,
+    ) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault()
+        event.stopPropagation()
 
-      setCurrentIndex((current) =>
-        current === gallery.length - 1 ? 0 : current + 1
+        setCurrentIndex((current) =>
+          current === 0
+            ? gallery.length - 1
+            : current - 1,
+        )
+      }
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault()
+        event.stopPropagation()
+
+        setCurrentIndex((current) =>
+          current ===
+          gallery.length - 1
+            ? 0
+            : current + 1,
+        )
+      }
+    }
+
+    document.addEventListener(
+      "keydown",
+      handleKeyDown,
+      true,
+    )
+
+    return () => {
+      document.removeEventListener(
+        "keydown",
+        handleKeyDown,
+        true,
       )
     }
+  }, [
+    isOpen,
+    hasMultipleImages,
+    gallery.length,
+  ])
+
+  const handleTouchStart = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    setTouchStartX(
+      event.touches[0].clientX,
+    )
   }
 
-  document.addEventListener("keydown", handleKeyDown, true)
+  const handleTouchEnd = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    if (
+      touchStartX === null ||
+      !hasMultipleImages
+    ) {
+      return
+    }
 
-  return () => {
-    document.removeEventListener("keydown", handleKeyDown, true)
-  }
-}, [isOpen, hasMultipleImages, gallery.length])
+    const touchEndX =
+      event.changedTouches[0].clientX
 
+    const difference =
+      touchStartX - touchEndX
 
-  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
-    setTouchStartX(event.touches[0].clientX)
-  }
-
-  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
-    if (touchStartX === null || !hasMultipleImages) return
-
-    const touchEndX = event.changedTouches[0].clientX
-    const difference = touchStartX - touchEndX
-
-    if (Math.abs(difference) > 50) {
+    if (
+      Math.abs(difference) > 50
+    ) {
       if (difference > 0) {
         nextImage()
       } else {
@@ -121,7 +180,12 @@ useEffect(() => {
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open)
-        if (open) setCurrentIndex(initialIndex)
+
+        if (open) {
+          setCurrentIndex(
+            initialIndex,
+          )
+        }
       }}
     >
       <DialogTrigger
@@ -129,7 +193,11 @@ useEffect(() => {
           <button
             type="button"
             className="group relative block size-full cursor-zoom-in overflow-hidden text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            aria-label={isEn ? `Enlarge photo: ${alt}` : `Powiększ zdjęcie: ${alt}`}
+            aria-label={
+              isEn
+                ? `Enlarge photo: ${alt}`
+                : `Powiększ zdjęcie: ${alt}`
+            }
           />
         }
       >
@@ -145,75 +213,116 @@ useEffect(() => {
         )}
 
         <span className="absolute bottom-3 right-3 flex size-9 items-center justify-center rounded-full bg-foreground/75 text-background opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-          <Maximize2 className="size-4" aria-hidden="true" />
+          <Maximize2
+            className="size-4"
+            aria-hidden="true"
+          />
         </span>
       </DialogTrigger>
 
       <DialogContent
         ref={contentRef}
-        className="top-[calc(50%+2.5rem)] flex max-h-[calc(100dvh-6rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-hidden bg-foreground p-2 text-background sm:w-[calc(100vw-2rem)] sm:max-w-6xl"
+        className="top-[calc(50%+2.5rem)] flex h-[calc(100dvh-6rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col gap-0 overflow-hidden border-black/40 bg-black p-0 text-white shadow-2xl sm:w-[calc(100vw-2rem)] sm:max-w-6xl"
         showCloseButton
       >
         <DialogTitle className="sr-only">
-          {isEn ? "Photo preview" : "Podgląd zdjęcia"}
+          {isEn
+            ? "Photo preview"
+            : "Podgląd zdjęcia"}
         </DialogTitle>
 
         <DialogDescription className="sr-only">
-          {isEn ? "Expanded photo. Use the arrows or swipe to move between photos." : "Powiększone zdjęcie. Użyj strzałek, aby przechodzić między zdjęciami lub przesuń zdjęcie palcem."}
+          {isEn
+            ? "Expanded photo. Use the arrows or swipe to move between photos."
+            : "Powiększone zdjęcie. Użyj strzałek, aby przechodzić między zdjęciami lub przesuń zdjęcie palcem."}
         </DialogDescription>
 
         <div
-          className="relative flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden rounded-lg"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+          className="relative size-full min-h-0 overflow-hidden bg-black"
+          onTouchStart={
+            handleTouchStart
+          }
+          onTouchEnd={
+            handleTouchEnd
+          }
         >
-          <Image
-            key={currentImage.src}
-            src={currentImage.src}
-            alt={currentImage.alt}
-            width={1600}
-            height={1200}
-            sizes="calc(100vw - 1rem)"
-            className="max-h-full max-w-full object-contain"
-            priority
-          />
+          <div
+            key={`background-${currentImage.src}`}
+            className="absolute inset-0 overflow-hidden"
+            aria-hidden="true"
+          >
+            <Image
+              src={currentImage.src}
+              alt=""
+              fill
+              sizes="100vw"
+              quality={90}
+              className="scale-110 object-cover blur-3xl"
+            />
+
+            <div className="absolute inset-0 bg-black/55" />
+          </div>
+
+          <div className="absolute inset-0 z-10 p-2 sm:p-4">
+            <div className="relative size-full">
+              <Image
+                key={currentImage.src}
+                src={currentImage.src}
+                alt={
+                  currentImage.alt
+                }
+                fill
+                sizes="(max-width: 640px) calc(100vw - 1rem), min(1152px, calc(100vw - 2rem))"
+                quality={95}
+                priority
+                className="object-contain"
+              />
+            </div>
+          </div>
 
           {hasMultipleImages && (
             <>
               <button
-  type="button"
-  onClick={(event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    previousImage()
-  }}
-  className="absolute left-2 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg transition-opacity hover:bg-background sm:left-3"
-  aria-label={isEn ? "Previous photo" : "Poprzednie zdjęcie"}
->
-  <ChevronLeft className="size-5" />
-</button>
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  previousImage()
+                }}
+                className="absolute left-2 top-1/2 z-20 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:left-4 sm:size-11"
+                aria-label={
+                  isEn
+                    ? "Previous photo"
+                    : "Poprzednie zdjęcie"
+                }
+              >
+                <ChevronLeft className="size-5 sm:size-6" />
+              </button>
 
-             <button
-  type="button"
-  onClick={(event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    nextImage()
-  }}
-  className="absolute right-2 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg transition-opacity hover:bg-background sm:right-3"
-  aria-label={isEn ? "Next photo" : "Następne zdjęcie"}
->
-  <ChevronRight className="size-5" />
-</button>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  nextImage()
+                }}
+                className="absolute right-2 top-1/2 z-20 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:right-4 sm:size-11"
+                aria-label={
+                  isEn
+                    ? "Next photo"
+                    : "Następne zdjęcie"
+                }
+              >
+                <ChevronRight className="size-5 sm:size-6" />
+              </button>
 
-              <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                {currentIndex + 1} / {gallery.length}
+              <div className="absolute bottom-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-black/65 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md sm:bottom-4">
+                {currentIndex + 1} /{" "}
+                {gallery.length}
               </div>
             </>
           )}
         </div>
-
-      
       </DialogContent>
     </Dialog>
   )
