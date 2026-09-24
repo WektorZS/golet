@@ -6,6 +6,27 @@ import { setLocalePreference } from "@/app/actions/locale"
 import { getDictionary } from "@/lib/dictionaries"
 import { localeFromPathname, localizedPath, type Locale } from "@/lib/i18n"
 
+function LanguageFlag({ locale }: { locale: Locale }) {
+  if (locale === "pl") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 32 20" className="h-3.5 w-[22px] shrink-0 overflow-hidden rounded-[2px] shadow-sm ring-1 ring-black/15">
+        <path fill="#fff" d="M0 0h32v10H0z" />
+        <path fill="#dc143c" d="M0 10h32v10H0z" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg aria-hidden="true" viewBox="0 0 60 36" className="h-3.5 w-[22px] shrink-0 overflow-hidden rounded-[2px] shadow-sm ring-1 ring-black/15">
+      <path fill="#012169" d="M0 0h60v36H0z" />
+      <path stroke="#fff" strokeWidth="8" d="m0 0 60 36M60 0 0 36" />
+      <path stroke="#c8102e" strokeWidth="4" d="m0 0 60 36M60 0 0 36" />
+      <path stroke="#fff" strokeWidth="12" d="M30 0v36M0 18h60" />
+      <path stroke="#c8102e" strokeWidth="7" d="M30 0v36M0 18h60" />
+    </svg>
+  )
+}
+
 export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -18,10 +39,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
     router.push(`${destination}${window.location.search}${window.location.hash}`)
   }
 
-  const languages = [
-    { value: "pl", flag: "🇵🇱" },
-    { value: "en", flag: "🇬🇧" },
-  ] as const
+  const languages = ["pl", "en"] as const
 
   return (
     <div
@@ -29,7 +47,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
       role="group"
       aria-label={dictionary.language.label}
     >
-      {languages.map(({ value, flag }) => (
+      {languages.map((value) => (
         <button
           key={value}
           type="button"
@@ -42,7 +60,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
               : "text-current/70 hover:text-current"
           } ${compact ? "min-w-12" : "min-w-14"}`}
         >
-          <span aria-hidden="true" className="font-sans text-sm leading-none">{flag}</span>
+          <LanguageFlag locale={value} />
           <span>{value.toUpperCase()}</span>
         </button>
       ))}
