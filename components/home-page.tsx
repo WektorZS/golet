@@ -536,8 +536,16 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 })()}
 
       <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
-        {copy?.customIntro || "Masz wymarzony mecz, na który chcesz pojechać?<br /> Napisz nam jaki - przygotujemy wyjazd dopasowany do Ciebie."}
-      </p>
+  {copy?.customIntro ? (
+    copy.customIntro
+  ) : (
+    <>
+      Masz wymarzony mecz, na który chcesz pojechać?
+      <br />
+      Napisz nam jaki - przygotujemy wyjazd dopasowany do Ciebie.
+    </>
+  )}
+</p>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         {(copy?.customPoints || [
