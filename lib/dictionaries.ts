@@ -41,7 +41,7 @@ const pl = {
   },
   footer: {
     fallbackText: "Razem tworzymy niezapomniane piłkarskie doświadczenia.",
-    seeYou: "Do zobaczenia\nna stadionie",
+    seeYou: "Do zobaczenia\nna stadionach!",
     navigation: "Nawigacja",
     company: "Dane firmy",
     documents: "Dokumenty",
