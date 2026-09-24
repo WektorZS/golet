@@ -31,8 +31,40 @@ export type TranslateTripResult =
   | { success: true; fields: TripTranslationFields }
   | { success: false; error: string }
 
+export type TranslateAdminFieldsResult =
+  | { success: true; fields: Record<string, string> }
+  | { success: false; error: string }
+
 function splitLines(value: string) {
   return value.split("\n").map((item) => item.trim()).filter(Boolean)
+}
+
+export async function translateAdminFieldsToEnglish(
+  fields: Record<string, string>
+): Promise<TranslateAdminFieldsResult> {
+  await requireAdmin()
+
+  try {
+    const entries = Object.entries(fields).slice(0, 60)
+    const characterCount = entries.reduce((sum, [, value]) => sum + String(value).length, 0)
+
+    if (!entries.length || !entries.some(([, value]) => String(value).trim())) {
+      return { success: false, error: "Najpierw uzupełnij przynajmniej jedno polskie pole." }
+    }
+
+    if (characterCount > 30_000) {
+      return { success: false, error: "Jednorazowe tłumaczenie może obejmować maksymalnie 30 000 znaków." }
+    }
+
+    const translations = await translatePolishTexts(entries.map(([, value]) => String(value)))
+    return {
+      success: true,
+      fields: Object.fromEntries(entries.map(([key], index) => [key, translations[index] || ""])),
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Nieznany błąd tłumaczenia."
+    return { success: false, error: `Nie udało się przetłumaczyć treści. ${message}` }
+  }
 }
 
 export async function translateTripToEnglish(formData: FormData): Promise<TranslateTripResult> {

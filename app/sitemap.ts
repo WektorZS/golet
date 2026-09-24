@@ -14,7 +14,6 @@ const staticRoutePairs = [
   ["/o-nas", "/en/about-us"],
   ["/faq", "/en/faq"],
   ["/kontakt", "/en/contact"],
-  ["/wycena-indywidualna", "/en/custom-trip"],
   ["/polityka-prywatnosci", "/en/privacy-policy"],
   ["/warunki-uczestnictwa", "/en/terms-and-conditions"],
 ] as const

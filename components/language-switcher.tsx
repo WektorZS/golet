@@ -58,10 +58,10 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
             locale === value
               ? "bg-primary text-black"
               : "text-current/70 hover:text-current"
-          } ${compact ? "min-w-12" : "min-w-14"}`}
+          } ${compact ? "size-8 px-1" : "min-w-14"}`}
         >
           <LanguageFlag locale={value} />
-          <span>{value.toUpperCase()}</span>
+          <span className={compact ? "sr-only" : undefined}>{value === "pl" ? "PL" : "GB"}</span>
         </button>
       ))}
     </div>

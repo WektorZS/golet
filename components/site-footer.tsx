@@ -82,7 +82,7 @@ export async function SiteFooter({
   const dictionary = getDictionary(locale)
   const quickLinks = [
     { label: dictionary.navigation.trips, href: routeFor(locale, "/wyjazdy") },
-    { label: dictionary.navigation.customTrip, href: routeFor(locale, "/wycena-indywidualna") },
+    { label: dictionary.navigation.customTrip, href: `${routeFor(locale, "/")}#twoj-wyjazd` },
     { label: dictionary.navigation.gallery, href: routeFor(locale, "/galeria") },
     { label: dictionary.navigation.about, href: routeFor(locale, "/o-nas") },
     { label: dictionary.navigation.faq, href: routeFor(locale, "/faq") },

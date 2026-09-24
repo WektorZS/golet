@@ -77,6 +77,7 @@ import {
   uploadMedia,
 } from "@/app/actions/admin"
 import {
+  translateAdminFieldsToEnglish,
   translateTripToEnglish,
   type TripTranslationFields,
 } from "@/app/actions/translation"
@@ -1488,6 +1489,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                         />
                       </Field>
 
+                      <AutoTranslateFields mappings={[{ source: "alt", target: "altEn" }]} />
                       <Field label="Opis po angielsku" hint="Opcjonalnie. Pusty opis zostanie utworzony automatycznie."><Input name="altEn" defaultValue={asset.altEn} /></Field>
 
                       <Button
@@ -1865,7 +1867,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
               </Card>
             </TabsContent>
             <TabsContent value="team-galleries" className="mt-6">
-              <Card><CardHeader><CardTitle>Galerie drużyn</CardTitle><CardDescription>Te zdjęcia będą automatycznie widoczne przy każdym wyjeździe danej drużyny. Podpisy i opisy są opcjonalne.</CardDescription></CardHeader><CardContent className="space-y-8">{data.teams.map((team) => { const items = data.teamGallery.filter((item) => item.teamId === team.id); return <section key={team.id}><div className="mb-3 flex items-center gap-3"><span className="relative size-8"><Image src={team.logo} alt="" fill className="object-contain" sizes="32px" /></span><h3 className="font-bold">{team.name}</h3><span className="text-xs text-muted-foreground">{items.length} zdjęć</span></div>{items.length ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{items.map((item) => <div key={item.id} className="border-b pb-3"><img src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || team.name} className="aspect-video w-full object-cover" /><form action={updateTeamGalleryItem} className="mt-3 grid gap-2"><input type="hidden" name="id" value={item.id} /><Input name="caption" defaultValue={item.caption} placeholder="Podpis opcjonalny" /><Input name="alt" defaultValue={item.alt} placeholder="Opis opcjonalny" /><Input name="captionEn" defaultValue={item.captionEn} placeholder="Podpis EN opcjonalny" /><Input name="altEn" defaultValue={item.altEn} placeholder="Opis EN opcjonalny" /><Input name="sortOrder" type="number" defaultValue={item.sortOrder} aria-label="Kolejność zdjęcia" /><Button type="submit" size="sm" variant="outline">Zapisz</Button></form><form action={removeGalleryItem} className="mt-2" onSubmit={(event) => { if (!window.confirm("Usunąć zdjęcie z galerii drużyny? Plik pozostanie w bibliotece mediów.")) event.preventDefault() }}><input type="hidden" name="id" value={item.id} /><input type="hidden" name="scope" value="team" /><Button type="submit" size="sm" variant="ghost">Usuń przypisanie</Button></form></div>)}</div> : <p className="border-y py-5 text-sm text-muted-foreground">Brak zdjęć. Przypisz je z biblioteki przyciskiem Dodaj zdjęcia.</p>}</section>})}</CardContent></Card>
+              <Card><CardHeader><CardTitle>Galerie drużyn</CardTitle><CardDescription>Te zdjęcia będą automatycznie widoczne przy każdym wyjeździe danej drużyny. Podpisy i opisy są opcjonalne.</CardDescription></CardHeader><CardContent className="space-y-8">{data.teams.map((team) => { const items = data.teamGallery.filter((item) => item.teamId === team.id); return <section key={team.id}><div className="mb-3 flex items-center gap-3"><span className="relative size-8"><Image src={team.logo} alt="" fill className="object-contain" sizes="32px" /></span><h3 className="font-bold">{team.name}</h3><span className="text-xs text-muted-foreground">{items.length} zdjęć</span></div>{items.length ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{items.map((item) => <div key={item.id} className="border-b pb-3"><img src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || team.name} className="aspect-video w-full object-cover" /><form action={updateTeamGalleryItem} className="mt-3 grid gap-2"><input type="hidden" name="id" value={item.id} /><Input name="caption" defaultValue={item.caption} placeholder="Podpis opcjonalny" /><Input name="alt" defaultValue={item.alt} placeholder="Opis opcjonalny" /><AutoTranslateFields mappings={[{ source: "caption", target: "captionEn" }, { source: "alt", target: "altEn" }]} /><Input name="captionEn" defaultValue={item.captionEn} placeholder="Podpis EN opcjonalny" /><Input name="altEn" defaultValue={item.altEn} placeholder="Opis EN opcjonalny" /><Input name="sortOrder" type="number" defaultValue={item.sortOrder} aria-label="Kolejność zdjęcia" /><Button type="submit" size="sm" variant="outline">Zapisz</Button></form><form action={removeGalleryItem} className="mt-2" onSubmit={(event) => { if (!window.confirm("Usunąć zdjęcie z galerii drużyny? Plik pozostanie w bibliotece mediów.")) event.preventDefault() }}><input type="hidden" name="id" value={item.id} /><input type="hidden" name="scope" value="team" /><Button type="submit" size="sm" variant="ghost">Usuń przypisanie</Button></form></div>)}</div> : <p className="border-y py-5 text-sm text-muted-foreground">Brak zdjęć. Przypisz je z biblioteki przyciskiem Dodaj zdjęcia.</p>}</section>})}</CardContent></Card>
             </TabsContent>
           </Tabs>
         </TabsContent>
@@ -3258,6 +3260,86 @@ function Field({
   )
 }
 
+type TranslationMapping = {
+  source: string
+  target: string
+}
+
+function AutoTranslateFields({
+  mappings,
+  className = "",
+}: {
+  mappings: readonly TranslationMapping[]
+  className?: string
+}) {
+  const [translating, setTranslating] = useState(false)
+
+  const handleTranslate = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    const form = event.currentTarget.form
+    if (!form) return
+
+    const getControl = (name: string) => {
+      const control = form.elements.namedItem(name)
+      return control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement
+        ? control
+        : null
+    }
+
+    const sources = Object.fromEntries(
+      mappings.map(({ source, target }) => [target, getControl(source)?.value || ""])
+    )
+    const hasExistingTranslation = mappings.some(({ target }) => getControl(target)?.value.trim())
+
+    if (!Object.values(sources).some((value) => value.trim())) {
+      toast.error("Najpierw uzupełnij polskie pola.")
+      return
+    }
+
+    if (
+      hasExistingTranslation &&
+      !window.confirm("Angielskie pola zawierają już treść. Czy zastąpić ją nowym tłumaczeniem?")
+    ) {
+      return
+    }
+
+    setTranslating(true)
+    try {
+      const result = await translateAdminFieldsToEnglish(sources)
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      Object.entries(result.fields).forEach(([name, value]) => {
+        const control = getControl(name)
+        if (!control) return
+        control.value = value
+        control.dispatchEvent(new Event("input", { bubbles: true }))
+        control.dispatchEvent(new Event("change", { bubbles: true }))
+      })
+      toast.success("Angielskie pola zostały uzupełnione. Sprawdź tłumaczenie i zapisz zmiany.")
+    } catch {
+      toast.error("Nie udało się połączyć z usługą tłumaczenia.")
+    } finally {
+      setTranslating(false)
+    }
+  }
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className={className}
+      onClick={handleTranslate}
+      disabled={translating}
+    >
+      <Languages className={translating ? "animate-pulse" : ""} />
+      {translating ? "Tłumaczę..." : "Przetłumacz na angielski"}
+    </Button>
+  )
+}
+
 const initialSaveSettingsState: SaveSettingsState = {}
 
 function YouTubeSettingsForm({
@@ -3805,6 +3887,15 @@ function TeamDialog({ team, media = [], trigger }: { team?: AdminTeam; media?: A
             <h3 className="font-sans text-lg font-black uppercase">Wersja angielska</h3>
             <p className="mt-1 text-sm text-muted-foreground">Nazwę możesz zostawić bez zmian, jeśli jest nazwą własną. Uzupełnij lokalizację i stadion, jeśli wymagają angielskiej formy.</p>
           </div>
+          <AutoTranslateFields
+            className="w-fit sm:col-span-2"
+            mappings={[
+              { source: "name", target: "nameEn" },
+              { source: "city", target: "cityEn" },
+              { source: "country", target: "countryEn" },
+              { source: "stadium", target: "stadiumEn" },
+            ]}
+          />
           <div className="sm:col-span-2"><Field label="Nazwa drużyny po angielsku" hint="Opcjonalnie."><Input name="nameEn" defaultValue={team?.nameEn} /></Field></div>
           <Field label="Miasto po angielsku" hint="Np. Warsaw zamiast Warszawa."><Input name="cityEn" defaultValue={team?.cityEn} /></Field>
           <Field label="Kraj po angielsku" hint="Np. Spain."><Input name="countryEn" defaultValue={team?.countryEn} /></Field>
@@ -4613,6 +4704,11 @@ function GalleryDialog({
             />
           </Field>
 
+          <AutoTranslateFields mappings={[
+            { source: "caption", target: "captionEn" },
+            { source: "city", target: "cityEn" },
+            { source: "alt", target: "altEn" },
+          ]} />
           <Field label="Podpis po angielsku" hint="Opcjonalnie."><Input name="captionEn" /></Field>
           <Field label="Miasto po angielsku" hint="Opcjonalnie."><Input name="cityEn" /></Field>
           <Field label="Opis zdjęcia po angielsku" hint="Opcjonalnie. Pusty opis zostanie wygenerowany automatycznie."><Input name="altEn" defaultValue={asset.altEn} /></Field>
@@ -4776,6 +4872,11 @@ function EditGalleryItemDialog({
           <div className="border-t pt-4">
             <h3 className="font-sans text-lg font-black uppercase">Wersja angielska</h3>
           </div>
+          <AutoTranslateFields mappings={[
+            { source: "title", target: "titleEn" },
+            { source: "city", target: "cityEn" },
+            { source: "alt", target: "altEn" },
+          ]} />
           <Field label="Podpis po angielsku" hint="Opcjonalnie."><Input name="titleEn" defaultValue={item.titleEn} /></Field>
           <Field label="Miasto po angielsku" hint="Opcjonalnie."><Input name="cityEn" defaultValue={item.cityEn} /></Field>
           <Field label="Opis zdjęcia po angielsku" hint="Opcjonalnie. Pusty opis zostanie utworzony automatycznie."><Input name="altEn" defaultValue={item.altEn} /></Field>
@@ -4920,6 +5021,10 @@ function EditTripGalleryItemDialog({
             />
           </Field>
 
+          <AutoTranslateFields mappings={[
+            { source: "caption", target: "captionEn" },
+            { source: "alt", target: "altEn" },
+          ]} />
           <Field label="Podpis po angielsku" hint="Opcjonalnie."><Input name="captionEn" defaultValue={item.captionEn} maxLength={160} /></Field>
           <Field label="Opis zdjęcia po angielsku" hint="Opcjonalnie. Pusty opis zostanie wygenerowany automatycznie."><Input name="altEn" defaultValue={item.altEn} maxLength={240} /></Field>
           <Field label="Kolejność" hint="Niższa liczba oznacza wcześniejsze miejsce w galerii."><Input name="sortOrder" type="number" defaultValue={item.sortOrder} /></Field>
@@ -5032,6 +5137,10 @@ function TestimonialDialog({
             <h3 className="font-sans text-lg font-black uppercase">Wersja angielska</h3>
             <p className="mt-1 text-sm text-muted-foreground">Opinie bez angielskiej treści nie będą pokazywane na stronie EN.</p>
           </div>
+          <AutoTranslateFields mappings={[
+            { source: "tripName", target: "tripNameEn" },
+            { source: "content", target: "contentEn" },
+          ]} />
           <Field label="Wyjazd po angielsku" hint="Opcjonalnie."><Input name="tripNameEn" defaultValue={item?.tripNameEn} /></Field>
           <Field label="Treść opinii po angielsku" hint="Naturalne tłumaczenie wypowiedzi klienta."><Textarea name="contentEn" defaultValue={item?.contentEn} /></Field>
 
@@ -5426,6 +5535,13 @@ function SettingsForm({
             <CardDescription>Angielska wersja strony publicznej. Panel administracyjny nadal pozostaje po polsku.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-5 md:grid-cols-2">
+            <AutoTranslateFields
+              className="w-fit md:col-span-2"
+              mappings={Object.keys(englishFallbacks).map((key) => ({
+                source: `setting.${key}`,
+                target: `setting.${key}En`,
+              }))}
+            />
             {renderEnglishField("seoTitle")}
             {renderEnglishField("seoDescription")}
             {renderEnglishField("heroEyebrow")}

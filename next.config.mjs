@@ -24,6 +24,21 @@ images: {
     },
   },
 
+  async redirects() {
+    return [
+      {
+        source: "/wycena-indywidualna",
+        destination: "/#twoj-wyjazd",
+        permanent: true,
+      },
+      {
+        source: "/en/custom-trip",
+        destination: "/en#twoj-wyjazd",
+        permanent: true,
+      },
+    ]
+  },
+
   async headers() {
     return [
       {

@@ -48,7 +48,7 @@ export function SiteHeader() {
   const dictionary = getDictionary(locale)
   const links = [
     [dictionary.navigation.trips, routeFor(locale, "/wyjazdy")],
-    [dictionary.navigation.customTrip, routeFor(locale, "/wycena-indywidualna")],
+    [dictionary.navigation.customTrip, `${routeFor(locale, "/")}#twoj-wyjazd`],
     [dictionary.navigation.gallery, routeFor(locale, "/galeria")],
     [dictionary.navigation.about, routeFor(locale, "/o-nas")],
     [dictionary.navigation.faq, routeFor(locale, "/faq")],
@@ -203,7 +203,7 @@ export function SiteHeader() {
 
             <SocialLinks showLabels />
             <div className="mt-4 text-background">
-              <LanguageSwitcher />
+              <LanguageSwitcher compact />
             </div>
           </div>
         </nav>
