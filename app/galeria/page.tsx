@@ -345,7 +345,7 @@ export default async function GalleryPage() {
           </div>
         </section>
 
-        <section className="overflow-hidden bg-foreground py-4 sm:py-0">
+        <section className="overflow-hidden bg-section-light py-4 sm:py-0">
           {gallery.length ? (
             <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-0">
               <div className="overflow-hidden rounded-xl sm:rounded-none">
@@ -384,7 +384,7 @@ export default async function GalleryPage() {
                             return (
                               <figure
                                 key={item.id}
-                                className={`group relative isolate m-0 overflow-hidden bg-foreground ${getMosaicTileClass(
+                                className={`group relative isolate m-0 overflow-hidden bg-section-light ${getMosaicTileClass(
                                   group.length,
                                   localIndex,
                                   reverse,
