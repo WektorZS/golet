@@ -612,25 +612,26 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
   <div className="relative mx-auto max-w-7xl px-4 md:px-6">
     <div className="grid lg:grid-cols-2">
-      <div className="relative flex min-h-105 items-center py-12 sm:py-14 lg:min-h-162.5 lg:py-14 lg:pr-16">
-        <div className="relative z-10 max-w-xl lg:-translate-y-8">
+      <div className="relative flex min-h-105 items-center py-12 sm:py-14 lg:min-h-144 lg:py-10 lg:pr-16">
+        <div className="relative z-10 max-w-xl lg:-translate-y-4">
           <p className="eyebrow eyebrow-on-dark">
-             {copy?.tailoredEyebrow || "Wyjazd szyty na miarę"}
+            {copy?.tailoredEyebrow || "Wyjazd szyty na miarę"}
           </p>
 
           <h2 className="mt-5 text-balance font-sans text-[38px] font-black uppercase leading-[0.94] tracking-tight text-white md:text-[46px]">
             {copy?.tailoredTitle || "Powiedz nam, czego potrzebujesz."}
           </h2>
 
-          <p className="mt-6 max-w-md text-base leading-7 text-white md:text-lg">
-            {copy?.tailoredIntro || "Nie musisz wybierać gotowego wyjazdu z kalendarza. Możemy zorganizować pojedynczy element albo całą podróż od biletu aż po lot i hotel."}
+          <p className="mt-5 max-w-md text-base leading-7 text-white md:text-lg">
+            {copy?.tailoredIntro ||
+              "Nie musisz wybierać gotowego wyjazdu z kalendarza. Możemy zorganizować pojedynczy element albo całą podróż od biletu aż po lot i hotel."}
           </p>
         </div>
       </div>
 
-      <div className="relative py-12 sm:py-14 lg:min-h-162.5 lg:py-16 lg:pl-16">
+      <div className="relative py-12 sm:py-14 lg:min-h-144 lg:py-10 lg:pl-16">
         <div
-          className="absolute bottom-12 left-0 top-12 hidden w-px bg-white/10 lg:block"
+          className="absolute bottom-10 left-0 top-10 hidden w-px bg-white/10 lg:block"
           aria-hidden="true"
         />
 
@@ -639,38 +640,70 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             {copy?.scopeEyebrow || "Czego potrzebujesz?"}
           </p>
 
-          <h3 className="mt-3 font-sans text-2xl font-black uppercase leading-tight tracking-tight text-white md:text-[28px]">
+          <h3 className="mt-2.5 font-sans text-2xl font-black uppercase leading-tight tracking-tight text-white md:text-[28px]">
             {copy?.scopeTitle || "Dopasuj zakres wyjazdu"}
           </h3>
 
-          <p className="mt-3 max-w-xl text-base leading-7 text-white/55">
-            {copy?.scopeIntro || "Możesz zacząć od samego biletu albo powierzyć nam organizację całego wyjazdu."}
+          <p className="mt-2.5 max-w-xl text-base leading-6 text-white/55">
+            {copy?.scopeIntro ||
+              "Możesz zacząć od samego biletu albo powierzyć nam organizację całego wyjazdu."}
           </p>
 
-          <div className="mt-7 grid gap-x-10 gap-y-7 sm:grid-cols-2">
-            {(isEn ? [
-              [Ticket, "Ticket only", "Entry to your chosen match."],
-              [Plane, "Ticket + flight", "A match ticket and return flight."],
-              [Hotel, "Ticket + hotel", "A match ticket and accommodation."],
-              [CircleCheckBig, "Full package", "Ticket, flights, hotel and sightseeing."],
-            ] : [
-              [Ticket, "Tylko bilet", "Wejście na wybrany mecz."],
-              [Plane, "Bilet + lot", "Bilet oraz przelot."],
-              [Hotel, "Bilet + hotel", "Bilet oraz nocleg."],
-              [
-                CircleCheckBig,
-                "Pełny pakiet",
-                "Bilet, lot, hotel i zwiedzanie.",
-              ],
-            ]).map(([Icon, title, description]) => {
+          <div className="mt-5 grid gap-x-10 gap-y-5 sm:grid-cols-2">
+            {(isEn
+              ? [
+                  [
+                    Ticket,
+                    "Ticket only",
+                    "Entry to your chosen match.",
+                  ],
+                  [
+                    Plane,
+                    "Ticket + flight",
+                    "A match ticket and return flight.",
+                  ],
+                  [
+                    Hotel,
+                    "Ticket + hotel",
+                    "A match ticket and accommodation.",
+                  ],
+                  [
+                    CircleCheckBig,
+                    "Full package",
+                    "Ticket, flights, hotel and sightseeing.",
+                  ],
+                ]
+              : [
+                  [
+                    Ticket,
+                    "Tylko bilet",
+                    "Wejście na wybrany mecz.",
+                  ],
+                  [
+                    Plane,
+                    "Bilet + lot",
+                    "Bilet oraz przelot.",
+                  ],
+                  [
+                    Hotel,
+                    "Bilet + hotel",
+                    "Bilet oraz nocleg.",
+                  ],
+                  [
+                    CircleCheckBig,
+                    "Pełny pakiet",
+                    "Bilet, lot, hotel i zwiedzanie.",
+                  ],
+                ]
+            ).map(([Icon, title, description]) => {
               const I = Icon as typeof Ticket
 
               return (
                 <div
                   key={title as string}
-                  className="flex items-start gap-4"
+                  className="flex items-start gap-3.5"
                 >
-                  <div className="flex size-10 shrink-0 items-center justify-center">
+                  <div className="flex size-9 shrink-0 items-center justify-center">
                     <I
                       className="size-5 text-primary"
                       aria-hidden="true"
@@ -682,7 +715,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                       {title as string}
                     </p>
 
-                    <p className="mt-2 text-sm leading-6 text-white/50">
+                    <p className="mt-1.5 text-sm leading-5.5 text-white/50">
                       {description as string}
                     </p>
                   </div>
@@ -692,55 +725,75 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           </div>
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-9">
+        <div className="mt-7 border-t border-white/10 pt-6">
           <p className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-primary">
-             {isEn ? "Who is it for?" : "Dla kogo?"}
+            {isEn ? "Who is it for?" : "Dla kogo?"}
           </p>
 
-          <h3 className="mt-3 font-sans text-2xl font-black uppercase leading-tight tracking-tight text-white md:text-[28px]">
-             {copy?.groupTitle || "Od jednej osoby po całą grupę"}
+          <h3 className="mt-2.5 font-sans text-2xl font-black uppercase leading-tight tracking-tight text-white md:text-[28px]">
+            {copy?.groupTitle || "Od jednej osoby po całą grupę"}
           </h3>
 
-          <p className="mt-3 max-w-xl text-base leading-7 text-white/55">
-             {copy?.groupIntro || "Organizujemy wyjazdy zarówno indywidualne, jak i dla rodzin, firm oraz większych grup."}
+          <p className="mt-2.5 max-w-xl text-base leading-6 text-white/55">
+            {copy?.groupIntro ||
+              "Organizujemy wyjazdy zarówno indywidualne, jak i dla rodzin, firm oraz większych grup."}
           </p>
 
-          <div className="mt-7 grid gap-x-10 gap-y-7 sm:grid-cols-2">
-            {(isEn ? [
-              [User, "Individuals", "A trip prepared around your exact requirements."],
-              [Users, "Families and groups", "A shared journey to the match of your choice."],
-              [BriefcaseBusiness, "Companies", "Team and corporate football trips."],
-              [GraduationCap, "Schools and clubs", "Complete service for organised groups."],
-            ] : [
-              [
-                User,
-                "Indywidualnie",
-                "Wyjazd przygotowany dokładnie pod Twoje potrzeby.",
-              ],
-              [
-                Users,
-                "Rodziny i grupy",
-                "Wspólna podróż na wybrany mecz.",
-              ],
-              [
-                BriefcaseBusiness,
-                "Firmy",
-                "Wyjazdy integracyjne i sportowe dla zespołów.",
-              ],
-              [
-                GraduationCap,
-                "Szkoły i kluby",
-                "Kompleksowa obsługa zorganizowanych grup.",
-              ],
-            ]).map(([Icon, title, description]) => {
+          <div className="mt-5 grid gap-x-10 gap-y-5 sm:grid-cols-2">
+            {(isEn
+              ? [
+                  [
+                    User,
+                    "Individuals",
+                    "A trip prepared around your exact requirements.",
+                  ],
+                  [
+                    Users,
+                    "Families and groups",
+                    "A shared journey to the match of your choice.",
+                  ],
+                  [
+                    BriefcaseBusiness,
+                    "Companies",
+                    "Team and corporate football trips.",
+                  ],
+                  [
+                    GraduationCap,
+                    "Schools and clubs",
+                    "Complete service for organised groups.",
+                  ],
+                ]
+              : [
+                  [
+                    User,
+                    "Indywidualnie",
+                    "Wyjazd przygotowany dokładnie pod Twoje potrzeby.",
+                  ],
+                  [
+                    Users,
+                    "Rodziny i grupy",
+                    "Wspólna podróż na wybrany mecz.",
+                  ],
+                  [
+                    BriefcaseBusiness,
+                    "Firmy",
+                    "Wyjazdy integracyjne i sportowe dla zespołów.",
+                  ],
+                  [
+                    GraduationCap,
+                    "Szkoły i kluby",
+                    "Kompleksowa obsługa zorganizowanych grup.",
+                  ],
+                ]
+            ).map(([Icon, title, description]) => {
               const I = Icon as typeof User
 
               return (
                 <div
                   key={title as string}
-                  className="flex items-start gap-4"
+                  className="flex items-start gap-3.5"
                 >
-                  <div className="flex size-10 shrink-0 items-center justify-center">
+                  <div className="flex size-9 shrink-0 items-center justify-center">
                     <I
                       className="size-5 text-primary"
                       aria-hidden="true"
@@ -752,7 +805,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                       {title as string}
                     </p>
 
-                    <p className="mt-2 text-sm leading-6 text-white/50">
+                    <p className="mt-1.5 text-sm leading-5.5 text-white/50">
                       {description as string}
                     </p>
                   </div>
