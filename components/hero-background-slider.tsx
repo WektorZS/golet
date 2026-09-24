@@ -29,6 +29,18 @@ const slides = [
     desktopScale: 1,
   },
   {
+    src: "/images/sagradafamilia.webp",
+    mobileSrc: "/images/sagradafamilia-mobile.webp",
+
+    mobileX: 50,
+    mobileY: -10,
+    mobileScale: 1,
+
+    desktopX: 50,
+    desktopY: 100,
+    desktopScale: 1,
+  },
+  {
     src: "/images/barcelonavsreal-hero.webp",
     mobileSrc: "/images/barcelonavsreal-hero-mobile.webp",
 
