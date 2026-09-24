@@ -163,11 +163,6 @@ export function ImageLightbox({
     number | null
   >(null)
 
-  const [
-    imageLoaded,
-    setImageLoaded,
-  ] = useState(false)
-
   const triggerRef =
     useRef<HTMLButtonElement>(
       null,
@@ -301,12 +296,6 @@ export function ImageLightbox({
     currentImage.src,
     gallery,
     hasMultipleImages,
-  ])
-
-  useEffect(() => {
-    setImageLoaded(false)
-  }, [
-    currentImage.src,
   ])
 
   useEffect(() => {
@@ -445,9 +434,7 @@ export function ImageLightbox({
       <DialogTrigger
         render={
           <button
-            ref={
-              triggerRef
-            }
+            ref={triggerRef}
             type="button"
             onMouseEnter={
               prepareCurrentImage
@@ -474,9 +461,7 @@ export function ImageLightbox({
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, 33vw"
-            priority={
-              priority
-            }
+            priority={priority}
           />
         )}
 
@@ -536,12 +521,6 @@ export function ImageLightbox({
             <div className="absolute inset-0 bg-black/55" />
           </div>
 
-          {!imageLoaded && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center">
-              <span className="size-7 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
-            </div>
-          )}
-
           <div className="absolute inset-0 z-10">
             <Image
               key={
@@ -561,16 +540,7 @@ export function ImageLightbox({
                 LIGHTBOX_QUALITY
               }
               loading="eager"
-              onLoad={() =>
-                setImageLoaded(
-                  true,
-                )
-              }
-              className={`object-contain transition-opacity duration-200 ${
-                imageLoaded
-                  ? "opacity-100"
-                  : "opacity-0"
-              }`}
+              className="object-contain"
             />
           </div>
 
@@ -635,12 +605,8 @@ export function ImageLightbox({
               </button>
 
               <div className="absolute bottom-3 left-1/2 z-30 -translate-x-1/2 rounded-full bg-black/65 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md sm:bottom-5">
-                {currentIndex +
-                  1}{" "}
-                /{" "}
-                {
-                  gallery.length
-                }
+                {currentIndex + 1} /{" "}
+                {gallery.length}
               </div>
             </>
           )}
