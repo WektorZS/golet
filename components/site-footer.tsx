@@ -133,16 +133,28 @@ export async function SiteFooter({
             <Brand locale={locale} />
 
             <p className="mt-6 max-w-60 text-[15px] leading-6 text-background/70">
-              {localizedSetting(content, "footerText", locale, dictionary.footer.fallbackText)}
-            </p>
+  {localizedSetting(
+    content,
+    "footerText",
+    locale,
+    dictionary.footer.fallbackText,
+  )}
+</p>
 
-            <p className="mt-7 max-w-56 -rotate-2 font-serif text-xl italic leading-tight text-background/90">
-              {dictionary.footer.seeYou.split("\n").map((line, index) => (
-                <span key={line}>{index > 0 ? <br /> : null}{line}</span>
-              ))}
-            </p>
+<div className="mt-6 text-background">
+  <LanguageSwitcher />
+</div>
 
-            <div className="mt-4 h-1 w-16 -rotate-6 rounded-full bg-primary" />
+<p className="mt-7 max-w-56 -rotate-2 font-serif text-xl italic leading-tight text-background/90">
+  {dictionary.footer.seeYou.split("\n").map((line, index) => (
+    <span key={line}>
+      {index > 0 ? <br /> : null}
+      {line}
+    </span>
+  ))}
+</p>
+
+<div className="mt-4 h-1 w-16 -rotate-6 rounded-full bg-primary" />
           </div>
 
           <nav
@@ -352,7 +364,7 @@ export async function SiteFooter({
               </p>
 
               <SocialLinks />
-              <div className="mt-5 text-background"><LanguageSwitcher /></div>
+             
             </div>
           </div>
         </div>
