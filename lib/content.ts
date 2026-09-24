@@ -1,7 +1,9 @@
 import { asc, desc, eq } from "drizzle-orm"
+
 import { db } from "@/lib/db"
 import { ensureTripColumns } from "@/lib/db/ensure-trip-columns"
 import type { Locale } from "@/lib/i18n"
+
 import {
   galleryItems,
   siteSettings,
@@ -25,51 +27,131 @@ export type YouTubeVideo = {
 
 export async function getSiteContent() {
   await ensureTripColumns()
-  const rows = await db.select().from(siteSettings)
+
+  const rows = await db
+    .select()
+    .from(siteSettings)
 
   return Object.fromEntries(
-    rows.map((item) => [item.key, item.value])
+    rows.map((item) => [
+      item.key,
+      item.value,
+    ])
   ) as SiteContent
 }
 
-export async function getPublishedGallery(locale: Locale = "pl") {
+export async function getPublishedGallery(
+  locale: Locale = "pl"
+) {
   await ensureTripColumns()
+
   const rows = await db
     .select()
     .from(galleryItems)
-    .where(eq(galleryItems.status, "published"))
-    .orderBy(asc(galleryItems.sortOrder))
+    .where(
+      eq(
+        galleryItems.status,
+        "published"
+      )
+    )
+    .orderBy(
+      asc(
+        galleryItems.sortOrder
+      )
+    )
 
-  return rows.map((item, index) => locale === "en" ? {
-    ...item,
-    title: item.titleEn || `Match trip photo ${index + 1}`,
-    city: item.cityEn || item.city,
-    alt: item.altEn || `${item.cityEn || item.city || "Football match trip"} - photo ${index + 1}`,
-  } : item)
+  return rows.map((item, index) => {
+    if (locale === "en") {
+      const city =
+        item.cityEn ||
+        item.city
+
+      const title =
+        item.titleEn ||
+        item.title ||
+        `Match trip photo ${index + 1}`
+
+      const alt =
+        item.altEn ||
+        item.alt ||
+        `${
+          city ||
+          "Football match trip"
+        } - photo ${index + 1}`
+
+      return {
+        ...item,
+        title,
+        city,
+        alt,
+      }
+    }
+
+    const alt =
+      item.alt ||
+      item.title ||
+      `${
+        item.city ||
+        "Wyjazd na mecz"
+      } - zdjęcie ${index + 1}`
+
+    return {
+      ...item,
+      alt,
+    }
+  })
 }
 
-export async function getPublishedTestimonials(locale: Locale = "pl") {
+export async function getPublishedTestimonials(
+  locale: Locale = "pl"
+) {
   await ensureTripColumns()
+
   const rows = await db
     .select()
     .from(testimonials)
-    .where(eq(testimonials.status, "published"))
-    .orderBy(asc(testimonials.sortOrder))
+    .where(
+      eq(
+        testimonials.status,
+        "published"
+      )
+    )
+    .orderBy(
+      asc(
+        testimonials.sortOrder
+      )
+    )
 
-  if (locale === "pl") return rows
+  if (locale === "pl") {
+    return rows
+  }
+
   return rows
-    .filter((item) => item.contentEn.trim())
-    .map((item) => ({ ...item, tripName: item.tripNameEn || "Football match trip", content: item.contentEn }))
+    .filter((item) =>
+      item.contentEn.trim()
+    )
+    .map((item) => ({
+      ...item,
+
+      tripName:
+        item.tripNameEn ||
+        item.tripName ||
+        "Football match trip",
+
+      content:
+        item.contentEn,
+    }))
 }
 
 /**
- * Filmy wybrane ręcznie przez administratora do wyświetlenia
- * na stronie głównej.
+ * Filmy wybrane ręcznie przez administratora
+ * do wyświetlenia na stronie głównej.
  */
 export async function getYouTubeVideos(
   content: SiteContent
 ): Promise<YouTubeVideo[]> {
   await ensureTripColumns()
+
   if (
     content.youtubeEnabled === "false" ||
     !content.youtubeUrl
@@ -80,22 +162,37 @@ export async function getYouTubeVideos(
   const rows = await db
     .select()
     .from(youtubeVideos)
-    .where(eq(youtubeVideos.featured, true))
+    .where(
+      eq(
+        youtubeVideos.featured,
+        true
+      )
+    )
     .orderBy(
-      asc(youtubeVideos.sortOrder),
-      desc(youtubeVideos.publishedAt)
+      asc(
+        youtubeVideos.sortOrder
+      ),
+      desc(
+        youtubeVideos.publishedAt
+      )
     )
 
   return rows.map((row) => ({
     id: row.id,
     videoId: row.videoId,
     title: row.title,
-    published: row.publishedAt.toISOString(),
-    publishedAt: row.publishedAt.toISOString(),
-    thumbnail: row.thumbnailUrl,
-    url: `https://www.youtube.com/watch?v=${row.videoId}`,
-    featured: row.featured,
-    sortOrder: row.sortOrder,
+    published:
+      row.publishedAt.toISOString(),
+    publishedAt:
+      row.publishedAt.toISOString(),
+    thumbnail:
+      row.thumbnailUrl,
+    url:
+      `https://www.youtube.com/watch?v=${row.videoId}`,
+    featured:
+      row.featured,
+    sortOrder:
+      row.sortOrder,
   }))
 }
 
@@ -118,17 +215,27 @@ export async function getAdminYouTubeVideos(
   const rows = await db
     .select()
     .from(youtubeVideos)
-    .orderBy(desc(youtubeVideos.publishedAt))
+    .orderBy(
+      desc(
+        youtubeVideos.publishedAt
+      )
+    )
 
   return rows.map((row) => ({
     id: row.id,
     videoId: row.videoId,
     title: row.title,
-    published: row.publishedAt.toISOString(),
-    publishedAt: row.publishedAt.toISOString(),
-    thumbnail: row.thumbnailUrl,
-    url: `https://www.youtube.com/watch?v=${row.videoId}`,
-    featured: row.featured,
-    sortOrder: row.sortOrder,
+    published:
+      row.publishedAt.toISOString(),
+    publishedAt:
+      row.publishedAt.toISOString(),
+    thumbnail:
+      row.thumbnailUrl,
+    url:
+      `https://www.youtube.com/watch?v=${row.videoId}`,
+    featured:
+      row.featured,
+    sortOrder:
+      row.sortOrder,
   }))
 }

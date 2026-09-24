@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
+import { absoluteUrl } from "@/lib/site"
 import { seoCopy } from "@/lib/seo-copy"
 
 const seo = seoCopy.privacy.pl
@@ -82,6 +83,24 @@ export default function PrivacyPolicyPage() {
         data={{
           "@context": "https://schema.org",
           "@graph": [
+            {
+              "@type": "WebPage",
+              "@id": `${absoluteUrl("/polityka-prywatnosci")}#webpage`,
+              url: absoluteUrl("/polityka-prywatnosci"),
+              name: seo.title,
+              description: seo.description,
+              inLanguage: "pl-PL",
+              isPartOf: {
+                "@id": absoluteUrl("/#website"),
+              },
+              breadcrumb: {
+                "@id": `${absoluteUrl("/polityka-prywatnosci")}#breadcrumb`,
+              },
+              about: {
+                "@id": absoluteUrl("/#organization"),
+              },
+              dateModified: "2026-09-17",
+            },
             breadcrumbSchema([
               {
                 name: "Strona główna",

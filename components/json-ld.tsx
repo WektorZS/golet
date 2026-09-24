@@ -1,4 +1,4 @@
-export function JsonLd({ data }: { data: Record<string, unknown> }) {
+export function JsonLd({ data }: { data: unknown }) {
   return (
     <script
       type="application/ld+json"
@@ -8,4 +8,3 @@ export function JsonLd({ data }: { data: Record<string, unknown> }) {
     />
   )
 }
-

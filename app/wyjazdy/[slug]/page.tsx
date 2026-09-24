@@ -47,12 +47,27 @@ function TeamLogo({ src, name, locale }: { src: string; name: string; locale: "p
   return <span className="relative block size-16 md:size-20"><Image src={src} alt={locale === "en" ? `${name} crest` : `Herb ${name}`} fill className="object-contain drop-shadow-xl" sizes="80px" /></span>
 }
 
+function normalizeSeoTitle(value: string) {
+  return value
+    .replace(/\s*[|–—-]\s*Let[’']s Gol\s*$/i, "")
+    .trim()
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const locale = await getRequestLocale()
   const isEn = locale === "en"
   const trip = await getTripBySlug(slug, locale)
-  if (!trip) return { title: isEn ? "Trip unavailable" : "Wyjazd niedostępny" }
+
+  if (!trip) {
+    return {
+      title: isEn ? "Trip unavailable" : "Wyjazd niedostępny",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }
+  }
 
   const description = buildTripSeoDescription({
     title: trip.title,
@@ -60,15 +75,60 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     locale,
     customDescription: trip.seoDescription,
   })
-  const title = trip.seoTitle || trip.title
+
+  const customTitle = normalizeSeoTitle(trip.seoTitle || "")
+  const title =
+    customTitle ||
+    (isEn
+      ? `Football trip to ${trip.title}`
+      : `Wyjazd na mecz ${trip.title}`)
+
+  const socialTitle = `${title} | Let’s Gol`
   const polishPath = `/wyjazdy/${trip.slug}`
-  const canonical = routeFor(locale, "/wyjazdy") + `/${trip.slug}`
+  const canonical = `${routeFor(locale, "/wyjazdy")}/${trip.slug}`
+  const imageAlt = isEn
+    ? `Football match trip to ${trip.city}: ${trip.title}`
+    : `Wyjazd na mecz ${trip.title} w ${trip.city}`
+
   return {
     title,
     description,
     alternates: localizedAlternates(polishPath, locale),
-    openGraph: { title, description, type: "website", url: canonical, locale: isEn ? "en_GB" : "pl_PL", images: [{ url: trip.image, alt: isEn ? `Football match trip to ${trip.city}: ${trip.title}` : `Wyjazd na mecz ${trip.title} w ${trip.city}` }] },
-    twitter: { card: "summary_large_image", title, description, images: [trip.image] },
+
+    openGraph: {
+      title: socialTitle,
+      description,
+      type: "website",
+      url: absoluteUrl(canonical),
+      siteName: "Let’s Gol",
+      locale: isEn ? "en_GB" : "pl_PL",
+      alternateLocale: [isEn ? "pl_PL" : "en_GB"],
+      images: [
+        {
+          url: absoluteUrl(trip.image),
+          alt: imageAlt,
+        },
+      ],
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: socialTitle,
+      description,
+      images: [absoluteUrl(trip.image)],
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
+    },
   }
 }
 
@@ -228,7 +288,15 @@ const includedItems: {
 
   const tripPath = `${routeFor(locale, "/wyjazdy")}/${trip.slug}`
   const tripUrl = absoluteUrl(tripPath)
-  const schemaDescription = stripHtml(trip.description).trim()
+  const schemaDescription =
+    stripHtml(trip.description).trim() ||
+    buildTripSeoDescription({
+      title: trip.title,
+      price: trip.price,
+      locale,
+      customDescription: trip.seoDescription,
+    })
+
   const offerSchema = {
     "@type": "Offer",
     "@id": `${tripUrl}#offer`,
@@ -238,12 +306,15 @@ const includedItems: {
     availability: `https://schema.org/${status.schema}`,
     seller: { "@id": absoluteUrl("/#organization") },
   }
+
   const tripSchema = {
     "@type": "TouristTrip",
     "@id": `${tripUrl}#trip`,
     url: tripUrl,
-    name: `${homeTeam} - ${awayTeam}`,
-    ...(schemaDescription && { description: schemaDescription }),
+    name: isEn
+      ? `Football trip: ${homeTeam} - ${awayTeam}`
+      : `Wyjazd na mecz ${homeTeam} - ${awayTeam}`,
+    description: schemaDescription,
     image: absoluteUrl(trip.image),
     touristType: isEn ? "Football supporters" : "Kibice piłkarscy",
     inLanguage: isEn ? "en-GB" : "pl-PL",
@@ -260,17 +331,13 @@ const includedItems: {
     provider: { "@id": absoluteUrl("/#organization") },
     offers: { "@id": offerSchema["@id"] },
   }
-  const productSchema = {
-    "@type": "Product",
-    "@id": `${tripUrl}#package`,
-    name: isEn ? `Football match trip: ${homeTeam} - ${awayTeam}` : `Wyjazd na mecz ${homeTeam} - ${awayTeam}`,
-    ...(schemaDescription && { description: schemaDescription }),
-    image: absoluteUrl(trip.image),
-    category: isEn ? "Football match travel package" : "Pakiet turystyczny na mecz piłkarski",
-    brand: { "@type": "Brand", name: "Let’s Gol" },
-    isRelatedTo: { "@id": tripSchema["@id"] },
-    offers: { "@id": offerSchema["@id"] },
-  }
+
+  const webPageTitle =
+    normalizeSeoTitle(trip.seoTitle || "") ||
+    (isEn
+      ? `Football trip to ${trip.title}`
+      : `Wyjazd na mecz ${trip.title}`)
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -278,15 +345,18 @@ const includedItems: {
         "@type": "WebPage",
         "@id": `${tripUrl}#webpage`,
         url: tripUrl,
-        name: trip.seoTitle || trip.title,
-        ...(schemaDescription && { description: schemaDescription }),
+        name: `${webPageTitle} | Let’s Gol`,
+        description: schemaDescription,
         isPartOf: { "@id": absoluteUrl("/#website") },
         breadcrumb: { "@id": `${tripUrl}#breadcrumb` },
         mainEntity: { "@id": tripSchema["@id"] },
+        primaryImageOfPage: {
+          "@type": "ImageObject",
+          url: absoluteUrl(trip.image),
+        },
         inLanguage: isEn ? "en-GB" : "pl-PL",
       },
       tripSchema,
-      productSchema,
       offerSchema,
       breadcrumbSchema([
         { name: t("Strona główna", "Home"), path: routeFor(locale, "/") },

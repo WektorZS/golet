@@ -33,6 +33,7 @@ import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo
 import { getRequestLocale } from "@/lib/i18n-request"
 import { routeFor } from "@/lib/i18n"
 import { getSeoCopy } from "@/lib/seo-copy"
+import { absoluteUrl } from "@/lib/site"
 
 export const dynamic = "force-dynamic"
 const socialProfiles = [
@@ -153,6 +154,23 @@ export default async function ContactPage() {
         data={{
           "@context": "https://schema.org",
           "@graph": [
+            {
+              "@type": "ContactPage",
+              "@id": `${absoluteUrl(routeFor(locale, "/kontakt"))}#webpage`,
+              url: absoluteUrl(routeFor(locale, "/kontakt")),
+              name: t("Kontakt z Let's Gol", "Contact Let's Gol"),
+              description: getSeoCopy("contact", locale).description,
+              inLanguage: isEn ? "en-GB" : "pl-PL",
+              isPartOf: {
+                "@id": absoluteUrl("/#website"),
+              },
+              breadcrumb: {
+                "@id": `${absoluteUrl(routeFor(locale, "/kontakt"))}#breadcrumb`,
+              },
+              about: {
+                "@id": absoluteUrl("/#organization"),
+              },
+            },
             breadcrumbSchema([
               {
                 name: t("Strona główna", "Home"),
@@ -163,15 +181,6 @@ export default async function ContactPage() {
                 path: routeFor(locale, "/kontakt"),
               },
             ]),
-            {
-              "@type": "ContactPage",
-              name: t("Kontakt z Let's Gol", "Contact Let's Gol"),
-              url: `https://letsgol.eu${routeFor(locale, "/kontakt")}`,
-              inLanguage: isEn ? "en-GB" : "pl-PL",
-              mainEntity: {
-                "@id": "https://letsgol.eu/#organization",
-              },
-            },
           ],
         }}
       />

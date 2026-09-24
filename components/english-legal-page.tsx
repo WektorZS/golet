@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { Button } from "@/components/ui/button"
 import { breadcrumbSchema } from "@/lib/seo"
+import { absoluteUrl } from "@/lib/site"
 
 type LegalSection = {
   title: string
@@ -54,7 +55,40 @@ export function EnglishLegalPage({ kind }: { kind: "privacy" | "terms" }) {
 
   return (
     <main className="min-h-screen bg-background">
-      <JsonLd data={{ "@context": "https://schema.org", "@graph": [breadcrumbSchema([{ name: "Home", path: "/en" }, { name: title, path }]), { "@type": "WebPage", name: title, url: `https://letsgol.eu${path}`, inLanguage: "en-GB" }] }} />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebPage",
+              "@id": `${absoluteUrl(path)}#webpage`,
+              url: absoluteUrl(path),
+              name: title,
+              description: intro,
+              inLanguage: "en-GB",
+              isPartOf: {
+                "@id": absoluteUrl("/#website"),
+              },
+              breadcrumb: {
+                "@id": `${absoluteUrl(path)}#breadcrumb`,
+              },
+              about: {
+                "@id": absoluteUrl("/#organization"),
+              },
+            },
+            breadcrumbSchema([
+              {
+                name: "Home",
+                path: "/en",
+              },
+              {
+                name: title,
+                path,
+              },
+            ]),
+          ],
+        }}
+      />
       <SiteHeader />
       <section className="bg-foreground px-4 pb-16 pt-36 text-background md:px-6 md:pb-20">
         <div className="mx-auto max-w-7xl">

@@ -18,73 +18,120 @@ import {
   type SiteContent,
 } from "@/lib/content"
 import { getFaqCategories } from "@/lib/faq"
-import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
+import {
+  breadcrumbSchema,
+  localizedAlternates,
+  socialMetadata,
+} from "@/lib/seo"
 import { getRequestLocale } from "@/lib/i18n-request"
 import { routeFor } from "@/lib/i18n"
 import { getSeoCopy } from "@/lib/seo-copy"
+import { absoluteUrl } from "@/lib/site"
 
 export const revalidate = 300
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
-  const { title, description } = getSeoCopy("faq", locale)
-  return { title, description, alternates: localizedAlternates("/faq", locale), ...socialMetadata(title, description, routeFor(locale, "/faq"), locale) }
+  const { title, description } = getSeoCopy(
+    "faq",
+    locale
+  )
+
+  const path = routeFor(locale, "/faq")
+
+  return {
+    title,
+    description,
+
+    alternates: localizedAlternates(
+      "/faq",
+      locale
+    ),
+
+    ...socialMetadata(
+      title,
+      description,
+      path,
+      locale
+    ),
+  }
 }
 
 export default async function FaqPage() {
   const locale = await getRequestLocale()
   const isEn = locale === "en"
+
   const faqCategories = getFaqCategories(locale)
-  const content: SiteContent = process.env.DATABASE_URL
-    ? await getSiteContent().catch(
-        () => ({} as SiteContent)
-      )
-    : {}
+
+  const content: SiteContent =
+    process.env.DATABASE_URL
+      ? await getSiteContent().catch(
+          () => ({} as SiteContent)
+        )
+      : {}
 
   const allFaqs = faqCategories.flatMap(
     (category) => category.items
   )
 
-  const popularFaqLinks = faqCategories.flatMap(
-    (category) =>
-      category.items
-        .filter((item) => item.popular)
-        .map((item) => ({
-          ...item,
-          categoryId: category.id,
-        }))
+  const path = routeFor(locale, "/faq")
+  const pageUrl = absoluteUrl(path)
+
+  const { title, description } = getSeoCopy(
+    "faq",
+    locale
   )
+
+  const breadcrumb = breadcrumbSchema([
+    {
+      name: isEn
+        ? "Home"
+        : "Strona główna",
+      path: routeFor(locale, "/"),
+    },
+    {
+      name: "FAQ",
+      path,
+    },
+  ])
+
+  const webPageSchema = {
+    "@type": "WebPage",
+    "@id": `${pageUrl}#webpage`,
+
+    url: pageUrl,
+    name: title,
+    description,
+
+    isPartOf: {
+      "@id": absoluteUrl("/#website"),
+    },
+
+    breadcrumb: {
+      "@id": `${pageUrl}#breadcrumb`,
+    },
+
+    about: {
+      "@id": absoluteUrl("/#organization"),
+    },
+
+    inLanguage: isEn
+      ? "en-GB"
+      : "pl-PL",
+  }
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+
+    "@graph": [
+      webPageSchema,
+      breadcrumb,
+    ],
+  }
 
   return (
     <main className="min-h-screen bg-background">
-      <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@graph": [
-            breadcrumbSchema([
-              {
-                name: isEn ? "Home" : "Strona główna",
-                path: routeFor(locale, "/"),
-              },
-              {
-                name: "FAQ",
-                path: routeFor(locale, "/faq"),
-              },
-            ]),
-            {
-              "@type": "FAQPage",
-              mainEntity: allFaqs.map((item) => ({
-                "@type": "Question",
-                name: item.question,
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: item.answer,
-                },
-              })),
-            },
-          ],
-        }}
-      />
+      <JsonLd data={jsonLd} />
 
       <SiteHeader />
 
@@ -107,11 +154,15 @@ export default async function FaqPage() {
             </p>
 
             <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
-              {isEn ? "Everything worth knowing before you travel" : "Wszystko, co warto wiedzieć przed wyjazdem"}
+              {isEn
+                ? "Everything worth knowing before you travel"
+                : "Wszystko, co warto wiedzieć przed wyjazdem"}
             </h1>
 
             <p className="mt-6 max-w-2xl text-lg leading-8 text-background/70">
-              {isEn ? "Booking, packages, tickets, transport, accommodation and trip planning. Here are clear answers to the questions travellers ask most often." : "Rezerwacja, pakiety, bilety, transport, noclegi i organizacja wyjazdu. Zebraliśmy odpowiedzi na pytania, które najczęściej pojawiają się przed podróżą."}
+              {isEn
+                ? "Booking, packages, tickets, transport, accommodation and trip planning. Here are clear answers to the questions travellers ask most often."
+                : "Rezerwacja, pakiety, bilety, transport, noclegi i organizacja wyjazdu. Zebraliśmy odpowiedzi na pytania, które najczęściej pojawiają się przed podróżą."}
             </p>
           </div>
 
@@ -122,11 +173,16 @@ export default async function FaqPage() {
             />
 
             <p className="mt-4 font-sans text-2xl font-black uppercase">
-              {allFaqs.length} {isEn ? "questions and answers" : "pytań i odpowiedzi"}
+              {allFaqs.length}{" "}
+              {isEn
+                ? "questions and answers"
+                : "pytań i odpowiedzi"}
             </p>
 
             <p className="mt-2 text-sm leading-6 text-background/60">
-              {isEn ? "From your first enquiry and package choice to the journey and match day." : "Od pierwszego zapytania i wyboru pakietu aż po podróż i dzień meczu."}
+              {isEn
+                ? "From your first enquiry and package choice to the journey and match day."
+                : "Od pierwszego zapytania i wyboru pakietu aż po podróż i dzień meczu."}
             </p>
           </div>
         </div>
@@ -143,12 +199,20 @@ export default async function FaqPage() {
         <div className="mx-auto mt-16 w-full max-w-7xl md:mt-20">
           <div className="border-t border-foreground/10 pt-8">
             <p className="mx-auto max-w-3xl text-center text-sm leading-6 text-muted-foreground">
-              {isEn ? "The detailed rules for your booking are set out in the offer, contract and " : "Szczegółowe zasady dotyczące konkretnej rezerwacji znajdziesz w ofercie, umowie oraz "}
+              {isEn
+                ? "The detailed rules for your booking are set out in the offer, contract and "
+                : "Szczegółowe zasady dotyczące konkretnej rezerwacji znajdziesz w ofercie, umowie oraz "}
+
               <Link
-                href={routeFor(locale, "/warunki-uczestnictwa")}
+                href={routeFor(
+                  locale,
+                  "/warunki-uczestnictwa"
+                )}
                 className="font-semibold text-foreground underline decoration-primary underline-offset-4 transition-colors hover:text-primary"
               >
-                {isEn ? "terms and conditions" : "warunkach uczestnictwa"}
+                {isEn
+                  ? "terms and conditions"
+                  : "warunkach uczestnictwa"}
               </Link>
               .
             </p>
@@ -165,11 +229,15 @@ export default async function FaqPage() {
             />
 
             <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-[0.97] tracking-tight md:text-5xl">
-              {isEn ? "Still have a question?" : "Nie znalazłeś odpowiedzi?"}
+              {isEn
+                ? "Still have a question?"
+                : "Nie znalazłeś odpowiedzi?"}
             </h2>
 
             <p className="mt-4 max-w-xl leading-7 text-background/65">
-              {isEn ? "Tell us what you need to know. We will check the details of your situation and reply." : "Napisz do nas i opisz, czego dotyczy pytanie. Sprawdzimy konkretną sytuację i odpowiemy."}
+              {isEn
+                ? "Tell us what you need to know. We will check the details of your situation and reply."
+                : "Napisz do nas i opisz, czego dotyczy pytanie. Sprawdzimy konkretną sytuację i odpowiemy."}
             </p>
           </div>
 
@@ -185,8 +253,14 @@ export default async function FaqPage() {
             }
           >
             <span className="inline-flex items-center gap-2">
-              {isEn ? "Contact us" : "Napisz do nas"}
-              <ArrowRight className="size-4 shrink-0" />
+              {isEn
+                ? "Contact us"
+                : "Napisz do nas"}
+
+              <ArrowRight
+                className="size-4 shrink-0"
+                aria-hidden="true"
+              />
             </span>
           </Button>
         </div>

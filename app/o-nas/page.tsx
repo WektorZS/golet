@@ -18,6 +18,7 @@ import { AboutStorySlider } from "@/components/about-story-slider"
 import { getRequestLocale } from "@/lib/i18n-request"
 import { routeFor } from "@/lib/i18n"
 import { getSeoCopy } from "@/lib/seo-copy"
+import { absoluteUrl } from "@/lib/site"
 
 export const dynamic = "force-dynamic"
 
@@ -46,6 +47,26 @@ export default async function AboutPage() {
         data={{
           "@context": "https://schema.org",
           "@graph": [
+            {
+              "@type": "AboutPage",
+              "@id": `${absoluteUrl(routeFor(locale, "/o-nas"))}#webpage`,
+              url: absoluteUrl(routeFor(locale, "/o-nas")),
+              name: t("O Let's Gol", "About Let's Gol"),
+              description: t(
+                "Historia Łukasza i Mateusza, których przyjaźń, piłka nożna i wspólne podróże dały początek Let's Gol.",
+                "The story of Lukasz and Mateusz, whose friendship, football and shared travels became Let's Gol."
+              ),
+              inLanguage: isEn ? "en-GB" : "pl-PL",
+              isPartOf: {
+                "@id": absoluteUrl("/#website"),
+              },
+              breadcrumb: {
+                "@id": `${absoluteUrl(routeFor(locale, "/o-nas"))}#breadcrumb`,
+              },
+              about: {
+                "@id": absoluteUrl("/#organization"),
+              },
+            },
             breadcrumbSchema([
               {
                 name: t("Strona główna", "Home"),
@@ -56,17 +77,6 @@ export default async function AboutPage() {
                 path: routeFor(locale, "/o-nas"),
               },
             ]),
-            {
-              "@type": "AboutPage",
-              name: t("O Let's Gol", "About Let's Gol"),
-              url: `https://letsgol.eu${routeFor(locale, "/o-nas")}`,
-              inLanguage: isEn ? "en-GB" : "pl-PL",
-              description:
-                t("Historia Łukasza i Mateusza, których przyjaźń, piłka nożna i wspólne podróże dały początek Let's Gol.", "The story of Lukasz and Mateusz, whose friendship, football and shared travels became Let's Gol."),
-              mainEntity: {
-                "@id": "https://letsgol.eu/#organization",
-              },
-            },
           ],
         }}
       />

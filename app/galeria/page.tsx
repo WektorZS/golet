@@ -26,6 +26,7 @@ import { getRequestLocale } from "@/lib/i18n-request"
 import { localizedSetting } from "@/lib/i18n-content"
 import { routeFor } from "@/lib/i18n"
 import { getSeoCopy } from "@/lib/seo-copy"
+import { absoluteUrl } from "@/lib/site"
 
 export const dynamic = "force-dynamic"
 
@@ -109,73 +110,61 @@ export default async function GalleryPage() {
       <main className="min-h-screen bg-background text-foreground">
         <JsonLd
           data={{
-            "@context":
-              "https://schema.org",
+            "@context": "https://schema.org",
             "@graph": [
+              {
+                "@type": "ImageGallery",
+                "@id": `${absoluteUrl(path)}#webpage`,
+                url: absoluteUrl(path),
+                name: localizedSetting(
+                  content,
+                  "galleryTitle",
+                  locale,
+                  isEn
+                    ? "Football trip gallery"
+                    : "Galeria z wyjazdów",
+                ),
+                description: getSeoCopy("gallery", locale).description,
+                inLanguage: isEn ? "en-GB" : "pl-PL",
+                isPartOf: {
+                  "@id": absoluteUrl("/#website"),
+                },
+                breadcrumb: {
+                  "@id": `${absoluteUrl(path)}#breadcrumb`,
+                },
+                about: {
+                  "@id": absoluteUrl("/#organization"),
+                },
+                image: gallery.map((item) => {
+                  const src = item.mediaId
+                    ? `/api/media/${item.mediaId}`
+                    : item.image
+
+                  const caption = [item.title, item.city]
+                    .filter(Boolean)
+                    .join(" · ")
+
+                  return {
+                    "@type": "ImageObject",
+                    "@id": `${absoluteUrl(path)}#image-${item.id}`,
+                    contentUrl: absoluteUrl(src),
+                    url: absoluteUrl(src),
+                    ...(caption && { caption }),
+                    ...(item.alt && { description: item.alt }),
+                    representativeOfPage: false,
+                  }
+                }),
+              },
               breadcrumbSchema([
                 {
-                  name: isEn
-                    ? "Home"
-                    : "Strona główna",
-                  path: routeFor(
-                    locale,
-                    "/",
-                  ),
+                  name: isEn ? "Home" : "Strona główna",
+                  path: routeFor(locale, "/"),
                 },
                 {
-                  name: isEn
-                    ? "Gallery"
-                    : "Galeria",
+                  name: isEn ? "Gallery" : "Galeria",
                   path,
                 },
               ]),
-              {
-                "@type":
-                  "ImageGallery",
-                name:
-                  localizedSetting(
-                    content,
-                    "galleryTitle",
-                    locale,
-                    isEn
-                      ? "Football trip gallery"
-                      : "Galeria z wyjazdów",
-                  ),
-                url: `https://letsgol.eu${path}`,
-                inLanguage:
-                  isEn
-                    ? "en-GB"
-                    : "pl-PL",
-                image:
-                  gallery.map(
-                    (item) => {
-                      const src =
-                        item.mediaId
-                          ? `/api/media/${item.mediaId}`
-                          : item.image
-
-                      return {
-                        "@type":
-                          "ImageObject",
-                        contentUrl:
-                          new URL(
-                            src,
-                            "https://letsgol.eu",
-                          ).toString(),
-                        caption: [
-                          item.title,
-                          item.city,
-                        ]
-                          .filter(
-                            Boolean,
-                          )
-                          .join(
-                            " · ",
-                          ),
-                      }
-                    },
-                  ),
-              },
             ],
           }}
         />

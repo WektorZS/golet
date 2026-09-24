@@ -3,28 +3,30 @@ import type { Locale } from "@/lib/i18n"
 export const seoCopy = {
   home: {
     pl: {
-      title: "Let’s Gol | Wyjazdy na mecze piłkarskie",
+      title: "Wyjazdy na mecze piłkarskie w Europie",
       description:
         "Wyjazdy na mecze piłkarskie w Europie z biletem, lotem, hotelem i opieką koordynatora. Wybierz gotowy pakiet lub poproś o indywidualną ofertę.",
     },
     en: {
-      title: "Let’s Gol | Football Match Trips Across Europe",
-      description:
-        "Travel to Europe’s biggest football matches with tickets, flights, hotels and coordinator support included. Choose a package or request a custom trip.",
-    },
-  },
-  trips: {
-    pl: {
-      title: "Wyjazdy na mecze piłkarskie w Europie",
-      description:
-        "Sprawdź aktualne wyjazdy na mecze piłkarskie w Europie. Porównaj terminy, ceny i pakiety obejmujące bilet, lot, hotel oraz opiekę koordynatora.",
-    },
-    en: {
       title: "Football Match Trips Across Europe",
       description:
-        "Explore current football match trips across Europe. Compare dates, prices and packages that include match tickets, flights, hotels and coordinator support.",
+        "Travel to football matches across Europe with match tickets, flights, hotels and coordinator support. Choose a ready-made package or request a custom trip.",
     },
   },
+
+  trips: {
+    pl: {
+      title: "Aktualne wyjazdy na mecze piłkarskie",
+      description:
+        "Sprawdź aktualne wyjazdy na mecze piłkarskie w Europie. Porównaj terminy, ceny i warianty z biletem, lotem, hotelem oraz opieką koordynatora.",
+    },
+    en: {
+      title: "Current Football Match Trips",
+      description:
+        "Explore current football match trips across Europe. Compare dates, prices and options with match tickets, flights, hotels and coordinator support.",
+    },
+  },
+
   gallery: {
     pl: {
       title: "Galeria wyjazdów na mecze piłkarskie",
@@ -34,21 +36,23 @@ export const seoCopy = {
     en: {
       title: "Football Match Trip Gallery",
       description:
-        "See photos from Let’s Gol football match trips across Europe, including iconic stadiums, city breaks, travelling supporters and unforgettable match days.",
+        "See photos from Let’s Gol football trips across Europe. Discover stadiums, cities, supporters and unforgettable match-day moments.",
     },
   },
+
   about: {
     pl: {
-      title: "O nas i organizacji wyjazdów na mecze",
+      title: "O nas – wyjazdy na mecze",
       description:
-        "Poznaj Let’s Gol, organizatora wyjazdów na mecze piłkarskie w Europie. Dowiedz się, jak Łukasz i Mateusz łączą podróże, futbol i opiekę nad kibicami.",
+        "Poznaj Let’s Gol i ludzi stojących za naszymi wyjazdami na mecze. Zobacz, jak Łukasz i Mateusz łączą futbol, podróże i organizację wyjazdów.",
     },
     en: {
-      title: "About Our Football Match Trips",
+      title: "About Let’s Gol",
       description:
         "Meet the people behind Let’s Gol and learn how we combine football, travel planning and personal support to organise memorable match trips across Europe.",
     },
   },
+
   faq: {
     pl: {
       title: "FAQ o wyjazdach na mecze piłkarskie",
@@ -61,30 +65,33 @@ export const seoCopy = {
         "Find answers about football match trips, tickets, flights, hotels, payments, travel documents, insurance and how Let’s Gol organises each journey.",
     },
   },
+
   contact: {
     pl: {
       title: "Kontakt i wycena wyjazdu na mecz",
       description:
-        "Skontaktuj się z Let’s Gol w sprawie wyjazdu na mecz piłkarski, dostępnych terminów, rezerwacji, oferty dla grupy lub wyceny indywidualnego pakietu.",
+        "Skontaktuj się z Let’s Gol w sprawie wyjazdu na mecz, dostępnych terminów, rezerwacji, oferty dla grupy lub indywidualnej wyceny wyjazdu.",
     },
     en: {
-      title: "Contact Us About a Football Match Trip",
+      title: "Contact Let’s Gol",
       description:
-        "Contact Let’s Gol about a football match trip, available dates, booking, a group offer, partnership or a custom package built around your chosen game.",
+        "Contact Let’s Gol about football match trips, available dates, bookings, group travel or a custom package built around your chosen match.",
     },
   },
+
   privacy: {
     pl: {
-      title: "Polityka prywatności i plików cookies",
+      title: "Polityka prywatności i pliki cookies",
       description:
-        "Sprawdź, jak Let’s Gol przetwarza dane osobowe, chroni prywatność użytkowników oraz wykorzystuje niezbędne i opcjonalne pliki cookies na stronie.",
+        "Sprawdź, jak Let’s Gol przetwarza dane osobowe, chroni prywatność użytkowników oraz wykorzystuje niezbędne i opcjonalne pliki cookies.",
     },
     en: {
       title: "Privacy and Cookie Policy",
       description:
-        "Learn how Let’s Gol processes personal data, protects visitor privacy and uses essential and optional cookies across the website and booking process.",
+        "Learn how Let’s Gol processes personal data, protects visitor privacy and uses essential and optional cookies across the website.",
     },
   },
+
   terms: {
     pl: {
       title: "Warunki uczestnictwa w wyjazdach na mecze",
@@ -94,14 +101,18 @@ export const seoCopy = {
     en: {
       title: "Football Trip Terms and Conditions",
       description:
-        "Read the booking, payment and participation terms for Let’s Gol football match trips, including tickets, transport, accommodation and traveller duties.",
+        "Read the booking, payment and participation terms for Let’s Gol football trips, including tickets, transport, accommodation and traveller responsibilities.",
     },
   },
 } as const
 
-export type SeoPage = keyof typeof seoCopy
+export type SeoPage =
+  keyof typeof seoCopy
 
-export function getSeoCopy(page: SeoPage, locale: Locale) {
+export function getSeoCopy(
+  page: SeoPage,
+  locale: Locale
+) {
   return seoCopy[page][locale]
 }
 
@@ -116,15 +127,23 @@ export function buildTripSeoDescription({
   locale: Locale
   customDescription?: string
 }) {
-  const custom = customDescription?.trim()
+  const custom =
+    customDescription?.trim()
 
-  if (custom && custom.length >= 140) return custom
-
-  const formattedPrice = new Intl.NumberFormat(locale === "en" ? "en-GB" : "pl-PL").format(price)
-
-  if (locale === "en") {
-    return `Explore the football trip to ${title}. Packages with tickets, flights, hotel and coordinator support. Prices from PLN ${formattedPrice} per person.`
+  if (custom) {
+    return custom
   }
 
-  return `Zobacz ofertę wyjazdu na mecz ${title}. Pakiety z biletem, lotem, hotelem i opieką koordynatora. Cena od ${formattedPrice} zł za osobę.`
+  const formattedPrice =
+    new Intl.NumberFormat(
+      locale === "en"
+        ? "en-GB"
+        : "pl-PL"
+    ).format(price)
+
+  if (locale === "en") {
+    return `Football trip to ${title} with Let’s Gol. Explore options with match tickets, flights, hotel and coordinator support. Prices from PLN ${formattedPrice} per person.`
+  }
+
+  return `Wyjazd na mecz ${title} z Let’s Gol. Sprawdź dostępne warianty z biletem, lotem, hotelem i opieką koordynatora. Cena od ${formattedPrice} zł za osobę.`
 }

@@ -54,6 +54,13 @@ function refreshPublic() {
   revalidatePath("/sitemap.xml")
 }
 
+function refreshTripPages(slug: string) {
+  if (!slug) return
+
+  revalidatePath(`/wyjazdy/${slug}`)
+  revalidatePath(`/en/trips/${slug}`)
+}
+
 function mediaIdFromUrl(url: string) {
   const match = url.match(/^\/api\/media\/(\d+)$/)
   return match ? Number(match[1]) : null
@@ -108,6 +115,10 @@ const tripSchema = z.object({
   hotelBoardEn: z.string().max(120), roomTypeEn: z.string().max(120),
   departureAirportsEn: z.string().max(300), flightTypeEn: z.string().max(120),
   baggageInfoEn: z.string().max(300), ticketCategoryEn: z.string().max(200), seatingInfoEn: z.string().max(300),
+  seoTitle: z.string().max(120),
+  seoDescription: z.string().max(320),
+  seoTitleEn: z.string().max(120),
+  seoDescriptionEn: z.string().max(320),
 })
 
 export type SaveTripState = { success?: boolean; error?: string }
@@ -334,6 +345,10 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
     hotelBoardEn: clean(formData.get("hotelBoardEn")), roomTypeEn: clean(formData.get("roomTypeEn")),
     departureAirportsEn: clean(formData.get("departureAirportsEn")), flightTypeEn: clean(formData.get("flightTypeEn")),
     baggageInfoEn: clean(formData.get("baggageInfoEn")), ticketCategoryEn: clean(formData.get("ticketCategoryEn")), seatingInfoEn: clean(formData.get("seatingInfoEn")),
+    seoTitle: clean(formData.get("seoTitle")),
+    seoDescription: clean(formData.get("seoDescription")),
+    seoTitleEn: clean(formData.get("seoTitleEn")),
+    seoDescriptionEn: clean(formData.get("seoDescriptionEn")),
   })
   if (!parsed.success) return { error: "Sprawdź wymagane pola wyjazdu." }
   const slug = slugify(clean(formData.get("slug")) || parsed.data.title)
@@ -351,7 +366,7 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
 
   const isEditing = Number.isInteger(id) && id > 0
   const [existingTrip] = isEditing
-    ? await db.select({ image: trips.image, coverMediaId: trips.coverMediaId, thumbnailMediaId: trips.thumbnailMediaId, homeLogo: trips.homeLogo, awayLogo: trips.awayLogo }).from(trips).where(eq(trips.id, id)).limit(1)
+    ? await db.select({ slug: trips.slug, image: trips.image, coverMediaId: trips.coverMediaId, thumbnailMediaId: trips.thumbnailMediaId, homeLogo: trips.homeLogo, awayLogo: trips.awayLogo }).from(trips).where(eq(trips.id, id)).limit(1)
     : []
   const coverMode = clean(formData.get("coverMode")) || (existingTrip?.coverMediaId ? "override" : "team")
   let coverMediaId = coverMode === "override"
@@ -380,7 +395,7 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   const coverFile = formData.get("coverFile")
   if (coverFile instanceof File && coverFile.size > 0) {
     try {
-      image = await uploadTripImage(coverFile, `Stadion - ${parsed.data.title}`)
+      image = await uploadTripImage(coverFile, `${parsed.data.stadium} - wyjazd na mecz ${parsed.data.title}`)
       coverMediaId = mediaIdFromUrl(image)
       homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${homeTeamRecord.name}`, "logo")) || homeLogo
       awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${awayTeamRecord.name}`, "logo")) || awayLogo
@@ -425,7 +440,7 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
     hotelInfoEn: clean(formData.get("hotelInfoEn")), flightInfoEn: clean(formData.get("flightInfoEn")),
     faq: clean(formData.get("faq")).split("\n").map((item) => item.trim()).filter(Boolean),
     faqEn: clean(formData.get("faqEn")).split("\n").map((item) => item.trim()).filter(Boolean),
-    sortOrder: Number(formData.get("sortOrder")) || 0, seoTitle: clean(formData.get("seoTitle")), seoDescription: clean(formData.get("seoDescription")), seoTitleEn: clean(formData.get("seoTitleEn")), seoDescriptionEn: clean(formData.get("seoDescriptionEn")), updatedAt: new Date(),
+    sortOrder: Number(formData.get("sortOrder")) || 0, updatedAt: new Date(),
   }
   if (Number.isInteger(id) && id > 0) {
     await db.update(trips).set(values).where(eq(trips.id, id))
@@ -435,16 +450,24 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
     await logActivity(user.id, "created", "trip", String(created.id), parsed.data.title)
   }
   refreshPublic()
+  refreshTripPages(slug)
+  if (existingTrip?.slug && existingTrip.slug !== slug) refreshTripPages(existingTrip.slug)
   return { success: true }
 }
 
 export async function setTripStatus(formData: FormData) {
   const user = await requireAdmin()
-  const id = Number(formData.get("id")); const status = clean(formData.get("status"))
+  const id = Number(formData.get("id"))
+  const status = clean(formData.get("status"))
   if (!Number.isInteger(id) || !statuses.includes(status as typeof statuses[number])) return
+
+  const [trip] = await db.select({ slug: trips.slug }).from(trips).where(eq(trips.id, id)).limit(1)
+  if (!trip) return
+
   await db.update(trips).set({ status, updatedAt: new Date() }).where(eq(trips.id, id))
   await logActivity(user.id, status, "trip", String(id))
   refreshPublic()
+  refreshTripPages(trip.slug)
 }
 
 export async function duplicateTrip(formData: FormData) {
@@ -812,11 +835,17 @@ export async function setTripCover(formData: FormData) {
   const tripId = Number(formData.get("tripId"))
   const mediaId = Number(formData.get("mediaId"))
   if (!Number.isInteger(tripId) || !Number.isInteger(mediaId)) throw new Error("Wybierz wyjazd i zdjęcie")
+
   const [asset] = await db.select({ id: mediaAssets.id }).from(mediaAssets).where(eq(mediaAssets.id, mediaId)).limit(1)
   if (!asset) throw new Error("Nie znaleziono zdjęcia")
+
+  const [trip] = await db.select({ slug: trips.slug }).from(trips).where(eq(trips.id, tripId)).limit(1)
+  if (!trip) throw new Error("Nie znaleziono wyjazdu")
+
   await db.update(trips).set({ image: `/api/media/${mediaId}`, coverMediaId: mediaId, updatedAt: new Date() }).where(eq(trips.id, tripId))
   await logActivity(user.id, "updated_cover", "trip", String(tripId), `Media #${mediaId}`)
   refreshPublic()
+  refreshTripPages(trip.slug)
 }
 
 export type UpdateGalleryItemState = { error?: string; success?: boolean }
