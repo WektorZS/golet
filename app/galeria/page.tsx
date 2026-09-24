@@ -28,6 +28,7 @@ const FACEBOOK_URL =
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
+
   const { title, description } = getSeoCopy(
     "gallery",
     locale,
@@ -53,18 +54,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 function getMosaicGroupClass(count: number) {
   if (count === 4) {
-    return "grid h-128 grid-cols-2 grid-rows-6 gap-0 sm:h-144 lg:h-160 lg:grid-cols-12 lg:grid-rows-6"
+    return "grid h-96 grid-cols-2 grid-rows-6 gap-0 sm:h-128 lg:h-160 lg:grid-cols-12 lg:grid-rows-6"
   }
 
   if (count === 3) {
-    return "grid h-96 grid-cols-2 grid-rows-4 gap-0 sm:h-112 lg:h-128 lg:grid-cols-12 lg:grid-rows-4"
+    return "grid h-80 grid-cols-2 grid-rows-4 gap-0 sm:h-96 lg:h-128 lg:grid-cols-12 lg:grid-rows-4"
   }
 
   if (count === 2) {
-    return "grid h-64 grid-cols-2 grid-rows-1 gap-0 sm:h-80 lg:h-96 lg:grid-cols-12"
+    return "grid h-52 grid-cols-2 grid-rows-1 gap-0 sm:h-72 lg:h-96 lg:grid-cols-12"
   }
 
-  return "grid h-72 grid-cols-1 grid-rows-1 gap-0 sm:h-96 lg:h-120 lg:grid-cols-12"
+  return "grid h-56 grid-cols-1 grid-rows-1 gap-0 sm:h-80 lg:h-120 lg:grid-cols-12"
 }
 
 function getMosaicTileClass(
@@ -344,82 +345,84 @@ export default async function GalleryPage() {
           </div>
         </section>
 
-        <section className="overflow-hidden bg-foreground">
+        <section className="overflow-hidden bg-foreground py-4 sm:py-0">
           {gallery.length ? (
-            <div className="w-full">
-              {galleryGroups.map(
-                (group, groupIndex) => {
-                  const reverse =
-                    groupIndex % 2 === 1
+            <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-0">
+              <div className="overflow-hidden rounded-xl sm:rounded-none">
+                {galleryGroups.map(
+                  (group, groupIndex) => {
+                    const reverse =
+                      groupIndex % 2 === 1
 
-                  return (
-                    <div
-                      key={
-                        group[0]?.item.id ??
-                        groupIndex
-                      }
-                      className={getMosaicGroupClass(
-                        group.length,
-                      )}
-                    >
-                      {group.map(
-                        (
-                          { item, index },
-                          localIndex,
-                        ) => {
-                          const src =
-                            item.mediaId
-                              ? `/api/media/${item.mediaId}`
-                              : item.image
+                    return (
+                      <div
+                        key={
+                          group[0]?.item.id ??
+                          groupIndex
+                        }
+                        className={getMosaicGroupClass(
+                          group.length,
+                        )}
+                      >
+                        {group.map(
+                          (
+                            { item, index },
+                            localIndex,
+                          ) => {
+                            const src =
+                              item.mediaId
+                                ? `/api/media/${item.mediaId}`
+                                : item.image
 
-                          const alt =
-                            item.alt ||
-                            item.title ||
-                            (isEn
-                              ? "Photo from a Let's Gol trip"
-                              : "Zdjęcie z wyjazdu Let's Gol")
+                            const alt =
+                              item.alt ||
+                              item.title ||
+                              (isEn
+                                ? "Photo from a Let's Gol trip"
+                                : "Zdjęcie z wyjazdu Let's Gol")
 
-                          return (
-                            <figure
-                              key={item.id}
-                              className={`group relative isolate m-0 overflow-hidden bg-foreground ${getMosaicTileClass(
-                                group.length,
-                                localIndex,
-                                reverse,
-                              )}`}
-                            >
-                              <ImageLightbox
-                                src={src}
-                                alt={alt}
-                                images={
-                                  lightboxImages
-                                }
-                                initialIndex={
-                                  index
-                                }
-                                priority={
-                                  index < 4
-                                }
+                            return (
+                              <figure
+                                key={item.id}
+                                className={`group relative isolate m-0 overflow-hidden bg-foreground ${getMosaicTileClass(
+                                  group.length,
+                                  localIndex,
+                                  reverse,
+                                )}`}
                               >
-                                <Image
+                                <ImageLightbox
                                   src={src}
                                   alt={alt}
-                                  fill
-                                  sizes={getMosaicSizes(
-                                    group.length,
-                                    localIndex,
-                                  )}
-                                  className="cursor-zoom-in object-cover brightness-100 transition-[transform,filter] duration-700 ease-out lg:brightness-70 lg:group-hover:scale-105 lg:group-hover:brightness-100"
-                                />
-                              </ImageLightbox>
-                            </figure>
-                          )
-                        },
-                      )}
-                    </div>
-                  )
-                },
-              )}
+                                  images={
+                                    lightboxImages
+                                  }
+                                  initialIndex={
+                                    index
+                                  }
+                                  priority={
+                                    index < 4
+                                  }
+                                >
+                                  <Image
+                                    src={src}
+                                    alt={alt}
+                                    fill
+                                    sizes={getMosaicSizes(
+                                      group.length,
+                                      localIndex,
+                                    )}
+                                    className="cursor-zoom-in object-cover brightness-100 transition-[transform,filter] duration-700 ease-out lg:brightness-70 lg:group-hover:scale-105 lg:group-hover:brightness-100"
+                                  />
+                                </ImageLightbox>
+                              </figure>
+                            )
+                          },
+                        )}
+                      </div>
+                    )
+                  },
+                )}
+              </div>
             </div>
           ) : (
             <div className="bg-section-light px-4 py-24 text-center md:px-6">
