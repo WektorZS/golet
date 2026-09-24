@@ -84,7 +84,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
             }
             className={`inline-flex h-8 items-center justify-center gap-1.5 rounded-sm px-2.5 font-mono text-[10px] font-bold uppercase tracking-wider transition-colors disabled:cursor-wait disabled:opacity-60 ${
               isActive
-                ? "bg-neutral-300 text-neutral-950"
+                 ? "bg-neutral-700 text-white"
                 : "text-current/60 hover:bg-black/5 hover:text-current"
             } ${compact ? "w-9 px-1" : "min-w-14"}`}
           >
