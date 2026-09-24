@@ -29,7 +29,7 @@ const slides = [
     desktopScale: 1,
   },
   {
-    src: "/images/sagradafamilia.webp",
+    src: "/images/sagradafamilia-hero.webp",
     mobileSrc: "/images/sagradafamilia-mobile.webp",
 
     mobileX: 50,
