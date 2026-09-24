@@ -23,6 +23,9 @@ import { getSeoCopy } from "@/lib/seo-copy"
 
 export const dynamic = "force-dynamic"
 
+const FACEBOOK_URL =
+  "https://facebook.com/profile.php?id=61573517165441"
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
   const { title, description } = getSeoCopy(
@@ -253,8 +256,7 @@ export default async function GalleryPage() {
                         : item.image
 
                     return {
-                      "@type":
-                        "ImageObject",
+                      "@type": "ImageObject",
                       contentUrl: new URL(
                         src,
                         "https://letsgol.eu",
@@ -295,7 +297,7 @@ export default async function GalleryPage() {
                   : "Galeria"}
               </p>
 
-              <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
+              <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
                 {localizedSetting(
                   content,
                   "galleryTitle",
@@ -407,14 +409,9 @@ export default async function GalleryPage() {
                                     group.length,
                                     localIndex,
                                   )}
-                                  className="cursor-zoom-in object-cover transition-[transform,filter] duration-700 ease-out group-hover:scale-105 group-hover:brightness-90"
+                                  className="cursor-zoom-in object-cover brightness-70 transition-[transform,filter] duration-700 ease-out group-hover:scale-105 group-hover:brightness-100"
                                 />
                               </ImageLightbox>
-
-                              <div
-                                aria-hidden="true"
-                                className="pointer-events-none absolute inset-0 z-10 bg-black/0 transition-colors duration-500 group-hover:bg-black/10"
-                              />
                             </figure>
                           )
                         },
@@ -439,53 +436,56 @@ export default async function GalleryPage() {
             </div>
           )}
         </section>
+
         <section className="bg-section-light">
-  <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-14 md:px-6 md:py-18 lg:flex-row lg:items-center lg:justify-between">
-    <div className="max-w-2xl">
-      <p className="eyebrow">
-        {isEn ? "More from our trips" : "Więcej z naszych wyjazdów"}
-      </p>
+          <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-14 md:px-6 md:py-18 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="eyebrow">
+                {isEn
+                  ? "More from our trips"
+                  : "Więcej z naszych wyjazdów"}
+              </p>
 
-      <h2 className="mt-5 text-balance font-sans text-3xl font-black uppercase leading-tight tracking-tight sm:text-4xl lg:text-5xl">
-        {isEn
-          ? "More photos on Facebook"
-          : "Więcej zdjęć na Facebooku"}
-      </h2>
+              <h2 className="mt-5 text-balance font-sans text-3xl font-black uppercase leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+                {isEn
+                  ? "More photos on Facebook"
+                  : "Więcej zdjęć na Facebooku"}
+              </h2>
 
-      <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
-        {isEn
-          ? "The gallery does not end here. See more photos, match-day reports and moments from our trips on Facebook."
-          : "Na tej galerii się nie kończy. Więcej zdjęć, relacji meczowych i momentów z naszych wyjazdów znajdziesz na naszym Facebooku."}
-      </p>
-    </div>
+              <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
+                {isEn
+                  ? "The gallery does not end here. See more photos, match-day reports and moments from our trips on Facebook."
+                  : "Na tej galerii się nie kończy. Więcej zdjęć, relacji meczowych i momentów z naszych wyjazdów znajdziesz na naszym Facebooku."}
+              </p>
+            </div>
 
-    <a
-      href="https://facebook.com/profile.php?id=61573517165441"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group inline-flex h-14 shrink-0 items-center justify-center gap-3 rounded-lg bg-foreground px-6 font-mono text-xs font-bold uppercase tracking-wider text-background transition-colors hover:bg-primary hover:text-black"
-    >
-      <Image
-        src="/icons/social/facebook.svg"
-        alt=""
-        width={24}
-        height={24}
-        className="size-6 shrink-0"
-      />
+            <a
+              href={FACEBOOK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex h-14 shrink-0 items-center justify-center gap-3 rounded-lg bg-foreground px-6 font-mono text-xs font-bold uppercase tracking-wider text-background transition-colors hover:bg-primary hover:text-black"
+            >
+              <Image
+                src="/icons/social/facebook.svg"
+                alt=""
+                width={24}
+                height={24}
+                className="size-6 shrink-0"
+              />
 
-      <span>
-        {isEn
-          ? "See us on Facebook"
-          : "Zobacz nas na Facebooku"}
-      </span>
+              <span>
+                {isEn
+                  ? "See us on Facebook"
+                  : "Zobacz nas na Facebooku"}
+              </span>
 
-      <ArrowUpRight
-        className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-        aria-hidden="true"
-      />
-    </a>
-  </div>
-</section>
+              <ArrowUpRight
+                className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </a>
+          </div>
+        </section>
       </main>
 
       <SiteFooter content={content} />
