@@ -107,14 +107,10 @@ export function ImageLightbox({
   const [
     touchStartX,
     setTouchStartX,
-  ] = useState<number | null>(
-    null,
-  )
+  ] = useState<number | null>(null)
 
   const triggerRef =
-    useRef<HTMLButtonElement>(
-      null,
-    )
+    useRef<HTMLButtonElement>(null)
 
   const currentImage =
     gallery[currentIndex]
@@ -134,8 +130,7 @@ export function ImageLightbox({
   const nextImage = () => {
     setCurrentIndex(
       (current) =>
-        current ===
-        gallery.length - 1
+        current === gallery.length - 1
           ? 0
           : current + 1,
     )
@@ -154,17 +149,13 @@ export function ImageLightbox({
     }
 
     let timer:
-      | ReturnType<
-          typeof setTimeout
-        >
+      | ReturnType<typeof setTimeout>
       | undefined
 
     const observer =
       new IntersectionObserver(
         ([entry]) => {
-          if (
-            !entry?.isIntersecting
-          ) {
+          if (!entry?.isIntersecting) {
             return
           }
 
@@ -178,8 +169,7 @@ export function ImageLightbox({
           observer.disconnect()
         },
         {
-          rootMargin:
-            "300px 0px",
+          rootMargin: "300px 0px",
         },
       )
 
@@ -203,9 +193,7 @@ export function ImageLightbox({
       currentImage.src,
     )
 
-    if (
-      !hasMultipleImages
-    ) {
+    if (!hasMultipleImages) {
       return
     }
 
@@ -221,9 +209,7 @@ export function ImageLightbox({
         : currentIndex + 1
 
     preloadImage(
-      gallery[
-        previousIndex
-      ].src,
+      gallery[previousIndex].src,
     )
 
     preloadImage(
@@ -245,26 +231,21 @@ export function ImageLightbox({
     const handleKeyDown = (
       event: KeyboardEvent,
     ) => {
-      if (
-        event.key ===
-        "Escape"
-      ) {
+      if (event.key === "Escape") {
         event.preventDefault()
         event.stopPropagation()
 
         setIsOpen(false)
+
+        return
+      }
+
+      if (!hasMultipleImages) {
         return
       }
 
       if (
-        !hasMultipleImages
-      ) {
-        return
-      }
-
-      if (
-        event.key ===
-        "ArrowLeft"
+        event.key === "ArrowLeft"
       ) {
         event.preventDefault()
         event.stopPropagation()
@@ -272,15 +253,13 @@ export function ImageLightbox({
         setCurrentIndex(
           (current) =>
             current === 0
-              ? gallery.length -
-                1
+              ? gallery.length - 1
               : current - 1,
         )
       }
 
       if (
-        event.key ===
-        "ArrowRight"
+        event.key === "ArrowRight"
       ) {
         event.preventDefault()
         event.stopPropagation()
@@ -337,12 +316,10 @@ export function ImageLightbox({
         .clientX
 
     const difference =
-      touchStartX -
-      touchEndX
+      touchStartX - touchEndX
 
     if (
-      Math.abs(difference) >
-      50
+      Math.abs(difference) > 50
     ) {
       if (difference > 0) {
         nextImage()
@@ -402,14 +379,12 @@ export function ImageLightbox({
             alt={alt}
             fill
             sizes="(max-width: 640px) 100vw, 33vw"
-            priority={
-              priority
-            }
+            priority={priority}
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         )}
 
-        <span className="absolute bottom-3 right-3 flex size-9 items-center justify-center rounded-full bg-foreground/75 text-background opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+        <span className="absolute bottom-3 right-3 flex size-9 items-center justify-center rounded-full bg-foreground/75 text-background opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
           <Maximize2
             className="size-4"
             aria-hidden="true"
@@ -418,10 +393,8 @@ export function ImageLightbox({
       </DialogTrigger>
 
       <DialogContent
-        className="!fixed !bottom-0 !left-0 !right-0 !top-20 !z-40 !m-0 !h-auto !w-screen !max-w-none !translate-x-0 !translate-y-0 !overflow-hidden !rounded-none !border-0 !bg-black !p-0 !shadow-none sm:!max-w-none"
-        showCloseButton={
-          false
-        }
+        className="!fixed !bottom-0 !left-0 !right-0 !top-20 !z-[60] !m-0 !h-auto !w-screen !max-w-none !translate-x-0 !translate-y-0 !overflow-hidden !rounded-none !border-0 !bg-black !p-0 !shadow-none !backdrop-blur-none sm:!max-w-none"
+        showCloseButton={false}
       >
         <DialogTitle className="sr-only">
           {isEn
@@ -445,17 +418,11 @@ export function ImageLightbox({
           }
         >
           <img
-            key={
-              currentImage.src
-            }
-            src={
-              currentImage.src
-            }
-            alt={
-              currentImage.alt
-            }
+            key={currentImage.src}
+            src={currentImage.src}
+            alt={currentImage.alt}
             decoding="async"
-            className="block size-full object-contain"
+            className="absolute inset-0 block size-full object-contain"
           />
 
           <button
@@ -466,7 +433,7 @@ export function ImageLightbox({
 
               setIsOpen(false)
             }}
-            className="absolute right-3 top-3 z-50 flex size-11 items-center justify-center rounded-full bg-white text-black shadow-xl transition-transform duration-200 hover:scale-105 sm:right-5 sm:top-5 sm:size-12"
+            className="absolute right-3 top-3 z-[70] flex size-11 items-center justify-center rounded-full bg-white text-black shadow-xl transition-transform duration-200 hover:scale-105 sm:right-5 sm:top-5 sm:size-12"
             aria-label={
               isEn
                 ? "Close photo"
@@ -490,7 +457,7 @@ export function ImageLightbox({
 
                   previousImage()
                 }}
-                className="absolute left-2 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white shadow-xl transition-colors hover:bg-black sm:left-5 sm:size-12"
+                className="absolute left-2 top-1/2 z-[70] flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/75 text-white shadow-xl transition-colors hover:bg-black sm:left-5 sm:size-12"
                 aria-label={
                   isEn
                     ? "Previous photo"
@@ -508,7 +475,7 @@ export function ImageLightbox({
 
                   nextImage()
                 }}
-                className="absolute right-2 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white shadow-xl transition-colors hover:bg-black sm:right-5 sm:size-12"
+                className="absolute right-2 top-1/2 z-[70] flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/75 text-white shadow-xl transition-colors hover:bg-black sm:right-5 sm:size-12"
                 aria-label={
                   isEn
                     ? "Next photo"
@@ -518,13 +485,9 @@ export function ImageLightbox({
                 <ChevronRight className="size-5 sm:size-6" />
               </button>
 
-              <div className="absolute bottom-3 left-1/2 z-30 -translate-x-1/2 rounded-full bg-black/75 px-3 py-1.5 text-xs font-medium text-white sm:bottom-5">
-                {currentIndex +
-                  1}{" "}
-                /{" "}
-                {
-                  gallery.length
-                }
+              <div className="absolute bottom-3 left-1/2 z-[70] -translate-x-1/2 rounded-full bg-black/75 px-3 py-1.5 text-xs font-medium text-white sm:bottom-5">
+                {currentIndex + 1} /{" "}
+                {gallery.length}
               </div>
             </>
           )}
