@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Image from "next/image"
-import { Images } from "lucide-react"
+import { ArrowUpRight, Images } from "lucide-react"
 
 import { ImageLightbox } from "@/components/image-lightbox"
 import { JsonLd } from "@/components/json-ld"
@@ -439,6 +439,53 @@ export default async function GalleryPage() {
             </div>
           )}
         </section>
+        <section className="bg-section-light">
+  <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-14 md:px-6 md:py-18 lg:flex-row lg:items-center lg:justify-between">
+    <div className="max-w-2xl">
+      <p className="eyebrow">
+        {isEn ? "More from our trips" : "Więcej z naszych wyjazdów"}
+      </p>
+
+      <h2 className="mt-5 text-balance font-sans text-3xl font-black uppercase leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+        {isEn
+          ? "More photos on Facebook"
+          : "Więcej zdjęć na Facebooku"}
+      </h2>
+
+      <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
+        {isEn
+          ? "The gallery does not end here. See more photos, match-day reports and moments from our trips on Facebook."
+          : "Na tej galerii się nie kończy. Więcej zdjęć, relacji meczowych i momentów z naszych wyjazdów znajdziesz na naszym Facebooku."}
+      </p>
+    </div>
+
+    <a
+      href="https://facebook.com/profile.php?id=61573517165441"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group inline-flex h-14 shrink-0 items-center justify-center gap-3 rounded-lg bg-foreground px-6 font-mono text-xs font-bold uppercase tracking-wider text-background transition-colors hover:bg-primary hover:text-black"
+    >
+      <Image
+        src="/icons/social/facebook.svg"
+        alt=""
+        width={24}
+        height={24}
+        className="size-6 shrink-0"
+      />
+
+      <span>
+        {isEn
+          ? "See us on Facebook"
+          : "Zobacz nas na Facebooku"}
+      </span>
+
+      <ArrowUpRight
+        className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+        aria-hidden="true"
+      />
+    </a>
+  </div>
+</section>
       </main>
 
       <SiteFooter content={content} />
