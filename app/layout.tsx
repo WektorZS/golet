@@ -6,6 +6,7 @@ import { CookieConsent } from "@/components/cookie-consent"
 import { FloatingContact } from "@/components/floating-contact"
 import { JsonLd } from "@/components/json-ld"
 import { absoluteUrl, siteUrl } from "@/lib/site"
+import { getRequestLocale } from "@/lib/i18n-request"
 import "./globals.css"
 
 const geist = Geist({
@@ -47,7 +48,7 @@ const organizationSchema = {
     telephone: "+48501465318",
     email: "kontakt.letsgol@gmail.com",
     contactType: "customer service",
-    availableLanguage: ["pl"],
+    availableLanguage: ["pl", "en"],
   },
   sameAs: [
     "https://facebook.com/profile.php?id=61573517165441",
@@ -57,20 +58,15 @@ const organizationSchema = {
   ],
 }
 
-const websiteSchema = {
-  "@type": "WebSite",
-  "@id": absoluteUrl("/#website"),
-  url: absoluteUrl(),
-  name: "Let’s Gol",
-  alternateName: "Let's Gol",
-  publisher: { "@id": absoluteUrl("/#organization") },
-  inLanguage: "pl-PL",
-}
-
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   alternates: {
     canonical: "/",
+    languages: {
+      "pl-PL": "/",
+      "en-GB": "/en",
+      "x-default": "/",
+    },
   },
 
   title: {
@@ -127,14 +123,25 @@ export const viewport: Viewport = {
   userScalable: true,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const locale = await getRequestLocale()
+  const websiteSchema = {
+    "@type": "WebSite",
+    "@id": absoluteUrl("/#website"),
+    url: absoluteUrl(),
+    name: "Let’s Gol",
+    alternateName: "Let's Gol",
+    publisher: { "@id": absoluteUrl("/#organization") },
+    inLanguage: locale === "en" ? "en-GB" : "pl-PL",
+  }
+
   return (
     <html
-      lang="pl"
+      lang={locale}
       className={`light bg-background ${geist.variable} ${oswald.variable}`}
     >
       <body>

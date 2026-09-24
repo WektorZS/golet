@@ -26,16 +26,19 @@ type Testimonial = {
 
 type TestimonialsCarouselProps = {
   testimonials: Testimonial[]
+  locale?: "pl" | "en"
 }
 
 function TestimonialCard({
   item,
   isActive,
   onOpen,
+  locale,
 }: {
   item: Testimonial
   isActive: boolean
   onOpen: () => void
+  locale: "pl" | "en"
 }) {
   const textRef = useRef<HTMLParagraphElement>(null)
   const fullTextRef = useRef<HTMLParagraphElement>(null)
@@ -96,7 +99,7 @@ function TestimonialCard({
       <div className="relative flex flex-1 flex-col justify-center">
         <div className="flex gap-1 text-primary">
           <span className="sr-only">
-            Ocena {item.rating} na 5
+            {locale === "en" ? `Rating ${item.rating} out of 5` : `Ocena ${item.rating} na 5`}
           </span>
 
           {Array.from({
@@ -133,7 +136,7 @@ function TestimonialCard({
               onClick={onOpen}
               className="group/more mt-4 inline-flex w-fit items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-primary transition-colors hover:text-primary/80"
             >
-              Zobacz więcej
+              {locale === "en" ? "Read more" : "Zobacz więcej"}
 
               <ArrowRight className="size-3.5 transition-transform duration-200 group-hover/more:translate-x-1" />
             </button>
@@ -160,6 +163,7 @@ function TestimonialCard({
 
 export function TestimonialsCarousel({
   testimonials,
+  locale = "pl",
 }: TestimonialsCarouselProps) {
   const [selected, setSelected] = useState<Testimonial | null>(null)
   const [typedText, setTypedText] = useState("")
@@ -272,7 +276,7 @@ export function TestimonialsCarousel({
 
     document.body.style.overflow = "hidden"
     const focusFrame = requestAnimationFrame(() => {
-      dialogRef.current?.querySelector<HTMLButtonElement>('[aria-label="Zamknij opinię"]')?.focus()
+      dialogRef.current?.querySelector<HTMLButtonElement>(`[aria-label="${locale === "en" ? "Close review" : "Zamknij opinię"}"]`)?.focus()
     })
 
     window.addEventListener(
@@ -290,7 +294,7 @@ export function TestimonialsCarousel({
         handleKeyDown
       )
     }
-  }, [selected, closeTestimonial])
+  }, [selected, closeTestimonial, locale])
 
   useEffect(() => {
     if (!selected) return
@@ -379,6 +383,7 @@ export function TestimonialsCarousel({
                       item={item}
                       isActive={isActive}
                       onOpen={() => openTestimonial(item)}
+                      locale={locale}
                     />
                   </div>
                 </CarouselItem>
@@ -388,7 +393,7 @@ export function TestimonialsCarousel({
         </div>
 
         <div className="mt-5 flex items-center justify-center gap-4">
-          <CarouselPrevious className="static size-11 translate-x-0 translate-y-0 border-white/15 bg-white/[0.05] text-background transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground" />
+          <CarouselPrevious aria-label={locale === "en" ? "Previous review" : "Poprzednia opinia"} className="static size-11 translate-x-0 translate-y-0 border-white/15 bg-white/[0.05] text-background transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground" />
 
       <div className="flex items-center">
   {items.map((item, index) => {
@@ -398,7 +403,7 @@ export function TestimonialsCarousel({
       <button
         key={item.id}
         type="button"
-        aria-label={`Przejdź do opinii ${index + 1}`}
+        aria-label={locale === "en" ? `Go to review ${index + 1}` : `Przejdź do opinii ${index + 1}`}
         aria-current={isActive ? "true" : undefined}
         onClick={() => api?.scrollTo(index)}
         className="group flex size-11 items-center justify-center"
@@ -416,7 +421,7 @@ export function TestimonialsCarousel({
   })}
 </div>
 
-          <CarouselNext className="static size-11 translate-x-0 translate-y-0 border-white/15 bg-white/[0.05] text-background transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground" />
+          <CarouselNext aria-label={locale === "en" ? "Next review" : "Następna opinia"} className="static size-11 translate-x-0 translate-y-0 border-white/15 bg-white/[0.05] text-background transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground" />
         </div>
       </Carousel>
 
@@ -461,7 +466,7 @@ export function TestimonialsCarousel({
                 onClick={() =>
                   closeTestimonial()
                 }
-                aria-label="Zamknij opinię"
+                aria-label={locale === "en" ? "Close review" : "Zamknij opinię"}
                 className="
                   absolute right-4 top-4
                   flex size-10 items-center justify-center
@@ -492,7 +497,7 @@ export function TestimonialsCarousel({
               </div>
 
               <p className="mt-3 font-mono text-[10px] font-black uppercase tracking-[0.18em] text-primary">
-                Opinia klienta
+                {locale === "en" ? "Traveller review" : "Opinia klienta"}
               </p>
 
               <h3
@@ -500,7 +505,7 @@ export function TestimonialsCarousel({
                 className="mt-4 max-w-2xl pr-14 font-sans text-3xl font-black uppercase leading-[1] tracking-tight text-white sm:text-4xl md:pr-0 md:text-5xl"
               >
                 {selected.author ||
-                  "Klient Let’s Gol"}
+                  (locale === "en" ? "Let's Gol traveller" : "Klient Let’s Gol")}
               </h3>
 
               {selected.tripName && (
@@ -562,7 +567,7 @@ export function TestimonialsCarousel({
                   {modalCanScroll &&
                   !modalAtBottom ? (
                     <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.12em] text-white/45 md:hidden">
-                      Przewiń, aby czytać dalej
+                      {locale === "en" ? "Scroll to continue reading" : "Przewiń, aby czytać dalej"}
 
                       <span className="animate-bounce text-primary">
                         ↓
@@ -579,7 +584,7 @@ export function TestimonialsCarousel({
                     }
                     className="ml-auto text-[11px] font-black uppercase tracking-[0.14em] text-primary transition-opacity hover:opacity-70"
                   >
-                    Zamknij
+                    {locale === "en" ? "Close" : "Zamknij"}
                   </button>
                 </div>
               </div>

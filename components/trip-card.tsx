@@ -8,36 +8,27 @@ import {
   Star,
 } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { formatDate, formatPrice, pluralizeDuration, routeFor, type Locale } from "@/lib/i18n"
 import type { Trip } from "@/lib/trips"
-
-const dateFormatter = new Intl.DateTimeFormat("pl-PL", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-})
 
 function formatTripDates(
   startDate: string,
-  endDate: string | null
+  endDate: string | null,
+  locale: Locale
 ) {
-  const start = dateFormatter.format(
-    new Date(`${startDate}T12:00:00`)
-  )
+  const start = formatDate(startDate, locale, { day: "2-digit", month: "2-digit", year: "numeric" })
 
   if (!endDate || endDate === startDate) {
     return start
   }
 
-  const end = dateFormatter.format(
-    new Date(`${endDate}T12:00:00`)
-  )
+  const end = formatDate(endDate, locale, { day: "2-digit", month: "2-digit", year: "numeric" })
 
   return `${start} - ${end}`
 }
 
-function formatStay(trip: Trip) {
+function formatStay(trip: Trip, locale: Locale) {
   let days = trip.durationDays
   let nights = trip.durationNights
 
@@ -59,17 +50,7 @@ function formatStay(trip: Trip) {
     days = nights + 1
   }
 
-  const dayLabel =
-    days === 1 ? "dzień" : "dni"
-
-  const nightLabel =
-    nights === 1
-      ? "noc"
-      : nights > 1 && nights < 5
-        ? "noce"
-        : "nocy"
-
-  return `${days} ${dayLabel} / ${nights} ${nightLabel}`
+  return pluralizeDuration(days, nights, locale)
 }
 
 const availability = {
@@ -166,15 +147,24 @@ function TripFact({
 
 export function TripCard({
   trip,
+  locale = "pl",
 }: {
   trip: Trip
+  locale?: Locale
 }) {
   const teams = getTeams(trip)
 
-  const status =
-    availability[
+  const statusBase = availability[
       trip.availabilityStatus as keyof typeof availability
     ] || availability.available
+  const status = {
+    ...statusBase,
+    label: locale === "en" ? {
+      available: "Places available",
+      last_places: "Last places",
+      sold_out: "Sold out",
+    }[trip.availabilityStatus] || "Places available" : statusBase.label,
+  }
 
   return (
     <article
@@ -193,7 +183,7 @@ export function TripCard({
             />
 
             <span className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-foreground">
-              Polecany
+              {locale === "en" ? "Recommended" : "Polecany"}
             </span>
           </div>
         </div>
@@ -204,7 +194,7 @@ export function TripCard({
           <div className="relative min-h-48 overflow-hidden bg-foreground md:min-h-full">
             <Image
               src={trip.image}
-              alt={`Stadion w mieście ${trip.city}`}
+              alt={locale === "en" ? `Stadium in ${trip.city}` : `Stadion w mieście ${trip.city}`}
               fill
               className="scale-[1.02] object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
               sizes="(max-width: 768px) 100vw, 260px"
@@ -267,26 +257,27 @@ export function TripCard({
             <div className="mt-6 grid gap-4 border-t border-foreground/10 pt-4 sm:grid-cols-3">
               <TripFact
                 icon={CalendarDays}
-                label="Termin"
+                label={locale === "en" ? "Dates" : "Termin"}
               >
                 {formatTripDates(
                   trip.startDate,
-                  trip.endDate
+                  trip.endDate,
+                  locale
                 )}
               </TripFact>
 
               <TripFact
                 icon={MapPin}
-                label="Miejsce"
+                label={locale === "en" ? "Location" : "Miejsce"}
               >
                 {trip.city}, {trip.country}
               </TripFact>
 
               <TripFact
                 icon={Clock3}
-                label="Pobyt"
+                label={locale === "en" ? "Stay" : "Pobyt"}
               >
-                {formatStay(trip)}
+                {formatStay(trip, locale)}
               </TripFact>
             </div>
           </div>
@@ -306,21 +297,21 @@ export function TripCard({
 
   <div>
     <p className="font-mono text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground">
-      Cena od / osoba
+      {locale === "en" ? "Price from / person" : "Cena od / osoba"}
     </p>
 
     <p className="mt-1 font-sans text-3xl font-black leading-none tracking-tight text-foreground">
-      {trip.price.toLocaleString("pl-PL")} zł
+      {formatPrice(trip.price, locale)} {locale === "en" ? "PLN" : "zł"}
     </p>
   </div>
 
   <Button
     nativeButton={false}
-    render={<Link href={`/wyjazdy/${trip.slug}`} />}
-    aria-label={`Szczegóły wyjazdu ${trip.title}`}
+    render={<Link href={`${routeFor(locale, "/wyjazdy")}/${trip.slug}`} />}
+    aria-label={locale === "en" ? `Trip details: ${trip.title}` : `Szczegóły wyjazdu ${trip.title}`}
     className="h-10 shrink-0 px-5"
   >
-    Szczegóły
+    {locale === "en" ? "Details" : "Szczegóły"}
     <ArrowRight data-icon="inline-end" />
   </Button>
 </div>

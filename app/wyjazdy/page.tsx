@@ -7,23 +7,28 @@ import { SiteFooter } from "@/components/site-footer"
 import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { getPublishedTrips } from "@/lib/trips"
-import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
+import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
+import { getRequestLocale } from "@/lib/i18n-request"
+import { routeFor } from "@/lib/i18n"
 
 export const dynamic = "force-dynamic"
 
-export const metadata: Metadata = {
-  title: "Wyjazdy na mecze",
-  description: "Aktualne pakiety na największe mecze piłkarskie w Europie: bilet, lot, hotel i opieka koordynatora.",
-  alternates: { canonical: "/wyjazdy" },
-  ...socialMetadata(
-    "Wyjazdy na mecze piłkarskie",
-    "Sprawdź aktualne terminy i pakiety wyjazdów na największe mecze w Europie.",
-    "/wyjazdy"
-  ),
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale()
+  const isEn = locale === "en"
+  const title = isEn ? "Football match trips" : "Wyjazdy na mecze"
+  const description = isEn
+    ? "Current packages for Europe's biggest football matches, including tickets, flights, hotels and coordinator support."
+    : "Aktualne pakiety na największe mecze piłkarskie w Europie: bilet, lot, hotel i opieka koordynatora."
+  const path = routeFor(locale, "/wyjazdy")
+  return { title, description, alternates: localizedAlternates("/wyjazdy", locale), ...socialMetadata(title, description, path, locale) }
 }
 
 export default async function TripsPage() {
-  const trips = await getPublishedTrips()
+  const locale = await getRequestLocale()
+  const isEn = locale === "en"
+  const trips = await getPublishedTrips(locale)
+  const path = routeFor(locale, "/wyjazdy")
 
   return (
     <main className="min-h-screen bg-background">
@@ -31,16 +36,17 @@ export default async function TripsPage() {
         "@context": "https://schema.org",
         "@graph": [
           breadcrumbSchema([
-            { name: "Strona główna", path: "/" },
-            { name: "Wyjazdy", path: "/wyjazdy" },
+            { name: isEn ? "Home" : "Strona główna", path: routeFor(locale, "/") },
+            { name: isEn ? "Trips" : "Wyjazdy", path },
           ]),
           {
             "@type": "ItemList",
-            name: "Aktualne wyjazdy na mecze",
+            name: isEn ? "Current football match trips" : "Aktualne wyjazdy na mecze",
+            inLanguage: isEn ? "en-GB" : "pl-PL",
             itemListElement: trips.map((trip, index) => ({
               "@type": "ListItem",
               position: index + 1,
-              url: `https://letsgol.eu/wyjazdy/${trip.slug}`,
+              url: `https://letsgol.eu${path}/${trip.slug}`,
               name: trip.title,
             })),
           },
@@ -62,17 +68,15 @@ export default async function TripsPage() {
   <div className="relative mx-auto grid min-h-140 max-w-7xl items-center gap-12 px-4 py-16 md:px-6 lg:grid-cols-[1fr_0.5fr] lg:py-20">
     <div className="max-w-4xl">
       <p className="eyebrow eyebrow-on-dark">
-        Kalendarz wyjazdów
+        {isEn ? "Trip calendar" : "Kalendarz wyjazdów"}
       </p>
 
       <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
-        Twój następny mecz zaczyna się tutaj
+        {isEn ? "Your next match starts here" : "Twój następny mecz zaczyna się tutaj"}
       </h1>
 
       <p className="mt-6 max-w-2xl text-lg leading-8 text-background/70">
-        Wybierz interesujący Cię mecz i sprawdź dostępne warianty
-        wyjazdu. Wszystkie aktualne terminy znajdziesz w kalendarzu
-        poniżej.
+        {isEn ? "Choose the match you want to attend and compare the available travel options. All current dates are listed below." : "Wybierz interesujący Cię mecz i sprawdź dostępne warianty wyjazdu. Wszystkie aktualne terminy znajdziesz w kalendarzu poniżej."}
       </p>
     </div>
 
@@ -83,12 +87,11 @@ export default async function TripsPage() {
       />
 
       <p className="mt-4 font-sans text-2xl font-black uppercase">
-        Wybierz mecz i termin
+        {isEn ? "Choose a match and date" : "Wybierz mecz i termin"}
       </p>
 
       <p className="mt-2 text-sm leading-6 text-background/60">
-        Sprawdź dostępne wyjazdy, zakres poszczególnych wariantów
-        oraz szczegóły każdego meczu.
+        {isEn ? "See available trips, compare package options and review every match in detail." : "Sprawdź dostępne wyjazdy, zakres poszczególnych wariantów oraz szczegóły każdego meczu."}
       </p>
     </div>
   </div>
@@ -96,7 +99,7 @@ export default async function TripsPage() {
 
       <section className="px-4 py-12 md:px-6 md:py-16">
         <div className="mx-auto max-w-7xl">
-          <TripCalendar trips={trips} />
+          <TripCalendar trips={trips} locale={locale} />
 
           <div className="relative mt-14 overflow-hidden rounded-2xl bg-foreground p-7 text-background shadow-xl md:p-10">
             <div className="absolute -bottom-16 -left-10 size-48 rounded-full bg-primary/10 blur-2xl" />
@@ -104,8 +107,8 @@ export default async function TripsPage() {
               <div className="flex max-w-2xl gap-4">
                 <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"><Search className="size-5" /></span>
                 <div>
-                  <h2 className="font-sans text-3xl font-black uppercase md:text-4xl">Nie widzisz meczu, na który chcesz jechać?</h2>
-                  <p className="mt-2 leading-7 text-background/60">Napisz do nas. Przygotujemy indywidualny wyjazd i sprawdzimy dostępność biletów.</p>
+                  <h2 className="font-sans text-3xl font-black uppercase md:text-4xl">{isEn ? "Cannot find the match you want?" : "Nie widzisz meczu, na który chcesz jechać?"}</h2>
+                  <p className="mt-2 leading-7 text-background/60">{isEn ? "Contact us. We will prepare a custom trip and check ticket availability." : "Napisz do nas. Przygotujemy indywidualny wyjazd i sprawdzimy dostępność biletów."}</p>
                 </div>
               </div>
               <Button
@@ -120,7 +123,7 @@ export default async function TripsPage() {
   }
 >
   <span className="inline-flex items-center gap-2">
-    Wyceń indywidualnie swój wyjazd
+    {isEn ? "Request a custom quote" : "Wyceń indywidualnie swój wyjazd"}
     <ArrowRight className="size-4 shrink-0" />
   </span>
 </Button>

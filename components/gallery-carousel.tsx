@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import { usePathname } from "next/navigation"
 import {
   useCallback,
   useEffect,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react"
 
 import { ImageLightbox } from "@/components/image-lightbox"
+import { localeFromPathname } from "@/lib/i18n"
 
 type GalleryCarouselItem = {
   id: number
@@ -30,6 +32,7 @@ export function GalleryCarousel({
 }: {
   items: GalleryCarouselItem[]
 }) {
+  const isEn = localeFromPathname(usePathname()) === "en"
   const [activeIndex, setActiveIndex] = useState(0)
   const [previousIndex, setPreviousIndex] = useState<number | null>(
     null
@@ -178,7 +181,6 @@ export function GalleryCarousel({
       reducedMotion ||
       itemCount <= 1
     ) {
-      setProgress(0)
       return
     }
 
@@ -562,7 +564,7 @@ export function GalleryCarousel({
                 type="button"
                 onClick={previous}
                 className="absolute left-3 top-1/2 z-20 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/35 text-white shadow-xl backdrop-blur-xl transition duration-300 hover:scale-105 hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:left-5 md:size-12"
-                aria-label="Poprzednie zdjęcie"
+                aria-label={isEn ? "Previous photo" : "Poprzednie zdjęcie"}
               >
                 <ChevronLeft className="size-5" />
               </button>
@@ -571,7 +573,7 @@ export function GalleryCarousel({
                 type="button"
                 onClick={next}
                 className="absolute right-3 top-1/2 z-20 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/35 text-white shadow-xl backdrop-blur-xl transition duration-300 hover:scale-105 hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:right-5 md:size-12"
-                aria-label="Następne zdjęcie"
+                aria-label={isEn ? "Next photo" : "Następne zdjęcie"}
               >
                 <ChevronRight className="size-5" />
               </button>
@@ -588,8 +590,8 @@ export function GalleryCarousel({
                     className="flex size-10 shrink-0 items-center justify-center border-r border-white/10 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                     aria-label={
                       autoplayEnabled
-                        ? "Zatrzymaj automatyczne przewijanie"
-                        : "Włącz automatyczne przewijanie"
+                        ? (isEn ? "Pause autoplay" : "Zatrzymaj automatyczne przewijanie")
+                        : (isEn ? "Start autoplay" : "Włącz automatyczne przewijanie")
                     }
                   >
                     {autoplayEnabled ? (
@@ -622,7 +624,7 @@ export function GalleryCarousel({
                   <div
                     className="h-full bg-primary"
                     style={{
-                      width: autoplayEnabled
+                      width: autoplayEnabled && !reducedMotion
                         ? `${progress}%`
                         : "0%",
                     }}
@@ -643,7 +645,7 @@ export function GalleryCarousel({
             }
             disabled={!canScrollLeft}
             className="hidden size-10 shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-background text-foreground shadow-sm transition hover:border-foreground/20 hover:bg-secondary disabled:pointer-events-none disabled:opacity-25 md:flex"
-            aria-label="Przewiń miniatury w lewo"
+            aria-label={isEn ? "Scroll thumbnails left" : "Przewiń miniatury w lewo"}
           >
             <ChevronLeft className="size-4" />
           </button>
@@ -698,9 +700,7 @@ export function GalleryCarousel({
                           ? "true"
                           : undefined
                       }
-                      aria-label={`Pokaż zdjęcie ${
-                        index + 1
-                      }`}
+                      aria-label={isEn ? `Show photo ${index + 1}` : `Pokaż zdjęcie ${index + 1}`}
                     >
                       <Image
                         src={item.src}
@@ -737,7 +737,7 @@ export function GalleryCarousel({
             }
             disabled={!canScrollRight}
             className="hidden size-10 shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-background text-foreground shadow-sm transition hover:border-foreground/20 hover:bg-secondary disabled:pointer-events-none disabled:opacity-25 md:flex"
-            aria-label="Przewiń miniatury w prawo"
+            aria-label={isEn ? "Scroll thumbnails right" : "Przewiń miniatury w prawo"}
           >
             <ChevronRight className="size-4" />
           </button>

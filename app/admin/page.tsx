@@ -35,8 +35,21 @@ export default async function AdminPage() {
     db.select().from(adminActivity).orderBy(desc(adminActivity.createdAt)).limit(10),
   ])
   const settings = Object.fromEntries(rawSettings.map((item) => [item.key, item.value]))
- const videos = await getAdminYouTubeVideos(settings)
-  const serializable = JSON.parse(JSON.stringify({ trips: allTrips, teams: allTeams, leagues: allLeagues, inquiries: allInquiries, testimonials: allTestimonials, media, gallery, tripGallery, teamGallery, settings, activity, videos, email: session.user.email })) as AdminData
+  const mediaWithUsage = media.map((asset) => {
+    const mediaUrl = `/api/media/${asset.id}`
+    const usage = [
+      ...allTeams.filter((team) => team.tripImageMediaId === asset.id).map((team) => `Zdjęcie główne wyjazdów: ${team.name}`),
+      ...allTeams.filter((team) => team.logo === mediaUrl).map((team) => `Herb drużyny: ${team.name}`),
+      ...allLeagues.filter((league) => league.logo === mediaUrl).map((league) => `Logo ligi: ${league.name}`),
+      ...allTrips.filter((trip) => trip.coverMediaId === asset.id || trip.image === mediaUrl).map((trip) => `Zdjęcie wyjazdu: ${trip.title}`),
+      ...gallery.filter((item) => item.mediaId === asset.id).map(() => "Galeria główna"),
+      ...tripGallery.filter((item) => item.mediaId === asset.id).map((item) => `Galeria wyjazdu #${item.tripId}`),
+      ...teamGallery.filter((item) => item.mediaId === asset.id).map((item) => `Galeria drużyny #${item.teamId}`),
+    ]
+    return { ...asset, usage: [...new Set(usage)] }
+  })
+  const videos = await getAdminYouTubeVideos(settings)
+  const serializable = JSON.parse(JSON.stringify({ trips: allTrips, teams: allTeams, leagues: allLeagues, inquiries: allInquiries, testimonials: allTestimonials, media: mediaWithUsage, gallery, tripGallery, teamGallery, settings, activity, videos, email: session.user.email })) as AdminData
   return <AdminDashboard data={serializable} />
 }
 

@@ -14,18 +14,8 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { formatDate, formatPrice, localeTags, pluralizeDuration, routeFor, type Locale } from "@/lib/i18n"
 import type { Trip } from "@/lib/trips"
-
-const monthFormatter = new Intl.DateTimeFormat("pl-PL", {
-  month: "long",
-  year: "numeric",
-})
-
-const dateFormatter = new Intl.DateTimeFormat("pl-PL", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-})
 
 const availability = {
   available: {
@@ -50,24 +40,24 @@ function asDate(date: string) {
   return new Date(`${date}T12:00:00`)
 }
 
-function monthLabel(date: string) {
-  const label = monthFormatter.format(asDate(date))
+function monthLabel(date: string, locale: Locale) {
+  const label = new Intl.DateTimeFormat(localeTags[locale], { month: "long", year: "numeric" }).format(asDate(date))
   return label.charAt(0).toUpperCase() + label.slice(1)
 }
 
-function formatDates(start: string, end: string | null) {
-  const startLabel = dateFormatter.format(asDate(start))
+function formatDates(start: string, end: string | null, locale: Locale) {
+  const options = { day: "2-digit", month: "2-digit", year: "numeric" } as const
+  const startLabel = formatDate(start, locale, options)
   if (!end || start === end) return startLabel
-  return `${startLabel} - ${dateFormatter.format(asDate(end))}`
+  return `${startLabel} - ${formatDate(end, locale, options)}`
 }
 
-function formatStay(days: number, nights: number) {
-  const dayLabel = days === 1 ? "dzień" : "dni"
-  const nightLabel = nights === 1 ? "noc" : nights > 1 && nights < 5 ? "noce" : "nocy"
-  return `${days} ${dayLabel} / ${nights} ${nightLabel}`
+function formatStay(days: number, nights: number, locale: Locale) {
+  return pluralizeDuration(days, nights, locale)
 }
 
-function tripsCount(count: number) {
+function tripsCount(count: number, locale: Locale) {
+  if (locale === "en") return `${count} ${count === 1 ? "trip" : "trips"}`
   if (count === 1) return "1 wyjazd"
   if (count > 1 && count < 5) return `${count} wyjazdy`
   return `${count} wyjazdów`
@@ -105,7 +95,7 @@ function TeamLogo({ src, name }: { src: string; name: string }) {
   )
 }
 
-export function TripCalendar({ trips }: { trips: Trip[] }) {
+export function TripCalendar({ trips, locale = "pl" }: { trips: Trip[]; locale?: Locale }) {
   const groups = trips.reduce<
     Array<{
       key: string
@@ -123,7 +113,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
     } else {
       result.push({
         key,
-        label: monthLabel(trip.startDate),
+        label: monthLabel(trip.startDate, locale),
         trips: [trip],
       })
     }
@@ -157,8 +147,8 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
     return (
       <div className="rounded-2xl border border-dashed bg-card px-6 py-16 text-center">
         <CalendarDays className="mx-auto size-10 text-primary" />
-        <h2 className="mt-4 font-sans text-3xl font-black uppercase">Nowe terminy już wkrótce</h2>
-        <p className="mx-auto mt-2 max-w-xl text-muted-foreground">Napisz do nas, a przygotujemy wyjazd na wybrany przez Ciebie mecz.</p>
+        <h2 className="mt-4 font-sans text-3xl font-black uppercase">{locale === "en" ? "New dates coming soon" : "Nowe terminy już wkrótce"}</h2>
+        <p className="mx-auto mt-2 max-w-xl text-muted-foreground">{locale === "en" ? "Contact us and we will prepare a trip to the match of your choice." : "Napisz do nas, a przygotujemy wyjazd na wybrany przez Ciebie mecz."}</p>
       </div>
     )
   }
@@ -170,7 +160,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
     <div>
       <div className="sticky top-20 z-40 -mx-4 border-y border-foreground/10 bg-background/95 backdrop-blur-md md:mx-0">
         <nav
-          aria-label="Miesiące wyjazdów"
+          aria-label={locale === "en" ? "Trip months" : "Miesiące wyjazdów"}
           className="hidden overflow-x-auto md:block"
         >
           <div className="flex items-stretch gap-2 px-3 py-3">
@@ -186,7 +176,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                   )
                 }
                 disabled={!canGoPrevious}
-                aria-label="Poprzednie miesiące"
+                aria-label={locale === "en" ? "Previous months" : "Poprzednie miesiące"}
                 className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-25"
               >
                 <ChevronLeft
@@ -221,7 +211,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                     </span>
 
                     <span className="mt-1 block font-mono text-[11px] font-bold normal-case tracking-normal opacity-65">
-                      {tripsCount(group.trips.length)}
+                      {tripsCount(group.trips.length, locale)}
                     </span>
                   </a>
                 )
@@ -241,7 +231,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                   )
                 }
                 disabled={!canGoNext}
-                aria-label="Następne miesiące"
+                aria-label={locale === "en" ? "Next months" : "Następne miesiące"}
                 className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-25"
               >
                 <ChevronRight
@@ -267,7 +257,7 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
           >
             <div className="min-w-0">
               <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-muted-foreground">
-                Wybierz miesiąc
+                {locale === "en" ? "Choose a month" : "Wybierz miesiąc"}
               </p>
 
               <div className="mt-1 flex items-center gap-2">
@@ -277,7 +267,8 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
 
                 <span className="font-mono text-[10px] text-muted-foreground">
                   {tripsCount(
-                    selectedMonth.trips.length
+                    selectedMonth.trips.length,
+                    locale
                   )}
                 </span>
               </div>
@@ -333,7 +324,8 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
                           }`}
                       >
                         {tripsCount(
-                          group.trips.length
+                          group.trips.length,
+                          locale
                         )}
                       </span>
                     </a>
@@ -349,15 +341,16 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
           <section key={group.key} id={`miesiac-${group.key}`} className="scroll-mt-40">
             <div className="mb-4 flex items-end justify-between border-b-2 border-foreground pb-3">
               <div>
-                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-amber-800">Terminarz</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-amber-800">{locale === "en" ? "Schedule" : "Terminarz"}</p>
                 <h2 className="font-sans text-3xl font-black uppercase md:text-4xl">{group.label}</h2>
               </div>
-              <p className="hidden text-sm text-muted-foreground sm:block">{tripsCount(group.trips.length)}</p>
+              <p className="hidden text-sm text-muted-foreground sm:block">{tripsCount(group.trips.length, locale)}</p>
             </div>
 
             <div className="space-y-3">
               {group.trips.map((trip) => {
-                const status = availability[trip.availabilityStatus as keyof typeof availability] || availability.available
+                const statusBase = availability[trip.availabilityStatus as keyof typeof availability] || availability.available
+                const status = { ...statusBase, label: locale === "en" ? ({ available: "Places available", last_places: "Last places", sold_out: "Sold out" }[trip.availabilityStatus] || "Places available") : statusBase.label }
                 const { homeTeam, awayTeam } = getTeams(trip)
                 const stay = getStay(trip)
         
@@ -416,11 +409,11 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
 
       <div className="min-w-0">
         <p className="font-mono text-[9px] font-black uppercase tracking-[0.14em] text-muted-foreground">
-          Termin
+          {locale === "en" ? "Dates" : "Termin"}
         </p>
 
         <p className="mt-0.5 text-sm font-semibold text-foreground">
-          {formatDates(trip.startDate, trip.endDate)}
+          {formatDates(trip.startDate, trip.endDate, locale)}
         </p>
       </div>
     </div>
@@ -435,11 +428,11 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
 
       <div className="min-w-0">
         <p className="font-mono text-[9px] font-black uppercase tracking-[0.14em] text-muted-foreground">
-          Stadion
+          {locale === "en" ? "Stadium" : "Stadion"}
         </p>
 
         <p className="mt-0.5 truncate text-sm font-semibold text-foreground">
-          {trip.stadium || "Stadion gospodarza"}
+          {trip.stadium || (locale === "en" ? "Home stadium" : "Stadion gospodarza")}
         </p>
       </div>
     </div>
@@ -454,11 +447,11 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
 
       <div className="min-w-0">
         <p className="font-mono text-[9px] font-black uppercase tracking-[0.14em] text-muted-foreground">
-          Pobyt
+          {locale === "en" ? "Stay" : "Pobyt"}
         </p>
 
         <p className="mt-0.5 text-sm font-semibold text-foreground">
-          {formatStay(stay.days, stay.nights)}
+          {formatStay(stay.days, stay.nights, locale)}
         </p>
       </div>
     </div>
@@ -482,21 +475,21 @@ export function TripCalendar({ trips }: { trips: Trip[] }) {
 
   <div>
     <p className="font-mono text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground">
-      Cena od / osoba
+      {locale === "en" ? "Price from / person" : "Cena od / osoba"}
     </p>
 
     <p className="mt-1 font-sans text-3xl font-black leading-none tracking-tight text-foreground">
-      {trip.price.toLocaleString("pl-PL")} zł
+      {formatPrice(trip.price, locale)} {locale === "en" ? "PLN" : "zł"}
     </p>
   </div>
 
   <Button
     nativeButton={false}
-    render={<Link href={`/wyjazdy/${trip.slug}`} />}
-    aria-label={`Szczegóły wyjazdu ${trip.title}`}
+    render={<Link href={`${routeFor(locale, "/wyjazdy")}/${trip.slug}`} />}
+    aria-label={locale === "en" ? `Trip details: ${trip.title}` : `Szczegóły wyjazdu ${trip.title}`}
     className="h-10 shrink-0 px-5"
   >
-    Szczegóły
+    {locale === "en" ? "Details" : "Szczegóły"}
     <ArrowRight data-icon="inline-end" />
   </Button>
 </div>

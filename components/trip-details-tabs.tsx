@@ -30,6 +30,7 @@ X,
 } from "lucide-react"
 
 import type { PackageFeatureKey } from "@/lib/package-options"
+import type { Locale } from "@/lib/i18n"
 
 type Icon = ComponentType<{
   className?: string
@@ -77,6 +78,7 @@ type FaqItem = {
 }
 
 type TripDetailsTabsProps = {
+  locale?: Locale
   descriptionHtml: string
   includedItems: PackageItem[]
   optionalItems: PackageItem[]
@@ -296,13 +298,17 @@ function MissingPackageElement({
   description,
   packageLabel,
   changePackageHref,
+  locale,
 }: {
   icon: Icon
   title: string
   description: string
   packageLabel: string
   changePackageHref: string
+  locale: Locale
 }) {
+  const isEn = locale === "en"
+
   return (
     <div className="grid gap-5 py-6 md:grid-cols-[190px_1fr]">
       <div>
@@ -315,13 +321,13 @@ function MissingPackageElement({
         </p>
 
         <p className="mt-1 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-primary">
-          Poza wybranym wariantem
+          {isEn ? "Not included in this package" : "Poza wybranym wariantem"}
         </p>
       </div>
 
       <div className="flex flex-col justify-center">
         <p className="text-sm font-semibold text-foreground">
-          Wybrany pakiet:{" "}
+          {isEn ? "Selected package:" : "Wybrany pakiet:"}{" "}
           {packageLabel}
         </p>
 
@@ -333,7 +339,7 @@ function MissingPackageElement({
           href={changePackageHref}
           className="mt-4 w-fit rounded-lg bg-primary px-4 py-2.5 font-sans text-xs font-black uppercase tracking-wide text-primary-foreground transition-opacity hover:opacity-85"
         >
-          Zmień wariant pakietu
+          {isEn ? "Change package" : "Zmień wariant pakietu"}
         </a>
       </div>
     </div>
@@ -342,9 +348,11 @@ function MissingPackageElement({
 function TestimonialCard({
   item,
   onOpen,
+  locale,
 }: {
   item: TestimonialItem
   onOpen: () => void
+  locale: Locale
 }) {
   const textRef =
     useRef<HTMLParagraphElement>(null)
@@ -410,7 +418,7 @@ function TestimonialCard({
     <blockquote className="flex h-full flex-col border-l-2 border-primary pl-5">
       <div
         className="flex gap-1 text-primary"
-        aria-label={`${item.rating} na 5 gwiazdek`}
+        aria-label={locale === "en" ? `${item.rating} out of 5 stars` : `${item.rating} na 5 gwiazdek`}
       >
         {Array.from({
           length: item.rating,
@@ -433,7 +441,7 @@ function TestimonialCard({
             onClick={onOpen}
             className="group mt-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary transition-colors hover:text-primary/80"
           >
-            Zobacz więcej
+            {locale === "en" ? "Read more" : "Zobacz więcej"}
 
             <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
           </button>
@@ -453,6 +461,9 @@ function TestimonialCard({
 export function TripDetailsTabs(
   props: TripDetailsTabsProps
 ) {
+  const locale = props.locale ?? "pl"
+  const isEn = locale === "en"
+  const t = (pl: string, en: string) => isEn ? en : pl
   const [selectedTab, setActiveTab] =
     useState("opis")
 
@@ -480,7 +491,7 @@ export function TripDetailsTabs(
 
   const selectedPackageLabel =
     props.selectedPackageLabel ||
-    "Wybrany wariant"
+    t("Wybrany wariant", "Selected package")
 
   const changePackageHref =
     props.changePackageHref ||
@@ -580,24 +591,24 @@ useEffect(() => {
   const tabs = [
     {
       id: "opis",
-      label: "O wyjeździe",
+      label: t("O wyjeździe", "About the trip"),
       icon: CalendarClock,
     },
     {
       id: "pakiet",
-      label: "Zakres pakietu",
+      label: t("Zakres pakietu", "Package details"),
       icon: TicketCheck,
     },
     {
       id: "plan",
-      label: "Plan wyjazdu",
+      label: t("Plan wyjazdu", "Itinerary"),
       icon: Route,
     },
     ...(hasLogistics
       ? [
           {
             id: "logistyka",
-            label: "Hotel i podróż",
+            label: t("Hotel i podróż", "Hotel and travel"),
             icon: BedDouble,
           },
         ]
@@ -606,7 +617,7 @@ useEffect(() => {
       ? [
           {
             id: "zdjecia",
-            label: "Zdjęcia",
+            label: t("Zdjęcia", "Photos"),
             icon: Images,
           },
         ]
@@ -615,7 +626,7 @@ useEffect(() => {
       ? [
           {
             id: "opinie",
-            label: "Opinie",
+            label: t("Opinie", "Reviews"),
             icon: MessageSquareQuote,
           },
         ]
@@ -633,18 +644,18 @@ useEffect(() => {
 
   return (
     <section
-      aria-label="Szczegóły wyjazdu"
+      aria-label={t("Szczegóły wyjazdu", "Trip details")}
       className="scroll-mt-24"
     >
       <div className="border-b pb-6">
         <h2 className="mt-1 font-sans text-3xl font-black uppercase md:text-4xl">
-          Szczegóły wyjazdu
+          {t("Szczegóły wyjazdu", "Trip details")}
         </h2>
 
         {partialPackageSelected ? (
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <span className="rounded-lg bg-primary px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-primary-foreground">
-              Wybrany wariant
+              {t("Wybrany wariant", "Selected package")}
             </span>
 
             <span className="text-sm font-semibold text-muted-foreground">
@@ -673,7 +684,7 @@ useEffect(() => {
           >
             <div className="min-w-0">
               <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-muted-foreground">
-                Szczegóły wyjazdu
+                {t("Szczegóły wyjazdu", "Trip details")}
               </p>
 
               <div className="mt-1 flex items-center gap-2">
@@ -719,7 +730,7 @@ useEffect(() => {
             >
               <div
                 role="tablist"
-                aria-label="Informacje o wyjeździe"
+                aria-label={t("Informacje o wyjeździe", "Trip information")}
                 className="grid max-h-80 grid-cols-2 gap-2 overflow-y-auto"
               >
                 {tabs.map((tab) => {
@@ -768,7 +779,7 @@ useEffect(() => {
         <div className="hidden min-w-0 lg:block">
           <div
             role="tablist"
-            aria-label="Informacje o wyjeździe"
+            aria-label={t("Informacje o wyjeździe", "Trip information")}
             className="flex flex-col border-r pr-6"
           >
             {tabs.map((tab) => {
@@ -815,20 +826,18 @@ useEffect(() => {
             }
           >
             <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-              O wyjeździe
+              {t("O wyjeździe", "About the trip")}
             </p>
 
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">
-              Najważniejsze informacje
+              {t("Najważniejsze informacje", "Essential information")}
             </h3>
 
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
-              Poznaj najważniejsze
-              informacje o meczu, mieście
-              i atmosferze całego
-              wyjazdu. Zebraliśmy tu to,
-              co warto wiedzieć przed
-              podjęciem decyzji.
+              {t(
+                "Poznaj najważniejsze informacje o meczu, mieście i atmosferze całego wyjazdu. Zebraliśmy tu to, co warto wiedzieć przed podjęciem decyzji.",
+                "Discover the key details about the match, the city and the atmosphere of the trip. Here you will find everything worth knowing before you decide."
+              )}
             </p>
 
             <div
@@ -844,13 +853,12 @@ useEffect(() => {
 
               <p className="text-sm leading-6 text-muted-foreground">
                 <strong className="block text-foreground">
-                  Termin pod kontrolą
+                  {t("Termin pod kontrolą", "Fixture date updates")}
                 </strong>
-                Dokładna godzina meczu
-                może zostać potwierdzona
-                bliżej wyjazdu. Program
-                dopasujemy do oficjalnego
-                terminarza.
+                {t(
+                  "Dokładna godzina meczu może zostać potwierdzona bliżej wyjazdu. Program dopasujemy do oficjalnego terminarza.",
+                  "The exact kick-off time may be confirmed closer to departure. We will adapt the itinerary to the official fixture schedule."
+                )}
               </p>
             </div>
           </div>
@@ -863,19 +871,19 @@ useEffect(() => {
             }
           >
             <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-              Zakres oferty
+              {t("Zakres oferty", "What is included")}
             </p>
 
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">
               {partialPackageSelected
-                ? "Co obejmuje wybrany wariant"
-                : "Co obejmuje cena"}
+                ? t("Co obejmuje wybrany wariant", "What your package includes")
+                : t("Co obejmuje cena", "What the price includes")}
             </h3>
 
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
   {partialPackageSelected
-    ? `Zakres poniżej został dopasowany do wybranego wariantu: ${selectedPackageLabel}.`
-    : "Tutaj dokładnie sprawdzisz, które elementy są już zawarte w cenie, które możesz dobrać dodatkowo i co pozostaje po Twojej stronie."}
+    ? `${t("Zakres poniżej został dopasowany do wybranego wariantu", "The details below have been tailored to your selected package")}: ${selectedPackageLabel}.`
+    : t("Tutaj dokładnie sprawdzisz, które elementy są już zawarte w cenie, które możesz dobrać dodatkowo i co pozostaje po Twojej stronie.", "See exactly what is included in the price, which extras you can add and what you will need to arrange yourself.")}
 </p>
 
             <div className="mt-6 divide-y border-y">
@@ -884,13 +892,13 @@ useEffect(() => {
                 <div className="grid gap-5 py-6 md:grid-cols-[180px_1fr]">
                   <div>
                     <p className="font-sans text-lg font-black uppercase">
-                      W pakiecie
+                      {t("W pakiecie", "Included")}
                     </p>
 
                     <p className="mt-1 text-xs text-muted-foreground">
                       {partialPackageSelected
-                        ? "Uwzględnione w wybranym wariancie"
-                        : "Uwzględnione w podanej cenie"}
+                        ? t("Uwzględnione w wybranym wariancie", "Included in the selected package")
+                        : t("Uwzględnione w podanej cenie", "Included in the quoted price")}
                     </p>
                   </div>
 
@@ -908,12 +916,11 @@ useEffect(() => {
                 <div className="grid gap-5 py-6 md:grid-cols-[180px_1fr]">
                   <div>
                     <p className="font-sans text-lg font-black uppercase">
-                      Opcjonalnie
+                      {t("Opcjonalnie", "Optional")}
                     </p>
 
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Możemy dodać do
-                      oferty
+                      {t("Możemy dodać do oferty", "Available as an extra")}
                     </p>
                   </div>
 
@@ -931,12 +938,11 @@ useEffect(() => {
                 <div className="grid gap-5 py-6 md:grid-cols-[180px_1fr]">
                   <div>
                     <p className="font-sans text-lg font-black uppercase">
-                      We własnym zakresie
+                      {t("We własnym zakresie", "Not included")}
                     </p>
 
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Nie znajduje się w
-                      pakiecie
+                      {t("Nie znajduje się w pakiecie", "Arrange separately")}
                     </p>
                   </div>
 
@@ -959,16 +965,12 @@ useEffect(() => {
             ) ? (
               <p className="mt-4 max-w-3xl text-xs leading-5 text-muted-foreground">
                 <strong className="text-foreground">
-                  * Bagaż:
+                  {t("* Bagaż:", "* Baggage:")}
                 </strong>{" "}
-                mały bagaż podręczny
-                mieszczący się pod
-                siedzeniem samolotu. Nie
-                oznacza walizki kabinowej
-                ani bagażu rejestrowanego,
-                chyba że opis konkretnej
-                oferty wyraźnie stanowi
-                inaczej.
+                {t(
+                  "mały bagaż podręczny mieszczący się pod siedzeniem samolotu. Nie oznacza walizki kabinowej ani bagażu rejestrowanego, chyba że opis konkretnej oferty wyraźnie stanowi inaczej.",
+                  "a small personal item that fits under the aircraft seat. This does not include cabin or checked baggage unless the specific offer clearly says otherwise."
+                )}
               </p>
             ) : null}
 
@@ -979,7 +981,7 @@ useEffect(() => {
 
                 <div>
                   <p className="font-bold">
-                    Bilet na mecz
+                    {t("Bilet na mecz", "Match ticket")}
                     {props.ticketCategory
                       ? ` ${props.ticketCategory}`
                       : ""}
@@ -1005,17 +1007,17 @@ useEffect(() => {
             }
           >
             <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-              Krok po kroku
+              {t("Krok po kroku", "Step by step")}
             </p>
 
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">
-              Plan wyjazdu
+              {t("Plan wyjazdu", "Trip itinerary")}
             </h3>
 
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
               {partialPackageSelected
-                ? "Plan poniżej został dopasowany do wybranego wariantu pakietu."
-                : "Od momentu wylotu aż po powrót masz jasny obraz tego, jak wygląda organizacja wyjazdu i najważniejsze punkty programu."}
+                ? t("Plan poniżej został dopasowany do wybranego wariantu pakietu.", "The itinerary below has been tailored to your selected package.")
+                : t("Od momentu wylotu aż po powrót masz jasny obraz tego, jak wygląda organizacja wyjazdu i najważniejsze punkty programu.", "From departure to your return, you can see how the trip is organised and which moments shape the itinerary.")}
             </p>
 
             <ol className="mt-7 grid gap-x-10 gap-y-0 md:grid-cols-2">
@@ -1053,17 +1055,17 @@ useEffect(() => {
               }
             >
               <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                Organizacja podróży
+                {t("Organizacja podróży", "Travel arrangements")}
               </p>
 
               <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">
-                Hotel i podróż
+                {t("Hotel i podróż", "Hotel and travel")}
               </h3>
 
               <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
                 {partialPackageSelected
-                  ? "Ta sekcja uwzględnia wybrany przez Ciebie wariant. Jeśli hotel lub przelot nie są jego częścią, możesz zmienić pakiet."
-                  : "W jednym miejscu znajdziesz informacje o zakwaterowaniu, locie, lotniskach, bagażu i dodatkowych warunkach organizacyjnych."}
+                  ? t("Ta sekcja uwzględnia wybrany przez Ciebie wariant. Jeśli hotel lub przelot nie są jego częścią, możesz zmienić pakiet.", "This section reflects your selected package. If it does not include a hotel or flight, you can choose a different package.")
+                  : t("W jednym miejscu znajdziesz informacje o zakwaterowaniu, locie, lotniskach, bagażu i dodatkowych warunkach organizacyjnych.", "Find accommodation, flight, airport, baggage and additional travel details in one place.")}
               </p>
 
               <div className="mt-7 divide-y border-y">
@@ -1084,8 +1086,8 @@ useEffect(() => {
                       <p className="mt-1 text-xs font-bold uppercase text-muted-foreground">
                         {props.hotel
                           .optional
-                          ? "Opcjonalnie"
-                          : "W pakiecie"}
+                          ? t("Opcjonalnie", "Optional")
+                          : t("W pakiecie", "Included")}
                       </p>
                     </div>
 
@@ -1102,7 +1104,7 @@ useEffect(() => {
                           .board ? (
                           <div>
                             <dt className="text-xs uppercase text-muted-foreground">
-                              Wyżywienie
+                              {t("Wyżywienie", "Board")}
                             </dt>
 
                             <dd className="mt-1 font-semibold">
@@ -1119,7 +1121,7 @@ useEffect(() => {
                           .roomType ? (
                           <div>
                             <dt className="text-xs uppercase text-muted-foreground">
-                              Pokój
+                              {t("Pokój", "Room")}
                             </dt>
 
                             <dd className="mt-1 font-semibold">
@@ -1138,13 +1140,14 @@ useEffect(() => {
                   <MissingPackageElement
                     icon={BedDouble}
                     title="Hotel"
+                    locale={locale}
                     packageLabel={
                       selectedPackageLabel
                     }
                     changePackageHref={
                       changePackageHref
                     }
-                    description="Wybrany wariant nie obejmuje noclegu. Jeśli chcesz, abyśmy zorganizowali hotel w ramach wyjazdu, wybierz pełny pakiet lub wariant zawierający nocleg."
+                    description={t("Wybrany wariant nie obejmuje noclegu. Jeśli chcesz, abyśmy zorganizowali hotel w ramach wyjazdu, wybierz pełny pakiet lub wariant zawierający nocleg.", "The selected package does not include accommodation. If you would like us to arrange a hotel, choose the full package or an option that includes accommodation.")}
                   />
                 ) : null}
 
@@ -1155,14 +1158,14 @@ useEffect(() => {
                       <Plane className="size-6 text-primary" />
 
                       <p className="mt-3 font-sans text-xl font-black uppercase">
-                        Przelot
+                        {t("Przelot", "Flight")}
                       </p>
 
                       <p className="mt-1 text-xs font-bold uppercase text-muted-foreground">
                         {props.flight
                           .optional
-                          ? "Opcjonalnie"
-                          : "W pakiecie"}
+                          ? t("Opcjonalnie", "Optional")
+                          : t("W pakiecie", "Included")}
                       </p>
                     </div>
 
@@ -1179,7 +1182,7 @@ useEffect(() => {
                           .airports ? (
                           <div>
                             <dt className="text-xs uppercase text-muted-foreground">
-                              Lotniska
+                              {t("Lotniska", "Airports")}
                             </dt>
 
                             <dd className="mt-1 font-semibold">
@@ -1196,7 +1199,7 @@ useEffect(() => {
                           .type ? (
                           <div>
                             <dt className="text-xs uppercase text-muted-foreground">
-                              Połączenie
+                              {t("Połączenie", "Route")}
                             </dt>
 
                             <dd className="mt-1 font-semibold">
@@ -1213,7 +1216,7 @@ useEffect(() => {
                           .baggage ? (
                           <div>
                             <dt className="text-xs uppercase text-muted-foreground">
-                              Bagaż
+                              {t("Bagaż", "Baggage")}
                             </dt>
 
                             <dd className="mt-1 font-semibold">
@@ -1231,14 +1234,15 @@ useEffect(() => {
                 ) : partialPackageSelected ? (
                   <MissingPackageElement
                     icon={Plane}
-                    title="Przelot"
+                    title={t("Przelot", "Flight")}
+                    locale={locale}
                     packageLabel={
                       selectedPackageLabel
                     }
                     changePackageHref={
                       changePackageHref
                     }
-                    description="Wybrany wariant nie obejmuje przelotu. Jeśli chcesz, abyśmy zorganizowali również lot, wybierz pełny pakiet lub wariant zawierający przelot."
+                    description={t("Wybrany wariant nie obejmuje przelotu. Jeśli chcesz, abyśmy zorganizowali również lot, wybierz pełny pakiet lub wariant zawierający przelot.", "The selected package does not include flights. If you would like us to arrange them, choose the full package or an option that includes flights.")}
                   />
                 ) : null}
               </div>
@@ -1256,19 +1260,18 @@ useEffect(() => {
               }
             >
               <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                Galeria wyjazdu
+                {t("Galeria wyjazdu", "Trip gallery")}
               </p>
 
               <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">
-                Zdjęcia
+                {t("Zdjęcia", "Photos")}
               </h3>
 
               <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
-                Zobacz stadion, miasto i
-                klimat wyjazdu na
-                zdjęciach przygotowanych
-                dla tej konkretnej
-                oferty.
+                {t(
+                  "Zobacz stadion, miasto i klimat wyjazdu na zdjęciach przygotowanych dla tej konkretnej oferty.",
+                  "Explore the stadium, the city and the atmosphere through photos selected for this trip."
+                )}
               </p>
 
               <div className="mt-7 grid gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -1284,7 +1287,7 @@ useEffect(() => {
                           alt={
                             item.alt ||
                             item.caption ||
-                            `Zdjęcie z wyjazdu ${props.tripTitle}`
+                            t(`Zdjęcie z wyjazdu ${props.tripTitle}`, `Photo from the ${props.tripTitle} trip`)
                           }
                           fill
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -1313,15 +1316,15 @@ useEffect(() => {
               hidden={activeTab !== "opinie"}
             >
               <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                Sprawdzone emocje
+                {t("Sprawdzone emocje", "Real experiences")}
               </p>
 
               <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">
-                Opinie kibiców
+                {t("Opinie kibiców", "Traveller reviews")}
               </h3>
 
               <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
-                Przeczytaj doświadczenia osób, które wybrały się z nami na piłkarską podróż.
+                {t("Przeczytaj doświadczenia osób, które wybrały się z nami na piłkarską podróż.", "Read about the experiences of people who travelled with us for football.")}
               </p>
 
               <div className="mt-7 grid gap-x-10 gap-y-8 md:grid-cols-2">
@@ -1329,6 +1332,7 @@ useEffect(() => {
                   <TestimonialCard
                     key={item.id}
                     item={item}
+                    locale={locale}
                     onOpen={() => setSelectedTestimonial(item)}
                   />
                 ))}
@@ -1344,19 +1348,18 @@ useEffect(() => {
             }
           >
             <p className="inline-block bg-black px-2 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-              Warto wiedzieć
+              {t("Warto wiedzieć", "Good to know")}
             </p>
 
             <h3 className="mt-2 font-sans text-3xl font-black uppercase md:text-4xl">
-              Najczęstsze pytania
+              {t("Najczęstsze pytania", "Frequently asked questions")}
             </h3>
 
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
-              Zebraliśmy odpowiedzi na
-              pytania, które najczęściej
-              pojawiają się przed
-              rezerwacją i w trakcie
-              przygotowań do wyjazdu.
+              {t(
+                "Zebraliśmy odpowiedzi na pytania, które najczęściej pojawiają się przed rezerwacją i w trakcie przygotowań do wyjazdu.",
+                "We have answered the questions that most often come up before booking and while preparing for the trip."
+              )}
             </p>
 
             <div className="mt-7 divide-y border-y">
@@ -1403,7 +1406,7 @@ useEffect(() => {
             <button
               type="button"
               onClick={() => setSelectedTestimonial(null)}
-              aria-label="Zamknij opinię"
+              aria-label={t("Zamknij opinię", "Close review")}
               className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full border border-white/10 text-white transition-colors hover:border-primary hover:bg-primary hover:text-black"
             >
               <X className="size-5" />
@@ -1411,7 +1414,7 @@ useEffect(() => {
 
             <div
               className="flex gap-1 text-primary"
-              aria-label={`${selectedTestimonial.rating} na 5 gwiazdek`}
+              aria-label={isEn ? `${selectedTestimonial.rating} out of 5 stars` : `${selectedTestimonial.rating} na 5 gwiazdek`}
             >
               {Array.from({ length: selectedTestimonial.rating }).map((_, index) => (
                 <span key={index} className="text-lg">
@@ -1421,14 +1424,14 @@ useEffect(() => {
             </div>
 
             <p className="mt-3 font-mono text-[10px] font-black uppercase tracking-[0.18em] text-primary">
-              Opinia klienta
+              {t("Opinia klienta", "Customer review")}
             </p>
 
             <h3
               id="trip-testimonial-title"
               className="mt-4 pr-12 font-sans text-3xl font-black uppercase"
             >
-              {selectedTestimonial.author || "Klient Let's Gol"}
+              {selectedTestimonial.author || t("Klient Let's Gol", "Let's Gol customer")}
             </h3>
 
             {selectedTestimonial.tripName ? (
@@ -1448,7 +1451,7 @@ useEffect(() => {
               onClick={() => setSelectedTestimonial(null)}
               className="mt-7 rounded-lg bg-primary px-5 py-2.5 font-sans text-sm font-black uppercase text-primary-foreground transition-opacity hover:opacity-85"
             >
-              Zamknij
+              {t("Zamknij", "Close")}
             </button>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { siteSettings, youtubeVideos } from "@/lib/db/schema"
 const MAX_CACHED_VIDEOS = 20
 
 const YOUTUBE_REQUEST_HEADERS = {
-  "User-Agent": "Mozilla/5.0 (compatible; LetsGolBot/1.0; +https://golet.vercel.app)",
+  "User-Agent": "Mozilla/5.0 (compatible; LetsGolBot/1.0; +https://letsgol.eu)",
   Accept: "application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
 }
 

@@ -6,6 +6,10 @@ import { Analytics } from "@vercel/analytics/next"
 import { Check, Cookie, ShieldCheck } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { LanguageSwitcher } from "@/components/language-switcher"
+import { getDictionary } from "@/lib/dictionaries"
+import { localeFromPathname } from "@/lib/i18n"
+import { usePathname } from "next/navigation"
 
 const COOKIE_NAME = "letsgol_analytics_consent"
 const COOKIE_MAX_AGE = 31536000
@@ -39,6 +43,8 @@ function subscribeHydration() {
 }
 
 export function CookieConsent() {
+  const pathname = usePathname()
+  const dictionary = getDictionary(localeFromPathname(pathname))
   const consent = useSyncExternalStore(subscribeConsent, readConsent, () => null)
   const ready = useSyncExternalStore(subscribeHydration, () => true, () => false)
   const [editing, setEditing] = useState(false)
@@ -187,19 +193,20 @@ export function CookieConsent() {
                       id="cookie-consent-title"
                       className="font-sans text-xl font-black uppercase leading-tight sm:text-2xl"
                     >
-                      Witaj w Let&apos;s Gol!
+                      {dictionary.cookies.welcome}
                     </h2>
 
                     <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:text-xs">
-                      Ustawienia cookies
+                      {dictionary.cookies.settingsTitle}
                     </p>
                   </div>
                 </div>
 
                 
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Wybierz, czy zgadzasz się na opcjonalną analitykę.
+                  {dictionary.cookies.choosePrompt}
                 </p>
+                <div><LanguageSwitcher /></div>
 
               
                 <div className="grid gap-3">
@@ -222,20 +229,20 @@ export function CookieConsent() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                           <p className="font-bold">
-                            Niezbędne cookies
+                            {dictionary.cookies.necessary}
                           </p>
 
                           <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
-                            NIEZBĘDNE
+                            {dictionary.cookies.required}
                           </span>
                         </div>
 
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          Wymagane do prawidłowego działania strony.
+                          {dictionary.cookies.necessaryDescription}
                         </p>
 
                         <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
-  Kliknij, aby wybrać
+  {dictionary.cookies.choose}
 </p>
                       </div>
                     </div>
@@ -259,20 +266,20 @@ export function CookieConsent() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                           <p className="font-bold">
-                            Analityka
+                            {dictionary.cookies.analytics}
                           </p>
 
                           <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-[#705300] sm:text-xs">
-  OPCJONALNE
+  {dictionary.cookies.optional}
 </span>
                         </div>
 
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          Pomaga nam analizować ruch na stronie, statystyki.
+                          {dictionary.cookies.analyticsDescription}
                         </p>
 
                         <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
-  Kliknij, aby wybrać
+  {dictionary.cookies.choose}
 </p>
                       </div>
                     </div>
@@ -281,8 +288,7 @@ export function CookieConsent() {
 
                 
                 <p className="border-t border-border pt-3 text-center text-[11px] leading-relaxed text-muted-foreground sm:pt-4 sm:text-xs">
-                  Zgodę możesz zmienić w każdej chwili,
-                  klikając ikonę ciasteczka w lewym dolnym rogu strony.
+                  {dictionary.cookies.changeAnytime}
                 </p>
 
               </div>
@@ -322,17 +328,17 @@ export function CookieConsent() {
                       id="cookie-settings-title"
                       className="font-sans text-xl font-black uppercase leading-tight sm:text-2xl"
                     >
-                      Ustawienia prywatności
+                      {dictionary.cookies.privacySettings}
                     </h2>
 
                     <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:text-xs">
-                      Zarządzaj zgodami
+                      {dictionary.cookies.manage}
                     </p>
                   </div>
                 </div>
 
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Kliknij opcję, którą chcesz wybrać.
+                  {dictionary.cookies.chooseOption}
                 </p>
 
                 {/* OPCJE */}
@@ -367,27 +373,27 @@ export function CookieConsent() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                           <p className="font-bold">
-                            Niezbędne cookies
+                            {dictionary.cookies.necessary}
                           </p>
 
                           {consent === "rejected" ? (
                             <span className="flex shrink-0 items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary sm:text-xs">
                               <Check className="size-4" />
-                              Wybrane
+                              {dictionary.cookies.selected}
                             </span>
                           ) : (
                             <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
-                              NIEZBĘDNE
+                              {dictionary.cookies.required}
                             </span>
                           )}
                         </div>
 
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          Wymagane do działania strony.
+                          {dictionary.cookies.necessaryDescription}
                         </p>
 
                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
-  Kliknij, aby wybrać
+  {dictionary.cookies.choose}
 </p>
                       </div>
                     </div>
@@ -422,27 +428,27 @@ export function CookieConsent() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                           <p className="font-bold">
-                            Analityka
+                            {dictionary.cookies.analytics}
                           </p>
 
                           {consent === "accepted" ? (
                             <span className="flex shrink-0 items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary sm:text-xs">
                               <Check className="size-4" />
-                              Wybrane
+                              {dictionary.cookies.selected}
                             </span>
                           ) : (
                             <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-[#705300] sm:text-xs">
-  OPCJONALNE
+  {dictionary.cookies.optional}
 </span>
                           )}
                         </div>
 
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          Pomaga nam analizować ruch na stronie, statystyki.
+                          {dictionary.cookies.analyticsDescription}
                         </p>
 
                         <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
-  Kliknij, aby wybrać
+  {dictionary.cookies.choose}
 </p>
                       </div>
                     </div>
@@ -455,7 +461,7 @@ export function CookieConsent() {
                   onClick={() => setEditing(false)}
                   className="mx-auto pt-1 text-sm font-medium text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
                 >
-                  Zamknij bez zmian
+                  {dictionary.cookies.closeWithoutChanges}
                 </button>
 
               </div>
@@ -469,8 +475,8 @@ export function CookieConsent() {
           type="button"
           size="lg"
           onClick={() => setEditing(true)}
-          aria-label="Ustawienia cookies"
-          title="Ustawienia cookies"
+          aria-label={dictionary.cookies.settingsTitle}
+          title={dictionary.cookies.settingsTitle}
           className={`fixed bottom-2 left-2 z-40 h-12 w-12 border border-[#f4b91e] bg-black text-black shadow-xl transition-[transform,opacity] duration-500 ease-out hover:scale-105 hover:bg-white md:bottom-3 md:left-3 ${
             floatingButtonReady && showFloatingButton
               ? "translate-y-0 opacity-100"

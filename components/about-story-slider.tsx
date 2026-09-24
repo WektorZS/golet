@@ -4,7 +4,8 @@ import { useState } from "react"
 import Image from "next/image"
 import { ArrowLeftRight } from "lucide-react"
 
-export function AboutStorySlider() {
+export function AboutStorySlider({ locale = "pl" }: { locale?: "pl" | "en" }) {
+  const isEn = locale === "en"
   const [position, setPosition] = useState(50)
 
   return (
@@ -12,7 +13,7 @@ export function AboutStorySlider() {
       <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-foreground shadow-2xl md:aspect-video">
         <Image
   src="/images/o-nas/lukasz-mateusz-archiwum-mobile.webp"
-  alt="Łukasz i Mateusz jako młodzi kibice FC Barcelony"
+  alt={isEn ? "Lukasz and Mateusz as young FC Barcelona supporters" : "Łukasz i Mateusz jako młodzi kibice FC Barcelony"}
   fill
   className="object-cover object-center md:hidden"
   sizes="100vw"
@@ -20,7 +21,7 @@ export function AboutStorySlider() {
 
 <Image
   src="/images/o-nas/lukasz-mateusz-archiwum.webp"
-  alt="Łukasz i Mateusz jako młodzi kibice FC Barcelony"
+  alt={isEn ? "Lukasz and Mateusz as young FC Barcelona supporters" : "Łukasz i Mateusz jako młodzi kibice FC Barcelony"}
   fill
   className="hidden object-cover object-center md:block"
   sizes="1280px"
@@ -36,7 +37,7 @@ export function AboutStorySlider() {
         >
           <Image
             src="/images/o-nas/lukasz-mateusz-slider-mobile.webp"
-            alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
+            alt={isEn ? "Lukasz and Mateusz at FC Barcelona's stadium today" : "Łukasz i Mateusz współcześnie na stadionie FC Barcelony"}
             fill
             className="object-cover object-[43%_35%] md:hidden"
             sizes="100vw"
@@ -44,7 +45,7 @@ export function AboutStorySlider() {
 
           <Image
             src="/images/o-nas/lukasz-mateusz-nowe.webp"
-            alt="Łukasz i Mateusz współcześnie na stadionie FC Barcelony"
+            alt={isEn ? "Lukasz and Mateusz at FC Barcelona's stadium today" : "Łukasz i Mateusz współcześnie na stadionie FC Barcelony"}
             fill
             quality={100}
             className="hidden object-cover object-center md:block"
@@ -56,11 +57,11 @@ export function AboutStorySlider() {
 
         <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between p-4 md:p-6">
           <span className="rounded-full bg-black/65 px-4 py-2 text-xs font-black uppercase tracking-widest text-white backdrop-blur-sm">
-            Kiedyś
+            {isEn ? "Then" : "Kiedyś"}
           </span>
 
           <span className="rounded-full bg-primary px-4 py-2 text-xs font-black uppercase tracking-widest text-primary-foreground">
-            Dzisiaj
+            {isEn ? "Today" : "Dzisiaj"}
           </span>
         </div>
 
@@ -83,14 +84,14 @@ export function AboutStorySlider() {
           max="100"
           value={position}
           onChange={(event) => setPosition(Number(event.target.value))}
-          aria-label="Porównaj zdjęcie kiedyś i dzisiaj"
+          aria-label={isEn ? "Compare the then and now photos" : "Porównaj zdjęcie kiedyś i dzisiaj"}
           className="absolute inset-0 z-30 h-full w-full cursor-ew-resize opacity-0"
         />
 
         <div className="pointer-events-none absolute inset-x-0 bottom-5 z-20 flex justify-center">
           <div className="flex items-center gap-2 rounded-full bg-black/55 px-4 py-2 text-xs font-bold text-white backdrop-blur-md md:text-sm">
             <ArrowLeftRight className="size-4" />
-            Przesuń
+            {isEn ? "Drag" : "Przesuń"}
           </div>
         </div>
       </div>

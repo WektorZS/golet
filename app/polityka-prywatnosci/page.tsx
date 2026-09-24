@@ -11,15 +11,13 @@ import {
 import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
-import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
+import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
 
 export const metadata: Metadata = {
   title: "Polityka prywatności i cookies",
   description:
     "Polityka prywatności i cookies Let's Gol. Informacje o przetwarzaniu danych osobowych, prawach użytkowników oraz wykorzystywaniu plików cookies.",
-  alternates: {
-    canonical: "/polityka-prywatnosci",
-  },
+  alternates: localizedAlternates("/polityka-prywatnosci", "pl"),
   ...socialMetadata(
     "Polityka prywatności i cookies | Let's Gol",
     "Informacje o przetwarzaniu danych osobowych, prywatności i wykorzystywaniu plików cookies w serwisie Let's Gol.",

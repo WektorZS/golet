@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { usePathname } from "next/navigation"
 import { Search, X } from "lucide-react"
 
 import {
@@ -10,7 +11,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Input } from "@/components/ui/input"
-import { faqCategories } from "@/lib/faq"
+import { getFaqCategories } from "@/lib/faq"
+import { localeFromPathname } from "@/lib/i18n"
 
 function normalize(value: string) {
   return value
@@ -20,6 +22,9 @@ function normalize(value: string) {
 }
 
 export function FaqBrowser() {
+  const locale = localeFromPathname(usePathname())
+  const isEn = locale === "en"
+  const faqCategories = useMemo(() => getFaqCategories(locale), [locale])
   const [query, setQuery] = useState("")
   const normalizedQuery = normalize(query.trim())
 
@@ -34,7 +39,7 @@ export function FaqBrowser() {
         ),
       }))
       .filter((category) => category.items.length > 0)
-  }, [normalizedQuery])
+  }, [normalizedQuery, faqCategories])
 
   const resultCount = visibleCategories.reduce(
     (sum, category) => sum + category.items.length,
@@ -46,10 +51,10 @@ export function FaqBrowser() {
       <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
         <div className="surface-card p-4">
           <p className="px-2 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-muted-foreground">
-            Kategorie
+            {isEn ? "Categories" : "Kategorie"}
           </p>
 
-          <nav className="mt-3 flex max-w-full gap-2 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden lg:flex-col" aria-label="Kategorie FAQ">
+          <nav className="mt-3 flex max-w-full gap-2 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden lg:flex-col" aria-label={isEn ? "FAQ categories" : "Kategorie FAQ"}>
             {faqCategories.map((category, index) => (
               <a
                 key={category.id}
@@ -73,8 +78,8 @@ export function FaqBrowser() {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Szukaj, np. bilet, bagaż, zmiana terminu"
-            aria-label="Szukaj w pytaniach i odpowiedziach"
+            placeholder={isEn ? "Search, for example tickets, baggage or fixture changes" : "Szukaj, np. bilet, bagaż, zmiana terminu"}
+            aria-label={isEn ? "Search questions and answers" : "Szukaj w pytaniach i odpowiedziach"}
             className="h-14 rounded-xl border-foreground/15 bg-background pl-12 pr-12 text-base shadow-sm"
           />
           {query ? (
@@ -82,7 +87,7 @@ export function FaqBrowser() {
               type="button"
               onClick={() => setQuery("")}
               className="absolute right-2 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              aria-label="Wyczyść wyszukiwanie"
+              aria-label={isEn ? "Clear search" : "Wyczyść wyszukiwanie"}
             >
               <X className="size-4" />
             </button>
@@ -91,8 +96,8 @@ export function FaqBrowser() {
 
         <p className="mt-3 text-sm text-muted-foreground" aria-live="polite">
           {normalizedQuery
-            ? `${resultCount} ${resultCount === 1 ? "wynik" : "wyników"}`
-            : `${resultCount} odpowiedzi w ${faqCategories.length} kategoriach`}
+            ? isEn ? `${resultCount} ${resultCount === 1 ? "result" : "results"}` : `${resultCount} ${resultCount === 1 ? "wynik" : "wyników"}`
+            : isEn ? `${resultCount} answers in ${faqCategories.length} categories` : `${resultCount} odpowiedzi w ${faqCategories.length} kategoriach`}
         </p>
 
         {visibleCategories.length ? (
@@ -135,9 +140,9 @@ export function FaqBrowser() {
           </div>
         ) : (
           <div className="surface-card mt-10 p-8 text-center md:p-12">
-            <h2 className="font-sans text-2xl font-black uppercase">Nie znaleźliśmy takiej odpowiedzi</h2>
+            <h2 className="font-sans text-2xl font-black uppercase">{isEn ? "We could not find that answer" : "Nie znaleźliśmy takiej odpowiedzi"}</h2>
             <p className="mx-auto mt-3 max-w-lg leading-7 text-muted-foreground">
-              Spróbuj krótszego hasła albo skontaktuj się z nami. Pomożemy w sprawie konkretnego wyjazdu.
+              {isEn ? "Try a shorter search term or contact us. We will help with your specific trip." : "Spróbuj krótszego hasła albo skontaktuj się z nami. Pomożemy w sprawie konkretnego wyjazdu."}
             </p>
           </div>
         )}

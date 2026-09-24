@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { useActionState, useEffect, useRef, useState } from "react"
 import type { Dispatch, FormEvent, KeyboardEvent as ReactKeyboardEvent, SetStateAction } from "react"
 import {
@@ -15,6 +16,8 @@ import {
   type InquiryState,
 } from "@/app/actions/inquiries"
 import { selectInquiryTrip } from "@/lib/inquiry-validation"
+import { getDictionary } from "@/lib/dictionaries"
+import { formatDate, localeFromPathname, routeFor, type Locale } from "@/lib/i18n"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,31 +47,26 @@ type InquiryTrip = {
 const inputClassName =
   "h-11 rounded-lg border-white/25 bg-white/1.5 px-3.5 text-sm text-white transition-all duration-200 placeholder:text-white/25 hover:border-white/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15"
 
-function formatTripDate(date: string | null) {
+function formatTripDate(date: string | null, locale: Locale) {
   if (!date) {
     return ""
   }
 
-  const [year, month, day] = date.split("-")
-
-  if (!year || !month || !day) {
-    return ""
-  }
-
-  return `${day}.${month}.${year}`
+  return formatDate(date, locale, { day: "2-digit", month: "2-digit", year: "numeric" })
 }
 
 function formatTripDateRange(
   startDate: string | null,
-  endDate: string | null
+  endDate: string | null,
+  locale: Locale
 ) {
-  const start = formatTripDate(startDate)
+  const start = formatTripDate(startDate, locale)
 
   if (!start) {
     return ""
   }
 
-  const end = formatTripDate(endDate)
+  const end = formatTripDate(endDate, locale)
 
   if (!end || endDate === startDate) {
     return start
@@ -135,6 +133,9 @@ export function InquiryForm({
   tripStartDate?: string
   tripEndDate?: string | null
 }) {
+  const pathname = usePathname()
+  const locale = localeFromPathname(pathname)
+  const dictionary = getDictionary(locale)
   const [state, action, pending] = useActionState(
     createInquiry,
     initialState
@@ -145,13 +146,6 @@ export function InquiryForm({
   const [privacyConsent, setPrivacyConsent] = useState(false)
   const [selectedMatch, setSelectedMatch] = useState("")
   const [selectedPackageVariant, setSelectedPackageVariant] = useState(defaultPackageVariant || packageVariants[0] || "")
-  useEffect(() => {
-  setSelectedPackageVariant(
-    defaultPackageVariant ||
-      packageVariants[0] ||
-      ""
-  )
-}, [defaultPackageVariant, packageVariants])
   const [matchDropdownOpen, setMatchDropdownOpen] = useState(false)
   const [packageDropdownOpen, setPackageDropdownOpen] = useState(false)
 const matchDropdownRef = useRef<HTMLDivElement>(null)
@@ -188,16 +182,19 @@ useEffect(() => {
 
 const selectedTrip = selectInquiryTrip(trips, selectedMatch)
 const availablePackageVariants = hasSelectedTrip ? packageVariants : selectedTrip?.packageVariants || []
+const selectedTripDate = selectedTrip
+  ? formatTripDateRange(selectedTrip.startDate, selectedTrip.endDate, locale)
+  : ""
 
 const selectedTripLabel = selectedTrip
   ? `${selectedTrip.title}${
-      formatTripDateRange(selectedTrip.startDate, selectedTrip.endDate)
-        ? ` - ${formatTripDateRange(selectedTrip.startDate, selectedTrip.endDate)}`
+      selectedTripDate
+        ? ` - ${selectedTripDate}`
         : ""
     }`
   : isOtherMatch
-    ? "Inny mecz"
-    : "Wybierz mecz"
+    ? dictionary.forms.otherMatch
+    : dictionary.forms.chooseMatch
   const handleNameInput = (
     event: FormEvent<HTMLInputElement>
   ) => {
@@ -288,6 +285,7 @@ const selectedTripLabel = selectedTrip
         name="formLoadedAt"
         value={formLoadedAt}
       />
+      <input type="hidden" name="locale" value={locale} />
 
    
       {hasSelectedTrip && (
@@ -346,7 +344,7 @@ const selectedTripLabel = selectedTrip
             htmlFor="name"
             className="text-sm font-semibold text-white"
           >
-            Imię i nazwisko
+            {dictionary.forms.name}
           </FieldLabel>
 
           <Input
@@ -355,9 +353,9 @@ const selectedTripLabel = selectedTrip
             required
             maxLength={100}
             autoComplete="name"
-            placeholder="Jan Kowalski"
+            placeholder={locale === "en" ? "John Smith" : "Jan Kowalski"}
             pattern="[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]+"
-            title="Wpisz imię i nazwisko używając liter, spacji, myślnika lub apostrofu."
+            title={locale === "en" ? "Enter your full name using letters, spaces, a hyphen or an apostrophe." : "Wpisz imię i nazwisko używając liter, spacji, myślnika lub apostrofu."}
             onInput={handleNameInput}
             className={inputClassName}
           />
@@ -368,7 +366,7 @@ const selectedTripLabel = selectedTrip
             htmlFor="phone"
             className="text-sm font-semibold text-white"
           >
-            Numer telefonu
+            {dictionary.forms.phone}
           </FieldLabel>
 
           <Input
@@ -382,7 +380,7 @@ const selectedTripLabel = selectedTrip
             autoComplete="tel"
             placeholder="+48500000000"
             pattern="\+?[0-9]{7,15}"
-            title="Numer telefonu powinien zawierać od 7 do 15 cyfr. Możesz użyć +48 lub innego kierunkowego."
+            title={locale === "en" ? "The phone number should contain 7 to 15 digits. You can include your country code." : "Numer telefonu powinien zawierać od 7 do 15 cyfr. Możesz użyć +48 lub innego kierunkowego."}
             onInput={handlePhoneInput}
             className={inputClassName}
           />
@@ -393,7 +391,7 @@ const selectedTripLabel = selectedTrip
             htmlFor="email"
             className="text-sm font-semibold text-white"
           >
-            E-mail
+            {dictionary.forms.email}
           </FieldLabel>
 
           <Input
@@ -405,7 +403,7 @@ const selectedTripLabel = selectedTrip
             autoComplete="email"
             placeholder="jan@example.com"
             pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+"
-            title="Wpisz poprawny adres e-mail, np. jan@example.com."
+            title={locale === "en" ? "Enter a valid email address, for example john@example.com." : "Wpisz poprawny adres e-mail, np. jan@example.com."}
             className={inputClassName}
           />
         </Field>
@@ -416,7 +414,7 @@ const selectedTripLabel = selectedTrip
       htmlFor="matchSelection"
       className="text-sm font-semibold text-white"
     >
-      Na jaki mecz?
+      {dictionary.forms.matchQuestion}
     </FieldLabel>
 
     <div
@@ -468,7 +466,8 @@ const selectedTripLabel = selectedTrip
             {trips.map((trip) => {
               const formattedDate = formatTripDateRange(
                 trip.startDate,
-                trip.endDate
+                trip.endDate,
+                locale
               )
 
               const active =
@@ -525,7 +524,7 @@ const selectedTripLabel = selectedTrip
                   : "text-white/80 hover:bg-primary/15 hover:text-primary"
               }`}
             >
-              Inny mecz
+              {dictionary.forms.otherMatch}
             </button>
           </div>
         </div>
@@ -534,14 +533,14 @@ const selectedTripLabel = selectedTrip
   </Field>
 )}
 
-        {availablePackageVariants.length > 0 && <Field><FieldLabel id="packageVariantLabel" className="text-sm font-semibold text-white">Wariant pakietu</FieldLabel><div ref={packageDropdownRef} className="relative" onKeyDown={(event) => handleDropdownKeyDown(event, packageDropdownOpen, setPackageDropdownOpen)}><button id="packageVariant" type="button" aria-haspopup="listbox" aria-expanded={packageDropdownOpen} aria-labelledby="packageVariantLabel packageVariant" onClick={() => setPackageDropdownOpen((open) => !open)} className={`flex h-11 w-full items-center justify-between gap-3 rounded-lg border bg-white/1.5 px-3.5 text-left text-sm outline-none transition-all duration-200 ${packageDropdownOpen ? "border-primary ring-2 ring-primary/15" : "border-white/25 hover:border-white/40"}`}><span className={selectedPackageVariant ? "min-w-0 truncate text-white" : "min-w-0 truncate text-white/40"}>{selectedPackageVariant || "Wybierz wariant"}</span><ChevronDown aria-hidden="true" className={`size-4 shrink-0 text-white/50 transition-transform duration-200 ${packageDropdownOpen ? "rotate-180 text-primary" : ""}`} /></button>{packageDropdownOpen && <div role="listbox" aria-labelledby="packageVariantLabel" className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-lg border border-white/15 bg-[#151515] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55)]"><div className="max-h-64 overflow-y-auto">{availablePackageVariants.map((variant) => { const active = selectedPackageVariant === variant; return <button key={variant} type="button" role="option" aria-selected={active} onClick={() => { setSelectedPackageVariant(variant); setPackageDropdownOpen(false); packageDropdownRef.current?.querySelector<HTMLButtonElement>('[aria-haspopup="listbox"]')?.focus() }} className={`w-full rounded-md px-3 py-2.5 text-left text-sm transition-colors ${active ? "bg-primary/20 text-primary" : "text-white/80 hover:bg-primary/15 hover:text-primary"}`}>{variant}</button> })}</div></div>}</div></Field>}
+        {availablePackageVariants.length > 0 && <Field><FieldLabel id="packageVariantLabel" className="text-sm font-semibold text-white">{dictionary.forms.package}</FieldLabel><div ref={packageDropdownRef} className="relative" onKeyDown={(event) => handleDropdownKeyDown(event, packageDropdownOpen, setPackageDropdownOpen)}><button id="packageVariant" type="button" aria-haspopup="listbox" aria-expanded={packageDropdownOpen} aria-labelledby="packageVariantLabel packageVariant" onClick={() => setPackageDropdownOpen((open) => !open)} className={`flex h-11 w-full items-center justify-between gap-3 rounded-lg border bg-white/1.5 px-3.5 text-left text-sm outline-none transition-all duration-200 ${packageDropdownOpen ? "border-primary ring-2 ring-primary/15" : "border-white/25 hover:border-white/40"}`}><span className={selectedPackageVariant ? "min-w-0 truncate text-white" : "min-w-0 truncate text-white/40"}>{selectedPackageVariant || dictionary.forms.choosePackage}</span><ChevronDown aria-hidden="true" className={`size-4 shrink-0 text-white/50 transition-transform duration-200 ${packageDropdownOpen ? "rotate-180 text-primary" : ""}`} /></button>{packageDropdownOpen && <div role="listbox" aria-labelledby="packageVariantLabel" className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-lg border border-white/15 bg-[#151515] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55)]"><div className="max-h-64 overflow-y-auto">{availablePackageVariants.map((variant) => { const active = selectedPackageVariant === variant; return <button key={variant} type="button" role="option" aria-selected={active} onClick={() => { setSelectedPackageVariant(variant); setPackageDropdownOpen(false); packageDropdownRef.current?.querySelector<HTMLButtonElement>('[aria-haspopup="listbox"]')?.focus() }} className={`w-full rounded-md px-3 py-2.5 text-left text-sm transition-colors ${active ? "bg-primary/20 text-primary" : "text-white/80 hover:bg-primary/15 hover:text-primary"}`}>{variant}</button> })}</div></div>}</div></Field>}
 
         <Field>
           <FieldLabel
             htmlFor="departureCity"
             className="text-sm font-semibold text-white"
           >
-            Skąd wylot?
+            {dictionary.forms.departure}
           </FieldLabel>
 
           <Input
@@ -550,9 +549,9 @@ const selectedTripLabel = selectedTrip
             required
             maxLength={100}
             autoComplete="address-level2"
-            placeholder="Warszawa"
+            placeholder={locale === "en" ? "London" : "Warszawa"}
             pattern="[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻżÀ-ÿ\s'-]+"
-            title="Wpisz nazwę miasta używając liter, spacji, myślnika lub apostrofu."
+            title={locale === "en" ? "Enter the city using letters, spaces, a hyphen or an apostrophe." : "Wpisz nazwę miasta używając liter, spacji, myślnika lub apostrofu."}
             onInput={handleDepartureCityInput}
             className={inputClassName}
           />
@@ -563,7 +562,7 @@ const selectedTripLabel = selectedTrip
             htmlFor="travelers"
             className="text-sm font-semibold text-white"
           >
-            Liczba osób
+            {dictionary.forms.travelers}
           </FieldLabel>
 
           <Input
@@ -587,7 +586,7 @@ const selectedTripLabel = selectedTrip
             htmlFor="matchName"
             className="text-sm font-semibold text-white"
           >
-            Jaki mecz?
+            {dictionary.forms.customMatch}
           </FieldLabel>
 
           <Input
@@ -595,7 +594,7 @@ const selectedTripLabel = selectedTrip
             name="matchName"
             required
             maxLength={160}
-            placeholder="np. Arsenal - Liverpool"
+            placeholder={locale === "en" ? "e.g. Arsenal - Liverpool" : "np. Arsenal - Liverpool"}
             onInput={handleMatchNameInput}
             className={inputClassName}
             autoFocus
@@ -610,7 +609,7 @@ const selectedTripLabel = selectedTrip
             htmlFor="message"
             className="text-sm font-semibold text-white"
           >
-            Dodatkowe informacje
+            {dictionary.forms.message}
           </FieldLabel>
 
           <span
@@ -630,7 +629,7 @@ const selectedTripLabel = selectedTrip
           name="message"
           rows={4}
           maxLength={MESSAGE_MAX_LENGTH}
-          placeholder="Termin, preferowany standard hotelu, specjalne potrzeby…"
+          placeholder={dictionary.forms.messagePlaceholder}
           onInput={handleMessageInput}
           className="min-h-28 resize-none rounded-lg border-white/25 bg-white/1.5 px-3.5 py-3 text-sm text-white transition-all duration-200 placeholder:text-white/25 hover:border-white/40 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15"
         />
@@ -668,21 +667,19 @@ const selectedTripLabel = selectedTrip
           </span>
 
           <span className="text-[13px] leading-relaxed text-white/70 transition-colors group-hover:text-white/80">
-            Wyrażam zgodę na przetwarzanie podanych danych w celu
-            przygotowania oferty i kontaktu w sprawie zapytania.
-            Zapoznałem/am się z{" "}
+            {dictionary.forms.consentText}{" "}
             <Link
-              href="/polityka-prywatnosci"
+              href={routeFor(locale, "/polityka-prywatnosci")}
               className="font-medium text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
             >
-              polityką prywatności i cookies
+              {dictionary.forms.privacyAndCookies}
             </Link>{" "}
-            oraz{" "}
+            {dictionary.forms.and}{" "}
             <Link
-              href="/warunki-uczestnictwa"
+              href={routeFor(locale, "/warunki-uczestnictwa")}
               className="font-medium text-white underline decoration-white/40 underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
             >
-              warunkami uczestnictwa
+              {dictionary.forms.terms}
             </Link>
             . <span className="text-primary">*</span>
           </span>
@@ -717,8 +714,8 @@ const selectedTripLabel = selectedTrip
         disabled={pending}
       >
         {pending
-          ? "Wysyłanie…"
-          : "Wyślij zapytanie"}
+          ? dictionary.forms.sending
+          : dictionary.forms.submit}
 
         <ArrowRight
           className="transition-transform duration-200 group-hover:translate-x-1"

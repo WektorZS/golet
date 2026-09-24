@@ -180,7 +180,7 @@ CarouselItem.displayName = "CarouselItem"
 const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, ...props }, ref) => {
+>(({ className, "aria-label": ariaLabel, ...props }, ref) => {
   const { scrollPrev, canScrollPrev } = useCarousel()
 
   return (
@@ -189,7 +189,7 @@ const CarouselPrevious = React.forwardRef<
       type="button"
       onClick={scrollPrev}
       disabled={!canScrollPrev}
-      aria-label="Poprzednia opinia"
+      aria-label={ariaLabel ?? "Previous slide"}
       className={clsx(
         "inline-flex size-10 items-center justify-center rounded-full border transition-colors disabled:pointer-events-none disabled:opacity-40",
         className
@@ -206,7 +206,7 @@ CarouselPrevious.displayName = "CarouselPrevious"
 const CarouselNext = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, ...props }, ref) => {
+>(({ className, "aria-label": ariaLabel, ...props }, ref) => {
   const { scrollNext, canScrollNext } = useCarousel()
 
   return (
@@ -215,7 +215,7 @@ const CarouselNext = React.forwardRef<
       type="button"
       onClick={scrollNext}
       disabled={!canScrollNext}
-      aria-label="Następna opinia"
+      aria-label={ariaLabel ?? "Next slide"}
       className={clsx(
         "inline-flex size-10 items-center justify-center rounded-full border transition-colors disabled:pointer-events-none disabled:opacity-40",
         className

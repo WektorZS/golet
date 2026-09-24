@@ -29,7 +29,9 @@ import { JsonLd } from "@/components/json-ld"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { Button } from "@/components/ui/button"
-import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
+import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
+import { getRequestLocale } from "@/lib/i18n-request"
+import { routeFor } from "@/lib/i18n"
 
 export const dynamic = "force-dynamic"
 const socialProfiles = [
@@ -39,6 +41,7 @@ const socialProfiles = [
     icon: "/icons/social/facebook.svg",
     description:
       "Aktualności, relacje i informacje o nowych wyjazdach.",
+    descriptionEn: "News, trip reports and information about new dates.",
   },
   {
     name: "Instagram",
@@ -46,6 +49,7 @@ const socialProfiles = [
     icon: "/icons/social/instagram.svg",
     description:
       "Zdjęcia ze stadionów, miast i wspólnych podróży.",
+    descriptionEn: "Photos from stadiums, cities and shared journeys.",
   },
   {
     name: "TikTok",
@@ -53,6 +57,7 @@ const socialProfiles = [
     icon: "/icons/social/tiktok.svg",
     description:
       "Krótkie materiały prosto z meczowych wyjazdów.",
+    descriptionEn: "Short videos straight from our football trips.",
   },
   {
     name: "YouTube",
@@ -60,21 +65,15 @@ const socialProfiles = [
     icon: "/icons/social/youtube.webp",
     description:
       "Dłuższe relacje i atmosfera piłkarskich podróży.",
+    descriptionEn: "Longer match-day stories and football travel atmosphere.",
   },
 ] as const
 
-export const metadata: Metadata = {
-  title: "Kontakt",
-  description:
-    "Skontaktuj się z Let's Gol w sprawie wyjazdu na mecz, rezerwacji, oferty grupowej lub współpracy.",
-  alternates: {
-    canonical: "/kontakt",
-  },
-  ...socialMetadata(
-    "Kontakt z Let's Gol",
-    "Wybierz wygodny kanał i zapytaj o wyjazd na mecz.",
-    "/kontakt"
-  ),
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale()
+  const title = locale === "en" ? "Contact" : "Kontakt"
+  const description = locale === "en" ? "Contact Let's Gol about a football trip, booking, group offer or partnership." : "Skontaktuj się z Let's Gol w sprawie wyjazdu na mecz, rezerwacji, oferty grupowej lub współpracy."
+  return { title, description, alternates: localizedAlternates("/kontakt", locale), ...socialMetadata(title, description, routeFor(locale, "/kontakt"), locale) }
 }
 function WhatsAppIcon({ className = "" }: { className?: string }) {
   return (
@@ -89,12 +88,15 @@ function WhatsAppIcon({ className = "" }: { className?: string }) {
   )
 }
 export default async function ContactPage() {
+  const locale = await getRequestLocale()
+  const isEn = locale === "en"
+  const t = (pl: string, en: string) => isEn ? en : pl
   const content: SiteContent = process.env.DATABASE_URL
     ? await getSiteContent().catch(() => ({} as SiteContent))
     : {}
 
   const trips: Trip[] = process.env.DATABASE_URL
-    ? await getPublishedTrips().catch(() => [])
+    ? await getPublishedTrips(locale).catch(() => [])
     : []
 
   const phone =
@@ -112,37 +114,34 @@ export default async function ContactPage() {
   }
   
   const whatsappMessage = encodeURIComponent(
-    "Dzień dobry, mam pytanie dotyczące wyjazdu z Let's Gol."
+    t("Dzień dobry, mam pytanie dotyczące wyjazdu z Let's Gol.", "Hello, I have a question about a trip with Let's Gol.")
   )
 
   const channels = [
     {
       title: "WhatsApp",
-      description:
-        "Najwygodniejszy do krótkiego pytania o termin, dostępność lub konkretny mecz.",
+      description: t("Najwygodniejszy do krótkiego pytania o termin, dostępność lub konkretny mecz.", "The easiest choice for a quick question about dates, availability or a specific match."),
       detail: contact.phone,
       href: `${contact.whatsappHref}?text=${whatsappMessage}`,
-      label: "Napisz na WhatsApp",
+      label: t("Napisz na WhatsApp", "Message us on WhatsApp"),
       icon: <WhatsAppIcon className="size-6" />,
       external: true,
     },
     {
-      title: "Telefon",
-      description:
-        "Dobry wybór, jeśli chcesz szybko omówić wariant podróży albo wyjazd dla grupy.",
+      title: t("Telefon", "Phone"),
+      description: t("Dobry wybór, jeśli chcesz szybko omówić wariant podróży albo wyjazd dla grupy.", "A good choice if you want to discuss travel options or a group trip quickly."),
       detail: contact.phone,
       href: contact.phoneHref,
-      label: "Zadzwoń teraz",
+      label: t("Zadzwoń teraz", "Call now"),
       icon: <Phone className="size-6" />,
       external: false,
     },
     {
       title: "E-mail",
-      description:
-        "Najlepszy kanał do współpracy, rozbudowanych pytań i wiadomości z większą liczbą szczegółów.",
+      description: t("Najlepszy kanał do współpracy, rozbudowanych pytań i wiadomości z większą liczbą szczegółów.", "Best for partnerships, detailed questions and messages containing more information."),
       detail: contact.email,
       href: `mailto:${contact.email}`,
-      label: "Napisz e-mail",
+      label: t("Napisz e-mail", "Send an email"),
       icon: <Mail className="size-6" />,
       external: false,
     },
@@ -156,18 +155,19 @@ export default async function ContactPage() {
           "@graph": [
             breadcrumbSchema([
               {
-                name: "Strona główna",
-                path: "/",
+                name: t("Strona główna", "Home"),
+                path: routeFor(locale, "/"),
               },
               {
-                name: "Kontakt",
-                path: "/kontakt",
+                name: t("Kontakt", "Contact"),
+                path: routeFor(locale, "/kontakt"),
               },
             ]),
             {
               "@type": "ContactPage",
-              name: "Kontakt z Let's Gol",
-              url: "https://letsgol.eu/kontakt",
+              name: t("Kontakt z Let's Gol", "Contact Let's Gol"),
+              url: `https://letsgol.eu${routeFor(locale, "/kontakt")}`,
+              inLanguage: isEn ? "en-GB" : "pl-PL",
               mainEntity: {
                 "@id": "https://letsgol.eu/#organization",
               },
@@ -194,17 +194,15 @@ export default async function ContactPage() {
 
           <div className="max-w-4xl">
             <p className="eyebrow eyebrow-on-dark">
-              Kontakt
+              {t("Kontakt", "Contact")}
             </p>
 
             <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
-              Porozmawiajmy o Twoim następnym meczu
+              {t("Porozmawiajmy o Twoim następnym meczu", "Let us talk about your next match")}
             </h1>
 
             <p className="mt-6 max-w-2xl text-lg leading-8 text-background/70">
-              Masz wybrany mecz, dopiero szukasz pomysłu albo
-              organizujesz wyjazd dla grupy? Wybierz wygodny kanał
-              i opowiedz nam, czego potrzebujesz.
+              {t("Masz wybrany mecz, dopiero szukasz pomysłu albo organizujesz wyjazd dla grupy? Wybierz wygodny kanał i opowiedz nam, czego potrzebujesz.", "Already have a match in mind, looking for inspiration or organising a group trip? Choose the channel that suits you and tell us what you need.")}
             </p>
           </div>
 
@@ -215,12 +213,11 @@ export default async function ContactPage() {
             />
 
             <p className="mt-4 font-sans text-2xl font-black uppercase">
-              Szybkie pytanie?
+              {t("Szybkie pytanie?", "A quick question?")}
             </p>
 
             <p className="mt-2 text-sm leading-6 text-background/60">
-              Zacznij od WhatsAppa lub telefonu. Przy bardziej
-              rozbudowanej sprawie skorzystaj z formularza.
+              {t("Zacznij od WhatsAppa lub telefonu. Przy bardziej rozbudowanej sprawie skorzystaj z formularza.", "Start with WhatsApp or a phone call. For a detailed enquiry, use the form below.")}
             </p>
           </div>
         </div>
@@ -230,17 +227,15 @@ export default async function ContactPage() {
   <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="eyebrow">
-              Wybierz kanał
+              {t("Wybierz kanał", "Choose a channel")}
             </p>
 
             <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Skontaktuj się tak, jak Ci wygodnie
+              {t("Skontaktuj się tak, jak Ci wygodnie", "Contact us in the way that suits you")}
             </h2>
 
             <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
-              Każda droga prowadzi do tego samego zespołu. Opis
-              podpowiada, który kanał najlepiej pasuje do Twojej
-              sprawy.
+              {t("Każda droga prowadzi do tego samego zespołu. Opis podpowiada, który kanał najlepiej pasuje do Twojej sprawy.", "Every channel reaches the same team. The descriptions will help you choose the best one for your enquiry.")}
             </p>
           </div>
 
@@ -297,12 +292,11 @@ export default async function ContactPage() {
               </p>
 
               <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-                Bądź bliżej wyjazdów
+                {t("Bądź bliżej wyjazdów", "Stay close to the action")}
               </h2>
 
               <p className="mt-4 max-w-2xl leading-7 text-muted-foreground">
-                Obserwuj relacje, zobacz atmosferę i dowiedz się o
-                nowych kierunkach.
+                {t("Obserwuj relacje, zobacz atmosferę i dowiedz się o nowych kierunkach.", "Follow our stories, see the atmosphere and hear about new destinations.")}
               </p>
             </div>
 
@@ -310,9 +304,9 @@ export default async function ContactPage() {
               variant="outline"
               size="lg"
               nativeButton={false}
-              render={<Link href="/galeria" />}
+              render={<Link href={routeFor(locale, "/galeria")} />}
             >
-              Zobacz galerię
+              {t("Zobacz galerię", "View gallery")}
               <ArrowRight data-icon="inline-end" />
             </Button>
           </div>
@@ -347,12 +341,12 @@ export default async function ContactPage() {
       </h3>
 
       <p className="mt-3 flex-1 text-sm leading-6 text-white/60">
-        {profile.description}
+        {isEn ? profile.descriptionEn : profile.description}
       </p>
 
       <div className="mt-6 border-t border-white/10 pt-5">
         <span className="inline-flex items-center gap-2 text-sm font-bold text-white transition-colors duration-300 group-hover:text-primary">
-          Otwórz profil
+          {t("Otwórz profil", "Open profile")}
 
           <ArrowRight
             className="size-4 transition-transform duration-300 group-hover:translate-x-1"
@@ -372,16 +366,15 @@ export default async function ContactPage() {
         <div className="site-container grid gap-12 py-16 md:py-20 lg:grid-cols-[0.65fr_1.15fr] lg:gap-20">
           <div>
             <p className="eyebrow eyebrow-on-dark">
-              Formularz
+              {t("Formularz", "Enquiry form")}
             </p>
 
             <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              Opisz swoją sprawę
+              {t("Opisz swoją sprawę", "Tell us what you need")}
             </h2>
 
             <p className="mt-5 max-w-md leading-7 text-background/65">
-              Podaj kontekst i najważniejsze szczegóły. Dzięki temu
-              pierwsza odpowiedź będzie bardziej konkretna.
+              {t("Podaj kontekst i najważniejsze szczegóły. Dzięki temu pierwsza odpowiedź będzie bardziej konkretna.", "Share the context and key details so our first response can be as useful as possible.")}
             </p>
 
             <div className="mt-8 space-y-5 border-t border-background/15 pt-7">
@@ -392,8 +385,7 @@ export default async function ContactPage() {
                 />
 
                 <p className="text-sm leading-6 text-background/60">
-                  Pytanie o wyjazd, rezerwację, grupę lub współpracę
-                  trafia przez ten sam bezpieczny formularz.
+                  {t("Pytanie o wyjazd, rezerwację, grupę lub współpracę trafia przez ten sam bezpieczny formularz.", "Trip, booking, group and partnership enquiries all use the same secure form.")}
                 </p>
               </div>
 
@@ -404,8 +396,7 @@ export default async function ContactPage() {
                 />
 
                 <p className="text-sm leading-6 text-background/60">
-                  Przy zapytaniu grupowym wpisz orientacyjną liczbę
-                  osób i interesujący termin w wiadomości.
+                  {t("Przy zapytaniu grupowym wpisz orientacyjną liczbę osób i interesujący termin w wiadomości.", "For a group enquiry, include the approximate number of travellers and your preferred dates.")}
                 </p>
               </div>
             </div>
@@ -424,7 +415,8 @@ export default async function ContactPage() {
       endDate: trip.endDate,
       packageVariants: getPackageVariants(
         trip.packageVariants,
-        trip.packageItems
+        trip.packageItems,
+        locale
       ).map((variant) => variant.label),
     }))}
 />

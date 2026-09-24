@@ -32,7 +32,7 @@ import { HomeTripCalendar } from "@/components/home-trip-calendar"
 import { SectionHeading } from "@/components/section-heading"
 import { InquiryForm } from "@/components/inquiry-form"
 import { ImageLightbox } from "@/components/image-lightbox"
-import { popularFaqs } from "@/lib/faq"
+import { getPopularFaqs } from "@/lib/faq"
 import {
   HeroBackgroundSlider,
   HeroTypewriter,
@@ -48,6 +48,8 @@ import {
 import type { SiteContent, YouTubeVideo } from "@/lib/content"
 import type { Trip } from "@/lib/trips"
 import { getPackageVariants } from "@/lib/package-options"
+import { localizedSetting } from "@/lib/i18n-content"
+import { routeFor, type Locale } from "@/lib/i18n"
 
 const trust = [
   [Users, "Setki zadowolonych klientów"],
@@ -140,7 +142,7 @@ type Testimonial = {
   rating: number
 }
 
-function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
+function HomeGallery({ gallery, locale }: { gallery: GalleryItem[]; locale: Locale }) {
   const items = gallery.slice(0, 8)
 
   const lightboxImages = items.map((item) => ({
@@ -150,7 +152,7 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
     alt:
       item.alt ||
       item.title ||
-      "Zdjęcie z wyjazdu Let's Gol",
+      (locale === "en" ? "Photo from a Let's Gol trip" : "Zdjęcie z wyjazdu Let's Gol"),
   }))
 
   return (
@@ -170,7 +172,7 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
               alt={
                 item.alt ||
                 item.title ||
-                "Zdjęcie z wyjazdu Let's Gol"
+                (locale === "en" ? "Photo from a Let's Gol trip" : "Zdjęcie z wyjazdu Let's Gol")
               }
               images={lightboxImages}
               initialIndex={index}
@@ -181,7 +183,7 @@ function HomeGallery({ gallery }: { gallery: GalleryItem[] }) {
                 alt={
                   item.alt ||
                   item.title ||
-                  "Zdjęcie z wyjazdu Let's Gol"
+                  (locale === "en" ? "Photo from a Let's Gol trip" : "Zdjęcie z wyjazdu Let's Gol")
                 }
                 fill
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
@@ -201,13 +203,108 @@ export function HomePage({
   gallery,
   testimonials,
   videos,
+  locale = "pl",
 }: {
   trips: Trip[]
   content: SiteContent
   gallery: GalleryItem[]
   testimonials: Testimonial[]
   videos: YouTubeVideo[]
+  locale?: Locale
 }) {
+  const isEn = locale === "en"
+  const copy = isEn ? {
+    heroEyebrow: "Trips to Europe's biggest football matches",
+    heroTitle: "Fly with us to Europe's biggest football matches",
+    heroDescription: "Tickets, flights, hotels and coordinator support in one complete package.",
+    heroCta: "View trips",
+    quote: "Plan my trip",
+    follow: "Follow us",
+    recommends: "100% recommend us",
+    reviews: "Facebook reviews",
+    followers: "Facebook followers",
+    tripsEyebrow: "Football travel calendar",
+    tripsTitle: "Upcoming trips",
+    tripsIntro: "Choose a date and see exactly what each available package includes.",
+    allTrips: "View all trips",
+    customImageAlt: "Football supporters travelling to a match",
+    customImageTitle: "You choose the match.\nWe organise the trip.",
+    customEyebrow: "Your trip",
+    customTitle: "Cannot find your match in our calendar?",
+    customIntro: "Tell us about the match you have always wanted to attend and we will prepare a trip tailored to you.",
+    customPoints: ["Any club or competition", "Departure from your preferred airport", "A hotel selected for you", "Anything from a ticket to a complete trip"],
+    customCta: "I want to attend a match",
+    tailoredEyebrow: "A trip made for you",
+    tailoredTitle: "Tell us what you need.",
+    tailoredIntro: "You do not have to choose a ready-made trip. We can arrange one part of the journey or the complete package, from the ticket to flights and hotel.",
+    scopeEyebrow: "What do you need?",
+    scopeTitle: "Choose your package",
+    scopeIntro: "Start with a match ticket or let us organise the complete journey.",
+    groupTitle: "From one traveller to a whole group",
+    groupIntro: "We organise individual and family trips as well as travel for companies and larger groups.",
+    packageTitle: "What is included in a full package?",
+    packageLabel: "Full package",
+    packageQuestion: "What do you receive as part of a complete trip?",
+    packageIntro: "You do not need to search separately for flights, a hotel or a match ticket. We arrange the journey for you from departure until you return home.",
+    processTitle: "How does booking work?",
+    processIntro: "From choosing the match to taking your seat. We handle the organisation.",
+    reasonsTitle: "Let's Gol handles the details. You experience the match.",
+    galleryEyebrow: "From the front row",
+    galleryTitle: "Photos from our trips",
+    galleryIntro: "Stadiums, cities and emotions that words alone cannot capture.",
+    galleryCta: "View the full gallery",
+    testimonialsEyebrow: "Traveller reviews",
+    testimonialsTitle: "Real match-day experiences",
+    testimonialsIntro: "The people who have travelled with us tell the story best.",
+    allReviews: "View all reviews",
+    videoEyebrow: "Feel the atmosphere",
+    videoTitle: "See what our trips are like",
+    videoIntro: "Match-day stories, stadiums and the emotions of our football journeys.",
+    watch: "Watch the story",
+    videoOutro: "Feel the atmosphere before your trip",
+    aboutEyebrow: "About Let's Gol",
+    aboutTitle: "A match is more than 90 minutes.",
+    aboutIntro: "We combine football, travel and careful organisation, guiding you from the first idea to your seat in the stands.",
+    aboutQuote: "You choose the match.\nWe help plan the route to the stadium.",
+    aboutCta: "Meet Let's Gol",
+    founders: "co-founders of Let's Gol",
+    aboutImageAlt: "The shared experience of travelling to a football match",
+    aboutImageEyebrow: "Football - travel - emotion",
+    aboutImageTitle: "The best matches stay with you together with the journey to the stadium.",
+    faqTitle: "Frequently asked questions",
+    faqIntro: "Clear answers to the most important questions. Our help centre covers every stage of the trip.",
+    faqCta: "View all FAQs",
+    contactEyebrow: "Your next match",
+    contactTitle: "Plan your football trip",
+    contactIntro: "Complete the form and we will prepare a proposal tailored to your match, budget and departure airport.",
+    response: "We usually reply within 24 hours",
+  } : null
+
+  const trustItems = isEn ? [
+    [Users, "Hundreds of happy travellers"],
+    [TicketCheck, "Guaranteed match tickets"],
+    [Headphones, "Coordinator support"],
+    [ShieldCheck, "Licensed tour operator"],
+  ] as const : trust
+
+  const reasonsItems = isEn ? [
+    [Plane, "Complete organisation", "Flights, hotel, ticket and transfers in one trusted booking."],
+    [TicketCheck, "Guaranteed tickets", "Tickets from legitimate sources with a clearly stated category."],
+    [Building2, "Trusted hotels", "Good locations and a standard selected for the trip."],
+    [Headphones, "Support throughout", "Help from check-in until you return home."],
+    [Star, "Created by supporters", "We plan each itinerary as we would want to travel ourselves."],
+    [ShieldCheck, "Safe travel", "A clear contract, insurance and travel guarantee."],
+  ] as const : reasons
+
+  const processItems = isEn ? [
+    ["1", "Choose a match", "Pick a listed trip or tell us about a match outside the calendar."],
+    ["2", "Confirm the details", "We select the airport, hotel, ticket category and number of nights."],
+    ["3", "Receive your offer", "We send a complete proposal tailored to your requirements."],
+    ["4", "Sign online", "You receive a clear contract and all required documents."],
+    ["5", "Pay the deposit", "The deposit secures the match tickets and travel arrangements."],
+    ["6", "Travel to the match", "We take care of logistics so you can focus on the experience."],
+  ] as const : process
+  const popularFaqs = getPopularFaqs(locale)
   const parsedFacebookReviewsCount = Number.parseInt(
     content.facebookReviewsCount ?? "",
     10
@@ -236,22 +333,25 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
         <div className="relative mx-auto flex min-h-svh w-full flex-1 items-center px-4 pb-14 pt-28 md:min-h-0 md:px-6 md:pb-8 md:pt-24 lg:max-w-7xl">
           <div className="flex max-w-3xl flex-col items-start gap-6">
-            <HeroTypewriter eyebrow={content.heroEyebrow} />
+            <HeroTypewriter eyebrow={localizedSetting(content, "heroEyebrow", locale, copy?.heroEyebrow || "Wyjazdy na największe mecze Europy")} locale={locale} />
 
             <h1 className="text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.04em] sm:text-7xl lg:text-[88px]">
-              {content.heroTitle ||
-                "Leć z nami na największe mecze w Europie"}
+              {localizedSetting(content, "heroTitle", locale, copy?.heroTitle || "Leć z nami na największe mecze w Europie")}
             </h1>
+
+            <p className="max-w-2xl text-base leading-7 text-background/75 md:text-lg">
+              {localizedSetting(content, "heroDescription", locale, copy?.heroDescription || "Bilety, lot, hotel i opieka koordynatora w jednym pakiecie.")}
+            </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Button
                 size="lg"
                 className="h-13 rounded-md px-6 font-bold uppercase"
                 nativeButton={false}
-                render={<Link href="/wyjazdy" />}
+                render={<Link href={routeFor(locale, "/wyjazdy")} />}
               >
                 <span className="inline-flex items-center gap-2">
-                  {content.heroCta || "Zobacz wyjazdy"}
+                  {localizedSetting(content, "heroCta", locale, copy?.heroCta || "Zobacz wyjazdy")}
                   <ArrowRight className="h-4 w-4" />
                 </span>
               </Button>
@@ -268,13 +368,13 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     />
   }
 >
-  Wyceń mój wyjazd
+  {copy?.quote || "Wyceń mój wyjazd"}
 </Button>
             </div>
 
             <div className="hidden items-center gap-4 border-t border-background/20 pt-5 md:flex">
               <p className="font-mono text-xs font-bold uppercase tracking-widest text-background/65">
-                Obserwuj nas
+                {copy?.follow || "Obserwuj nas"}
               </p>
 
               <SocialLinks />
@@ -292,12 +392,12 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               />
 
               <span className="text-lg font-black">
-                100% poleca
+                {copy?.recommends || "100% poleca"}
               </span>
             </div>
 
             <p className="mt-1 text-xs font-medium text-background/60">
-              {facebookReviewsCount} opinii na Facebooku
+              {facebookReviewsCount} {copy?.reviews || "opinii na Facebooku"}
             </p>
 
             <div className="mt-3 border-t border-background/10 pt-3">
@@ -306,7 +406,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               </p>
 
               <p className="text-xs font-medium text-background/60">
-                obserwujących na Facebooku
+                {copy?.followers || "obserwujących na Facebooku"}
               </p>
             </div>
           </div>
@@ -314,7 +414,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
         <div className="relative border-t border-background/7 bg-foreground/75 backdrop-blur-sm">
           <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:grid-cols-2 md:px-6 lg:grid-cols-4">
-            {trust.map(([Icon, text]) => (
+            {trustItems.map(([Icon, text]) => (
               <div
                 key={text}
                 className="flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-3 sm:text-left"
@@ -337,27 +437,26 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 <div className="mx-auto max-w-7xl">
   <div className="flex flex-col items-center text-center">
     <SectionHeading
-      eyebrow="Terminarz meczowych podróży"
-      title="Kalendarz wyjazdów"
+      eyebrow={copy?.tripsEyebrow || "Terminarz meczowych podróży"}
+      title={localizedSetting(content, "tripsTitle", locale, copy?.tripsTitle || "Kalendarz wyjazdów")}
       intro={
-        content.tripsDescription ||
-        "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu."
+        localizedSetting(content, "tripsDescription", locale, copy?.tripsIntro || "Wybierz termin i sprawdź dokładny zakres dostępnego pakietu.")
       }
       align="center"
     />
   </div>
 
-  <HomeTripCalendar trips={trips} />
+  <HomeTripCalendar trips={trips} locale={locale} />
 
   <div className="mt-8 flex justify-center">
     <Button
       variant="outline"
       size="lg"
       nativeButton={false}
-      render={<Link href="/wyjazdy" />}
+      render={<Link href={routeFor(locale, "/wyjazdy")} />}
     >
       <span className="inline-flex items-center gap-2">
-        Wszystkie wyjazdy
+        {copy?.allTrips || "Wszystkie wyjazdy"}
         <ArrowRight className="size-4 shrink-0" />
       </span>
     </Button>
@@ -373,7 +472,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
    <div className="relative min-h-105 overflow-hidden rounded-xl">
   <Image
     src="/images/indywidualny.webp"
-    alt="Podróż kibiców na mecz"
+    alt={copy?.customImageAlt || "Podróż kibiców na mecz"}
     fill
     className="object-cover"
     sizes="(max-width: 1024px) 100vw, 45vw"
@@ -388,33 +487,28 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </p>
 
     <p className="mt-1.5 max-w-md text-xl font-black uppercase leading-[1.05] tracking-[-0.02em] text-white md:text-2xl">
-      Ty wybierasz mecz.
-      <br />
-      My organizujemy wyjazd.
+      {(copy?.customImageTitle || "Ty wybierasz mecz.\nMy organizujemy wyjazd.").split("\n").map((line) => <span className="block" key={line}>{line}</span>)}
     </p>
   </div>
 </div>
 
     <div>
       <p className="eyebrow">
-        Twój wyjazd
+        {copy?.customEyebrow || "Twój wyjazd"}
       </p>
 
       <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight md:text-6xl">
-        Nie ma Twojego meczu w kalendarzu?
+        {localizedSetting(content, "customTripTitle", locale, copy?.customTitle || "Nie ma Twojego meczu w kalendarzu?")}
       </h2>
 
       <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
-        Masz wymarzony mecz, na który chcesz pojechać? Napisz nam jaki - przygotujemy wyjazd dopasowany do Ciebie.
+        {copy?.customIntro || "Masz wymarzony mecz, na który chcesz pojechać? Napisz nam jaki - przygotujemy wyjazd dopasowany do Ciebie."}
       </p>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        {[
-          "Dowolny klub i rozgrywki",
-          "Wylot z dowolnego lotniska",
-          "Hotel dopasowany do Ciebie",
-          "Od samego biletu po pełny wyjazd",
-        ].map((item) => (
+        {(copy?.customPoints || [
+          "Dowolny klub i rozgrywki", "Wylot z dowolnego lotniska", "Hotel dopasowany do Ciebie", "Od samego biletu po pełny wyjazd",
+        ]).map((item) => (
           <div
             key={item}
             className="flex items-center gap-3 text-sm font-semibold"
@@ -444,7 +538,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   }
 >
  <span className="inline-flex items-center gap-2">
-  Chcę pojechać na mecz
+  {copy?.customCta || "Chcę pojechać na mecz"}
   <ArrowRight className="size-4 shrink-0" />
 </span>
 </Button>
@@ -479,19 +573,15 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       <div className="relative flex min-h-105 items-center py-12 sm:py-14 lg:min-h-162.5 lg:py-14 lg:pr-16">
         <div className="relative z-10 max-w-xl lg:-translate-y-8">
           <p className="eyebrow eyebrow-on-dark">
-            Wyjazd szyty na miarę
+             {copy?.tailoredEyebrow || "Wyjazd szyty na miarę"}
           </p>
 
           <h2 className="mt-5 text-balance font-sans text-[38px] font-black uppercase leading-[0.94] tracking-tight text-white md:text-[46px]">
-            Powiedz nam,
-            <br />
-            czego potrzebujesz.
+            {copy?.tailoredTitle || "Powiedz nam, czego potrzebujesz."}
           </h2>
 
           <p className="mt-6 max-w-md text-base leading-7 text-white md:text-lg">
-            Nie musisz wybierać gotowego wyjazdu z kalendarza.
-            Możemy zorganizować pojedynczy element albo całą podróż
-            od biletu aż po lot i hotel.
+            {copy?.tailoredIntro || "Nie musisz wybierać gotowego wyjazdu z kalendarza. Możemy zorganizować pojedynczy element albo całą podróż od biletu aż po lot i hotel."}
           </p>
         </div>
       </div>
@@ -504,20 +594,24 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
         <div>
           <p className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-primary">
-            Czego potrzebujesz?
+            {copy?.scopeEyebrow || "Czego potrzebujesz?"}
           </p>
 
           <h3 className="mt-3 font-sans text-2xl font-black uppercase leading-tight tracking-tight text-white md:text-[28px]">
-            Dopasuj zakres wyjazdu
+            {copy?.scopeTitle || "Dopasuj zakres wyjazdu"}
           </h3>
 
           <p className="mt-3 max-w-xl text-base leading-7 text-white/55">
-            Możesz zacząć od samego biletu albo powierzyć nam
-            organizację całego wyjazdu.
+            {copy?.scopeIntro || "Możesz zacząć od samego biletu albo powierzyć nam organizację całego wyjazdu."}
           </p>
 
           <div className="mt-7 grid gap-x-10 gap-y-7 sm:grid-cols-2">
-            {[
+            {(isEn ? [
+              [Ticket, "Ticket only", "Entry to your chosen match."],
+              [Plane, "Ticket + flight", "A match ticket and return flight."],
+              [Hotel, "Ticket + hotel", "A match ticket and accommodation."],
+              [CircleCheckBig, "Full package", "Ticket, flights, hotel and sightseeing."],
+            ] : [
               [Ticket, "Tylko bilet", "Wejście na wybrany mecz."],
               [Plane, "Bilet + lot", "Bilet oraz przelot."],
               [Hotel, "Bilet + hotel", "Bilet oraz nocleg."],
@@ -526,7 +620,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                 "Pełny pakiet",
                 "Bilet, lot, hotel i zwiedzanie.",
               ],
-            ].map(([Icon, title, description]) => {
+            ]).map(([Icon, title, description]) => {
               const I = Icon as typeof Ticket
 
               return (
@@ -558,20 +652,24 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
         <div className="mt-10 border-t border-white/10 pt-9">
           <p className="font-mono text-[11px] font-black uppercase tracking-[0.18em] text-primary">
-            Dla kogo?
+             {isEn ? "Who is it for?" : "Dla kogo?"}
           </p>
 
           <h3 className="mt-3 font-sans text-2xl font-black uppercase leading-tight tracking-tight text-white md:text-[28px]">
-            Od jednej osoby po całą grupę
+             {copy?.groupTitle || "Od jednej osoby po całą grupę"}
           </h3>
 
           <p className="mt-3 max-w-xl text-base leading-7 text-white/55">
-            Organizujemy wyjazdy zarówno indywidualne, jak i dla rodzin,
-            firm oraz większych grup.
+             {copy?.groupIntro || "Organizujemy wyjazdy zarówno indywidualne, jak i dla rodzin, firm oraz większych grup."}
           </p>
 
           <div className="mt-7 grid gap-x-10 gap-y-7 sm:grid-cols-2">
-            {[
+            {(isEn ? [
+              [User, "Individuals", "A trip prepared around your exact requirements."],
+              [Users, "Families and groups", "A shared journey to the match of your choice."],
+              [BriefcaseBusiness, "Companies", "Team and corporate football trips."],
+              [GraduationCap, "Schools and clubs", "Complete service for organised groups."],
+            ] : [
               [
                 User,
                 "Indywidualnie",
@@ -592,7 +690,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                 "Szkoły i kluby",
                 "Kompleksowa obsługa zorganizowanych grup.",
               ],
-            ].map(([Icon, title, description]) => {
+            ]).map(([Icon, title, description]) => {
               const I = Icon as typeof User
 
               return (
@@ -628,30 +726,38 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 <section className="bg-section-light px-4 py-16 md:px-6 md:py-20">
   <div className="mx-auto max-w-7xl">
     <SectionHeading
-      eyebrow="Wszystko w jednym"
+      eyebrow={isEn ? "Everything in one place" : "Wszystko w jednym"}
       title={
-        content.packageTitle ||
-        "Co zawiera pełny pakiet?"
+        localizedSetting(content, "packageTitle", locale, copy?.packageTitle || "Co zawiera pełny pakiet?")
       }
     />
 
     <div className="mt-14 grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
       <div className="max-w-md">
         <p className="eyebrow">
-          Pełny pakiet
+          {copy?.packageLabel || "Pełny pakiet"}
         </p>
 
         <h3 className="mt-5 font-sans text-3xl font-black uppercase leading-[0.98] tracking-tight text-foreground md:text-4xl">
-          Co otrzymujesz w cenie pełnego wyjazdu?
+          {copy?.packageQuestion || "Co otrzymujesz w cenie pełnego wyjazdu?"}
         </h3>
 
         <p className="mt-5 text-base leading-7 text-muted-foreground">
-          Nie musisz osobno szukać lotów, hotelu, biletu na mecz ani planować całego wyjazdu. Zajmiemy się wszystkim za Ciebie - od wylotu aż do powrotu do domu.
+          {copy?.packageIntro || "Nie musisz osobno szukać lotów, hotelu, biletu na mecz ani planować całego wyjazdu. Zajmiemy się wszystkim za Ciebie - od wylotu aż do powrotu do domu."}
         </p>
       </div>
 
       <div className="grid gap-x-10 gap-y-0 sm:grid-cols-2">
-        {[
+        {(isEn ? [
+          [Plane, "Flights", "Return flights from the agreed departure airport."],
+          [TicketCheck, "Match ticket", "A guaranteed ticket in the agreed category."],
+          [Building2, "Trusted hotel", "Quality accommodation in a convenient location."],
+          [Headphones, "Coordinator support", "Support before departure and during your stay."],
+          [MapPinned, "Local transfers", "Airport transport and transfers during the shared programme."],
+          [ShieldCheck, "Insurance", "Travel insurance for the duration of the trip."],
+          [CalendarCheck, "Travel plan", "All essential travel information before departure."],
+          [Landmark, "City sightseeing", "Discover the city's highlights beyond the stadium."],
+        ] : [
           [Plane, "Przelot", "Lot w obie strony z wybranego lotniska."],
           [TicketCheck, "Bilet na mecz", "Pewny bilet na mecz w wybranej kategorii."],
           [Building2, "Sprawdzony hotel", "Sprawdzony nocleg w dobrej lokalizacji."],
@@ -660,7 +766,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           [ShieldCheck, "Ubezpieczenie", "Ubezpieczenie turystyczne na czas wyjazdu."],
           [CalendarCheck, "Plan podróży", "Przed wyjazdem dostajesz od nas wszystkie najważniejsze informacje."],
           [Landmark, "Zwiedzanie miasta", "Wspólnie odkrywamy najciekawsze miejsca poza stadionem."],
-        ].map(([Icon, title, description]) => {
+        ]).map(([Icon, title, description]) => {
           const I = Icon as typeof Plane
 
           return (
@@ -695,9 +801,9 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   <div className="relative mx-auto max-w-7xl">
     <SectionHeading
       inverse
-      eyebrow="Prosty plan"
-      title={content.processTitle || "Jak wygląda rezerwacja?"}
-      intro="Od wyboru meczu do miejsca na trybunach. Całą organizację bierzemy na siebie."
+      eyebrow={isEn ? "A simple plan" : "Prosty plan"}
+      title={localizedSetting(content, "processTitle", locale, copy?.processTitle || "Jak wygląda rezerwacja?")}
+      intro={copy?.processIntro || "Od wyboru meczu do miejsca na trybunach. Całą organizację bierzemy na siebie."}
     />
 
     <div className="relative mt-12">
@@ -710,7 +816,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         </div>
 
         <div className="relative grid grid-cols-6">
-          {process.map(([number, title, copy], index) => (
+          {processItems.map(([number, title, stepCopy], index) => (
             <article
               key={number}
               className="group relative min-w-0 px-4 xl:px-6"
@@ -731,7 +837,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
                 </h3>
 
                 <p className="mx-auto mt-3 max-w-48.75 text-sm leading-[1.75] text-white/50 xl:text-[15px]">
-                  {copy}
+                   {stepCopy}
                 </p>
               </div>
             </article>
@@ -740,7 +846,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:hidden">
-        {process.map(([number, title, copy]) => (
+        {processItems.map(([number, title, stepCopy]) => (
           <article
             key={number}
             className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/4 p-6 transition-all duration-300 hover:border-white/20 hover:bg-white/6"
@@ -758,7 +864,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               </div>
 
               <span className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-primary/90">
-                Krok {number}
+                {isEn ? "Step" : "Krok"} {number}
               </span>
             </div>
 
@@ -767,7 +873,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             </h3>
 
             <p className="mt-3 text-[15px] leading-7 text-white/50">
-              {copy}
+              {stepCopy}
             </p>
           </article>
         ))}
@@ -780,15 +886,14 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 <section className="bg-secondary px-4 py-16 md:px-6 md:py-20 lg:py-24">
   <div className="mx-auto max-w-7xl">
     <SectionHeading
-      eyebrow="Dlaczego my"
+      eyebrow={isEn ? "Why us" : "Dlaczego my"}
       title={
-        content.benefitsTitle ||
-        "Let’s Gol pilnuje szczegółów. Ty przeżywasz mecz."
+        localizedSetting(content, "benefitsTitle", locale, copy?.reasonsTitle || "Let’s Gol pilnuje szczegółów. Ty przeżywasz mecz.")
       }
     />
 
     <div className="mt-12 grid gap-x-10 gap-y-9 md:grid-cols-2 lg:grid-cols-3 lg:gap-y-10">
-      {reasons.map(([Icon, title, copy]) => (
+      {reasonsItems.map(([Icon, title, reasonCopy]) => (
         <article
           key={title}
           className="group flex items-start gap-4"
@@ -806,7 +911,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
             </h3>
 
             <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground md:text-[15px]">
-              {copy}
+              {reasonCopy}
             </p>
           </div>
         </article>
@@ -825,12 +930,11 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
   <div className="relative mx-auto max-w-7xl">
     <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
       <SectionHeading
-        eyebrow="Z pierwszego rzędu"
+        eyebrow={copy?.galleryEyebrow || "Z pierwszego rzędu"}
         title={
-          content.galleryTitle ||
-          "Galeria z wyjazdów"
+          localizedSetting(content, "galleryTitle", locale, copy?.galleryTitle || "Galeria z wyjazdów")
         }
-        intro="Stadiony, miasta i emocje, których nie da się oddać samym opisem."
+        intro={copy?.galleryIntro || "Stadiony, miasta i emocje, których nie da się oddać samym opisem."}
         align="left"
       />
 
@@ -838,26 +942,26 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         className="hidden w-fit shrink-0 md:inline-flex"
         variant="outline"
         nativeButton={false}
-        render={<Link href="/galeria" />}
+        render={<Link href={routeFor(locale, "/galeria")} />}
       >
        <span className="inline-flex items-center gap-2">
-  Zobacz całą galerię
+  {copy?.galleryCta || "Zobacz całą galerię"}
   <ArrowRight className="size-4 shrink-0" />
 </span>
       </Button>
     </div>
 
-    <HomeGallery gallery={gallery} />
+    <HomeGallery gallery={gallery} locale={locale} />
 
     <div className="mt-8 flex md:hidden">
       <Button
         className="w-full"
         variant="outline"
         nativeButton={false}
-        render={<Link href="/galeria" />}
+        render={<Link href={routeFor(locale, "/galeria")} />}
       >
        <span className="inline-flex items-center gap-2">
-  Zobacz całą galerię
+  {copy?.galleryCta || "Zobacz całą galerię"}
   <ArrowRight className="size-4 shrink-0" />
 </span>
       </Button>
@@ -874,16 +978,15 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
   <div className="relative mx-auto max-w-7xl">
     <SectionHeading
-      eyebrow="Opinie klientów"
+      eyebrow={copy?.testimonialsEyebrow || "Opinie klientów"}
       title={
-        content.testimonialsTitle ||
-        "Emocje potwierdzone na trybunach"
+        localizedSetting(content, "testimonialsTitle", locale, copy?.testimonialsTitle || "Emocje potwierdzone na trybunach")
       }
-      intro="Najlepiej o naszych wyjazdach opowiadają osoby, które już poleciały z nami na mecz."
+      intro={copy?.testimonialsIntro || "Najlepiej o naszych wyjazdach opowiadają osoby, które już poleciały z nami na mecz."}
       inverse
     />
 
-<TestimonialsCarousel testimonials={testimonials} />
+<TestimonialsCarousel testimonials={testimonials} locale={locale} />
 
     <div className="mt-8 flex flex-col items-center justify-center gap-5 sm:flex-row">
       <div className="flex items-center gap-3">
@@ -895,11 +998,11 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
         <div>
           <p className="text-sm font-bold text-background">
-            {facebookReviewsAverage}/5 · {facebookReviewsCount} opinii
+            {facebookReviewsAverage}/5 · {facebookReviewsCount} {isEn ? "reviews" : "opinii"}
           </p>
 
           <p className="mt-0.5 text-xs text-background/70">
-            100% poleca nas na Facebooku
+            {isEn ? "100% recommend us on Facebook" : "100% poleca nas na Facebooku"}
           </p>
         </div>
       </div>
@@ -919,7 +1022,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         }
       >
         <span className="inline-flex items-center gap-2">
-  Zobacz wszystkie opinie
+  {copy?.allReviews || "Zobacz wszystkie opinie"}
   <ArrowRight className="size-4 shrink-0" />
 </span>
       </Button>
@@ -941,12 +1044,11 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
     <div className="relative mx-auto max-w-7xl">
       <SectionHeading
-        eyebrow="Zobacz atmosferę"
+        eyebrow={copy?.videoEyebrow || "Zobacz atmosferę"}
         title={
-          content.youtubeTitle ||
-          "Zobacz, jak wyglądają nasze wyjazdy"
+          localizedSetting(content, "youtubeTitle", locale, copy?.videoTitle || "Zobacz, jak wyglądają nasze wyjazdy")
         }
-        intro="Relacje, stadiony i emocje z naszych piłkarskich podróży."
+        intro={copy?.videoIntro || "Relacje, stadiony i emocje z naszych piłkarskich podróży."}
       />
 
       <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -964,7 +1066,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               <div className="relative aspect-video overflow-hidden bg-black">
                 <Image
                   src={video.thumbnail}
-                  alt={`Miniatura filmu: ${video.title}`}
+                  alt={isEn ? `Video thumbnail: ${video.title}` : `Miniatura filmu: ${video.title}`}
                   fill
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -992,7 +1094,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               <div className="relative flex min-h-32.5 items-start justify-between gap-5 bg-white/3.5 p-5 md:p-6">
                 <div className="min-w-0">
                   <p className="mb-2.5 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-primary">
-                    Zobacz relację
+                    {copy?.watch || "Zobacz relację"}
                   </p>
 
                   <h3 className="line-clamp-2 text-base font-bold leading-[1.45] text-background transition-colors duration-300 group-hover:text-white">
@@ -1013,7 +1115,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         <div className="h-px w-8 bg-black/15" />
 
         <span className="text-center font-mono text-xs font-bold uppercase tracking-[0.18em] text-black/65">
-          Poczuj atmosferę przed swoim wyjazdem
+          {copy?.videoOutro || "Poczuj atmosferę przed swoim wyjazdem"}
         </span>
 
         <div className="h-px w-8 bg-black/15" />
@@ -1035,22 +1137,19 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
   <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
     <div>
-      <p className="eyebrow">O Let&apos;s Gol</p>
+      <p className="eyebrow">{copy?.aboutEyebrow || <>O Let&apos;s Gol</>}</p>
 
       <h2 className="mt-5 max-w-2xl text-balance font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight text-foreground md:text-6xl">
-        Mecz to więcej niż 90 minut.
+        {localizedSetting(content, "aboutTitle", locale, copy?.aboutTitle || "Mecz to więcej niż 90 minut.")}
       </h2>
 
       <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
-        Łączymy piłkę nożną z podróżowaniem i organizacją, która porządkuje
-        drogę od pierwszego pomysłu aż do miejsca na trybunach.
+        {localizedSetting(content, "aboutText", locale, copy?.aboutIntro || "Łączymy piłkę nożną z podróżowaniem i organizacją, która porządkuje drogę od pierwszego pomysłu aż do miejsca na trybunach.")}
       </p>
 
       <div className="mt-8 border-l-2 border-primary pl-5">
         <p className="max-w-lg font-sans text-xl font-black uppercase leading-tight text-foreground md:text-2xl">
-          Ty wybierasz mecz.
-          <br />
-          My pomagamy poukładać drogę na stadion.
+          {(copy?.aboutQuote || "Ty wybierasz mecz.\nMy pomagamy poukładać drogę na stadion.").split("\n").map((line) => <span className="block" key={line}>{line}</span>)}
         </p>
       </div>
 
@@ -1059,10 +1158,10 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           size="lg"
           className="h-12 px-6"
           nativeButton={false}
-          render={<Link href="/o-nas" />}
+          render={<Link href={routeFor(locale, "/o-nas")} />}
         >
           <span className="inline-flex items-center gap-2">
-  Poznaj Let&apos;s Gol
+  {copy?.aboutCta || <>Poznaj Let&apos;s Gol</>}
   <ArrowRight className="size-4 shrink-0" />
 </span>
         </Button>
@@ -1096,7 +1195,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
     </p>
 
     <p className="text-xs text-muted-foreground">
-      współtwórcy Let&apos;s Gol
+      {copy?.founders || <>współtwórcy Let&apos;s Gol</>}
     </p>
   </div>
 </div>
@@ -1107,7 +1206,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       <div className="relative min-h-90 overflow-hidden rounded-xl md:min-h-120">
         <Image
   src="/images/droga.webp"
-  alt="Atmosfera wspólnego wyjazdu na mecz"
+  alt={copy?.aboutImageAlt || "Atmosfera wspólnego wyjazdu na mecz"}
   fill
   className="object-cover object-top"
   sizes="(max-width: 1024px) 100vw, 55vw"
@@ -1117,11 +1216,11 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
 
         <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-8">
           <p className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-primary">
-            Piłka · podróże · emocje
+            {copy?.aboutImageEyebrow || "Piłka - podróże - emocje"}
           </p>
 
           <p className="mt-3 max-w-md font-sans text-2xl font-black uppercase leading-[1.05] md:text-3xl">
-            Najlepsze mecze pamięta się razem z drogą na stadion.
+            {copy?.aboutImageTitle || "Najlepsze mecze pamięta się razem z drogą na stadion."}
           </p>
         </div>
       </div>
@@ -1139,8 +1238,8 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       <div className="lg:pt-16">
   <SectionHeading
           eyebrow="FAQ"
-          title={content.faqTitle || "Najczęstsze pytania"}
-          intro="Krótko odpowiadamy na najważniejsze kwestie. Pełne centrum pomocy obejmuje wszystkie etapy wyjazdu."
+          title={localizedSetting(content, "faqTitle", locale, copy?.faqTitle || "Najczęstsze pytania")}
+          intro={copy?.faqIntro || "Krótko odpowiadamy na najważniejsze kwestie. Pełne centrum pomocy obejmuje wszystkie etapy wyjazdu."}
           align="left"
         />
 
@@ -1149,9 +1248,9 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
           size="lg"
           className="mt-8"
           nativeButton={false}
-          render={<Link href="/faq" />}
+          render={<Link href={routeFor(locale, "/faq")} />}
         >
-          Zobacz całe FAQ
+          {copy?.faqCta || "Zobacz całe FAQ"}
           <ArrowRight data-icon="inline-end" />
         </Button>
       </div>
@@ -1184,17 +1283,15 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.75fr_1.25fr]">
           <div className="flex flex-col gap-6">
             <p className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-primary">
-              Twój następny mecz
+              {copy?.contactEyebrow || "Twój następny mecz"}
             </p>
 
             <h2 className="text-balance font-sans text-4xl font-black uppercase leading-tight md:text-6xl">
-              {content.contactTitle ||
-                "Zapytaj o swój wyjazd"}
+              {localizedSetting(content, "contactTitle", locale, copy?.contactTitle || "Zapytaj o swój wyjazd")}
             </h2>
 
             <p className="max-w-md leading-relaxed text-background/65">
-              Wypełnij formularz, a przygotujemy propozycję dopasowaną
-              do meczu, budżetu i lotniska wylotu.
+              {copy?.contactIntro || "Wypełnij formularz, a przygotujemy propozycję dopasowaną do meczu, budżetu i lotniska wylotu."}
             </p>
 
             <div className="flex items-center gap-3">
@@ -1204,7 +1301,7 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
               />
 
               <span>
-                Odpowiedź zwykle w ciągu 24 godzin
+                {copy?.response || "Odpowiedź zwykle w ciągu 24 godzin"}
               </span>
             </div>
           </div>
@@ -1222,7 +1319,8 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
       endDate: trip.endDate,
       packageVariants: getPackageVariants(
         trip.packageVariants,
-        trip.packageItems
+        trip.packageItems,
+        locale
       ).map((variant) => variant.label),
     }))}
 />

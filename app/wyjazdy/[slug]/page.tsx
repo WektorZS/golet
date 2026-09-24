@@ -13,11 +13,13 @@ import { SiteHeader } from "@/components/site-header"
 import { TripDetailsTabs } from "@/components/trip-details-tabs"
 import { Button } from "@/components/ui/button"
 import { getPublishedTestimonials, getSiteContent } from "@/lib/content"
-import { getPackageVariants, packageFeatures, parsePackageItems } from "@/lib/package-options"
+import { getPackageFeatures, getPackageVariants, parsePackageItems } from "@/lib/package-options"
 import { sanitizeDescriptionHtml, stripHtml } from "@/lib/sanitize-html"
-import { breadcrumbSchema } from "@/lib/seo"
+import { breadcrumbSchema, localizedAlternates } from "@/lib/seo"
 import { absoluteUrl } from "@/lib/site"
 import { getPublishedTrips, getTripBySlug, getTripGallery } from "@/lib/trips"
+import { getRequestLocale } from "@/lib/i18n-request"
+import { formatPrice, localeTags, pluralizeDuration, routeFor } from "@/lib/i18n"
 
 export const dynamic = "force-dynamic"
 
@@ -31,12 +33,6 @@ function asDate(value: string) {
   return new Date(`${value}T12:00:00`)
 }
 
-function formatStay(days: number, nights: number) {
-  const dayLabel = days === 1 ? "dzień" : "dni"
-  const nightLabel = nights === 1 ? "noc" : nights > 1 && nights < 5 ? "noce" : "nocy"
-  return `${days} ${dayLabel} / ${nights} ${nightLabel}`
-}
-
 function getTeams(title: string, opponent: string, homeTeam: string, awayTeam: string) {
   const [titleHome, titleAway] = title.split(/\s+vs\.?\s+|\s+-\s+/i).map((item) => item.trim())
   return {
@@ -45,25 +41,28 @@ function getTeams(title: string, opponent: string, homeTeam: string, awayTeam: s
   }
 }
 
-function TeamLogo({ src, name }: { src: string; name: string }) {
+function TeamLogo({ src, name, locale }: { src: string; name: string; locale: "pl" | "en" }) {
   if (!src) return <span className="flex size-16 items-center justify-center rounded-full border border-white/20 bg-white/10 font-sans text-lg font-black md:size-20">{name.slice(0, 2).toUpperCase()}</span>
-  return <span className="relative block size-16 md:size-20"><Image src={src} alt={`Herb ${name}`} fill className="object-contain drop-shadow-xl" sizes="80px" /></span>
+  return <span className="relative block size-16 md:size-20"><Image src={src} alt={locale === "en" ? `${name} crest` : `Herb ${name}`} fill className="object-contain drop-shadow-xl" sizes="80px" /></span>
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const trip = await getTripBySlug(slug)
-  if (!trip) return { title: "Wyjazd niedostępny" }
+  const locale = await getRequestLocale()
+  const isEn = locale === "en"
+  const trip = await getTripBySlug(slug, locale)
+  if (!trip) return { title: isEn ? "Trip unavailable" : "Wyjazd niedostępny" }
 
-  const description = trip.seoDescription || `${stripHtml(trip.description)} Pakiet od ${trip.price.toLocaleString("pl-PL")} zł.`
+  const description = trip.seoDescription || `${stripHtml(trip.description)} ${isEn ? "Packages from" : "Pakiet od"} ${formatPrice(trip.price, locale)} ${isEn ? "PLN" : "zł"}.`
   const title = trip.seoTitle || trip.title
   const summary = description.slice(0, 160)
-  const canonical = `/wyjazdy/${trip.slug}`
+  const polishPath = `/wyjazdy/${trip.slug}`
+  const canonical = routeFor(locale, "/wyjazdy") + `/${trip.slug}`
   return {
     title,
     description: summary,
-    alternates: { canonical },
-    openGraph: { title, description: summary, type: "website", url: canonical, images: [{ url: trip.image, alt: `Wyjazd na mecz ${trip.title} w ${trip.city}` }] },
+    alternates: localizedAlternates(polishPath, locale),
+    openGraph: { title, description: summary, type: "website", url: canonical, locale: isEn ? "en_GB" : "pl_PL", images: [{ url: trip.image, alt: isEn ? `Football match trip to ${trip.city}: ${trip.title}` : `Wyjazd na mecz ${trip.title} w ${trip.city}` }] },
     twitter: { card: "summary_large_image", title, description: summary, images: [trip.image] },
   }
 }
@@ -71,24 +70,27 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function TripDetailPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ pakiet?: string }> }) {
   const { slug } = await params
   const { pakiet } = await searchParams
-  const trip = await getTripBySlug(slug)
+  const locale = await getRequestLocale()
+  const isEn = locale === "en"
+  const t = (pl: string, en: string) => isEn ? en : pl
+  const trip = await getTripBySlug(slug, locale)
   if (!trip) notFound()
 
   const [gallery, testimonials, content, publishedTrips] = await Promise.all([
-    getTripGallery(trip.id, trip.homeTeamId, trip.awayTeamId),
-    getPublishedTestimonials(),
+    getTripGallery(trip.id, trip.homeTeamId, trip.awayTeamId, locale),
+    getPublishedTestimonials(locale),
     getSiteContent(),
-    getPublishedTrips(),
+    getPublishedTrips(locale),
   ])
-  const dateFormatter = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric" })
+  const dateFormatter = new Intl.DateTimeFormat(localeTags[locale], { day: "numeric", month: "long", year: "numeric" })
   const startDate = dateFormatter.format(asDate(trip.startDate))
   const date = trip.endDate && trip.endDate !== trip.startDate ? `${startDate} - ${dateFormatter.format(asDate(trip.endDate))}` : startDate
-  const matchDate = trip.matchDate ? dateFormatter.format(asDate(trip.matchDate)) : startDate
-  const status = availability[trip.availabilityStatus as keyof typeof availability] || availability.available
+  const statusBase = availability[trip.availabilityStatus as keyof typeof availability] || availability.available
+  const status = { ...statusBase, label: isEn ? ({ available: "Places available", last_places: "Last places", sold_out: "Sold out" }[trip.availabilityStatus] || "Places available") : statusBase.label }
   const soldOut = trip.availabilityStatus === "sold_out"
   const teams = getTeams(trip.title, trip.opponent, trip.homeTeam, trip.awayTeam)
   const packageOptions = parsePackageItems(trip.packageItems)
-  const packageVariants = getPackageVariants(trip.packageVariants, trip.packageItems)
+  const packageVariants = getPackageVariants(trip.packageVariants, trip.packageItems, locale)
   const variantOrder = [
   "ticket",
   "ticket_flight",
@@ -136,6 +138,7 @@ const selectedHasHotel =
     selectedPackageKey === "full" ||
     selectedPackageKey === "ticket_hotel"
   )
+  const packageFeatures = getPackageFeatures(locale)
   const includedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "included")
   const optionalFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "optional")
   const excludedFeatures = packageFeatures.filter((feature) => packageOptions[feature.key] === "excluded")
@@ -186,7 +189,7 @@ const includedItems: {
     : trip.durationNights
   const computedDays = computedNights !== trip.durationNights ? computedNights + 1 : trip.durationDays
   const whatsappNumber = (content.contactPhone || "+48501465318").replace(/\D/g, "")
-  const whatsappText = encodeURIComponent(`Dzień dobry, interesuje mnie wyjazd ${homeTeam} - ${awayTeam}, ${date}. Wariant: ${selectedPackageVariant.label}.`)
+  const whatsappText = encodeURIComponent(isEn ? `Hello, I am interested in the ${homeTeam} - ${awayTeam} trip on ${date}. Package: ${selectedPackageVariant.label}.` : `Dzień dobry, interesuje mnie wyjazd ${homeTeam} - ${awayTeam}, ${date}. Wariant: ${selectedPackageVariant.label}.`)
   const availableTripOptions = publishedTrips
   .filter(
     (item) =>
@@ -200,18 +203,26 @@ const includedItems: {
     endDate: item.endDate,
     packageVariants: getPackageVariants(
       item.packageVariants,
-      item.packageItems
+      item.packageItems,
+      locale
     ).map((variant) => variant.label),
   }))
   const faq = trip.faq.length > 0
     ? trip.faq.map((item) => { const [question, ...answer] = item.split("|"); return { question: question.trim(), answer: answer.join("|").trim() } }).filter((item) => item.question && item.answer)
     : [
-        { question: "Czy bilet na mecz jest w cenie?", answer: "Tak, pakiet obejmuje bilet na mecz. Jego kategoria jest potwierdzana przed rezerwacją." },
-        { question: "Kiedy otrzymam dokładne godziny lotów?", answer: "Szczegóły lotów przekazujemy po finalnym potwierdzeniu terminarza i wybranego wariantu podróży." },
-        { question: "Czy mogę wyjechać z innego lotniska?", answer: "Tak, sprawdzamy połączenia z lotniska najwygodniejszego dla uczestnika." },
+        ...(isEn ? [
+          { question: "Is the match ticket included?", answer: "Yes. The package includes a match ticket, and its category is confirmed before booking." },
+          { question: "When will I receive the exact flight times?", answer: "We share flight details after the fixture and selected travel option are confirmed." },
+          { question: "Can I depart from another airport?", answer: "Yes. We can check connections from the most convenient airport for you." },
+        ] : [
+          { question: "Czy bilet na mecz jest w cenie?", answer: "Tak, pakiet obejmuje bilet na mecz. Jego kategoria jest potwierdzana przed rezerwacją." },
+          { question: "Kiedy otrzymam dokładne godziny lotów?", answer: "Szczegóły lotów przekazujemy po finalnym potwierdzeniu terminarza i wybranego wariantu podróży." },
+          { question: "Czy mogę wyjechać z innego lotniska?", answer: "Tak, sprawdzamy połączenia z lotniska najwygodniejszego dla uczestnika." },
+        ]),
       ]
 
-  const tripUrl = absoluteUrl(`/wyjazdy/${trip.slug}`)
+  const tripPath = `${routeFor(locale, "/wyjazdy")}/${trip.slug}`
+  const tripUrl = absoluteUrl(tripPath)
   const schemaDescription = stripHtml(trip.description).trim()
   const offerSchema = {
     "@type": "Offer",
@@ -229,7 +240,8 @@ const includedItems: {
     name: `${homeTeam} - ${awayTeam}`,
     ...(schemaDescription && { description: schemaDescription }),
     image: absoluteUrl(trip.image),
-    touristType: "Kibice piłkarscy",
+    touristType: isEn ? "Football supporters" : "Kibice piłkarscy",
+    inLanguage: isEn ? "en-GB" : "pl-PL",
     itinerary: {
       "@type": "Place",
       name: trip.city,
@@ -246,10 +258,10 @@ const includedItems: {
   const productSchema = {
     "@type": "Product",
     "@id": `${tripUrl}#package`,
-    name: `Wyjazd na mecz ${homeTeam} - ${awayTeam}`,
+    name: isEn ? `Football match trip: ${homeTeam} - ${awayTeam}` : `Wyjazd na mecz ${homeTeam} - ${awayTeam}`,
     ...(schemaDescription && { description: schemaDescription }),
     image: absoluteUrl(trip.image),
-    category: "Pakiet turystyczny na mecz piłkarski",
+    category: isEn ? "Football match travel package" : "Pakiet turystyczny na mecz piłkarski",
     brand: { "@type": "Brand", name: "Let’s Gol" },
     isRelatedTo: { "@id": tripSchema["@id"] },
     offers: { "@id": offerSchema["@id"] },
@@ -266,32 +278,33 @@ const includedItems: {
         isPartOf: { "@id": absoluteUrl("/#website") },
         breadcrumb: { "@id": `${tripUrl}#breadcrumb` },
         mainEntity: { "@id": tripSchema["@id"] },
+        inLanguage: isEn ? "en-GB" : "pl-PL",
       },
       tripSchema,
       productSchema,
       offerSchema,
       breadcrumbSchema([
-        { name: "Strona główna", path: "/" },
-        { name: "Wyjazdy", path: "/wyjazdy" },
-        { name: `${homeTeam} - ${awayTeam}`, path: `/wyjazdy/${trip.slug}` },
+        { name: t("Strona główna", "Home"), path: routeFor(locale, "/") },
+        { name: t("Wyjazdy", "Trips"), path: routeFor(locale, "/wyjazdy") },
+        { name: `${homeTeam} - ${awayTeam}`, path: tripPath },
       ]),
     ],
   }
 const defaultPlan = [
   selectedHasFlight
-    ? "Wylot z wybranego lotniska i przejazd do miasta"
-    : "Dojazd do miasta we własnym zakresie",
+    ? t("Wylot z wybranego lotniska i przejazd do miasta", "Departure from the selected airport and transfer to the city")
+    : t("Dojazd do miasta we własnym zakresie", "Make your own way to the city"),
 
   ...(selectedHasHotel
-    ? ["Zakwaterowanie w hotelu i czas wolny"]
+    ? [t("Zakwaterowanie w hotelu i czas wolny", "Hotel check-in and free time")]
     : []),
 
-  "Dzień meczowy i wejście na stadion",
-  "Czas na poznanie miasta",
+  t("Dzień meczowy i wejście na stadion", "Match day and stadium entry"),
+  t("Czas na poznanie miasta", "Time to explore the city"),
 
   selectedHasFlight
-    ? "Lot powrotny do Polski"
-    : "Powrót we własnym zakresie",
+    ? t("Lot powrotny do Polski", "Return flight")
+    : t("Powrót we własnym zakresie", "Make your own return arrangements"),
 ]
 
   return (
@@ -303,7 +316,7 @@ const defaultPlan = [
     <section className="relative isolate overflow-hidden bg-foreground pt-20 text-white">
   <Image
     src={trip.image}
-    alt={`Stadion ${trip.stadium || trip.city}`}
+    alt={t(`Stadion ${trip.stadium || trip.city}`, `Stadium ${trip.stadium || trip.city}`)}
     fill
     preload
     className="object-cover object-[center_35%] brightness-75 md:object-center md:brightness-100"
@@ -363,6 +376,7 @@ const defaultPlan = [
           <TeamLogo
             src={trip.homeLogo}
             name={homeTeam}
+            locale={locale}
           />
 
           <span className="font-mono text-[11px] font-black uppercase tracking-[0.14em] text-white/60 md:text-white/40">
@@ -372,6 +386,7 @@ const defaultPlan = [
           <TeamLogo
             src={trip.awayLogo}
             name={awayTeam}
+            locale={locale}
           />
         </div>
 
@@ -417,7 +432,7 @@ const defaultPlan = [
 
             <div className="min-w-0">
               <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-white/60">
-                Termin wyjazdu
+                {t("Termin wyjazdu", "Trip dates")}
               </p>
 
               <p className="mt-1 text-sm font-semibold leading-5 text-white">
@@ -434,11 +449,11 @@ const defaultPlan = [
 
             <div className="min-w-0">
               <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-white/60">
-                Stadion
+                {t("Stadion", "Stadium")}
               </p>
 
               <p className="mt-1 text-sm font-semibold leading-5 text-white">
-                {trip.stadium || `Stadion w ${trip.city}`}
+                {trip.stadium || t(`Stadion w ${trip.city}`, `Stadium in ${trip.city}`)}
               </p>
             </div>
           </div>
@@ -451,14 +466,11 @@ const defaultPlan = [
 
             <div className="min-w-0">
               <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-white/60">
-                Pobyt
+                {t("Pobyt", "Stay")}
               </p>
 
               <p className="mt-1 text-sm font-semibold leading-5 text-white">
-                {formatStay(
-                  computedDays,
-                  computedNights
-                )}
+                {pluralizeDuration(computedDays, computedNights, locale)}
               </p>
             </div>
           </div>
@@ -474,7 +486,7 @@ const defaultPlan = [
 
             <div>
               <p className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white/40">
-                Termin wyjazdu
+                 {t("Termin wyjazdu", "Trip dates")}
               </p>
 
               <p className="mt-0.5 text-base font-semibold text-white/90">
@@ -493,11 +505,11 @@ const defaultPlan = [
 
             <div>
               <p className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white/40">
-                Stadion
+                 {t("Stadion", "Stadium")}
               </p>
 
               <p className="mt-0.5 text-base font-semibold text-white/90">
-                {trip.stadium || `Stadion w ${trip.city}`}
+                 {trip.stadium || t(`Stadion w ${trip.city}`, `Stadium in ${trip.city}`)}
               </p>
             </div>
           </div>
@@ -512,14 +524,11 @@ const defaultPlan = [
 
             <div>
               <p className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white/40">
-                Pobyt
+                 {t("Pobyt", "Stay")}
               </p>
 
               <p className="mt-0.5 text-base font-semibold text-white/90">
-                {formatStay(
-                  computedDays,
-                  computedNights
-                )}
+                 {pluralizeDuration(computedDays, computedNights, locale)}
               </p>
             </div>
           </div>
@@ -534,32 +543,34 @@ const defaultPlan = [
           <div className="relative">
             <p className="font-mono text-[10px] font-black uppercase tracking-[0.17em] text-white/80">
               {fullPackageSelected
-                ? "Cena od / osoba"
-                : "Cena wybranego wariantu"}
+                ? t("Cena od / osoba", "Price from / person")
+                : t("Cena wybranego wariantu", "Selected package price")}
             </p>
 
             {fullPackageSelected ? (
   <div className="mt-2 flex items-end gap-1.5">
     <p className="font-sans text-4xl font-black leading-none tracking-[-0.04em] text-primary md:text-5xl">
-      {trip.price.toLocaleString("pl-PL")}
+      {formatPrice(trip.price, locale)}
     </p>
 
     <span className="pb-0.5 font-sans text-lg font-black text-primary md:text-2xl">
-      zł
+      {t("zł", "PLN")}
     </span>
   </div>
 ) : (
   <p className="mt-3 font-sans text-xl font-black uppercase leading-[0.95] tracking-tight text-primary md:text-3xl">
-    Ustalana
+    {t("Ustalana", "Quoted")}
     <br />
-    indywidualnie
+    {t("indywidualnie", "individually")}
   </p>
 )}
 
             {partialPackageSelected && (
               <p className="mt-3 text-[11px] leading-5 text-white/50 md:mt-4 md:text-xs">
-                Cena zależy od wybranego zakresu i zazwyczaj
-                jest niższa niż cena pełnego pakietu.
+                {t(
+                  "Cena zależy od wybranego zakresu i zazwyczaj jest niższa niż cena pełnego pakietu.",
+                  "The price depends on the selected services and is usually lower than the full package price."
+                )}
               </p>
             )}
 
@@ -570,7 +581,7 @@ const defaultPlan = [
                   size="lg"
                   className="h-11 w-full rounded-xl md:h-12"
                 >
-                  Wyprzedane
+                  {t("Wyprzedane", "Sold out")}
                 </Button>
               ) : (
                 <Button
@@ -584,7 +595,7 @@ const defaultPlan = [
   }
   className="h-11 w-full rounded-xl font-semibold md:h-12"
 >
-  Rezerwuj miejsce
+  {t("Rezerwuj miejsce", "Book your place")}
   <ArrowRight data-icon="inline-end" />
 </Button>
               )}
@@ -603,13 +614,13 @@ const defaultPlan = [
                 className="h-11 w-full rounded-xl border-white/20 bg-white/5 font-semibold text-white hover:border-white/30 hover:bg-white/10 hover:text-white md:h-12"
               >
                 <MessageCircle data-icon="inline-start" />
-                Napisz na WhatsApp
+                {t("Napisz na WhatsApp", "Message us on WhatsApp")}
               </Button>
             </div>
 
             {!soldOut && (
               <p className="mt-3 text-center text-[11px] leading-4 text-white/45 md:mt-4 md:text-xs">
-                Wyślij zapytanie - skontaktujemy się z Tobą
+                {t("Wyślij zapytanie - skontaktujemy się z Tobą", "Send an enquiry - we will get back to you")}
               </p>
             )}
           </div>
@@ -621,7 +632,7 @@ const defaultPlan = [
 
       <section aria-labelledby="wariant-pakietu" className="border-b bg-secondary px-4 py-8 md:px-6 md:py-10">
         <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between"><div><p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-amber-800">Dopasuj ofertę</p><h2 id="wariant-pakietu" className="mt-1 font-sans text-2xl font-black uppercase md:text-3xl">Wybierz wariant pakietu</h2></div><p className="max-w-xl text-sm leading-6 text-muted-foreground">Niepełne pakiety wyceniamy indywidualnie według Twoich potrzeb.</p></div>
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between"><div><p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-amber-800">{t("Dopasuj ofertę", "Tailor your trip")}</p><h2 id="wariant-pakietu" className="mt-1 font-sans text-2xl font-black uppercase md:text-3xl">{t("Wybierz wariant pakietu", "Choose your package")}</h2></div><p className="max-w-xl text-sm leading-6 text-muted-foreground">{t("Niepełne pakiety wyceniamy indywidualnie według Twoich potrzeb.", "Partial packages are quoted individually to match your needs.")}</p></div>
          <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
   {orderedPackageVariants.map((variant) => {
     const VariantIcon =
@@ -664,8 +675,8 @@ const defaultPlan = [
 
           <span className="mt-1 block text-xs">
             {variant.key === "full"
-              ? `od ${trip.price.toLocaleString("pl-PL")} zł`
-              : "Wycena indywidualna"}
+              ? `${t("od", "from")} ${formatPrice(trip.price, locale)} ${t("zł", "PLN")}`
+              : t("Wycena indywidualna", "Individual quote")}
           </span>
         </span>
       </Link>
@@ -679,6 +690,7 @@ const defaultPlan = [
       <section className="px-4 py-10 md:px-6 md:py-14">
         <div className="mx-auto max-w-7xl">
           <TripDetailsTabs
+            locale={locale}
             descriptionHtml={sanitizeDescriptionHtml(trip.description)}
             includedItems={includedItems}
             optionalItems={optionalFeatures.map(({ key, label }) => ({ key, label }))}
@@ -688,13 +700,13 @@ const defaultPlan = [
             itinerary={trip.itinerary.length > 0 ? trip.itinerary : defaultPlan}
             hotel={selectedHasHotel ? {
               stars: trip.hotelStars,
-              info: trip.hotelInfo || "Dokładny obiekt potwierdzimy przed rezerwacją.",
+              info: trip.hotelInfo || t("Dokładny obiekt potwierdzimy przed rezerwacją.", "We will confirm the exact hotel before booking."),
               board: trip.hotelBoard,
               roomType: trip.roomType,
               optional: packageOptions.hotel === "optional",
             } : undefined}
             flight={selectedHasFlight ? {
-              info: trip.flightInfo || "Godziny i połączenie potwierdzamy po ustaleniu wariantu.",
+              info: trip.flightInfo || t("Godziny i połączenie potwierdzamy po ustaleniu wariantu.", "We will confirm the flight times and route once your package is agreed."),
               airports: trip.departureAirports,
               type: trip.flightType,
               baggage: trip.baggageInfo,
@@ -746,26 +758,27 @@ const defaultPlan = [
               soldOut ? "text-red-400" : "text-primary"
             }`}
           >
-            {soldOut ? "Brak miejsc" : "Rezerwacja"}
+            {soldOut ? t("Brak miejsc", "No places available") : t("Rezerwacja", "Booking")}
           </p>
         </div>
 
         <h2 className="mt-4 max-w-lg font-sans text-4xl font-black uppercase leading-none md:text-5xl">
           {soldOut
-            ? "Ten wyjazd jest już wyprzedany"
-            : "Zarezerwuj miejsce"}
+            ? t("Ten wyjazd jest już wyprzedany", "This trip is sold out")
+            : t("Zarezerwuj miejsce", "Book your place")}
         </h2>
 
         <p className="mt-4 max-w-lg text-sm leading-6 text-background/60">
           {soldOut
-            ? "Na ten wyjazd nie przyjmujemy już rezerwacji. Wybierz inny dostępny mecz lub opisz wydarzenie, które mamy dla Ciebie wycenić."
-            : "Wyślij zapytanie. Sprawdzimy aktualną dostępność i przygotujemy konkretny wariant wyjazdu."}
+            ? t("Na ten wyjazd nie przyjmujemy już rezerwacji. Wybierz inny dostępny mecz lub opisz wydarzenie, które mamy dla Ciebie wycenić.", "We are no longer taking bookings for this trip. Choose another available match or tell us which event you would like us to quote.")
+            : t("Wyślij zapytanie. Sprawdzimy aktualną dostępność i przygotujemy konkretny wariant wyjazdu.", "Send an enquiry. We will check current availability and prepare a suitable trip option for you.")}
         </p>
 
         <div className="mt-7 flex items-center gap-3 opacity-90">
           <TeamLogo
             src={trip.homeLogo}
             name={homeTeam}
+            locale={locale}
           />
 
           <span className="font-sans text-lg font-black text-background/60">
@@ -775,6 +788,7 @@ const defaultPlan = [
           <TeamLogo
             src={trip.awayLogo}
             name={awayTeam}
+            locale={locale}
           />
         </div>
 
@@ -785,32 +799,34 @@ const defaultPlan = [
 <div className="relative mt-8">
             <p className="font-mono text-[10px] font-black uppercase tracking-[0.17em] text-white/80">
               {fullPackageSelected
-                ? "Cena od / osoba"
-                : "Cena wybranego wariantu"}
+                ? t("Cena od / osoba", "Price from / person")
+                : t("Cena wybranego wariantu", "Selected package price")}
             </p>
 
             {fullPackageSelected ? (
   <div className="mt-2 flex items-end gap-1.5">
     <p className="font-sans text-4xl font-black leading-none tracking-[-0.04em] text-primary md:text-5xl">
-      {trip.price.toLocaleString("pl-PL")}
+      {formatPrice(trip.price, locale)}
     </p>
 
     <span className="pb-0.5 font-sans text-lg font-black text-primary md:text-2xl">
-      zł
+      {t("zł", "PLN")}
     </span>
   </div>
 ) : (
   <p className="mt-3 font-sans text-xl font-black uppercase leading-[0.95] tracking-tight text-primary md:text-3xl">
-    Ustalana
+    {t("Ustalana", "Quoted")}
     <br />
-    indywidualnie
+    {t("indywidualnie", "individually")}
   </p>
 )}
 
             {partialPackageSelected && (
               <p className="mt-3 text-[11px] leading-5 text-white/50 md:mt-4 md:text-xs">
-                Cena zależy od wybranego zakresu i zazwyczaj
-                jest niższa niż cena pełnego pakietu.
+                {t(
+                  "Cena zależy od wybranego zakresu i zazwyczaj jest niższa niż cena pełnego pakietu.",
+                  "The price depends on the selected services and is usually lower than the full package price."
+                )}
               </p>
             )}
 
@@ -821,7 +837,7 @@ const defaultPlan = [
                   size="lg"
                   className="h-11 w-full rounded-xl md:h-12"
                 >
-                  Wyprzedane
+                  {t("Wyprzedane", "Sold out")}
                 </Button>
               ) : (
                 <Button
@@ -835,7 +851,7 @@ const defaultPlan = [
   }
   className="h-11 w-full rounded-xl font-semibold md:h-12"
 >
-  Rezerwuj miejsce
+  {t("Rezerwuj miejsce", "Book your place")}
   <ArrowRight data-icon="inline-end" />
 </Button>
               )}
@@ -854,13 +870,13 @@ const defaultPlan = [
                 className="h-11 w-full rounded-xl border-white/20 bg-white/5 font-semibold text-white hover:border-white/30 hover:bg-white/10 hover:text-white md:h-12"
               >
                 <MessageCircle data-icon="inline-start" />
-                Napisz na WhatsApp
+                {t("Napisz na WhatsApp", "Message us on WhatsApp")}
               </Button>
             </div>
 
             {!soldOut && (
               <p className="mt-3 text-center text-[11px] leading-4 text-white/45 md:mt-4 md:text-xs">
-                Wyślij zapytanie - skontaktujemy się z Tobą
+                {t("Wyślij zapytanie - skontaktujemy się z Tobą", "Send an enquiry - we will get back to you")}
               </p>
             )}
           </div>
@@ -868,14 +884,14 @@ const defaultPlan = [
     </div>
 
           <div className="py-10 md:py-14 lg:pl-12">
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">Formularz zapytania</p>
+            <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">{t("Formularz zapytania", "Enquiry form")}</p>
             <h3 className="mt-2 font-sans text-3xl font-black uppercase">
-              {soldOut ? "Wybierz inny mecz" : "Podaj swoje dane"}
+              {soldOut ? t("Wybierz inny mecz", "Choose another match") : t("Podaj swoje dane", "Tell us about yourself")}
             </h3>
             <p className="mb-7 mt-2 text-sm text-background/55">
               {soldOut
-                ? "Pokażemy dostępne wyjazdy, a jeśli nie ma Twojego meczu, przygotujemy ofertę indywidualną."
-                : "Oddzwonimy lub odpiszemy z potwierdzeniem dostępności."}
+                ? t("Pokażemy dostępne wyjazdy, a jeśli nie ma Twojego meczu, przygotujemy ofertę indywidualną.", "We will show you the available trips. If your match is not listed, we can prepare a custom offer.")
+                : t("Oddzwonimy lub odpiszemy z potwierdzeniem dostępności.", "We will call or email you to confirm availability.")}
             </p>
            {soldOut ? (
   <InquiryForm

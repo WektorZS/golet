@@ -1,4 +1,9 @@
+"use client"
+
 import Image from "next/image"
+import { usePathname } from "next/navigation"
+
+import { localeFromPathname } from "@/lib/i18n"
 
 export const socialProfiles = [
   { name: "Facebook", href: "https://facebook.com/profile.php?id=61573517165441", icon: "/icons/social/facebook.svg" },
@@ -14,6 +19,8 @@ export function SocialLinks({
   showLabels?: boolean
   variant?: "dark" | "light"
 }) {
+  const locale = localeFromPathname(usePathname())
+  const isEn = locale === "en"
   const linkClassName =
     variant === "light"
       ? "border-border bg-background text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground"
@@ -22,7 +29,7 @@ export function SocialLinks({
   return (
     <div
       className="flex flex-wrap items-center gap-3"
-      aria-label="Let’s Gol w mediach społecznościowych"
+      aria-label={isEn ? "Let's Gol on social media" : "Let’s Gol w mediach społecznościowych"}
     >
       {socialProfiles.map(({ name, href, icon }) => {
         const currentIcon =
@@ -37,7 +44,7 @@ export function SocialLinks({
             target="_blank"
             rel="noopener noreferrer"
             className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-semibold transition-colors ${linkClassName}`}
-            aria-label={`${name} - profil Let’s Gol (otwiera się w nowej karcie)`}
+            aria-label={isEn ? `${name} - Let's Gol profile (opens in a new tab)` : `${name} - profil Let’s Gol (otwiera się w nowej karcie)`}
           >
             <Image
               src={currentIcon}

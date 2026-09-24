@@ -17,26 +17,24 @@ import {
   getSiteContent,
   type SiteContent,
 } from "@/lib/content"
-import { faqCategories } from "@/lib/faq"
-import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
+import { getFaqCategories } from "@/lib/faq"
+import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
+import { getRequestLocale } from "@/lib/i18n-request"
+import { routeFor } from "@/lib/i18n"
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: "FAQ o wyjazdach na mecze",
-  description:
-    "Odpowiedzi na najczęstsze pytania o rezerwację, pakiety, bilety, transport, noclegi, dokumenty i organizację wyjazdów na mecze.",
-  alternates: {
-    canonical: "/faq",
-  },
-  ...socialMetadata(
-    "FAQ o wyjazdach na mecze | Let's Gol",
-    "Sprawdź najważniejsze informacje o rezerwacji, pakietach, biletach, transporcie i organizacji wyjazdów na mecze.",
-    "/faq"
-  ),
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale()
+  const title = locale === "en" ? "Football trip FAQ" : "FAQ o wyjazdach na mecze"
+  const description = locale === "en" ? "Answers about booking, packages, tickets, transport, accommodation and how Let's Gol football trips work." : "Odpowiedzi na najczęstsze pytania o rezerwację, pakiety, bilety, transport, noclegi, dokumenty i organizację wyjazdów na mecze."
+  return { title, description, alternates: localizedAlternates("/faq", locale), ...socialMetadata(title, description, routeFor(locale, "/faq"), locale) }
 }
 
 export default async function FaqPage() {
+  const locale = await getRequestLocale()
+  const isEn = locale === "en"
+  const faqCategories = getFaqCategories(locale)
   const content: SiteContent = process.env.DATABASE_URL
     ? await getSiteContent().catch(
         () => ({} as SiteContent)
@@ -65,12 +63,12 @@ export default async function FaqPage() {
           "@graph": [
             breadcrumbSchema([
               {
-                name: "Strona główna",
-                path: "/",
+                name: isEn ? "Home" : "Strona główna",
+                path: routeFor(locale, "/"),
               },
               {
                 name: "FAQ",
-                path: "/faq",
+                path: routeFor(locale, "/faq"),
               },
             ]),
             {
@@ -109,14 +107,11 @@ export default async function FaqPage() {
             </p>
 
             <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
-              Wszystko, co warto wiedzieć przed wyjazdem
+              {isEn ? "Everything worth knowing before you travel" : "Wszystko, co warto wiedzieć przed wyjazdem"}
             </h1>
 
             <p className="mt-6 max-w-2xl text-lg leading-8 text-background/70">
-              Rezerwacja, pakiety, bilety, transport,
-              noclegi i organizacja wyjazdu. Zebraliśmy
-              odpowiedzi na pytania, które najczęściej
-              pojawiają się przed podróżą.
+              {isEn ? "Booking, packages, tickets, transport, accommodation and trip planning. Here are clear answers to the questions travellers ask most often." : "Rezerwacja, pakiety, bilety, transport, noclegi i organizacja wyjazdu. Zebraliśmy odpowiedzi na pytania, które najczęściej pojawiają się przed podróżą."}
             </p>
           </div>
 
@@ -127,12 +122,11 @@ export default async function FaqPage() {
             />
 
             <p className="mt-4 font-sans text-2xl font-black uppercase">
-              {allFaqs.length} pytań i odpowiedzi
+              {allFaqs.length} {isEn ? "questions and answers" : "pytań i odpowiedzi"}
             </p>
 
             <p className="mt-2 text-sm leading-6 text-background/60">
-              Od pierwszego zapytania i wyboru pakietu
-              aż po podróż i dzień meczu.
+              {isEn ? "From your first enquiry and package choice to the journey and match day." : "Od pierwszego zapytania i wyboru pakietu aż po podróż i dzień meczu."}
             </p>
           </div>
         </div>
@@ -141,7 +135,7 @@ export default async function FaqPage() {
       <section className="border-b border-foreground/10 bg-secondary/60">
         <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
           <p className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
-            Najczęściej sprawdzane
+            {isEn ? "Most viewed" : "Najczęściej sprawdzane"}
           </p>
 
           <div className="mt-4 flex gap-2 overflow-x-auto pb-2 lg:flex-wrap lg:overflow-visible">
@@ -169,13 +163,12 @@ export default async function FaqPage() {
         <div className="mx-auto mt-16 w-full max-w-7xl md:mt-20">
           <div className="border-t border-foreground/10 pt-8">
             <p className="mx-auto max-w-3xl text-center text-sm leading-6 text-muted-foreground">
-              Szczegółowe zasady dotyczące konkretnej rezerwacji
-              znajdziesz w ofercie, umowie oraz{" "}
+              {isEn ? "The detailed rules for your booking are set out in the offer, contract and " : "Szczegółowe zasady dotyczące konkretnej rezerwacji znajdziesz w ofercie, umowie oraz "}
               <Link
-                href="/warunki-uczestnictwa"
+                href={routeFor(locale, "/warunki-uczestnictwa")}
                 className="font-semibold text-foreground underline decoration-primary underline-offset-4 transition-colors hover:text-primary"
               >
-                warunkach uczestnictwa
+                {isEn ? "terms and conditions" : "warunkach uczestnictwa"}
               </Link>
               .
             </p>
@@ -192,13 +185,11 @@ export default async function FaqPage() {
             />
 
             <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-[0.97] tracking-tight md:text-5xl">
-              Nie znalazłeś odpowiedzi?
+              {isEn ? "Still have a question?" : "Nie znalazłeś odpowiedzi?"}
             </h2>
 
             <p className="mt-4 max-w-xl leading-7 text-background/65">
-              Napisz do nas i opisz, czego dotyczy
-              pytanie. Sprawdzimy konkretną sytuację
-              i odpowiemy.
+              {isEn ? "Tell us what you need to know. We will check the details of your situation and reply." : "Napisz do nas i opisz, czego dotyczy pytanie. Sprawdzimy konkretną sytuację i odpowiemy."}
             </p>
           </div>
 
@@ -214,7 +205,7 @@ export default async function FaqPage() {
             }
           >
             <span className="inline-flex items-center gap-2">
-              Napisz do nas
+              {isEn ? "Contact us" : "Napisz do nas"}
               <ArrowRight className="size-4 shrink-0" />
             </span>
           </Button>

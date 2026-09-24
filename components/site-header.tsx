@@ -9,20 +9,15 @@ import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { SocialLinks } from "@/components/social-links"
+import { LanguageSwitcher } from "@/components/language-switcher"
+import { getDictionary } from "@/lib/dictionaries"
+import { localeFromPathname, routeFor, type Locale } from "@/lib/i18n"
 
-const links = [
-  ["WYJAZDY", "/wyjazdy"],
-  ["TWÓJ WYJAZD", "/#twoj-wyjazd"],
-  ["GALERIA", "/galeria"],
-  ["O NAS", "/o-nas"],
-  ["FAQ", "/faq"],
-  ["KONTAKT", "/kontakt"],
-] as const
-
-export function Brand({ priority = false }: { priority?: boolean }) {
+export function Brand({ priority = false, locale = "pl" }: { priority?: boolean; locale?: Locale }) {
+  const dictionary = getDictionary(locale)
   return (
     <Link
-      href="/"
+      href={routeFor(locale, "/")}
       className="flex items-center gap-3 text-background"
     >
       <span className="flex size-16 shrink-0 items-center justify-center">
@@ -40,7 +35,7 @@ export function Brand({ priority = false }: { priority?: boolean }) {
         <span className="text-xl">Let&apos;s Gol</span>
 
         <span className="font-mono text-[10px] font-semibold tracking-[0.16em] text-primary">
-          Wyjazdy na mecze
+          {dictionary.brandTagline}
         </span>
       </span>
     </Link>
@@ -49,6 +44,16 @@ export function Brand({ priority = false }: { priority?: boolean }) {
 
 export function SiteHeader() {
   const pathname = usePathname()
+  const locale = localeFromPathname(pathname)
+  const dictionary = getDictionary(locale)
+  const links = [
+    [dictionary.navigation.trips, routeFor(locale, "/wyjazdy")],
+    [dictionary.navigation.customTrip, routeFor(locale, "/wycena-indywidualna")],
+    [dictionary.navigation.gallery, routeFor(locale, "/galeria")],
+    [dictionary.navigation.about, routeFor(locale, "/o-nas")],
+    [dictionary.navigation.faq, routeFor(locale, "/faq")],
+    [dictionary.navigation.contact, routeFor(locale, "/kontakt")],
+  ] as const
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -84,11 +89,11 @@ export function SiteHeader() {
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 md:px-6">
         {/* LOGO */}
-        <Brand priority />
+        <Brand priority locale={locale} />
 
         <nav
           className="hidden items-center justify-center gap-7 lg:flex"
-          aria-label="Główna nawigacja"
+          aria-label={dictionary.navigation.label}
         >
           {links.map(([label, href]) => {
             const route = href.split("#")[0] || "/"
@@ -112,6 +117,8 @@ export function SiteHeader() {
         </nav>
 
         {/* DESKTOP CTA */}
+        <div className="hidden items-center gap-3 lg:flex">
+          <LanguageSwitcher compact />
         <Button
           type="button"
           onClick={() => {
@@ -119,19 +126,20 @@ export function SiteHeader() {
               new Event("open-floating-contact")
             )
           }}
-          className="group hidden h-11 items-center gap-3 rounded-lg border border-primary/60 bg-primary/10 px-5 font-mono text-[11px] font-bold uppercase tracking-wider text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-black lg:inline-flex"
+          className="group h-11 items-center gap-3 rounded-lg border border-primary/60 bg-primary/10 px-5 font-mono text-[11px] font-bold uppercase tracking-wider text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-black"
         >
-          <span>Zapytaj o wyjazd</span>
+          <span>{dictionary.navigation.ask}</span>
 
           <Plane className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
         </Button>
+        </div>
 
         {/* MOBILE MENU BUTTON */}
         <Button
           variant="outline"
           size="icon-lg"
           className="border-background/30 bg-transparent text-background lg:hidden"
-          aria-label={open ? "Zamknij menu" : "Otwórz menu"}
+          aria-label={open ? dictionary.navigation.close : dictionary.navigation.open}
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
         >
@@ -142,7 +150,7 @@ export function SiteHeader() {
       {open ? (
         <nav
           className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 lg:hidden"
-          aria-label="Menu mobilne"
+          aria-label={dictionary.navigation.mobileLabel}
         >
         {links.map(([label, href]) => {
   const route = href.split("#")[0] || "/"
@@ -184,16 +192,19 @@ export function SiteHeader() {
               )
             }}
           >
-            Zapytaj o wyjazd
+            {dictionary.navigation.ask}
             <Plane data-icon="inline-end" />
           </Button>
 
           <div className="mt-auto border-t border-background/15 pt-5">
             <p className="mb-3 font-mono text-xs font-bold uppercase tracking-widest text-primary">
-              Obserwuj nas
+              {dictionary.navigation.follow}
             </p>
 
             <SocialLinks showLabels />
+            <div className="mt-4 text-background">
+              <LanguageSwitcher />
+            </div>
           </div>
         </nav>
       ) : null}

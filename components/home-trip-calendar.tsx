@@ -12,30 +12,27 @@ import {
 } from "lucide-react"
 
 import { TripCard } from "@/components/trip-card"
+import { localeTags, type Locale } from "@/lib/i18n"
 import type { Trip } from "@/lib/trips"
 
 const DESKTOP_MONTHS_VISIBLE = 6
-
-const monthFormatter = new Intl.DateTimeFormat("pl-PL", {
-  month: "short",
-  year: "numeric",
-})
 
 function monthKey(date: string) {
   return date.slice(0, 7)
 }
 
 
-function monthLabel(key: string) {
+function monthLabel(key: string, locale: Locale) {
   const [year, month] = key.split("-").map(Number)
 
-  return monthFormatter
+  return new Intl.DateTimeFormat(localeTags[locale], { month: "short", year: "numeric" })
     .format(new Date(year, month - 1, 1))
     .replace(".", "")
     .toUpperCase()
 }
 
-function tripsCount(count: number) {
+function tripsCount(count: number, locale: Locale) {
+  if (locale === "en") return `${count} ${count === 1 ? "trip" : "trips"}`
   if (count === 1) {
     return "1 wyjazd"
   }
@@ -49,8 +46,10 @@ function tripsCount(count: number) {
 
 export function HomeTripCalendar({
   trips,
+  locale = "pl",
 }: {
   trips: Trip[]
+  locale?: Locale
 }) {
   const months = useMemo(
     () =>
@@ -162,7 +161,7 @@ const calendarAnchorRef =
   if (trips.length === 0) {
     return (
       <div className="mt-10 border-y py-12 text-center text-muted-foreground">
-        Nowe terminy pojawią się wkrótce.
+        {locale === "en" ? "New dates will be announced soon." : "Nowe terminy pojawią się wkrótce."}
       </div>
     )
   }
@@ -179,7 +178,7 @@ const calendarAnchorRef =
 <div className="sticky top-20 z-40 -mx-4 border-y border-foreground/10 bg-section-light/95 backdrop-blur-md md:mx-0">
         <div
           role="tablist"
-          aria-label="Miesiąc wyjazdu"
+          aria-label={locale === "en" ? "Trip month" : "Miesiąc wyjazdu"}
           className="hidden items-stretch justify-start gap-2 overflow-x-auto px-3 py-3 md:flex xl:justify-center"
         >
           {months.length >
@@ -193,7 +192,7 @@ const calendarAnchorRef =
                 )
               }
               disabled={!canGoPrevious}
-              aria-label="Poprzednie miesiące"
+              aria-label={locale === "en" ? "Previous months" : "Poprzednie miesiące"}
               className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-25"
             >
               <ChevronLeft
@@ -228,11 +227,11 @@ const calendarAnchorRef =
                     }`}
                   >
                     <span className="block truncate font-sans text-sm font-black uppercase tracking-wide">
-                      {monthLabel(month)}
+                      {monthLabel(month, locale)}
                     </span>
 
                     <span className="mt-1 block font-mono text-[11px] font-bold normal-case tracking-normal opacity-65">
-                      {tripsCount(count)}
+                      {tripsCount(count, locale)}
                     </span>
                   </button>
                 )
@@ -255,7 +254,7 @@ const calendarAnchorRef =
                 )
               }
               disabled={!canGoNext}
-              aria-label="Następne miesiące"
+              aria-label={locale === "en" ? "Next months" : "Następne miesiące"}
               className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-background text-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-25"
             >
               <ChevronRight
@@ -280,19 +279,20 @@ const calendarAnchorRef =
           >
             <div className="min-w-0">
               <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-muted-foreground">
-                Wybierz miesiąc
+                {locale === "en" ? "Choose a month" : "Wybierz miesiąc"}
               </p>
 
               <div className="mt-1 flex items-center gap-2">
                 <span className="truncate font-sans text-lg font-black uppercase leading-none text-foreground">
-                  {monthLabel(selectedMonth)}
+                  {monthLabel(selectedMonth, locale)}
                 </span>
 
                 <span className="font-mono text-[10px] text-muted-foreground">
                   {tripsCount(
                     monthCounts.get(
                       selectedMonth
-                    ) ?? 0
+                    ) ?? 0,
+                    locale
                   )}
                 </span>
               </div>
@@ -338,7 +338,7 @@ const calendarAnchorRef =
                       }`}
                     >
                       <span className="font-sans text-sm font-black uppercase leading-tight">
-                        {monthLabel(month)}
+                        {monthLabel(month, locale)}
                       </span>
 
                       <span
@@ -348,7 +348,7 @@ const calendarAnchorRef =
                             : "text-muted-foreground"
                         }`}
                       >
-                        {tripsCount(count)}
+                        {tripsCount(count, locale)}
                       </span>
                     </button>
                   )
@@ -367,6 +367,7 @@ const calendarAnchorRef =
           <TripCard
             key={trip.id}
             trip={trip}
+            locale={locale}
           />
         ))}
       </div>

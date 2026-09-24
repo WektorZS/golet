@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
+import { usePathname } from "next/navigation"
 import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react"
+import { localeFromPathname } from "@/lib/i18n"
 
 
 import {
@@ -35,6 +37,7 @@ export function ImageLightbox({
   children?: React.ReactNode
   priority?: boolean
 }) {
+  const isEn = localeFromPathname(usePathname()) === "en"
   const gallery =
     images && images.length > 0
       ? images
@@ -126,7 +129,7 @@ useEffect(() => {
           <button
             type="button"
             className="group relative block size-full cursor-zoom-in overflow-hidden text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            aria-label={`Powiększ zdjęcie: ${alt}`}
+            aria-label={isEn ? `Enlarge photo: ${alt}` : `Powiększ zdjęcie: ${alt}`}
           />
         }
       >
@@ -152,12 +155,11 @@ useEffect(() => {
         showCloseButton
       >
         <DialogTitle className="sr-only">
-          Podgląd zdjęcia
+          {isEn ? "Photo preview" : "Podgląd zdjęcia"}
         </DialogTitle>
 
         <DialogDescription className="sr-only">
-          Powiększone zdjęcie. Użyj strzałek, aby przechodzić między
-          zdjęciami lub przesuń zdjęcie palcem.
+          {isEn ? "Expanded photo. Use the arrows or swipe to move between photos." : "Powiększone zdjęcie. Użyj strzałek, aby przechodzić między zdjęciami lub przesuń zdjęcie palcem."}
         </DialogDescription>
 
         <div
@@ -186,7 +188,7 @@ useEffect(() => {
     previousImage()
   }}
   className="absolute left-2 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg transition-opacity hover:bg-background sm:left-3"
-  aria-label="Poprzednie zdjęcie"
+  aria-label={isEn ? "Previous photo" : "Poprzednie zdjęcie"}
 >
   <ChevronLeft className="size-5" />
 </button>
@@ -199,7 +201,7 @@ useEffect(() => {
     nextImage()
   }}
   className="absolute right-2 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg transition-opacity hover:bg-background sm:right-3"
-  aria-label="Następne zdjęcie"
+  aria-label={isEn ? "Next photo" : "Następne zdjęcie"}
 >
   <ChevronRight className="size-5" />
 </button>

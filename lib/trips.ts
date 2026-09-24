@@ -1,11 +1,47 @@
-import { and, asc, desc, eq, gte } from "drizzle-orm"
+import { and, asc, desc, eq, gte, inArray } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 
-import { teamGalleryItems, tripGalleryItems, trips } from "@/lib/db/schema"
+import { teamGalleryItems, teams, tripGalleryItems, trips } from "@/lib/db/schema"
 import { ensureTripColumns } from "@/lib/db/ensure-trip-columns"
+import { type Locale } from "@/lib/i18n"
+import { localizeTrip } from "@/lib/i18n-content"
 
 export type Trip = typeof trips.$inferSelect
+
+async function resolveTripImages(rows: Trip[], locale: Locale) {
+  const teamIds = [...new Set(rows.flatMap((trip) => [trip.homeTeamId, trip.awayTeamId]).filter((id): id is number => Boolean(id)))]
+  const teamRows = teamIds.length
+    ? await db.select({
+        id: teams.id,
+        tripImageMediaId: teams.tripImageMediaId,
+        nameEn: teams.nameEn,
+        cityEn: teams.cityEn,
+        countryEn: teams.countryEn,
+        stadiumEn: teams.stadiumEn,
+      }).from(teams).where(inArray(teams.id, teamIds))
+    : []
+  const teamById = new Map(teamRows.map((team) => [team.id, team]))
+
+  return rows.map((trip) => {
+    const homeTeam = trip.homeTeamId ? teamById.get(trip.homeTeamId) : undefined
+    const awayTeam = trip.awayTeamId ? teamById.get(trip.awayTeamId) : undefined
+    const inheritedMediaId = homeTeam?.tripImageMediaId
+    const mediaId = trip.coverMediaId || inheritedMediaId
+    const imageResolved = mediaId ? { ...trip, image: `/api/media/${mediaId}` } : trip
+
+    if (locale === "pl") return imageResolved
+
+    return {
+      ...imageResolved,
+      homeTeam: homeTeam?.nameEn || trip.homeTeam,
+      awayTeam: awayTeam?.nameEn || trip.awayTeam,
+      cityEn: trip.cityEn || homeTeam?.cityEn || "",
+      countryEn: trip.countryEn || homeTeam?.countryEn || "",
+      stadium: homeTeam?.stadiumEn || trip.stadium,
+    }
+  })
+}
 
 function getTodayPoland() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -16,11 +52,11 @@ function getTodayPoland() {
   }).format(new Date())
 }
 
-export async function getPublishedTrips() {
+export async function getPublishedTrips(locale: Locale = "pl") {
   await ensureTripColumns()
   const today = getTodayPoland()
 
-  return db
+  const rows = await db
     .select()
     .from(trips)
     .where(
@@ -34,9 +70,11 @@ export async function getPublishedTrips() {
       asc(trips.sortOrder),
       asc(trips.startDate)
     )
+
+  return (await resolveTripImages(rows, locale)).map((trip) => localizeTrip(trip, locale))
 }
 
-export async function getTripBySlug(slug: string) {
+export async function getTripBySlug(slug: string, locale: Locale = "pl") {
   await ensureTripColumns()
   const today = getTodayPoland()
 
@@ -52,10 +90,12 @@ export async function getTripBySlug(slug: string) {
     )
     .limit(1)
 
-  return trip ?? null
+  if (!trip) return null
+  const [resolved] = await resolveTripImages([trip], locale)
+  return localizeTrip(resolved, locale)
 }
 
-export async function getTripGallery(tripId: number, homeTeamId?: number | null, awayTeamId?: number | null) {
+export async function getTripGallery(tripId: number, homeTeamId?: number | null, awayTeamId?: number | null, locale: Locale = "pl") {
   await ensureTripColumns()
   const teamIds = [homeTeamId, awayTeamId].filter((id): id is number => Boolean(id))
   const [homeGallery, awayGallery, manualGallery] = await Promise.all([
@@ -71,5 +111,10 @@ export async function getTripGallery(tripId: number, homeTeamId?: number | null,
   const seen = new Set<number>()
   return [...homeGallery, ...awayGallery, ...manualGallery]
     .filter((item) => !seen.has(item.mediaId) && Boolean(seen.add(item.mediaId)))
-    .map((item, index) => ({ ...item, id: `${"teamId" in item ? "team" : "trip"}-${item.id}-${index}` }))
+    .map((item, index) => ({
+      ...item,
+      caption: locale === "en" ? item.captionEn : item.caption,
+      alt: locale === "en" ? item.altEn : item.alt,
+      id: `${"teamId" in item ? "team" : "trip"}-${item.id}-${index}`,
+    }))
 }

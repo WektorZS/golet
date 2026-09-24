@@ -11,6 +11,8 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { getDictionary } from "@/lib/dictionaries"
+import { localeFromPathname, routeFor } from "@/lib/i18n"
 
 import {
   Dialog,
@@ -48,6 +50,8 @@ function WhatsappIcon() {
 
 export function FloatingContact() {
   const pathname = usePathname()
+  const locale = localeFromPathname(pathname)
+  const dictionary = getDictionary(locale)
 
   const [showButton, setShowButton] = useState(false)
   const [buttonReady, setButtonReady] = useState(false)
@@ -210,18 +214,17 @@ useEffect(() => {
         }
       >
         <MessageCircle className="size-5 shrink-0" />
-        Skontaktuj się
+        {dictionary.floating.buttonContact}
       </DialogTrigger>
 
       <DialogContent>
   <DialogHeader>
     <DialogTitle>
-      Jak chcesz się skontaktować?
+       {dictionary.floating.choiceTitle}
     </DialogTitle>
 
     <DialogDescription>
-      Wybierz najwygodniejszą formę kontaktu
-      z zespołem Let&apos;s Gol.
+       {dictionary.floating.choiceDescription}
     </DialogDescription>
   </DialogHeader>
 
@@ -231,7 +234,7 @@ useEffect(() => {
       nativeButton={false}
       render={
         <Link
-          href="/#kontakt"
+          href={`${routeFor(locale, "/")}#kontakt`}
           onClick={() => setOpen(false)}
         />
       }
@@ -239,7 +242,7 @@ useEffect(() => {
       size="lg"
     >
       <MessageCircle className="size-5 shrink-0" />
-      Przejdź do formularza
+       {dictionary.floating.goToForm}
     </Button>
 
     {/* E-MAIL */}
@@ -250,7 +253,7 @@ useEffect(() => {
       size="lg"
     >
       <Mail className="size-5 shrink-0" />
-      Napisz e-mail
+       {dictionary.floating.email}
     </Button>
 
     {/* TELEFON */}
@@ -260,7 +263,7 @@ useEffect(() => {
       size="lg"
     >
       <Phone className="size-5 shrink-0" />
-      Zadzwoń: {PHONE_DISPLAY}
+       {dictionary.floating.call}: {PHONE_DISPLAY}
     </Button>
 
     {/* WHATSAPP */}
@@ -276,7 +279,7 @@ useEffect(() => {
       size="lg"
     >
       <WhatsappIcon />
-      Napisz na WhatsApp
+       {dictionary.footer.whatsapp}
     </Button>
   </div>
 </DialogContent>

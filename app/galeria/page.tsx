@@ -11,22 +11,19 @@ import {
   getPublishedGallery,
   getSiteContent,
 } from "@/lib/content"
-import { breadcrumbSchema, socialMetadata } from "@/lib/seo"
+import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
+import { getRequestLocale } from "@/lib/i18n-request"
+import { localizedSetting } from "@/lib/i18n-content"
+import { routeFor } from "@/lib/i18n"
 
 export const dynamic = "force-dynamic"
 
-export const metadata: Metadata = {
-  title: "Galeria z wyjazdów",
-  description:
-    "Zobacz zdjęcia z piłkarskich wyjazdów organizowanych przez Let's Gol.",
-  alternates: {
-    canonical: "/galeria",
-  },
-  ...socialMetadata(
-    "Galeria z wyjazdów Let’s Gol",
-    "Zobacz stadiony, miasta i emocje z piłkarskich podróży Let’s Gol.",
-    "/galeria"
-  ),
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale()
+  const title = locale === "en" ? "Football trip gallery" : "Galeria z wyjazdów"
+  const description = locale === "en" ? "See stadiums, cities and match-day memories from Let's Gol football trips." : "Zobacz zdjęcia z piłkarskich wyjazdów organizowanych przez Let's Gol."
+  const path = routeFor(locale, "/galeria")
+  return { title, description, alternates: localizedAlternates("/galeria", locale), ...socialMetadata(title, description, path, locale) }
 }
 
 const galleryLayout = [
@@ -41,8 +38,11 @@ const galleryLayout = [
 ] as const
 
 export default async function GalleryPage() {
+  const locale = await getRequestLocale()
+  const isEn = locale === "en"
+  const path = routeFor(locale, "/galeria")
   const [gallery, content] = await Promise.all([
-    getPublishedGallery(),
+    getPublishedGallery(locale),
     getSiteContent(),
   ])
 
@@ -53,7 +53,7 @@ export default async function GalleryPage() {
     alt:
       item.alt ||
       item.title ||
-      "Zdjęcie z wyjazdu Let's Gol",
+      (isEn ? "Photo from a Let's Gol trip" : "Zdjęcie z wyjazdu Let's Gol"),
   }))
 
   return (
@@ -65,20 +65,20 @@ export default async function GalleryPage() {
             "@graph": [
               breadcrumbSchema([
                 {
-                  name: "Strona główna",
-                  path: "/",
+                  name: isEn ? "Home" : "Strona główna",
+                  path: routeFor(locale, "/"),
                 },
                 {
-                  name: "Galeria",
-                  path: "/galeria",
+                  name: isEn ? "Gallery" : "Galeria",
+                  path,
                 },
               ]),
               {
                 "@type": "ImageGallery",
                 name:
-                  content.galleryTitle ||
-                  "Galeria z wyjazdów",
-                url: "https://letsgol.eu/galeria",
+                  localizedSetting(content, "galleryTitle", locale, isEn ? "Football trip gallery" : "Galeria z wyjazdów"),
+                url: `https://letsgol.eu${path}`,
+                inLanguage: isEn ? "en-GB" : "pl-PL",
                 image: gallery.map((item) => {
                   const src = item.mediaId
                     ? `/api/media/${item.mediaId}`
@@ -117,18 +117,15 @@ export default async function GalleryPage() {
           <div className="relative mx-auto grid min-h-140 max-w-7xl items-center gap-12 px-4 py-16 md:px-6 lg:grid-cols-[1fr_0.5fr] lg:py-20">
             <div className="max-w-4xl">
               <p className="eyebrow eyebrow-on-dark">
-                Galeria
+                {isEn ? "Gallery" : "Galeria"}
               </p>
 
               <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
-                {content.galleryTitle ||
-                  "Galeria z wyjazdów"}
+                {localizedSetting(content, "galleryTitle", locale, isEn ? "Football trip gallery" : "Galeria z wyjazdów")}
               </h1>
 
               <p className="mt-6 max-w-2xl text-lg leading-8 text-background/70">
-                Stadiony, miasta i emocje z naszych
-                piłkarskich podróży. Zobacz zdjęcia z
-                wyjazdów Let&apos;s Gol.
+                {isEn ? "Stadiums, cities and match-day emotion from our football journeys. Explore photos from Let's Gol trips." : <>Stadiony, miasta i emocje z naszych piłkarskich podróży. Zobacz zdjęcia z wyjazdów Let&apos;s Gol.</>}
               </p>
             </div>
 
@@ -139,12 +136,11 @@ export default async function GalleryPage() {
               />
 
               <p className="mt-4 font-sans text-2xl font-black uppercase">
-                Wspomnienia z trybun
+                {isEn ? "Memories from the stands" : "Wspomnienia z trybun"}
               </p>
 
               <p className="mt-2 text-sm leading-6 text-background/60">
-                Mecze, stadiony i miejsca, które odwiedziliśmy
-                razem z uczestnikami naszych wyjazdów.
+                {isEn ? "Matches, stadiums and places we have experienced together with our travellers." : "Mecze, stadiony i miejsca, które odwiedziliśmy razem z uczestnikami naszych wyjazdów."}
               </p>
             </div>
           </div>
@@ -180,7 +176,7 @@ export default async function GalleryPage() {
                         alt={
                           item.alt ||
                           item.title ||
-                          "Zdjęcie z wyjazdu Let's Gol"
+                          (isEn ? "Photo from a Let's Gol trip" : "Zdjęcie z wyjazdu Let's Gol")
                         }
                         images={lightboxImages}
                         initialIndex={index}
@@ -191,7 +187,7 @@ export default async function GalleryPage() {
                           alt={
                             item.alt ||
                             item.title ||
-                            "Zdjęcie z wyjazdu Let's Gol"
+                            (isEn ? "Photo from a Let's Gol trip" : "Zdjęcie z wyjazdu Let's Gol")
                           }
                           fill
                           className="object-cover transition-[transform,filter] duration-700 ease-out group-hover:scale-105 group-hover:brightness-95"
@@ -210,7 +206,7 @@ export default async function GalleryPage() {
                 />
 
                 <p className="mt-4 text-muted-foreground">
-                  Galeria zostanie uzupełniona wkrótce.
+                  {isEn ? "More photos will be added soon." : "Galeria zostanie uzupełniona wkrótce."}
                 </p>
               </div>
             )}

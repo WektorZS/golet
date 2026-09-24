@@ -18,7 +18,7 @@ import { sanitizeDescriptionHtml } from "@/lib/sanitize-html"
  * Renders a hidden input carrying the sanitized HTML so it submits with the
  * surrounding <form action={saveTrip}> like any other field.
  */
-export function DescriptionEditor({ name, defaultValue }: { name: string; defaultValue?: string }) {
+export function DescriptionEditor({ name, defaultValue, label = "Opis" }: { name: string; defaultValue?: string; label?: string }) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -51,7 +51,7 @@ export function DescriptionEditor({ name, defaultValue }: { name: string; defaul
 
   return (
     <div className="flex flex-col gap-2">
-      <Label>Opis</Label>
+      <Label>{label}</Label>
       <div className="rounded-lg border">
         <div className="flex items-center gap-1 border-b bg-secondary/40 p-1.5">
           <Button type="button" variant={editor?.isActive("bold") ? "secondary" : "ghost"} size="icon" className="size-8" onClick={() => editor?.chain().focus().toggleBold().run()} aria-label="Pogrubienie"><Bold className="size-4" /></Button>

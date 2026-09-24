@@ -234,19 +234,23 @@ export function HeroBackgroundSlider() {
 
 export function HeroTypewriter({
   eyebrow,
+  locale = "pl",
 }: {
   eyebrow?: string
+  locale?: "pl" | "en"
 }) {
   const phrases = useMemo(
     () =>
       Array.from(
         new Set([
-          eyebrow ||
-            fallbackEyebrow,
-          ...rotatingPhrases,
+          eyebrow || (locale === "en" ? "Do not just watch the biggest matches on a screen" : fallbackEyebrow),
+          ...(locale === "en" ? [
+            "Feel the stadium atmosphere for yourself",
+            "Some matches have to be experienced live",
+          ] : rotatingPhrases),
         ])
       ),
-    [eyebrow]
+    [eyebrow, locale]
   )
 
   const {

@@ -9,31 +9,36 @@ function escapeHtml(value: string) {
     .replace(/'/g, "&#039;")
 }
 
-function formatDate(date: string) {
+function formatDate(date: string, locale: "pl" | "en") {
   if (!date) {
     return ""
   }
 
-  const [year, month, day] = date.split("-")
-
-  if (!year || !month || !day) {
+  const parsed = new Date(`${date}T12:00:00Z`)
+  if (Number.isNaN(parsed.getTime())) {
     return ""
   }
 
-  return `${day}.${month}.${year}`
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "pl-PL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(parsed)
 }
 
 function formatTripDateRange(
   startDate: string,
-  endDate: string
+  endDate: string,
+  locale: "pl" | "en"
 ) {
-  const start = formatDate(startDate)
+  const start = formatDate(startDate, locale)
 
   if (!start) {
-    return "Nie podano"
+    return locale === "en" ? "Not provided" : "Nie podano"
   }
 
-  const end = formatDate(endDate)
+  const end = formatDate(endDate, locale)
 
   if (!end || endDate === startDate) {
     return start
@@ -53,6 +58,35 @@ export type InquiryEmailData = {
   departureCity: string
   travelers: number
   message: string
+  locale: "pl" | "en"
+}
+
+function englishClientEmail(inquiry: InquiryEmailData, values: { name: string; matchName: string; tripDate: string; packageVariant: string; departureCity: string }) {
+  return `
+    <div style="margin:0;padding:32px 16px;background:#f3f3f3;font-family:Arial,Helvetica,sans-serif;color:#111;">
+      <div style="max-width:620px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.06);">
+        <div style="background:#111;padding:30px 24px;text-align:center;">
+          <img src="https://letsgol.eu/logoemail.png" alt="Let's Gol" width="90" style="display:block;margin:0 auto 12px;width:90px;height:auto;" />
+          <div style="font-size:27px;font-weight:800;color:#f4b91e;">Let's Gol</div>
+          <div style="margin-top:6px;color:#aaa;font-size:13px;">Football match trips</div>
+        </div>
+        <div style="padding:34px 30px;">
+          <div style="display:inline-block;margin-bottom:14px;padding:6px 10px;background:#fff7df;border-radius:6px;color:#806000;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Enquiry received</div>
+          <h1 style="margin:0 0 14px;font-size:25px;line-height:1.25;">Thank you for getting in touch, ${values.name}!</h1>
+          <p style="margin:0;color:#555;line-height:1.7;">We have received your football trip enquiry. Here is a summary of the information you sent us.</p>
+          <div style="margin:28px 0;border:1px solid #eee;border-radius:12px;overflow:hidden;">
+            <div style="padding:15px 18px;border-bottom:1px solid #eee;"><small style="color:#777;">Match</small><div style="margin-top:4px;font-weight:700;">${values.matchName}</div></div>
+            <div style="padding:15px 18px;border-bottom:1px solid #eee;"><small style="color:#777;">Trip dates</small><div style="margin-top:4px;font-weight:700;">${values.tripDate}</div></div>
+            <div style="padding:15px 18px;border-bottom:1px solid #eee;"><small style="color:#777;">Package</small><div style="margin-top:4px;font-weight:700;">${values.packageVariant}</div></div>
+            <div style="padding:15px 18px;border-bottom:1px solid #eee;"><small style="color:#777;">Departure city</small><div style="margin-top:4px;font-weight:700;">${values.departureCity}</div></div>
+            <div style="padding:15px 18px;"><small style="color:#777;">Travellers</small><div style="margin-top:4px;font-weight:700;">${inquiry.travelers}</div></div>
+          </div>
+          <div style="padding:18px 20px;background:#111;border-radius:12px;color:#eee;line-height:1.65;"><strong style="color:#f4b91e;">What happens next?</strong><br />We will contact you within 24 hours and prepare a proposal tailored to your plans.</div>
+          <p style="margin:24px 0 0;color:#666;line-height:1.7;">You can reply directly to this email if you would like to add any information.</p>
+          <p style="margin:24px 0 0;">Kind regards,<br /><strong>The Let's Gol team</strong></p>
+        </div>
+      </div>
+    </div>`
 }
 
 export async function sendInquiryEmails(
@@ -66,15 +100,10 @@ export async function sendInquiryEmails(
     process.env.RESEND_REPLY_TO_EMAIL
 
   const packageVariant = escapeHtml(
-    inquiry.packageVariant || "Nie wybrano"
+    inquiry.packageVariant || (inquiry.locale === "en" ? "Not selected" : "Nie wybrano")
   )
 
-  const tripDate = escapeHtml(
-    formatTripDateRange(
-      inquiry.tripStartDate,
-      inquiry.tripEndDate
-    )
-  )
+  const tripDate = escapeHtml(formatTripDateRange(inquiry.tripStartDate, inquiry.tripEndDate, inquiry.locale))
 
   if (!apiKey) {
     throw new Error("Brak RESEND_API_KEY")
@@ -108,15 +137,14 @@ export async function sendInquiryEmails(
     from: fromEmail,
     to: inquiry.email,
     replyTo: replyToEmail,
-    subject:
-      "Otrzymaliśmy Twoje zapytanie - Let's Gol",
-    html: `
+    subject: inquiry.locale === "en" ? "We have received your enquiry - Let's Gol" : "Otrzymaliśmy Twoje zapytanie - Let's Gol",
+    html: inquiry.locale === "en" ? englishClientEmail(inquiry, { name, matchName, tripDate, packageVariant, departureCity }) : `
       <div style="margin:0;padding:32px 16px;background:#f3f3f3;font-family:Arial,Helvetica,sans-serif;color:#111;">
         <div style="max-width:620px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
 
           <div style="background:#111111;padding:32px 24px;text-align:center;">
             <img
-              src="https://golet.vercel.app/logoemail.png"
+              src="https://letsgol.eu/logoemail.png"
               alt="Let's Gol"
               width="90"
               style="display:block;margin:0 auto 14px;width:90px;height:auto;"
@@ -254,7 +282,7 @@ export async function sendInquiryEmails(
 
           <div style="background:#111111;padding:30px 24px;text-align:center;">
             <img
-              src="https://golet.vercel.app/logoemail.png"
+              src="https://letsgol.eu/logoemail.png"
               alt="Let's Gol"
               width="90"
               style="display:block;margin:0 auto 14px;width:90px;height:auto;"
@@ -278,6 +306,8 @@ export async function sendInquiryEmails(
             <p style="margin:0;font-size:15px;line-height:1.7;color:#666666;">
               Klient właśnie wysłał nowe zapytanie poprzez formularz na stronie Let's Gol.
             </p>
+
+            <p style="margin:8px 0 0;font-size:13px;color:#666666;">Język formularza: ${inquiry.locale.toUpperCase()}</p>
 
             <div style="height:1px;margin:28px 0;background:#eeeeee;"></div>
 

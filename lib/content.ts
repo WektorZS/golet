@@ -1,5 +1,7 @@
 import { asc, desc, eq } from "drizzle-orm"
 import { db } from "@/lib/db"
+import { ensureTripColumns } from "@/lib/db/ensure-trip-columns"
+import type { Locale } from "@/lib/i18n"
 import {
   galleryItems,
   siteSettings,
@@ -22,6 +24,7 @@ export type YouTubeVideo = {
 }
 
 export async function getSiteContent() {
+  await ensureTripColumns()
   const rows = await db.select().from(siteSettings)
 
   return Object.fromEntries(
@@ -29,20 +32,34 @@ export async function getSiteContent() {
   ) as SiteContent
 }
 
-export async function getPublishedGallery() {
-  return db
+export async function getPublishedGallery(locale: Locale = "pl") {
+  await ensureTripColumns()
+  const rows = await db
     .select()
     .from(galleryItems)
     .where(eq(galleryItems.status, "published"))
     .orderBy(asc(galleryItems.sortOrder))
+
+  return rows.map((item, index) => locale === "en" ? {
+    ...item,
+    title: item.titleEn || `Match trip photo ${index + 1}`,
+    city: item.cityEn || item.city,
+    alt: item.altEn || `${item.cityEn || item.city || "Football match trip"} - photo ${index + 1}`,
+  } : item)
 }
 
-export async function getPublishedTestimonials() {
-  return db
+export async function getPublishedTestimonials(locale: Locale = "pl") {
+  await ensureTripColumns()
+  const rows = await db
     .select()
     .from(testimonials)
     .where(eq(testimonials.status, "published"))
     .orderBy(asc(testimonials.sortOrder))
+
+  if (locale === "pl") return rows
+  return rows
+    .filter((item) => item.contentEn.trim())
+    .map((item) => ({ ...item, tripName: item.tripNameEn || "Football match trip", content: item.contentEn }))
 }
 
 /**
@@ -52,6 +69,7 @@ export async function getPublishedTestimonials() {
 export async function getYouTubeVideos(
   content: SiteContent
 ): Promise<YouTubeVideo[]> {
+  await ensureTripColumns()
   if (
     content.youtubeEnabled === "false" ||
     !content.youtubeUrl

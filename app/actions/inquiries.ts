@@ -162,6 +162,7 @@ export async function createInquiry(
   _: InquiryState,
   formData: FormData
 ): Promise<InquiryState> {
+  const locale = formData.get("locale") === "en" ? "en" : "pl"
   const parsed =
     inquirySchema.safeParse({
       name: formData.get("name"),
@@ -193,7 +194,7 @@ export async function createInquiry(
     return {
       status: "error",
       message:
-        "Sprawdź poprawność wszystkich pól formularza i spróbuj ponownie.",
+        locale === "en" ? "Please check all form fields and try again." : "Sprawdź poprawność wszystkich pól formularza i spróbuj ponownie.",
     }
   }
 
@@ -201,7 +202,7 @@ export async function createInquiry(
     return {
       status: "success",
       message:
-        "Dziękujemy. Odezwiemy się z propozycją w ciągu 24 godzin.",
+        locale === "en" ? "Thank you. We will get back to you with a proposal within 24 hours." : "Dziękujemy. Odezwiemy się z propozycją w ciągu 24 godzin.",
     }
   }
 
@@ -214,7 +215,7 @@ export async function createInquiry(
     return {
       status: "error",
       message:
-        "Formularz wysłano zbyt szybko. Spróbuj ponownie za chwilę.",
+        locale === "en" ? "The form was submitted too quickly. Please try again in a moment." : "Formularz wysłano zbyt szybko. Spróbuj ponownie za chwilę.",
     }
   }
 
@@ -323,7 +324,7 @@ export async function createInquiry(
       return {
         status: "error",
         message:
-          "To zapytanie zostało już wysłane. Odpowiemy wkrótce.",
+          locale === "en" ? "This enquiry has already been submitted. We will reply shortly." : "To zapytanie zostało już wysłane. Odpowiemy wkrótce.",
       }
     }
 
@@ -347,7 +348,7 @@ export async function createInquiry(
       return {
         status: "error",
         message:
-          "Ochrona przed spamem: osiągnięto dzienny limit zapytań. Spróbuj ponownie jutro.",
+          locale === "en" ? "Spam protection: the daily enquiry limit has been reached. Please try again tomorrow." : "Ochrona przed spamem: osiągnięto dzienny limit zapytań. Spróbuj ponownie jutro.",
       }
     }
 
@@ -362,6 +363,7 @@ export async function createInquiry(
       departureCity: parsed.data.departureCity,
       travelers: parsed.data.travelers,
       message: parsed.data.message,
+      locale,
     }
 
     await db
@@ -373,6 +375,7 @@ export async function createInquiry(
         tripEndDate:
           values.tripEndDate || null,
         consentAcceptedAt: new Date(),
+        locale,
       })
 
     await db
@@ -402,6 +405,7 @@ export async function createInquiry(
           values.travelers,
         message:
           values.message,
+        locale,
       })
     } catch (error) {
       console.error(
@@ -413,7 +417,7 @@ export async function createInquiry(
     return {
       status: "success",
       message:
-        "Dziękujemy. Odezwiemy się z propozycją w ciągu 24 godzin.",
+        locale === "en" ? "Thank you. We will get back to you with a proposal within 24 hours." : "Dziękujemy. Odezwiemy się z propozycją w ciągu 24 godzin.",
     }
   } catch (error) {
     console.error(
@@ -423,7 +427,7 @@ export async function createInquiry(
 
     return {
       status: "error",
-      message: GENERIC_ERROR,
+      message: locale === "en" ? "Something went wrong. Please try again later." : GENERIC_ERROR,
     }
   }
 }

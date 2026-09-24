@@ -48,6 +48,9 @@ function refreshPublic() {
   revalidatePath("/")
   revalidatePath("/galeria")
   revalidatePath("/wyjazdy")
+  revalidatePath("/en")
+  revalidatePath("/en/trips")
+  revalidatePath("/en/gallery")
   revalidatePath("/sitemap.xml")
 }
 
@@ -72,12 +75,13 @@ async function mediaHasReferences(mediaId: number): Promise<boolean> {
     db.select({ id: tripGalleryItems.id }).from(tripGalleryItems).where(eq(tripGalleryItems.mediaId, mediaId)).limit(1),
     db.select({ id: teamGalleryItems.id }).from(teamGalleryItems).where(eq(teamGalleryItems.mediaId, mediaId)).limit(1),
     db.select({ id: trips.id }).from(trips).where(or(
+      eq(trips.coverMediaId, mediaId),
       eq(trips.image, mediaUrl),
       eq(trips.homeLogo, mediaUrl),
       eq(trips.awayLogo, mediaUrl),
       eq(trips.leagueLogo, mediaUrl)
     )).limit(1),
-    db.select({ id: teams.id }).from(teams).where(eq(teams.logo, mediaUrl)).limit(1),
+    db.select({ id: teams.id }).from(teams).where(or(eq(teams.logo, mediaUrl), eq(teams.tripImageMediaId, mediaId))).limit(1),
     db.select({ id: leagues.id }).from(leagues).where(eq(leagues.logo, mediaUrl)).limit(1),
   ])
 
@@ -98,6 +102,11 @@ const tripSchema = z.object({
   departureAirports: z.string().max(300), flightType: z.string().max(120),
   baggageInfo: z.string().max(300), ticketCategory: z.string().max(200), seatingInfo: z.string().max(300),
   description: z.string().max(12000).refine((value) => stripHtml(value).length <= 8000, "Opis jest za długi"),
+  titleEn: z.string().max(120), cityEn: z.string().max(100), countryEn: z.string().max(100),
+  descriptionEn: z.string().max(12000).refine((value) => stripHtml(value).length <= 8000, "Opis angielski jest za długi"),
+  hotelBoardEn: z.string().max(120), roomTypeEn: z.string().max(120),
+  departureAirportsEn: z.string().max(300), flightTypeEn: z.string().max(120),
+  baggageInfoEn: z.string().max(300), ticketCategoryEn: z.string().max(200), seatingInfoEn: z.string().max(300),
 })
 
 export type SaveTripState = { success?: boolean; error?: string }
@@ -109,6 +118,10 @@ const teamSchema = z.object({
   city: z.string().min(2).max(100),
   country: z.string().min(2).max(100),
   stadium: z.string().min(2).max(140),
+  nameEn: z.string().max(100),
+  cityEn: z.string().max(100),
+  countryEn: z.string().max(100),
+  stadiumEn: z.string().max(140),
 })
 
 export async function saveTeam(_: SaveTeamState, formData: FormData): Promise<SaveTeamState> {
@@ -120,6 +133,10 @@ export async function saveTeam(_: SaveTeamState, formData: FormData): Promise<Sa
     city: clean(formData.get("city")),
     country: clean(formData.get("country")),
     stadium: clean(formData.get("stadium")),
+    nameEn: clean(formData.get("nameEn")),
+    cityEn: clean(formData.get("cityEn")),
+    countryEn: clean(formData.get("countryEn")),
+    stadiumEn: clean(formData.get("stadiumEn")),
   })
   if (!parsed.success) return { error: "Uzupełnij nazwę drużyny, miasto, kraj i stadion." }
 
@@ -141,7 +158,32 @@ export async function saveTeam(_: SaveTeamState, formData: FormData): Promise<Sa
   }
   if (!logo) return { error: "Dodaj herb drużyny." }
 
-  const values = { ...parsed.data, logo, updatedAt: new Date() }
+  let tripImageMediaId = Number(formData.get("tripImageMediaId")) || existing?.tripImageMediaId || null
+  const tripImageFile = formData.get("tripImageFile")
+  if (tripImageFile instanceof File && tripImageFile.size > 0) {
+    try {
+      const optimized = await optimizeUploadedImage(tripImageFile)
+      const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
+      const [asset] = await db.insert(mediaAssets).values({
+        pathname: blob.pathname,
+        contentType: optimized.contentType,
+        size: optimized.size,
+        width: optimized.width,
+        height: optimized.height,
+        alt: `${parsed.data.name} - zdjęcie główne wyjazdów`,
+        altEn: `${parsed.data.nameEn || parsed.data.name} - main trip image`,
+        originalName: tripImageFile.name,
+        category: "team",
+        createdBy: user.id,
+      }).returning({ id: mediaAssets.id })
+      tripImageMediaId = asset.id
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : "Nie udało się zapisać zdjęcia głównego wyjazdów." }
+    }
+  }
+  if (!tripImageMediaId) return { error: "Dodaj zdjęcie główne wyjazdów albo wybierz je z biblioteki." }
+
+  const values = { ...parsed.data, logo, tripImageMediaId, updatedAt: new Date() }
   if (existing) {
     await db.update(teams).set(values).where(eq(teams.id, id))
     await db.update(trips).set({
@@ -149,6 +191,10 @@ export async function saveTeam(_: SaveTeamState, formData: FormData): Promise<Sa
       homeLogo: logo,
       updatedAt: new Date(),
     }).where(eq(trips.homeTeamId, id))
+    await db.update(trips).set({
+      image: `/api/media/${tripImageMediaId}`,
+      updatedAt: new Date(),
+    }).where(and(eq(trips.homeTeamId, id), sql`${trips.coverMediaId} IS NULL`))
     await db.update(trips).set({
       awayTeam: parsed.data.name,
       awayLogo: logo,
@@ -180,6 +226,7 @@ export async function deleteTeam(_: SaveTeamState, formData: FormData): Promise<
   await db.delete(teams).where(eq(teams.id, id))
   const logoId = mediaIdFromUrl(team.logo)
   if (logoId) await deleteMediaAsset(logoId).catch(() => undefined)
+  if (team.tripImageMediaId) await deleteMediaAsset(team.tripImageMediaId).catch(() => undefined)
   await logActivity(user.id, "deleted", "team", String(id), team.name)
   revalidatePath("/admin")
   return { success: true }
@@ -244,6 +291,7 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   // (bold/italic/lists/links only); sanitize before validation so stored content is
   // always the safe, allowlisted subset regardless of what the client actually sent.
   const description = sanitizeDescriptionHtml(clean(formData.get("description")))
+  const descriptionEn = sanitizeDescriptionHtml(clean(formData.get("descriptionEn")))
   const parsed = tripSchema.safeParse({
     title: clean(formData.get("title")), city: clean(formData.get("city")),
     country: clean(formData.get("country")), startDate: clean(formData.get("startDate")), endDate: clean(formData.get("endDate")) || undefined,
@@ -255,6 +303,10 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
     hotelStars: clean(formData.get("hotelStars")) || "0", hotelBoard: clean(formData.get("hotelBoard")), roomType: clean(formData.get("roomType")),
     departureAirports: clean(formData.get("departureAirports")), flightType: clean(formData.get("flightType")),
     baggageInfo: clean(formData.get("baggageInfo")), ticketCategory: clean(formData.get("ticketCategory")), seatingInfo: clean(formData.get("seatingInfo")),
+    titleEn: clean(formData.get("titleEn")), cityEn: clean(formData.get("cityEn")), countryEn: clean(formData.get("countryEn")), descriptionEn,
+    hotelBoardEn: clean(formData.get("hotelBoardEn")), roomTypeEn: clean(formData.get("roomTypeEn")),
+    departureAirportsEn: clean(formData.get("departureAirportsEn")), flightTypeEn: clean(formData.get("flightTypeEn")),
+    baggageInfoEn: clean(formData.get("baggageInfoEn")), ticketCategoryEn: clean(formData.get("ticketCategoryEn")), seatingInfoEn: clean(formData.get("seatingInfoEn")),
   })
   if (!parsed.success) return { error: "Sprawdź wymagane pola wyjazdu." }
   const slug = slugify(clean(formData.get("slug")) || parsed.data.title)
@@ -272,9 +324,17 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
 
   const isEditing = Number.isInteger(id) && id > 0
   const [existingTrip] = isEditing
-    ? await db.select({ image: trips.image, homeLogo: trips.homeLogo, awayLogo: trips.awayLogo }).from(trips).where(eq(trips.id, id)).limit(1)
+    ? await db.select({ image: trips.image, coverMediaId: trips.coverMediaId, homeLogo: trips.homeLogo, awayLogo: trips.awayLogo }).from(trips).where(eq(trips.id, id)).limit(1)
     : []
-  let image = clean(formData.get("image")) || existingTrip?.image || ""
+  const coverMode = clean(formData.get("coverMode")) || (existingTrip?.coverMediaId ? "override" : "team")
+  let coverMediaId = coverMode === "override"
+    ? Number(formData.get("coverMediaId")) || existingTrip?.coverMediaId || null
+    : null
+  let image = coverMediaId
+    ? `/api/media/${coverMediaId}`
+    : homeTeamRecord.tripImageMediaId
+      ? `/api/media/${homeTeamRecord.tripImageMediaId}`
+      : clean(formData.get("image")) || existingTrip?.image || ""
   let homeLogo = homeTeamRecord.logo || clean(formData.get("homeLogo")) || existingTrip?.homeLogo || ""
   let awayLogo = awayTeamRecord.logo || clean(formData.get("awayLogo")) || existingTrip?.awayLogo || ""
 
@@ -282,7 +342,7 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
     if (!(file instanceof File) || file.size === 0) return ""
     const optimized = kind === "logo" ? await optimizeTeamLogo(file) : await optimizeUploadedImage(file)
     const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
-    const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt, originalName: file.name, createdBy: user.id }).returning({ id: mediaAssets.id })
+    const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt, originalName: file.name, category: kind === "cover" ? "trip" : "logo", createdBy: user.id }).returning({ id: mediaAssets.id })
     return `/api/media/${asset.id}`
   }
 
@@ -290,6 +350,7 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
   if (coverFile instanceof File && coverFile.size > 0) {
     try {
       image = await uploadTripImage(coverFile, `Stadion - ${parsed.data.title}`)
+      coverMediaId = mediaIdFromUrl(image)
       homeLogo = (await uploadTripImage(formData.get("homeLogoFile"), `Herb ${homeTeamRecord.name}`, "logo")) || homeLogo
       awayLogo = (await uploadTripImage(formData.get("awayLogoFile"), `Herb ${awayTeamRecord.name}`, "logo")) || awayLogo
     } catch (error) {
@@ -304,21 +365,25 @@ export async function saveTrip(_: SaveTripState, formData: FormData): Promise<Sa
     }
   }
 
-  if (!image || !homeLogo || !awayLogo) return { error: "Dodaj zdjęcie stadionu oraz herby obu zespołów." }
+  if (!image || !homeLogo || !awayLogo) return { error: "Drużyna gospodarza musi mieć zdjęcie główne wyjazdów oraz oba zespoły muszą mieć herby." }
 
   const values = {
-    ...parsed.data, homeTeam: homeTeamRecord.name, awayTeam: awayTeamRecord.name, opponent: awayTeamRecord.name, slug, endDate: parsed.data.endDate || null, matchDate: parsed.data.matchDate || null, image, homeLogo, awayLogo,
+    ...parsed.data, homeTeam: homeTeamRecord.name, awayTeam: awayTeamRecord.name, opponent: awayTeamRecord.name, slug, endDate: parsed.data.endDate || null, matchDate: parsed.data.matchDate || null, image, coverMediaId, homeLogo, awayLogo,
     leagueId, leagueName: league?.name || "", leagueLogo: league?.logo || "",
     featured: formData.get("featured") === "on", includes: clean(formData.get("includes")).split("\n").map((item) => item.trim()).filter(Boolean),
+    includesEn: clean(formData.get("includesEn")).split("\n").map((item) => item.trim()).filter(Boolean),
     packageItems: packageFeatures.map(({ key }) => {
       const value = clean(formData.get(`package.${key}`)) as PackageFeatureStatus
       return `${key}|${["included", "optional", "excluded"].includes(value) ? value : "excluded"}`
     }),
     packageVariants: packageVariantOptions.filter(({ key }) => formData.get(`packageVariant.${key}`) === "on").map(({ key }) => key),
     itinerary: clean(formData.get("itinerary")).split("\n").map((item) => item.trim()).filter(Boolean),
+    itineraryEn: clean(formData.get("itineraryEn")).split("\n").map((item) => item.trim()).filter(Boolean),
     hotelInfo: clean(formData.get("hotelInfo")), flightInfo: clean(formData.get("flightInfo")),
+    hotelInfoEn: clean(formData.get("hotelInfoEn")), flightInfoEn: clean(formData.get("flightInfoEn")),
     faq: clean(formData.get("faq")).split("\n").map((item) => item.trim()).filter(Boolean),
-    sortOrder: Number(formData.get("sortOrder")) || 0, seoTitle: clean(formData.get("seoTitle")), seoDescription: clean(formData.get("seoDescription")), updatedAt: new Date(),
+    faqEn: clean(formData.get("faqEn")).split("\n").map((item) => item.trim()).filter(Boolean),
+    sortOrder: Number(formData.get("sortOrder")) || 0, seoTitle: clean(formData.get("seoTitle")), seoDescription: clean(formData.get("seoDescription")), seoTitleEn: clean(formData.get("seoTitleEn")), seoDescriptionEn: clean(formData.get("seoDescriptionEn")), updatedAt: new Date(),
   }
   if (Number.isInteger(id) && id > 0) {
     await db.update(trips).set(values).where(eq(trips.id, id))
@@ -455,7 +520,7 @@ export async function deleteInquiry(formData: FormData) {
 
 export async function saveTestimonial(formData: FormData) {
   const user = await requireAdmin(); const id = Number(formData.get("id"))
-  const values = { author: clean(formData.get("author")), tripName: clean(formData.get("tripName")), content: clean(formData.get("content")), rating: Math.min(5, Math.max(1, Number(formData.get("rating")) || 5)), status: clean(formData.get("status")) === "published" ? "published" : "draft", sortOrder: Number(formData.get("sortOrder")) || 0, updatedAt: new Date() }
+  const values = { author: clean(formData.get("author")), tripName: clean(formData.get("tripName")), content: clean(formData.get("content")), tripNameEn: clean(formData.get("tripNameEn")), contentEn: clean(formData.get("contentEn")), rating: Math.min(5, Math.max(1, Number(formData.get("rating")) || 5)), status: clean(formData.get("status")) === "published" ? "published" : "draft", sortOrder: Number(formData.get("sortOrder")) || 0, updatedAt: new Date() }
   if (!values.author || !values.content) throw new Error("Autor i treść opinii są wymagane")
   if (id > 0) await db.update(testimonials).set(values).where(eq(testimonials.id, id)); else await db.insert(testimonials).values(values)
   await logActivity(user.id, id > 0 ? "updated" : "created", "testimonial", id > 0 ? String(id) : undefined, values.author)
@@ -477,6 +542,10 @@ const ALLOWED_SETTING_KEYS = new Set([
   "youtubeTitle", "youtubeUrl", "youtubeLimit", "youtubeEnabled",
 ])
 
+const isAllowedSettingKey = (key: string) =>
+  ALLOWED_SETTING_KEYS.has(key) ||
+  (key.endsWith("En") && ALLOWED_SETTING_KEYS.has(key.slice(0, -2)))
+
 export type SaveSettingsState = {
   error?: string
   success?: boolean
@@ -494,7 +563,7 @@ export async function saveSettings(
 
       const settingKey = key.slice(8)
 
-      if (!ALLOWED_SETTING_KEYS.has(settingKey)) continue
+      if (!isAllowedSettingKey(settingKey)) continue
 
       let settingValue = String(value).slice(0, 4000)
 
@@ -560,18 +629,35 @@ export async function saveSettings(
 }
 
 export async function uploadMedia(formData: FormData) {
-  const user = await requireAdmin(); const file = formData.get("file")
-  if (!(file instanceof File)) throw new Error("Wybierz plik")
-  const optimized = await optimizeUploadedImage(file)
-  const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
-  const [asset] = await db.insert(mediaAssets).values({ pathname: blob.pathname, contentType: optimized.contentType, size: optimized.size, width: optimized.width, height: optimized.height, alt: clean(formData.get("alt")), originalName: file.name, createdBy: user.id }).returning({ id: mediaAssets.id })
-  await logActivity(user.id, "uploaded", "media", String(asset.id), file.name)
+  const user = await requireAdmin()
+  const files = [...formData.getAll("files"), ...formData.getAll("file")]
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0)
+  if (!files.length) throw new Error("Wybierz co najmniej jedno zdjęcie")
+  if (files.length > 20) throw new Error("Jednorazowo możesz przesłać maksymalnie 20 zdjęć")
+
+  for (const file of files) {
+    const optimized = await optimizeUploadedImage(file)
+    const blob = await put(optimized.pathname, optimized.data, { access: "private", addRandomSuffix: false, contentType: optimized.contentType })
+    const [asset] = await db.insert(mediaAssets).values({
+      pathname: blob.pathname,
+      contentType: optimized.contentType,
+      size: optimized.size,
+      width: optimized.width,
+      height: optimized.height,
+      alt: clean(formData.get("alt")),
+      altEn: clean(formData.get("altEn")),
+      category: clean(formData.get("category")) || "other",
+      originalName: file.name,
+      createdBy: user.id,
+    }).returning({ id: mediaAssets.id })
+    await logActivity(user.id, "uploaded", "media", String(asset.id), file.name)
+  }
   revalidatePath("/admin")
 }
 
 export async function updateMedia(formData: FormData) {
   const user = await requireAdmin(); const id = Number(formData.get("id"))
-  await db.update(mediaAssets).set({ alt: clean(formData.get("alt")), updatedAt: new Date() }).where(eq(mediaAssets.id, id))
+  await db.update(mediaAssets).set({ alt: clean(formData.get("alt")), altEn: clean(formData.get("altEn")), category: clean(formData.get("category")) || "other", updatedAt: new Date() }).where(eq(mediaAssets.id, id))
   await logActivity(user.id, "updated", "media", String(id)); refreshPublic()
 }
 export async function deleteMedia(formData: FormData) {
@@ -619,17 +705,60 @@ export type AddGalleryItemState = { error?: string; success?: boolean; message?:
 
 export async function addGalleryItem(_: AddGalleryItemState, formData: FormData): Promise<AddGalleryItemState> {
   try {
-    const user = await requireAdmin(); const mediaId = Number(formData.get("mediaId")); const destination = clean(formData.get("destination"));
-    const [scope, rawId] = destination.split(":"); const targetId = Number(rawId)
-    const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, mediaId)).limit(1)
-    if (!asset) return { error: "Nie znaleziono zdjęcia" }
-    const common = { mediaId, caption: clean(formData.get("caption")), alt: clean(formData.get("alt")) || asset.alt, sortOrder: Number(formData.get("sortOrder")) || 0 }
-    if (scope === "trip" && targetId > 0) await db.insert(tripGalleryItems).values({ tripId: targetId, ...common })
-    else if (scope === "team" && targetId > 0) await db.insert(teamGalleryItems).values({ teamId: targetId, ...common })
-    else await db.insert(galleryItems).values({ title: common.caption || asset.originalName, city: clean(formData.get("city")), image: `/api/media/${mediaId}`, mediaId, alt: common.alt, sortOrder: common.sortOrder })
+    const user = await requireAdmin()
+    const destination = clean(formData.get("destination"))
+    const [scope, rawId] = destination.split(":")
+    const targetId = Number(rawId)
+    const mediaIds = [...formData.getAll("mediaIds"), formData.get("mediaId")]
+      .flatMap((entry) => String(entry || "").split(","))
+      .map(Number)
+      .filter((id) => Number.isInteger(id) && id > 0)
+
+    const files = formData
+      .getAll("files")
+      .filter((entry): entry is File => entry instanceof File && entry.size > 0)
+
+    if (files.length > 20) return { error: "Jednorazowo możesz przesłać maksymalnie 20 zdjęć." }
+
+    const category = scope === "trip" ? "trip" : scope === "team" ? "team" : "homepage"
+    for (const file of files) {
+      const optimized = await optimizeUploadedImage(file)
+      const blob = await put(optimized.pathname, optimized.data, {
+        access: "private",
+        addRandomSuffix: false,
+        contentType: optimized.contentType,
+      })
+      const [asset] = await db.insert(mediaAssets).values({
+        pathname: blob.pathname,
+        contentType: optimized.contentType,
+        size: optimized.size,
+        width: optimized.width,
+        height: optimized.height,
+        alt: clean(formData.get("alt")),
+        altEn: clean(formData.get("altEn")),
+        category,
+        originalName: file.name,
+        createdBy: user.id,
+      }).returning({ id: mediaAssets.id })
+      mediaIds.push(asset.id)
+      await logActivity(user.id, "uploaded", "media", String(asset.id), file.name)
+    }
+
+    if (!mediaIds.length) return { error: "Wybierz zdjęcia z biblioteki albo prześlij nowe." }
+
+    const selectedAssets = await db.select().from(mediaAssets).where(inArray(mediaAssets.id, mediaIds))
+    const assetsById = new Map(selectedAssets.map((asset) => [asset.id, asset]))
+    const assets = mediaIds.map((id) => assetsById.get(id)).filter((asset): asset is typeof selectedAssets[number] => Boolean(asset))
+    if (!assets.length) return { error: "Nie znaleziono zdjęć" }
+    for (const [index, asset] of assets.entries()) {
+      const common = { mediaId: asset.id, caption: clean(formData.get("caption")), captionEn: clean(formData.get("captionEn")), alt: clean(formData.get("alt")) || asset.alt, altEn: clean(formData.get("altEn")) || asset.altEn, sortOrder: (Number(formData.get("sortOrder")) || 0) + index }
+      if (scope === "trip" && targetId > 0) await db.insert(tripGalleryItems).values({ tripId: targetId, ...common })
+      else if (scope === "team" && targetId > 0) await db.insert(teamGalleryItems).values({ teamId: targetId, ...common }).onConflictDoNothing()
+      else await db.insert(galleryItems).values({ title: common.caption || asset.originalName, titleEn: common.captionEn, city: clean(formData.get("city")), cityEn: clean(formData.get("cityEn")), image: `/api/media/${asset.id}`, mediaId: asset.id, alt: common.alt, altEn: common.altEn, sortOrder: common.sortOrder })
+    }
     const entity = scope === "trip" ? "trip_gallery" : scope === "team" ? "team_gallery" : "gallery"
-    await logActivity(user.id, "added", entity, String(mediaId)); refreshPublic()
-    return { success: true, message: scope === "trip" ? "Zdjęcie dodano do galerii wyjazdu." : scope === "team" ? "Zdjęcie dodano do galerii drużyny." : "Zdjęcie dodano do galerii głównej." }
+    await logActivity(user.id, "added", entity, mediaIds.join(",")); refreshPublic()
+    return { success: true, message: `Dodano ${assets.length} ${assets.length === 1 ? "zdjęcie" : "zdjęcia"}.` }
   } catch {
     return { error: "Nie udało się dodać zdjęcia do galerii." }
   }
@@ -642,7 +771,7 @@ export async function setTripCover(formData: FormData) {
   if (!Number.isInteger(tripId) || !Number.isInteger(mediaId)) throw new Error("Wybierz wyjazd i zdjęcie")
   const [asset] = await db.select({ id: mediaAssets.id }).from(mediaAssets).where(eq(mediaAssets.id, mediaId)).limit(1)
   if (!asset) throw new Error("Nie znaleziono zdjęcia")
-  await db.update(trips).set({ image: `/api/media/${mediaId}`, updatedAt: new Date() }).where(eq(trips.id, tripId))
+  await db.update(trips).set({ image: `/api/media/${mediaId}`, coverMediaId: mediaId, updatedAt: new Date() }).where(eq(trips.id, tripId))
   await logActivity(user.id, "updated_cover", "trip", String(tripId), `Media #${mediaId}`)
   refreshPublic()
 }
@@ -657,6 +786,10 @@ export async function updateGalleryItem(_: UpdateGalleryItemState, formData: For
     await db.update(galleryItems).set({
       title: clean(formData.get("title")),
       city: clean(formData.get("city")),
+      titleEn: clean(formData.get("titleEn")),
+      cityEn: clean(formData.get("cityEn")),
+      alt: clean(formData.get("alt")),
+      altEn: clean(formData.get("altEn")),
     }).where(eq(galleryItems.id, id))
     await logActivity(user.id, "updated", "gallery", String(id))
     refreshPublic()
@@ -674,6 +807,9 @@ export async function updateTripGalleryItem(_: UpdateGalleryItemState, formData:
     await db.update(tripGalleryItems).set({
       caption: clean(formData.get("caption")).slice(0, 160),
       alt: clean(formData.get("alt")).slice(0, 240),
+      captionEn: clean(formData.get("captionEn")).slice(0, 160),
+      altEn: clean(formData.get("altEn")).slice(0, 240),
+      sortOrder: Number(formData.get("sortOrder")) || 0,
       updatedAt: new Date(),
     }).where(eq(tripGalleryItems.id, id))
     await logActivity(user.id, "updated", "trip_gallery", String(id))
@@ -687,7 +823,7 @@ export async function updateTripGalleryItem(_: UpdateGalleryItemState, formData:
 export async function updateTeamGalleryItem(_: UpdateGalleryItemState, formData: FormData): Promise<UpdateGalleryItemState> {
   try {
     const user = await requireAdmin(); const id = Number(formData.get("id"))
-    await db.update(teamGalleryItems).set({ caption: clean(formData.get("caption")).slice(0, 160), alt: clean(formData.get("alt")).slice(0, 240), sortOrder: Number(formData.get("sortOrder")) || 0, updatedAt: new Date() }).where(eq(teamGalleryItems.id, id))
+    await db.update(teamGalleryItems).set({ caption: clean(formData.get("caption")).slice(0, 160), alt: clean(formData.get("alt")).slice(0, 240), captionEn: clean(formData.get("captionEn")).slice(0, 160), altEn: clean(formData.get("altEn")).slice(0, 240), sortOrder: Number(formData.get("sortOrder")) || 0, updatedAt: new Date() }).where(eq(teamGalleryItems.id, id))
     await logActivity(user.id, "updated", "team_gallery", String(id)); refreshPublic(); return { success: true }
   } catch { return { error: "Nie udało się zapisać zdjęcia drużyny." } }
 }

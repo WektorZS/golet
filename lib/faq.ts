@@ -11,6 +11,8 @@ export type FaqCategory = {
   items: FaqItem[]
 }
 
+import type { Locale } from "@/lib/i18n"
+
 export const faqCategories: FaqCategory[] = [
   {
     id: "rezerwacja",
@@ -141,3 +143,64 @@ export const faqCategories: FaqCategory[] = [
 export const popularFaqs = faqCategories
   .flatMap((category) => category.items)
   .filter((item) => item.popular)
+
+const faqCategoriesEn: FaqCategory[] = [
+  {
+    id: "booking",
+    title: "Booking and payment",
+    description: "Key information about booking, payments and preparing for your trip.",
+    items: [
+      { question: "How do I book a trip?", answer: "Choose a listed trip or tell us which match you would like to attend. We confirm the details and availability, send you an offer and then provide the contract and payment instructions. Once the booking is confirmed, we take care of the agreed travel arrangements." },
+      { question: "Do I have to pay the full amount immediately?", answer: "Not always. Most trips require a deposit, with the remaining balance due on the date shown in your contract. You will receive the exact payment schedule before signing." },
+      { question: "Can I travel on my own?", answer: "Of course. Solo travellers regularly join our trips. We will explain the available room options and any single-room supplement before booking." },
+    ],
+  },
+  {
+    id: "package",
+    title: "Package and organisation",
+    description: "What a Let's Gol trip can include and how we support you while travelling.",
+    items: [
+      { question: "What is included in a Let's Gol trip?", answer: "The exact scope depends on the offer. A full package may include flights, accommodation, a match ticket, insurance, local transport, an itinerary, sightseeing and coordinator support. The confirmed inclusions are always stated in the offer and contract.", popular: true },
+      { question: "Will a coordinator travel with us?", answer: "Support may be provided in person or remotely, depending on the package. An on-site coordinator helps with the itinerary, transport and match-day arrangements. With remote support, our team remains available to help throughout the trip.", popular: true },
+      { question: "Do I have to join the group sightseeing?", answer: "No. Group sightseeing is an option, and you are welcome to use your free time independently as long as it does not conflict with key parts of the itinerary." },
+    ],
+  },
+  {
+    id: "transport",
+    title: "Transport and baggage",
+    description: "Departure airports, baggage allowances and transport arrangements.",
+    items: [
+      { question: "What baggage is included?", answer: "The standard price normally includes a small cabin bag up to 40 x 30 x 20 cm, stored under the seat. Larger cabin baggage or checked baggage can usually be added for an extra charge. We confirm the final allowance before departure according to the airline's rules.", popular: true },
+      { question: "Which airports do you use?", answer: "We choose the airport based on each trip and available connections. We commonly use Warsaw, Krakow, Wroclaw, Gdansk, Katowice and Berlin. For a custom quote, we can also check another departure airport.", popular: true },
+    ],
+  },
+  {
+    id: "tickets",
+    title: "Tickets and matches",
+    description: "Important information about tickets, stadium seating and fixture changes.",
+    items: [
+      { question: "Will we sit together at the stadium?", answer: "We aim to provide adjacent seats or seats as close together as possible. The final allocation depends on availability and the ticketing rules for the event. If a particular seating arrangement is guaranteed, we state it clearly in the offer." },
+      { question: "Can I choose a better seat category?", answer: "For many matches, we can offer several ticket categories, including premium options. Availability and any surcharge are confirmed individually." },
+      { question: "What happens if the match date changes?", answer: "Fixture dates are set by leagues, clubs and competition organisers and may change. If this happens, we inform you and adjust the arrangements where possible. Any material change is handled according to the contract and applicable law.", popular: true },
+      { question: "When will I receive my match ticket?", answer: "The timing and delivery method depend on the club. Tickets may be supplied as a PDF, through the club's official app or in another required format. You will receive the relevant instructions before the match." },
+    ],
+  },
+  {
+    id: "custom",
+    title: "Custom and group trips",
+    description: "Matches outside our calendar and trips for private groups, companies, schools and clubs.",
+    items: [
+      { question: "Can you organise a trip to a match that is not listed?", answer: "Yes. Tell us the match, club, preferred dates and departure airport. We will prepare a tailored proposal, subject to availability. You can choose anything from a match ticket only to a complete ticket, flight and hotel package.", popular: true },
+      { question: "Do you organise trips for companies, schools, clubs or larger groups?", answer: "Yes. We prepare tailored trips for companies, schools, academies, sports clubs and private groups. Transport, accommodation, tickets and the programme are matched to the group size and requirements." },
+      { question: "Is Let's Gol a licensed tour operator and are trips insured?", answer: "Yes. Let's Gol is a registered tour operator with the required insolvency protection. Our operator register number is 42848. When travel insurance is part of a package, its cover is described in the documents for that trip." },
+    ],
+  },
+]
+
+export function getFaqCategories(locale: Locale = "pl") {
+  return locale === "en" ? faqCategoriesEn : faqCategories
+}
+
+export function getPopularFaqs(locale: Locale = "pl") {
+  return getFaqCategories(locale).flatMap((category) => category.items).filter((item) => item.popular)
+}

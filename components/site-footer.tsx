@@ -15,45 +15,13 @@ import {
 } from "lucide-react"
 
 import { Brand } from "@/components/site-header"
+import { LanguageSwitcher } from "@/components/language-switcher"
 import { SocialLinks } from "@/components/social-links"
 import type { SiteContent } from "@/lib/content"
-
-const quickLinks = [
-  { label: "Wyjazdy", href: "/wyjazdy" },
-  { label: "Twój wyjazd", href: "/#twoj-wyjazd" },
-  { label: "Galeria", href: "/galeria" },
-  { label: "O nas", href: "/o-nas" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Kontakt", href: "/kontakt" },
-] as const
-
-const documentLinks = [
-  {
-    label: "Gwarancja Turystyczna",
-    href: "/dokumenty/Gwarancja-LB-Coaching%202026-2027.pdf",
-    pdf: true,
-  },
-  {
-    label: "Ubezpieczenie",
-    href: "/dokumenty/Ubezpieczenie-Compensa.pdf",
-    pdf: true,
-  },
-  {
-    label: "Wzór umowy",
-    href: "/dokumenty/Lets_Gol_wzór-umowy-o-świadczenie-usług-turystycznych.pdf",
-    pdf: true,
-  },
-  {
-    label: "Warunki Uczestnictwa",
-    href: "/warunki-uczestnictwa",
-    pdf: false,
-  },
-  {
-    label: "Polityka prywatności",
-    href: "/polityka-prywatnosci",
-    pdf: false,
-  },
-] as const
+import { getDictionary } from "@/lib/dictionaries"
+import { routeFor } from "@/lib/i18n"
+import { localizedSetting } from "@/lib/i18n-content"
+import { getRequestLocale } from "@/lib/i18n-request"
 
 function WhatsAppIcon({
   className = "",
@@ -105,11 +73,28 @@ function FooterHeading({
   )
 }
 
-export function SiteFooter({
+export async function SiteFooter({
   content = {},
 }: {
   content?: SiteContent
 }) {
+  const locale = await getRequestLocale()
+  const dictionary = getDictionary(locale)
+  const quickLinks = [
+    { label: dictionary.navigation.trips, href: routeFor(locale, "/wyjazdy") },
+    { label: dictionary.navigation.customTrip, href: routeFor(locale, "/wycena-indywidualna") },
+    { label: dictionary.navigation.gallery, href: routeFor(locale, "/galeria") },
+    { label: dictionary.navigation.about, href: routeFor(locale, "/o-nas") },
+    { label: dictionary.navigation.faq, href: routeFor(locale, "/faq") },
+    { label: dictionary.navigation.contact, href: routeFor(locale, "/kontakt") },
+  ]
+  const documentLinks = [
+    { label: locale === "en" ? "Travel guarantee" : "Gwarancja Turystyczna", href: "/dokumenty/Gwarancja-LB-Coaching%202026-2027.pdf", pdf: true },
+    { label: locale === "en" ? "Insurance" : "Ubezpieczenie", href: "/dokumenty/Ubezpieczenie-Compensa.pdf", pdf: true },
+    { label: locale === "en" ? "Contract template" : "Wzór umowy", href: "/dokumenty/Lets_Gol_wzór-umowy-o-świadczenie-usług-turystycznych.pdf", pdf: true },
+    { label: locale === "en" ? "Terms and conditions" : "Warunki Uczestnictwa", href: routeFor(locale, "/warunki-uczestnictwa"), pdf: false },
+    { label: locale === "en" ? "Privacy policy" : "Polityka prywatności", href: routeFor(locale, "/polityka-prywatnosci"), pdf: false },
+  ]
   const phone = content.contactPhone || "+48 501 465 318"
   const phoneHref = `tel:${phone.replace(/[^+\d]/g, "")}`
 
@@ -145,28 +130,27 @@ export function SiteFooter({
       <div className="relative mx-auto max-w-screen-2xl px-4 md:px-6 lg:px-10 xl:px-12">
         <div className="grid gap-y-12 py-12 sm:grid-cols-2 lg:grid-cols-[1.12fr_0.8fr_1.05fr_1.05fr_1.3fr] lg:gap-0 lg:py-16">
           <div className="pr-0 sm:pr-8 lg:pr-10">
-            <Brand />
+            <Brand locale={locale} />
 
             <p className="mt-6 max-w-60 text-[15px] leading-6 text-background/70">
-              {content.footerText ||
-                "Razem tworzymy niezapomniane piłkarskie doświadczenia."}
+              {localizedSetting(content, "footerText", locale, dictionary.footer.fallbackText)}
             </p>
 
             <p className="mt-7 max-w-56 -rotate-2 font-serif text-xl italic leading-tight text-background/90">
-              Do zobaczenia
-              <br />
-              na stadionach!
+              {dictionary.footer.seeYou.split("\n").map((line, index) => (
+                <span key={line}>{index > 0 ? <br /> : null}{line}</span>
+              ))}
             </p>
 
             <div className="mt-4 h-1 w-16 -rotate-6 rounded-full bg-primary" />
           </div>
 
           <nav
-            aria-label="Nawigacja w stopce"
+            aria-label={dictionary.footer.navigation}
             className="border-white/10 sm:border-l sm:pl-8 lg:px-8"
           >
             <FooterHeading icon={Navigation}>
-              Nawigacja
+              {dictionary.footer.navigation}
             </FooterHeading>
 
             <div className="mt-6 flex flex-col gap-3">
@@ -190,7 +174,7 @@ export function SiteFooter({
 
           <div className="border-white/10 sm:border-l sm:pl-8 lg:px-8">
             <FooterHeading icon={Building2}>
-              Dane firmy
+              {dictionary.footer.company}
             </FooterHeading>
 
             <div className="mt-6 space-y-3 text-sm leading-6">
@@ -211,11 +195,7 @@ export function SiteFooter({
 
               <div>
                 <p className="text-background/65">
-                  Nr wpisu do rejestru
-                </p>
-
-                <p className="text-background/65">
-                  organizatorów turystyki:
+                  {dictionary.footer.registryNumber}
                 </p>
 
                 <a
@@ -233,7 +213,7 @@ export function SiteFooter({
                 </a>
 
                 <p className="mt-1 text-xs text-background/45">
-                  Sprawdź wpis w oficjalnym rejestrze
+                  {dictionary.footer.checkRegistry}
                 </p>
               </div>
             </div>
@@ -241,7 +221,7 @@ export function SiteFooter({
 
           <div className="border-white/10 sm:border-l sm:pl-8 lg:px-8">
             <FooterHeading icon={FileText}>
-              Dokumenty
+              {dictionary.footer.documents}
             </FooterHeading>
 
             <div className="mt-6 flex flex-col gap-3">
@@ -289,7 +269,7 @@ export function SiteFooter({
 
             <div className="mt-6 border-t border-white/10 pt-5">
               <p className="text-xs font-bold uppercase tracking-wider text-background/40">
-                Gwarancja turystyczna
+                {dictionary.footer.travelGuarantee}
               </p>
 
               <p className="mt-2 text-sm font-semibold text-background">
@@ -300,7 +280,7 @@ export function SiteFooter({
 
           <div className="border-white/10 sm:border-l sm:pl-8 lg:pl-8">
             <FooterHeading icon={MessageCircle}>
-              Kontakt
+              {dictionary.footer.contact}
             </FooterHeading>
 
             <div className="mt-6 space-y-5">
@@ -320,7 +300,7 @@ export function SiteFooter({
                   </p>
 
                   <p className="mt-1 text-xs text-background/45">
-                    Pon - Pt 9:00 - 18:00
+                    {dictionary.footer.hours}
                   </p>
                 </div>
               </a>
@@ -341,7 +321,7 @@ export function SiteFooter({
                   </p>
 
                   <p className="mt-1 text-xs text-background/45">
-                    Odpowiadamy na wszystkie wiadomości
+                    {dictionary.footer.emailReply}
                   </p>
                 </div>
               </a>
@@ -356,11 +336,11 @@ export function SiteFooter({
 
                 <div>
                   <p className="font-bold text-background transition-colors group-hover:text-primary">
-                    Napisz na WhatsApp
+                    {dictionary.footer.whatsapp}
                   </p>
 
                   <p className="mt-1 text-xs text-background/45">
-                    Szybki kontakt
+                    {dictionary.footer.quickContact}
                   </p>
                 </div>
               </a>
@@ -368,10 +348,11 @@ export function SiteFooter({
 
             <div className="mt-7 border-t border-white/12 pt-6">
               <p className="mb-4 text-sm font-black uppercase tracking-wide text-primary">
-                Śledź nas
+                {dictionary.footer.follow}
               </p>
 
               <SocialLinks />
+              <div className="mt-5 text-background"><LanguageSwitcher /></div>
             </div>
           </div>
         </div>
@@ -388,11 +369,11 @@ export function SiteFooter({
 
         <div className="min-w-0">
           <p className="text-sm font-black leading-tight text-background">
-            Legalny organizator turystyki
+            {dictionary.footer.legalOrganizer}
           </p>
 
           <p className="mt-1 text-xs leading-tight text-background/60">
-            Nr wpisu: 42848
+            {dictionary.footer.entryNumber}
           </p>
         </div>
       </div>
@@ -406,11 +387,11 @@ export function SiteFooter({
 
         <div className="min-w-0">
           <p className="text-sm font-black leading-tight text-background">
-            Turystyczny Fundusz
+            {dictionary.footer.fund}
           </p>
 
           <p className="mt-1 text-xs leading-tight text-background/60">
-            Gwarancyjny i Pomocowy
+            {dictionary.footer.fundDetail}
           </p>
         </div>
       </div>
@@ -425,7 +406,7 @@ export function SiteFooter({
 
         <div className="min-w-0">
           <p className="text-sm font-black leading-tight text-background">
-            Ubezpieczenie podróżne
+            {dictionary.footer.insurance}
           </p>
 
           <p className="mt-1 text-xs leading-tight text-background/50">
@@ -444,11 +425,11 @@ export function SiteFooter({
 
         <div className="min-w-0">
           <p className="text-sm font-black leading-tight text-background lg:whitespace-nowrap">
-            Sprawdzone hotele i pewne bilety
+            {dictionary.footer.trusted}
           </p>
 
           <p className="mt-1 text-xs leading-tight text-background/50">
-            Twój komfort to nasz priorytet
+            {dictionary.footer.priority}
           </p>
         </div>
       </div>
@@ -459,7 +440,7 @@ export function SiteFooter({
         <div className="border-t border-white/10">
           <div className="flex flex-col gap-4 py-5 text-xs text-background/45 md:flex-row md:items-center md:justify-between">
             <p>
-              © 2026 Let&apos;s Gol. Wszystkie prawa zastrzeżone.
+              © 2026 Let&apos;s Gol. {dictionary.footer.rights}
             </p>
 
             <a
@@ -468,7 +449,7 @@ export function SiteFooter({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 transition-colors hover:text-background"
             >
-              Profil firmy w Google
+              {dictionary.footer.google}
 
               <ArrowUpRight
                 className="size-3"

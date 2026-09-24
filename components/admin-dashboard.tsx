@@ -161,7 +161,7 @@ type AdminTeam = Serialized<typeof teamsTable.$inferSelect>
 type AdminLeague = Serialized<typeof leaguesTable.$inferSelect>
 type AdminInquiry = Serialized<typeof inquiriesTable.$inferSelect>
 type AdminTestimonial = Serialized<typeof testimonialsTable.$inferSelect>
-type AdminMedia = Serialized<typeof mediaAssetsTable.$inferSelect>
+type AdminMedia = Serialized<typeof mediaAssetsTable.$inferSelect> & { usage: string[] }
 type AdminGalleryItem = Serialized<typeof galleryItemsTable.$inferSelect>
 type AdminTripGalleryItem = Serialized<typeof tripGalleryItemsTable.$inferSelect>
 type AdminTeamGalleryItem = Serialized<typeof teamGalleryItemsTable.$inferSelect>
@@ -300,6 +300,9 @@ const [tripSort, setTripSort] = useState("nearest")
   const [galleryItems, setGalleryItems] = useState(data.gallery)
   const [youtubeItems, setYoutubeItems] = useState(data.videos)
   const [mediaLibraryPage, setMediaLibraryPage] = useState(1)
+  const [mediaQuery, setMediaQuery] = useState("")
+  const [mediaCategory, setMediaCategory] = useState("all")
+  const [mediaSort, setMediaSort] = useState("newest")
 
   const mediaLibraryAssets = useMemo(
     () =>
@@ -313,8 +316,13 @@ const [tripSort, setTripSort] = useState("nearest")
             (league) =>
               league.logo === `/api/media/${asset.id}`
           )
-      ),
-    [data.media, data.teams, data.leagues]
+      ).filter((asset) => {
+        const search = mediaQuery.trim().toLocaleLowerCase("pl-PL")
+        const matchesSearch = !search || asset.originalName.toLocaleLowerCase("pl-PL").includes(search) || asset.alt.toLocaleLowerCase("pl-PL").includes(search)
+        const matchesCategory = mediaCategory === "all" || asset.category === mediaCategory
+        return matchesSearch && matchesCategory
+      }).sort((a, b) => mediaSort === "oldest" ? a.id - b.id : mediaSort === "name" ? a.originalName.localeCompare(b.originalName, "pl") : b.id - a.id),
+    [data.media, data.teams, data.leagues, mediaQuery, mediaCategory, mediaSort]
   )
 
   const mediaLibraryPageCount = Math.max(
@@ -673,6 +681,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                 <TripDialog
                   teams={data.teams}
                   leagues={data.leagues}
+                  media={data.media}
                   trigger={
                     <Button>
                       <Plus />
@@ -1066,6 +1075,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
       <TripDialog
         teams={data.teams}
         leagues={data.leagues}
+        media={data.media}
         trigger={
           <Button>
             <Plus />
@@ -1217,6 +1227,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                           trip={trip}
                           teams={data.teams}
                           leagues={data.leagues}
+                          media={data.media}
                           trigger={
                             <Button
                               size="icon-sm"
@@ -1305,7 +1316,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
             eyebrow="Baza danych"
             title="Drużyny"
             description="Dodaj drużynę raz. Jej herb, stadion i lokalizacja będą automatycznie używane przy kolejnych wyjazdach."
-            action={<TeamDialog trigger={<Button><Plus />Nowa drużyna</Button>} />}
+            action={<TeamDialog media={data.media} trigger={<Button><Plus />Nowa drużyna</Button>} />}
           />
 
           {data.teams.length === 0 ? (
@@ -1315,14 +1326,15 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
               <CardContent className="pt-6">
                 <div className="overflow-x-auto">
                   <Table>
-                    <TableHeader><TableRow><TableHead>Drużyna</TableHead><TableHead>Stadion</TableHead><TableHead>Lokalizacja</TableHead><TableHead className="text-right">Operacje</TableHead></TableRow></TableHeader>
+                    <TableHeader><TableRow><TableHead>Drużyna</TableHead><TableHead>Zdjęcie wyjazdów</TableHead><TableHead>Stadion</TableHead><TableHead>Lokalizacja</TableHead><TableHead className="text-right">Operacje</TableHead></TableRow></TableHeader>
                     <TableBody>
                       {data.teams.map((team) => (
                         <TableRow key={team.id}>
                           <TableCell><div className="flex items-center gap-3"><span className="relative block size-12 shrink-0 rounded-lg bg-secondary p-1"><Image src={team.logo} alt={`Herb ${team.name}`} fill className="object-contain p-1" sizes="48px" /></span><strong>{team.name}</strong></div></TableCell>
+                          <TableCell>{team.tripImageMediaId ? <img src={`/api/media/${team.tripImageMediaId}`} alt="" className="h-12 w-20 rounded-md object-cover" /> : <Badge variant="outline">Brak zdjęcia</Badge>}</TableCell>
                           <TableCell>{team.stadium}</TableCell>
                           <TableCell>{team.city}, {team.country}</TableCell>
-                          <TableCell><div className="flex justify-end gap-2"><TeamDialog team={team} trigger={<Button size="icon-sm" variant="outline" title="Edytuj drużynę"><Pencil /><span className="sr-only">Edytuj</span></Button>} /><TeamDeleteButton team={team} /></div></TableCell>
+                          <TableCell><div className="flex justify-end gap-2"><TeamDialog team={team} media={data.media} trigger={<Button size="icon-sm" variant="outline" title="Edytuj drużynę"><Pencil /><span className="sr-only">Edytuj</span></Button>} /><TeamDeleteButton team={team} /></div></TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -1345,13 +1357,14 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
         <TabsContent value="media">
           <SectionHeader
             eyebrow="Biblioteka"
-            title="Media i galerie"
-            description="Zdjęcia galerii i herby drużyn są przechowywane osobno, aby łatwiej było nimi zarządzać."
+            title="Media"
+            description="Jedna biblioteka wszystkich zdjęć. Plik możesz przesłać raz, a potem wykorzystać w wielu miejscach."
           />
 
           <Tabs defaultValue="photos" className="mt-6">
-            <TabsList className="grid! h-auto! min-h-14 w-full grid-cols-3 gap-1 rounded-xl border bg-card p-1.5 shadow-sm">
-              <TabsTrigger className="h-full min-w-0 whitespace-normal px-2 py-3 text-center text-xs sm:text-sm" value="photos"><FileImage />Zdjęcia i galerie</TabsTrigger>
+            <TabsList className="grid! h-auto! min-h-14 w-full grid-cols-2 gap-1 rounded-xl border bg-card p-1.5 shadow-sm sm:grid-cols-4">
+              <TabsTrigger className="h-full min-w-0 whitespace-normal px-2 py-3 text-center text-xs sm:text-sm" value="photos"><FileImage />Biblioteka zdjęć</TabsTrigger>
+              <TabsTrigger className="h-full min-w-0 whitespace-normal px-2 py-3 text-center text-xs sm:text-sm" value="galleries"><FileImage />Galerie</TabsTrigger>
               <TabsTrigger className="h-full min-w-0 whitespace-normal px-2 py-3 text-center text-xs sm:text-sm" value="logos"><Trophy />Herby drużyn</TabsTrigger>
               <TabsTrigger className="h-full min-w-0 whitespace-normal px-2 py-3 text-center text-xs sm:text-sm" value="team-galleries"><FileImage />Galerie drużyn</TabsTrigger>
             </TabsList>
@@ -1363,8 +1376,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                 <CardTitle>Dodaj zdjęcie</CardTitle>
 
                 <CardDescription>
-                  JPEG, PNG, WebP lub AVIF, maksymalnie 4 MB.
-                  Zdjęcie zostanie automatycznie zoptymalizowane.
+                  Możesz dodać do 20 zdjęć naraz. Każdy plik zostanie automatycznie zoptymalizowany.
                 </CardDescription>
               </CardHeader>
 
@@ -1378,15 +1390,16 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                     hint=""
                   >
                     <ImageDropzone
-                      name="file"
+                      name="files"
                       accept="image/jpeg,image/png,image/webp,image/avif"
+                      multiple
                       required
                     />
                   </Field>
 
                   <Field
-                    label="Opis zdjęcia"
-                    hint="Napisz krótko, co znajduje się na zdjęciu, np. „Kibice na stadionie w Mediolanie”. Nie musisz używać żadnych specjalnych oznaczeń."
+                    label="Opis zdjęć"
+                    hint="Opcjonalnie. Jeśli pole zostawisz puste, strona utworzy opis automatycznie na podstawie miejsca użycia."
                   >
                     <Input
                       name="alt"
@@ -1394,6 +1407,15 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                     />
                   </Field>
 
+                  <Field label="Kategoria" hint="Pomaga później znaleźć zdjęcie w bibliotece.">
+                    <select name="category" defaultValue="other" className="h-10 rounded-lg border bg-background px-3">
+                      <option value="team">Zdjęcia drużyn</option>
+                      <option value="trip">Galerie wyjazdów</option>
+                      <option value="homepage">Galeria główna</option>
+                      <option value="page">Zdjęcia strony</option>
+                      <option value="other">Pozostałe</option>
+                    </select>
+                  </Field>
                   <Button type="submit">
                     <Upload />
                     Dodaj zdjęcie
@@ -1403,6 +1425,12 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
             </Card>
 
             <div className="min-w-0">
+              <div className="mb-4 grid gap-3 sm:grid-cols-3">
+                <div className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input value={mediaQuery} onChange={(event) => { setMediaQuery(event.target.value); setMediaLibraryPage(1) }} placeholder="Szukaj po nazwie lub opisie" className="pl-9" /></div>
+                <select value={mediaCategory} onChange={(event) => { setMediaCategory(event.target.value); setMediaLibraryPage(1) }} className="h-9 rounded-lg border bg-background px-3 text-sm"><option value="all">Wszystkie kategorie</option><option value="team">Zdjęcia drużyn</option><option value="trip">Galerie wyjazdów</option><option value="homepage">Galeria główna</option><option value="page">Zdjęcia strony</option><option value="other">Pozostałe</option></select>
+                <select value={mediaSort} onChange={(event) => setMediaSort(event.target.value)} className="h-9 rounded-lg border bg-background px-3 text-sm"><option value="newest">Najnowsze</option><option value="oldest">Najstarsze</option><option value="name">Nazwa A-Z</option></select>
+              </div>
+              {visibleMediaLibraryAssets.length === 0 ? <div className="flex min-h-52 flex-col items-center justify-center rounded-xl border border-dashed text-center"><FileImage className="mb-3 size-10 text-muted-foreground" /><p className="font-bold">Brak zdjęć pasujących do filtrów</p><p className="mt-1 text-sm text-muted-foreground">Zmień wyszukiwanie albo dodaj nowe zdjęcia.</p></div> : null}
               <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
                 {visibleMediaLibraryAssets.map((asset) => (
                 <Card
@@ -1429,16 +1457,19 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                       )}{" "}
                       KB
                     </p>
+                    <Badge variant="outline" className="w-fit">{asset.category === "team" ? "Zdjęcia drużyn" : asset.category === "trip" ? "Galerie wyjazdów" : asset.category === "homepage" ? "Galeria główna" : asset.category === "page" ? "Zdjęcia strony" : "Pozostałe"}</Badge>
+                    <div className="rounded-lg bg-muted/50 p-3 text-xs"><p className="font-bold">Użycie zdjęcia</p>{asset.usage.length ? <ul className="mt-1 space-y-1 text-muted-foreground">{asset.usage.slice(0, 3).map((usage) => <li key={usage}>{usage}</li>)}</ul> : <p className="mt-1 text-muted-foreground">Zdjęcie nie jest obecnie używane.</p>}</div>
 
                     <form
                       action={updateMedia}
-                      className="flex gap-2"
+                      className="grid gap-2"
                     >
                       <input
                         type="hidden"
                         name="id"
                         value={asset.id}
                       />
+                      <input type="hidden" name="category" value={asset.category} />
 
                       <Field
                         label="Opis zdjęcia"
@@ -1450,6 +1481,8 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                           placeholder="Np. Kibice podczas meczu"
                         />
                       </Field>
+
+                      <Field label="Opis po angielsku" hint="Opcjonalnie. Pusty opis zostanie utworzony automatycznie."><Input name="altEn" defaultValue={asset.altEn} /></Field>
 
                       <Button
                         type="submit"
@@ -1466,7 +1499,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                         teams={data.teams}
                       />
 
-                      <form action={deleteMedia}>
+                      <form action={deleteMedia} onSubmit={(event) => { if (!window.confirm("Czy na pewno chcesz trwale usunąć ten plik?")) event.preventDefault() }}>
                         <input
                           type="hidden"
                           name="id"
@@ -1478,6 +1511,8 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                           className="w-full"
                           variant="ghost"
                           size="sm"
+                          disabled={asset.usage.length > 0}
+                          title={asset.usage.length > 0 ? "Najpierw usuń wszystkie przypisania tego zdjęcia" : "Trwale usuń plik z biblioteki"}
                         >
                           Usuń
                         </Button>
@@ -1577,6 +1612,16 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
               )}
             </div>
           </div>
+            </TabsContent>
+
+            <TabsContent value="galleries" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><CardTitle>Galerie</CardTitle>
+                  <CardDescription>Galeria to kolekcja zdjęć z biblioteki. Usunięcie zdjęcia z galerii nie kasuje pliku z biblioteki.</CardDescription>
+                  </div><AddFromLibraryDialog assets={mediaLibraryAssets} trips={data.trips} teams={data.teams} /></div>
+                </CardHeader>
+              </Card>
 
           <Card className="mt-6">
             <CardHeader>
@@ -1640,6 +1685,9 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
 
                             <form
                               action={removeGalleryItem}
+                              onSubmit={(event) => {
+                                if (!window.confirm("Usunąć zdjęcie z tej galerii? Plik pozostanie w bibliotece mediów.")) event.preventDefault()
+                              }}
                             >
                               <input
                                 type="hidden"
@@ -1738,6 +1786,9 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                                   action={
                                     removeGalleryItem
                                   }
+                                  onSubmit={(event) => {
+                                    if (!window.confirm("Usunąć zdjęcie z galerii wyjazdu? Plik pozostanie w bibliotece mediów.")) event.preventDefault()
+                                  }}
                                 >
                                   <input
                                     type="hidden"
@@ -1796,6 +1847,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
                             <p className="mt-1 text-xs text-muted-foreground">{team.city}, {team.country}</p>
                             <TeamDialog
                               team={team}
+                              media={data.media}
                               trigger={<Button className="mt-3" size="sm" variant="outline"><Pencil />Zmień herb</Button>}
                             />
                           </div>
@@ -1807,7 +1859,7 @@ const handleYouTubeDragEnd = async (event: DragEndEvent) => {
               </Card>
             </TabsContent>
             <TabsContent value="team-galleries" className="mt-6">
-              <Card><CardHeader><CardTitle>Galerie drużyn</CardTitle><CardDescription>Te zdjęcia będą automatycznie widoczne przy każdym wyjeździe danej drużyny.</CardDescription></CardHeader><CardContent className="space-y-8">{data.teams.map((team) => { const items = data.teamGallery.filter((item) => item.teamId === team.id); return <section key={team.id}><div className="mb-3 flex items-center gap-3"><span className="relative size-8"><Image src={team.logo} alt="" fill className="object-contain" sizes="32px" /></span><h3 className="font-bold">{team.name}</h3><span className="text-xs text-muted-foreground">{items.length} zdjęć</span></div>{items.length ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{items.map((item) => <div key={item.id} className="border-b pb-3"><img src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || team.name} className="aspect-video w-full object-cover" /><form action={updateTeamGalleryItem} className="mt-3 grid gap-2"><input type="hidden" name="id" value={item.id} /><Input name="caption" defaultValue={item.caption} placeholder="Podpis zdjęcia" /><Input name="alt" defaultValue={item.alt} placeholder="Opis alternatywny" /><Input name="sortOrder" type="number" defaultValue={item.sortOrder} aria-label="Kolejność zdjęcia" /><Button type="submit" size="sm" variant="outline">Zapisz</Button></form><form action={removeGalleryItem} className="mt-2"><input type="hidden" name="id" value={item.id} /><input type="hidden" name="scope" value="team" /><Button type="submit" size="sm" variant="ghost">Usuń przypisanie</Button></form></div>)}</div> : <p className="border-y py-5 text-sm text-muted-foreground">Brak zdjęć. Przypisz je z biblioteki przez przycisk Użyj.</p>}</section>})}</CardContent></Card>
+              <Card><CardHeader><CardTitle>Galerie drużyn</CardTitle><CardDescription>Te zdjęcia będą automatycznie widoczne przy każdym wyjeździe danej drużyny. Podpisy i opisy są opcjonalne.</CardDescription></CardHeader><CardContent className="space-y-8">{data.teams.map((team) => { const items = data.teamGallery.filter((item) => item.teamId === team.id); return <section key={team.id}><div className="mb-3 flex items-center gap-3"><span className="relative size-8"><Image src={team.logo} alt="" fill className="object-contain" sizes="32px" /></span><h3 className="font-bold">{team.name}</h3><span className="text-xs text-muted-foreground">{items.length} zdjęć</span></div>{items.length ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{items.map((item) => <div key={item.id} className="border-b pb-3"><img src={`/api/media/${item.mediaId}`} alt={item.alt || item.caption || team.name} className="aspect-video w-full object-cover" /><form action={updateTeamGalleryItem} className="mt-3 grid gap-2"><input type="hidden" name="id" value={item.id} /><Input name="caption" defaultValue={item.caption} placeholder="Podpis opcjonalny" /><Input name="alt" defaultValue={item.alt} placeholder="Opis opcjonalny" /><Input name="captionEn" defaultValue={item.captionEn} placeholder="Podpis EN opcjonalny" /><Input name="altEn" defaultValue={item.altEn} placeholder="Opis EN opcjonalny" /><Input name="sortOrder" type="number" defaultValue={item.sortOrder} aria-label="Kolejność zdjęcia" /><Button type="submit" size="sm" variant="outline">Zapisz</Button></form><form action={removeGalleryItem} className="mt-2" onSubmit={(event) => { if (!window.confirm("Usunąć zdjęcie z galerii drużyny? Plik pozostanie w bibliotece mediów.")) event.preventDefault() }}><input type="hidden" name="id" value={item.id} /><input type="hidden" name="scope" value="team" /><Button type="submit" size="sm" variant="ghost">Usuń przypisanie</Button></form></div>)}</div> : <p className="border-y py-5 text-sm text-muted-foreground">Brak zdjęć. Przypisz je z biblioteki przyciskiem Dodaj zdjęcia.</p>}</section>})}</CardContent></Card>
             </TabsContent>
           </Tabs>
         </TabsContent>
@@ -2998,11 +3050,13 @@ function ImageDropzone({
   accept = "image/jpeg,image/png,image/webp,image/avif",
   required = false,
   currentImage,
+  multiple = false,
 }: {
   name: string
   accept?: string
   required?: boolean
   currentImage?: string
+  multiple?: boolean
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -3013,15 +3067,16 @@ function ImageDropzone({
   const setFiles = (files: FileList | null) => {
     if (!files || !files.length || !inputRef.current) return
 
-    const file = files[0]
+    const selectedFiles = Array.from(files)
+    const oversized = selectedFiles.find((file) => file.size > MAX_UPLOAD_SIZE)
 
-    if (file.size > MAX_UPLOAD_SIZE) {
+    if (oversized) {
       inputRef.current.value = ""
 
       setFileName("")
       setFileSize("")
       setFileError(
-        `Plik jest za duży (${(file.size / 1024 / 1024).toFixed(
+        `Plik ${oversized.name} jest za duży (${(oversized.size / 1024 / 1024).toFixed(
           1
         )} MB). Maksymalny rozmiar to 4 MB.`
       )
@@ -3032,11 +3087,12 @@ function ImageDropzone({
     setFileError("")
 
     const dataTransfer = new DataTransfer()
-    dataTransfer.items.add(file)
+    selectedFiles.slice(0, multiple ? 20 : 1).forEach((file) => dataTransfer.items.add(file))
     inputRef.current.files = dataTransfer.files
 
-    setFileName(file.name)
-    setFileSize(`${(file.size / 1024 / 1024).toFixed(2)} MB`)
+    setFileName(multiple && selectedFiles.length > 1 ? `${selectedFiles.length} wybrane zdjęcia` : selectedFiles[0].name)
+    const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0)
+    setFileSize(`${(totalSize / 1024 / 1024).toFixed(2)} MB łącznie`)
   }
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -3085,6 +3141,7 @@ function ImageDropzone({
           type="file"
           accept={accept}
           required={required}
+          multiple={multiple}
           className="sr-only"
           onChange={(event) => {
             setFiles(event.target.files)
@@ -3684,7 +3741,7 @@ function ChangePasswordForm() {
 
 const initialTeamState: SaveTeamState = {}
 
-function TeamDialog({ team, trigger }: { team?: AdminTeam; trigger: React.ReactNode }) {
+function TeamDialog({ team, media = [], trigger }: { team?: AdminTeam; media?: AdminMedia[]; trigger: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [state, action, pending] = useActionState(saveTeam, initialTeamState)
 
@@ -3697,7 +3754,7 @@ function TeamDialog({ team, trigger }: { team?: AdminTeam; trigger: React.ReactN
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={trigger as React.ReactElement} />
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader><DialogTitle>{team ? "Edytuj drużynę" : "Nowa drużyna"}</DialogTitle><DialogDescription>Te dane będą automatycznie podpowiadane podczas tworzenia wyjazdu.</DialogDescription></DialogHeader>
         <form action={action} className="grid gap-4 sm:grid-cols-2">
           {team && <input type="hidden" name="id" value={team.id} />}
@@ -3706,6 +3763,30 @@ function TeamDialog({ team, trigger }: { team?: AdminTeam; trigger: React.ReactN
           <Field label="Kraj" hint="Domyślny kraj drużyny."><Input name="country" defaultValue={team?.country} required /></Field>
           <div className="sm:col-span-2"><Field label="Stadion" hint="Domyślny stadion gospodarza."><Input name="stadium" defaultValue={team?.stadium} required /></Field></div>
           <div className="sm:col-span-2"><Field label="Herb" hint="Plik zostanie zmniejszony do maksymalnie 128 x 128 px i zapisany jako WebP."><ImageDropzone name="logoFile" accept="image/png,image/webp,image/jpeg,image/avif" required={!team?.logo} currentImage={team?.logo} /></Field></div>
+          <div className="rounded-xl border bg-muted/25 p-4 sm:col-span-2">
+            <h3 className="font-sans text-lg font-black uppercase">Zdjęcie główne wyjazdów</h3>
+            <p className="mt-1 text-sm text-muted-foreground">To zdjęcie będzie automatycznie używane na kartach i stronach nowych wyjazdów tej drużyny. W konkretnym wyjeździe nadal można ustawić wyjątek.</p>
+            {team?.tripImageMediaId ? <img src={`/api/media/${team.tripImageMediaId}`} alt={`Aktualne zdjęcie główne wyjazdów ${team.name}`} className="mt-4 aspect-video w-full max-w-md rounded-lg object-cover" /> : null}
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <Field label="Wybierz z biblioteki" hint="Możesz ponownie użyć zdjęcia, które już zostało przesłane.">
+                <select name="tripImageMediaId" defaultValue={team?.tripImageMediaId || ""} className="h-10 w-full rounded-lg border bg-background px-3">
+                  <option value="">Wybierz zdjęcie</option>
+                  {media.filter((asset) => asset.category !== "logo").map((asset) => <option key={asset.id} value={asset.id}>{asset.originalName || `Zdjęcie #${asset.id}`}</option>)}
+                </select>
+              </Field>
+              <Field label="Albo prześlij nowe" hint="Nowy plik zostanie dodany także do biblioteki mediów.">
+                <ImageDropzone name="tripImageFile" accept="image/png,image/webp,image/jpeg,image/avif" required={!team?.tripImageMediaId && media.length === 0} />
+              </Field>
+            </div>
+          </div>
+          <div className="border-t pt-4 sm:col-span-2">
+            <h3 className="font-sans text-lg font-black uppercase">Wersja angielska</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Nazwę możesz zostawić bez zmian, jeśli jest nazwą własną. Uzupełnij lokalizację i stadion, jeśli wymagają angielskiej formy.</p>
+          </div>
+          <div className="sm:col-span-2"><Field label="Nazwa drużyny po angielsku" hint="Opcjonalnie."><Input name="nameEn" defaultValue={team?.nameEn} /></Field></div>
+          <Field label="Miasto po angielsku" hint="Np. Warsaw zamiast Warszawa."><Input name="cityEn" defaultValue={team?.cityEn} /></Field>
+          <Field label="Kraj po angielsku" hint="Np. Spain."><Input name="countryEn" defaultValue={team?.countryEn} /></Field>
+          <div className="sm:col-span-2"><Field label="Stadion po angielsku" hint="Zwykle nazwa własna pozostaje bez zmian."><Input name="stadiumEn" defaultValue={team?.stadiumEn} /></Field></div>
           {state.error && <p role="alert" className="text-sm text-destructive sm:col-span-2">{state.error}</p>}
           <DialogFooter className="sm:col-span-2"><Button type="submit" disabled={pending}>{pending ? "Zapisuję..." : "Zapisz drużynę"}</Button></DialogFooter>
         </form>
@@ -3720,7 +3801,7 @@ function TeamDeleteButton({ team }: { team: AdminTeam }) {
     if (state.error) toast.error(state.error)
     if (state.success) toast.success("Drużyna została usunięta.")
   }, [state])
-  return <form action={action}><input type="hidden" name="id" value={team.id} /><Button type="submit" size="icon-sm" variant="outline" disabled={pending} title="Usuń drużynę"><XCircle /><span className="sr-only">Usuń</span></Button></form>
+  return <form action={action} onSubmit={(event) => { if (!window.confirm(`Czy na pewno chcesz usunąć drużynę „${team.name}”?`)) event.preventDefault() }}><input type="hidden" name="id" value={team.id} /><Button type="submit" size="icon-sm" variant="outline" disabled={pending} title="Usuń drużynę"><XCircle /><span className="sr-only">Usuń</span></Button></form>
 }
 
 const initialLeagueState: SaveLeagueState = {}
@@ -3735,7 +3816,7 @@ function LeagueDialog({ league, trigger }: { league?: AdminLeague; trigger: Reac
 function LeagueDeleteButton({ league }: { league: AdminLeague }) {
   const [state, action, pending] = useActionState(deleteLeague, initialLeagueState)
   useEffect(() => { if (state.error) toast.error(state.error); if (state.success) toast.success("Liga została usunięta.") }, [state])
-  return <form action={action}><input type="hidden" name="id" value={league.id} /><Button type="submit" size="icon-sm" variant="outline" disabled={pending}><XCircle /><span className="sr-only">Usuń ligę</span></Button></form>
+  return <form action={action} onSubmit={(event) => { if (!window.confirm(`Czy na pewno chcesz usunąć ligę „${league.name}”?`)) event.preventDefault() }}><input type="hidden" name="id" value={league.id} /><Button type="submit" size="icon-sm" variant="outline" disabled={pending}><XCircle /><span className="sr-only">Usuń ligę</span></Button></form>
 }
 
 const initialTripState: SaveTripState = {}
@@ -3744,11 +3825,13 @@ function TripDialog({
   trip,
   teams,
   leagues,
+  media,
   trigger,
 }: {
   trip?: AdminTrip
   teams: AdminTeam[]
   leagues: AdminLeague[]
+  media: AdminMedia[]
   trigger: React.ReactNode
 }) {
   const [open, setOpen] =
@@ -3768,6 +3851,8 @@ function TripDialog({
   const [city, setCity] = useState(trip?.city || "")
   const [country, setCountry] = useState(trip?.country || "")
   const [stadium, setStadium] = useState(trip?.stadium || "")
+  const [coverMode, setCoverMode] = useState(trip?.coverMediaId ? "override" : "team")
+  const selectedHomeTeam = teams.find((team) => String(team.id) === homeTeamId)
   const packageValues = parsePackageItems(trip?.packageItems)
   const activePackageVariants = getPackageVariants(trip?.packageVariants, trip?.packageItems).map((variant) => variant.key)
 
@@ -4022,26 +4107,37 @@ function TripDialog({
             />
           </Field>
 
-          <div className="sm:col-span-2">
-            <Field
-              label="Zdjęcie główne"
-              hint="Wybierz zdjęcie, które będzie głównym zdjęciem tego wyjazdu. Możesz wybrać je z komputera lub telefonu."
-            >
-              <ImageDropzone
-                name="coverFile"
-                accept="image/jpeg,image/png,image/webp,image/avif"
-                required={!trip?.image}
-                currentImage={trip?.image}
-              />
-            </Field>
-
-            {trip?.image ? (
-              <input
-                type="hidden"
-                name="image"
-                value={trip.image}
-              />
-            ) : null}
+          <div className="rounded-xl border bg-muted/25 p-4 sm:col-span-2">
+            <h3 className="font-sans text-lg font-black uppercase">Zdjęcie główne</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Domyślnie wyjazd korzysta ze zdjęcia przypisanego do drużyny gospodarza. Nadpisanie wybierz tylko wtedy, gdy ten konkretny wyjazd ma mieć inne zdjęcie.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <label className={`cursor-pointer rounded-lg border p-4 ${coverMode === "team" ? "border-primary bg-primary/5" : "bg-background"}`}>
+                <input type="radio" name="coverMode" value="team" checked={coverMode === "team"} onChange={() => setCoverMode("team")} className="mr-2" />
+                <strong>Użyj zdjęcia drużyny</strong>
+                <span className="mt-1 block text-xs text-muted-foreground">Bez dodatkowego uploadu. Zmiana zdjęcia w drużynie zaktualizuje także ten wyjazd.</span>
+              </label>
+              <label className={`cursor-pointer rounded-lg border p-4 ${coverMode === "override" ? "border-primary bg-primary/5" : "bg-background"}`}>
+                <input type="radio" name="coverMode" value="override" checked={coverMode === "override"} onChange={() => setCoverMode("override")} className="mr-2" />
+                <strong>Ustaw inne zdjęcie</strong>
+                <span className="mt-1 block text-xs text-muted-foreground">Opcja zaawansowana dla pojedynczej oferty.</span>
+              </label>
+            </div>
+            {coverMode === "team" ? (
+              selectedHomeTeam?.tripImageMediaId ? <img src={`/api/media/${selectedHomeTeam.tripImageMediaId}`} alt="Podgląd zdjęcia drużyny" className="mt-4 aspect-video w-full max-w-lg rounded-lg object-cover" /> : <p className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">Wybrana drużyna nie ma jeszcze zdjęcia głównego wyjazdów. Dodaj je w sekcji Drużyny.</p>
+            ) : (
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <Field label="Wybierz z biblioteki" hint="Ponownie użyj istniejącego zdjęcia.">
+                  <select name="coverMediaId" defaultValue={trip?.coverMediaId || ""} className="h-10 w-full rounded-lg border bg-background px-3">
+                    <option value="">Wybierz zdjęcie</option>
+                    {media.filter((asset) => asset.category !== "logo").map((asset) => <option key={asset.id} value={asset.id}>{asset.originalName || `Zdjęcie #${asset.id}`}</option>)}
+                  </select>
+                </Field>
+                <Field label="Albo prześlij nowe" hint="Plik zostanie zapisany w bibliotece.">
+                  <ImageDropzone name="coverFile" accept="image/jpeg,image/png,image/webp,image/avif" currentImage={trip?.coverMediaId ? trip.image : undefined} />
+                </Field>
+              </div>
+            )}
+            {trip?.image ? <input type="hidden" name="image" value={trip.image} /> : null}
           </div>
 
           <div className="sm:col-span-2">
@@ -4130,6 +4226,31 @@ function TripDialog({
             </Field>
           </div>
 
+          <details className="rounded-xl border bg-muted/20 p-4 sm:col-span-2" open={!trip?.titleEn}>
+            <summary className="cursor-pointer font-sans text-lg font-black uppercase">Wersja angielska</summary>
+            <p className="mt-1 text-sm text-muted-foreground">Treści widoczne pod adresem /en. Puste pola otrzymają bezpieczny angielski fallback, ale warto uzupełnić je przed publikacją.</p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-2"><Field label="Tytuł po angielsku" hint="Naturalna nazwa oferty dla klienta anglojęzycznego."><Input name="titleEn" defaultValue={trip?.titleEn} /></Field></div>
+              <Field label="Miasto po angielsku" hint="Możesz pozostawić nazwę własną bez zmian."><Input name="cityEn" defaultValue={trip?.cityEn} /></Field>
+              <Field label="Kraj po angielsku" hint="Np. Spain, Italy, England."><Input name="countryEn" defaultValue={trip?.countryEn} /></Field>
+              <div className="sm:col-span-2"><DescriptionEditor name="descriptionEn" defaultValue={trip?.descriptionEn} label="Opis po angielsku" /></div>
+              <div className="sm:col-span-2"><Field label="Dodatkowe elementy pakietu po angielsku" hint="Każdy w osobnej linii."><Textarea name="includesEn" defaultValue={trip?.includesEn?.join("\n")} rows={4} /></Field></div>
+              <div className="sm:col-span-2"><Field label="Plan wyjazdu po angielsku" hint="Każdy etap w osobnej linii."><Textarea name="itineraryEn" defaultValue={trip?.itineraryEn?.join("\n")} rows={5} /></Field></div>
+              <div className="sm:col-span-2"><Field label="Hotel po angielsku" hint="Opis hotelu i wyżywienia."><Textarea name="hotelInfoEn" defaultValue={trip?.hotelInfoEn} rows={4} /></Field></div>
+              <div className="sm:col-span-2"><Field label="Loty po angielsku" hint="Lotniska, bagaż i sposób potwierdzenia godzin."><Textarea name="flightInfoEn" defaultValue={trip?.flightInfoEn} rows={4} /></Field></div>
+              <Field label="Kategoria biletu po angielsku" hint=""><Input name="ticketCategoryEn" defaultValue={trip?.ticketCategoryEn} /></Field>
+              <Field label="Miejsca na stadionie po angielsku" hint=""><Input name="seatingInfoEn" defaultValue={trip?.seatingInfoEn} /></Field>
+              <Field label="Wyżywienie po angielsku" hint=""><Input name="hotelBoardEn" defaultValue={trip?.hotelBoardEn} /></Field>
+              <Field label="Rodzaj pokoju po angielsku" hint=""><Input name="roomTypeEn" defaultValue={trip?.roomTypeEn} /></Field>
+              <Field label="Lotniska wylotu po angielsku" hint=""><Input name="departureAirportsEn" defaultValue={trip?.departureAirportsEn} /></Field>
+              <Field label="Rodzaj lotu po angielsku" hint=""><Input name="flightTypeEn" defaultValue={trip?.flightTypeEn} /></Field>
+              <div className="sm:col-span-2"><Field label="Bagaż po angielsku" hint=""><Input name="baggageInfoEn" defaultValue={trip?.baggageInfoEn} /></Field></div>
+              <div className="sm:col-span-2"><Field label="FAQ po angielsku" hint="Pytanie i odpowiedź oddziel znakiem |. Każda para w osobnej linii."><Textarea name="faqEn" defaultValue={trip?.faqEn?.join("\n")} rows={5} /></Field></div>
+              <Field label="Tytuł SEO po angielsku" hint="Najlepiej 50-60 znaków."><Input name="seoTitleEn" defaultValue={trip?.seoTitleEn} maxLength={70} /></Field>
+              <Field label="Opis SEO po angielsku" hint="Naturalny opis oferty w wynikach wyszukiwania."><Textarea name="seoDescriptionEn" defaultValue={trip?.seoDescriptionEn} rows={3} maxLength={180} /></Field>
+            </div>
+          </details>
+
           <Field
             label="Tytuł strony w Google"
             hint="Tytuł, który może być wyświetlany przy stronie w wynikach Google. Najlepiej około 50-60 znaków."
@@ -4208,6 +4329,48 @@ const initialGalleryState: AddGalleryItemState = {}
 
 async function updateTeamGalleryItem(formData: FormData) {
   await updateTeamGalleryItemState({}, formData)
+}
+
+function AddFromLibraryDialog({ assets, trips, teams }: { assets: AdminMedia[]; trips: AdminTrip[]; teams: AdminTeam[] }) {
+  const [open, setOpen] = useState(false)
+  const [selected, setSelected] = useState<number[]>([])
+  const [state, action, pending] = useActionState(addGalleryItem, initialGalleryState)
+
+  useEffect(() => {
+    if (!state.success) return
+    toast.success(state.message || "Zdjęcia zostały dodane do galerii.")
+    setSelected([])
+    setOpen(false)
+  }, [state])
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger render={<Button />}><Plus />Dodaj zdjęcia</DialogTrigger>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
+        <DialogHeader><DialogTitle>Dodaj zdjęcia do galerii</DialogTitle><DialogDescription>Wybierz zdjęcia z biblioteki albo prześlij nowe, wskaż galerię i zatwierdź. Podpisy nie są wymagane.</DialogDescription></DialogHeader>
+        <form action={action} className="space-y-5">
+          <input type="hidden" name="mediaIds" value={selected.join(",")} />
+          <Field label="Galeria" hint="Wybierz miejsce, w którym zdjęcia będą wyświetlane.">
+            <select name="destination" className="h-10 w-full rounded-lg border bg-background px-3">
+              <option value="global">Galeria główna</option>
+              {trips.map((trip) => <option key={trip.id} value={`trip:${trip.id}`}>Wyjazd: {trip.title}</option>)}
+              {teams.map((team) => <option key={team.id} value={`team:${team.id}`}>Drużyna: {team.name}</option>)}
+            </select>
+          </Field>
+          <Field label="Prześlij nowe" hint="Możesz od razu dodać do 20 nowych zdjęć. Trafią także do biblioteki mediów.">
+            <ImageDropzone name="files" accept="image/jpeg,image/png,image/webp,image/avif" multiple />
+          </Field>
+          <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-muted-foreground"><span className="h-px flex-1 bg-border" /><span>lub wybierz z biblioteki</span><span className="h-px flex-1 bg-border" /></div>
+          {assets.length ? <div className="grid max-h-[50vh] gap-3 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3">{assets.map((asset) => {
+            const checked = selected.includes(asset.id)
+            return <label key={asset.id} className={`cursor-pointer overflow-hidden rounded-xl border ${checked ? "border-primary ring-2 ring-primary/20" : ""}`}><img src={`/api/media/${asset.id}`} alt={asset.alt || asset.originalName} className="aspect-video w-full object-cover" /><span className="flex items-center gap-2 p-3 text-sm"><input type="checkbox" checked={checked} onChange={() => setSelected((current) => checked ? current.filter((id) => id !== asset.id) : [...current, asset.id])} /><span className="truncate">{asset.originalName}</span></span></label>
+          })}</div> : <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">Biblioteka jest pusta. Najpierw prześlij zdjęcia w zakładce Biblioteka zdjęć.</p>}
+          {state.error ? <p role="alert" className="text-sm text-destructive">{state.error}</p> : null}
+          <DialogFooter><Button type="submit" disabled={pending}>{pending ? "Dodaję..." : selected.length ? `Dodaj wybrane (${selected.length})` : "Dodaj zdjęcia"}</Button></DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
 }
 
 function GalleryDialog({
@@ -4313,6 +4476,10 @@ function GalleryDialog({
               placeholder="Np. Kibice na stadionie"
             />
           </Field>
+
+          <Field label="Podpis po angielsku" hint="Opcjonalnie."><Input name="captionEn" /></Field>
+          <Field label="Miasto po angielsku" hint="Opcjonalnie."><Input name="cityEn" /></Field>
+          <Field label="Opis zdjęcia po angielsku" hint="Opcjonalnie. Pusty opis zostanie wygenerowany automatycznie."><Input name="altEn" defaultValue={asset.altEn} /></Field>
 
           {state.error && (
             <p
@@ -4466,6 +4633,17 @@ function EditGalleryItemDialog({
             />
           </Field>
 
+          <Field label="Opis zdjęcia" hint="Opcjonalny tekst dla czytników ekranu.">
+            <Input name="alt" defaultValue={item.alt} />
+          </Field>
+
+          <div className="border-t pt-4">
+            <h3 className="font-sans text-lg font-black uppercase">Wersja angielska</h3>
+          </div>
+          <Field label="Podpis po angielsku" hint="Opcjonalnie."><Input name="titleEn" defaultValue={item.titleEn} /></Field>
+          <Field label="Miasto po angielsku" hint="Opcjonalnie."><Input name="cityEn" defaultValue={item.cityEn} /></Field>
+          <Field label="Opis zdjęcia po angielsku" hint="Opcjonalnie. Pusty opis zostanie utworzony automatycznie."><Input name="altEn" defaultValue={item.altEn} /></Field>
+
           {state.error && (
             <p
               role="alert"
@@ -4606,6 +4784,10 @@ function EditTripGalleryItemDialog({
             />
           </Field>
 
+          <Field label="Podpis po angielsku" hint="Opcjonalnie."><Input name="captionEn" defaultValue={item.captionEn} maxLength={160} /></Field>
+          <Field label="Opis zdjęcia po angielsku" hint="Opcjonalnie. Pusty opis zostanie wygenerowany automatycznie."><Input name="altEn" defaultValue={item.altEn} maxLength={240} /></Field>
+          <Field label="Kolejność" hint="Niższa liczba oznacza wcześniejsze miejsce w galerii."><Input name="sortOrder" type="number" defaultValue={item.sortOrder} /></Field>
+
           {state.error && (
             <p
               role="alert"
@@ -4709,6 +4891,13 @@ function TestimonialDialog({
               required
             />
           </Field>
+
+          <div className="border-t pt-4">
+            <h3 className="font-sans text-lg font-black uppercase">Wersja angielska</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Opinie bez angielskiej treści nie będą pokazywane na stronie EN.</p>
+          </div>
+          <Field label="Wyjazd po angielsku" hint="Opcjonalnie."><Input name="tripNameEn" defaultValue={item?.tripNameEn} /></Field>
+          <Field label="Treść opinii po angielsku" hint="Naturalne tłumaczenie wypowiedzi klienta."><Textarea name="contentEn" defaultValue={item?.contentEn} /></Field>
 
           <div className="grid grid-cols-3 gap-3">
             <Field
@@ -5006,6 +5195,29 @@ function SettingsForm({
   const getField = (key: string) =>
     fields.find((field) => field[0] === key)
 
+  const englishFallbacks: Record<string, string> = {
+    seoTitle: "Let’s Gol - football match trips across Europe",
+    seoDescription: "Complete football match trips with tickets, flights, hotels and on-site support.",
+    heroEyebrow: "Trips to Europe’s biggest football matches",
+    heroTitle: "You choose the match. We organise the rest.",
+    heroDescription: "Tickets, flights, hotels and coordinator support in one complete package.",
+    heroCta: "View trips",
+    tripsTitle: "Upcoming trips",
+    tripsDescription: "Choose a ready-made package and take your seat at Europe’s greatest stadiums.",
+    customTripTitle: "Can’t find your match? We will organise it for you",
+    packageTitle: "What is included in the complete package?",
+    benefitsTitle: "Let’s Gol handles the details. You enjoy the match.",
+    processTitle: "How does booking work?",
+    galleryTitle: "Photos from our trips",
+    testimonialsTitle: "Real emotions, shared from the stands",
+    faqTitle: "Frequently asked questions",
+    youtubeTitle: "Latest on YouTube",
+    aboutTitle: "We travel together and support together",
+    aboutText: "We create football trips that stay with you for years.",
+    contactTitle: "Which match is on your mind?",
+    footerText: "Complete football match trips across Europe.",
+  }
+
   const renderField = (key: string) => {
     const field = getField(key)
 
@@ -5034,6 +5246,16 @@ function SettingsForm({
     )
   }
 
+  const renderEnglishField = (key: string) => {
+    const field = getField(key)
+    if (!field) return null
+    const [, label, hint] = field
+    const isTextarea = key.endsWith("Text") || key.endsWith("Description")
+    const fieldName = `setting.${key}En`
+    const value = settings[`${key}En`] || englishFallbacks[key] || ""
+    return <Field key={`${key}En`} label={`${label} - EN`} hint={`${hint} Wersja angielska.`}>{isTextarea ? <Textarea name={fieldName} defaultValue={value} rows={4} /> : <Input name={fieldName} defaultValue={value} />}</Field>
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -5059,6 +5281,35 @@ function SettingsForm({
           <CardContent className="grid gap-5">
             {renderField("seoTitle")}
             {renderField("seoDescription")}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Treści angielskie</CardTitle>
+            <CardDescription>Angielska wersja strony publicznej. Panel administracyjny nadal pozostaje po polsku.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-5 md:grid-cols-2">
+            {renderEnglishField("seoTitle")}
+            {renderEnglishField("seoDescription")}
+            {renderEnglishField("heroEyebrow")}
+            {renderEnglishField("heroTitle")}
+            {renderEnglishField("heroDescription")}
+            {renderEnglishField("heroCta")}
+            {renderEnglishField("tripsTitle")}
+            {renderEnglishField("tripsDescription")}
+            {renderEnglishField("customTripTitle")}
+            {renderEnglishField("packageTitle")}
+            {renderEnglishField("benefitsTitle")}
+            {renderEnglishField("processTitle")}
+            {renderEnglishField("galleryTitle")}
+            {renderEnglishField("testimonialsTitle")}
+            {renderEnglishField("faqTitle")}
+            {renderEnglishField("youtubeTitle")}
+            {renderEnglishField("aboutTitle")}
+            {renderEnglishField("aboutText")}
+            {renderEnglishField("contactTitle")}
+            {renderEnglishField("footerText")}
           </CardContent>
         </Card>
 
