@@ -172,22 +172,28 @@ export function SiteHeader() {
           </Button>
         </div>
 
-        <Button
-          variant="outline"
-          size="icon-lg"
-          className="ml-auto border-background/30 bg-transparent text-background lg:hidden"
-          aria-label={
-            open
-              ? dictionary.navigation.close
-              : dictionary.navigation.open
-          }
-          aria-expanded={open}
-          onClick={() =>
-            setOpen((value) => !value)
-          }
-        >
-          {open ? <X /> : <Menu />}
-        </Button>
+        <div className="ml-auto flex items-center gap-2 lg:hidden">
+  <div className="text-background">
+    <LanguageSwitcher compact />
+  </div>
+
+  <Button
+    variant="outline"
+    size="icon-lg"
+    className="border-background/30 bg-transparent text-background"
+    aria-label={
+      open
+        ? dictionary.navigation.close
+        : dictionary.navigation.open
+    }
+    aria-expanded={open}
+    onClick={() =>
+      setOpen((value) => !value)
+    }
+  >
+    {open ? <X /> : <Menu />}
+  </Button>
+</div>
       </div>
 
       {open ? (
@@ -255,10 +261,7 @@ export function SiteHeader() {
             </p>
 
             <SocialLinks showLabels />
-
-            <div className="mt-4 text-background">
-              <LanguageSwitcher compact />
-            </div>
+            
           </div>
         </nav>
       ) : null}
