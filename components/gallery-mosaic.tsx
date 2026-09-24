@@ -233,7 +233,7 @@ export function GalleryMosaic({
   }
 
   return (
-    <div className="mx-auto w-full px-4 sm:px-0 lg:max-w-5xl lg:px-6 xl:max-w-6xl">
+    <div className="mx-auto w-full max-w-7xl px-4 md:px-6">
       <div className="flex flex-col gap-1.5 overflow-hidden rounded-xl bg-section-light p-1.5 sm:rounded-none lg:rounded-xl">
         {groups.map(
           (
