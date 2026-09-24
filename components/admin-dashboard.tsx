@@ -22,6 +22,7 @@ import {
   Inbox,
   KeyRound,
   LayoutDashboard,
+  Languages,
   LogOut,
   Mail,
   MessageCircle,
@@ -75,6 +76,10 @@ import {
   updateMedia,
   uploadMedia,
 } from "@/app/actions/admin"
+import {
+  translateTripToEnglish,
+  type TripTranslationFields,
+} from "@/app/actions/translation"
 
 import {
   changeAdminPassword,
@@ -3834,6 +3839,7 @@ function TripDialog({
   media: AdminMedia[]
   trigger: React.ReactNode
 }) {
+  const formRef = useRef<HTMLFormElement>(null)
   const [open, setOpen] =
     useState(false)
 
@@ -3852,6 +3858,28 @@ function TripDialog({
   const [country, setCountry] = useState(trip?.country || "")
   const [stadium, setStadium] = useState(trip?.stadium || "")
   const [coverMode, setCoverMode] = useState(trip?.coverMediaId ? "override" : "team")
+  const [translating, setTranslating] = useState(false)
+  const [translationRevision, setTranslationRevision] = useState(0)
+  const [englishFields, setEnglishFields] = useState<TripTranslationFields>(() => ({
+    titleEn: trip?.titleEn || "",
+    cityEn: trip?.cityEn || "",
+    countryEn: trip?.countryEn || "",
+    descriptionEn: trip?.descriptionEn || "",
+    includesEn: trip?.includesEn?.join("\n") || "",
+    itineraryEn: trip?.itineraryEn?.join("\n") || "",
+    hotelInfoEn: trip?.hotelInfoEn || "",
+    flightInfoEn: trip?.flightInfoEn || "",
+    ticketCategoryEn: trip?.ticketCategoryEn || "",
+    seatingInfoEn: trip?.seatingInfoEn || "",
+    hotelBoardEn: trip?.hotelBoardEn || "",
+    roomTypeEn: trip?.roomTypeEn || "",
+    departureAirportsEn: trip?.departureAirportsEn || "",
+    flightTypeEn: trip?.flightTypeEn || "",
+    baggageInfoEn: trip?.baggageInfoEn || "",
+    faqEn: trip?.faqEn?.join("\n") || "",
+    seoTitleEn: trip?.seoTitleEn || "",
+    seoDescriptionEn: trip?.seoDescriptionEn || "",
+  }))
   const selectedHomeTeam = teams.find((team) => String(team.id) === homeTeamId)
   const packageValues = parsePackageItems(trip?.packageItems)
   const activePackageVariants = getPackageVariants(trip?.packageVariants, trip?.packageItems).map((variant) => variant.key)
@@ -3876,6 +3904,56 @@ function TripDialog({
   const selectAwayTeam = (value: string) => {
     setAwayTeamId(value)
     updateTitle(homeTeamId, value)
+  }
+
+  const updateEnglishField = (field: keyof TripTranslationFields, value: string) => {
+    setEnglishFields((current) => ({ ...current, [field]: value }))
+  }
+
+  const handleTranslate = async () => {
+    const form = formRef.current
+    if (!form) return
+
+    const sourceNames = [
+      "title", "city", "country", "description", "includes", "itinerary",
+      "hotelInfo", "flightInfo", "ticketCategory", "seatingInfo", "hotelBoard",
+      "roomType", "departureAirports", "flightType", "baggageInfo", "faq",
+      "seoTitle", "seoDescription",
+    ]
+    const englishNames = Object.keys(englishFields)
+    const readValue = (name: string) => {
+      const element = form.elements.namedItem(name)
+      return element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement
+        ? element.value
+        : ""
+    }
+
+    if (
+      englishNames.some((name) => readValue(name).trim()) &&
+      !window.confirm("Angielskie pola zawierają już treść. Czy zastąpić ją nowym tłumaczeniem?")
+    ) {
+      return
+    }
+
+    const sourceData = new FormData()
+    sourceNames.forEach((name) => sourceData.set(name, readValue(name)))
+
+    setTranslating(true)
+    try {
+      const result = await translateTripToEnglish(sourceData)
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      setEnglishFields(result.fields)
+      setTranslationRevision((value) => value + 1)
+      toast.success("Angielskie pola zostały uzupełnione. Sprawdź tłumaczenie i zapisz wyjazd.")
+    } catch {
+      toast.error("Nie udało się połączyć z usługą tłumaczenia.")
+    } finally {
+      setTranslating(false)
+    }
   }
 
   useEffect(() => {
@@ -3917,6 +3995,7 @@ function TripDialog({
         </DialogHeader>
 
         <form
+          ref={formRef}
           action={action}
           className="grid gap-4 sm:grid-cols-2"
         >
@@ -4229,25 +4308,32 @@ function TripDialog({
           <details className="rounded-xl border bg-muted/20 p-4 sm:col-span-2" open={!trip?.titleEn}>
             <summary className="cursor-pointer font-sans text-lg font-black uppercase">Wersja angielska</summary>
             <p className="mt-1 text-sm text-muted-foreground">Treści widoczne pod adresem /en. Puste pola otrzymają bezpieczny angielski fallback, ale warto uzupełnić je przed publikacją.</p>
+            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
+              <Button type="button" onClick={handleTranslate} disabled={translating}>
+                <Languages className={translating ? "animate-pulse" : ""} />
+                {translating ? "Tłumaczę..." : "Przetłumacz na angielski"}
+              </Button>
+              <p className="text-xs text-muted-foreground">Google przetłumaczy polskie pola, ale niczego nie zapisze bez użycia przycisku „Zapisz wyjazd”.</p>
+            </div>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2"><Field label="Tytuł po angielsku" hint="Naturalna nazwa oferty dla klienta anglojęzycznego."><Input name="titleEn" defaultValue={trip?.titleEn} /></Field></div>
-              <Field label="Miasto po angielsku" hint="Możesz pozostawić nazwę własną bez zmian."><Input name="cityEn" defaultValue={trip?.cityEn} /></Field>
-              <Field label="Kraj po angielsku" hint="Np. Spain, Italy, England."><Input name="countryEn" defaultValue={trip?.countryEn} /></Field>
-              <div className="sm:col-span-2"><DescriptionEditor name="descriptionEn" defaultValue={trip?.descriptionEn} label="Opis po angielsku" /></div>
-              <div className="sm:col-span-2"><Field label="Dodatkowe elementy pakietu po angielsku" hint="Każdy w osobnej linii."><Textarea name="includesEn" defaultValue={trip?.includesEn?.join("\n")} rows={4} /></Field></div>
-              <div className="sm:col-span-2"><Field label="Plan wyjazdu po angielsku" hint="Każdy etap w osobnej linii."><Textarea name="itineraryEn" defaultValue={trip?.itineraryEn?.join("\n")} rows={5} /></Field></div>
-              <div className="sm:col-span-2"><Field label="Hotel po angielsku" hint="Opis hotelu i wyżywienia."><Textarea name="hotelInfoEn" defaultValue={trip?.hotelInfoEn} rows={4} /></Field></div>
-              <div className="sm:col-span-2"><Field label="Loty po angielsku" hint="Lotniska, bagaż i sposób potwierdzenia godzin."><Textarea name="flightInfoEn" defaultValue={trip?.flightInfoEn} rows={4} /></Field></div>
-              <Field label="Kategoria biletu po angielsku" hint=""><Input name="ticketCategoryEn" defaultValue={trip?.ticketCategoryEn} /></Field>
-              <Field label="Miejsca na stadionie po angielsku" hint=""><Input name="seatingInfoEn" defaultValue={trip?.seatingInfoEn} /></Field>
-              <Field label="Wyżywienie po angielsku" hint=""><Input name="hotelBoardEn" defaultValue={trip?.hotelBoardEn} /></Field>
-              <Field label="Rodzaj pokoju po angielsku" hint=""><Input name="roomTypeEn" defaultValue={trip?.roomTypeEn} /></Field>
-              <Field label="Lotniska wylotu po angielsku" hint=""><Input name="departureAirportsEn" defaultValue={trip?.departureAirportsEn} /></Field>
-              <Field label="Rodzaj lotu po angielsku" hint=""><Input name="flightTypeEn" defaultValue={trip?.flightTypeEn} /></Field>
-              <div className="sm:col-span-2"><Field label="Bagaż po angielsku" hint=""><Input name="baggageInfoEn" defaultValue={trip?.baggageInfoEn} /></Field></div>
-              <div className="sm:col-span-2"><Field label="FAQ po angielsku" hint="Pytanie i odpowiedź oddziel znakiem |. Każda para w osobnej linii."><Textarea name="faqEn" defaultValue={trip?.faqEn?.join("\n")} rows={5} /></Field></div>
-              <Field label="Tytuł SEO po angielsku" hint="Najlepiej 50-60 znaków."><Input name="seoTitleEn" defaultValue={trip?.seoTitleEn} maxLength={70} /></Field>
-              <Field label="Opis SEO po angielsku" hint="Naturalny opis oferty w wynikach wyszukiwania."><Textarea name="seoDescriptionEn" defaultValue={trip?.seoDescriptionEn} rows={3} maxLength={180} /></Field>
+              <div className="sm:col-span-2"><Field label="Tytuł po angielsku" hint="Naturalna nazwa oferty dla klienta anglojęzycznego."><Input name="titleEn" value={englishFields.titleEn} onChange={(event) => updateEnglishField("titleEn", event.target.value)} /></Field></div>
+              <Field label="Miasto po angielsku" hint="Możesz pozostawić nazwę własną bez zmian."><Input name="cityEn" value={englishFields.cityEn} onChange={(event) => updateEnglishField("cityEn", event.target.value)} /></Field>
+              <Field label="Kraj po angielsku" hint="Np. Spain, Italy, England."><Input name="countryEn" value={englishFields.countryEn} onChange={(event) => updateEnglishField("countryEn", event.target.value)} /></Field>
+              <div className="sm:col-span-2"><DescriptionEditor key={`description-en-${translationRevision}`} name="descriptionEn" defaultValue={englishFields.descriptionEn} label="Opis po angielsku" /></div>
+              <div className="sm:col-span-2"><Field label="Dodatkowe elementy pakietu po angielsku" hint="Każdy w osobnej linii."><Textarea name="includesEn" value={englishFields.includesEn} onChange={(event) => updateEnglishField("includesEn", event.target.value)} rows={4} /></Field></div>
+              <div className="sm:col-span-2"><Field label="Plan wyjazdu po angielsku" hint="Każdy etap w osobnej linii."><Textarea name="itineraryEn" value={englishFields.itineraryEn} onChange={(event) => updateEnglishField("itineraryEn", event.target.value)} rows={5} /></Field></div>
+              <div className="sm:col-span-2"><Field label="Hotel po angielsku" hint="Opis hotelu i wyżywienia."><Textarea name="hotelInfoEn" value={englishFields.hotelInfoEn} onChange={(event) => updateEnglishField("hotelInfoEn", event.target.value)} rows={4} /></Field></div>
+              <div className="sm:col-span-2"><Field label="Loty po angielsku" hint="Lotniska, bagaż i sposób potwierdzenia godzin."><Textarea name="flightInfoEn" value={englishFields.flightInfoEn} onChange={(event) => updateEnglishField("flightInfoEn", event.target.value)} rows={4} /></Field></div>
+              <Field label="Kategoria biletu po angielsku" hint=""><Input name="ticketCategoryEn" value={englishFields.ticketCategoryEn} onChange={(event) => updateEnglishField("ticketCategoryEn", event.target.value)} /></Field>
+              <Field label="Miejsca na stadionie po angielsku" hint=""><Input name="seatingInfoEn" value={englishFields.seatingInfoEn} onChange={(event) => updateEnglishField("seatingInfoEn", event.target.value)} /></Field>
+              <Field label="Wyżywienie po angielsku" hint=""><Input name="hotelBoardEn" value={englishFields.hotelBoardEn} onChange={(event) => updateEnglishField("hotelBoardEn", event.target.value)} /></Field>
+              <Field label="Rodzaj pokoju po angielsku" hint=""><Input name="roomTypeEn" value={englishFields.roomTypeEn} onChange={(event) => updateEnglishField("roomTypeEn", event.target.value)} /></Field>
+              <Field label="Lotniska wylotu po angielsku" hint=""><Input name="departureAirportsEn" value={englishFields.departureAirportsEn} onChange={(event) => updateEnglishField("departureAirportsEn", event.target.value)} /></Field>
+              <Field label="Rodzaj lotu po angielsku" hint=""><Input name="flightTypeEn" value={englishFields.flightTypeEn} onChange={(event) => updateEnglishField("flightTypeEn", event.target.value)} /></Field>
+              <div className="sm:col-span-2"><Field label="Bagaż po angielsku" hint=""><Input name="baggageInfoEn" value={englishFields.baggageInfoEn} onChange={(event) => updateEnglishField("baggageInfoEn", event.target.value)} /></Field></div>
+              <div className="sm:col-span-2"><Field label="FAQ po angielsku" hint="Pytanie i odpowiedź oddziel znakiem |. Każda para w osobnej linii."><Textarea name="faqEn" value={englishFields.faqEn} onChange={(event) => updateEnglishField("faqEn", event.target.value)} rows={5} /></Field></div>
+              <Field label="Tytuł SEO po angielsku" hint="Najlepiej 50-60 znaków."><Input name="seoTitleEn" value={englishFields.seoTitleEn} onChange={(event) => updateEnglishField("seoTitleEn", event.target.value)} maxLength={70} /></Field>
+              <Field label="Opis SEO po angielsku" hint="Naturalny opis oferty w wynikach wyszukiwania."><Textarea name="seoDescriptionEn" value={englishFields.seoDescriptionEn} onChange={(event) => updateEnglishField("seoDescriptionEn", event.target.value)} rows={3} maxLength={180} /></Field>
             </div>
           </details>
 
