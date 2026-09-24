@@ -132,26 +132,6 @@ export default async function FaqPage() {
         </div>
       </section>
 
-      <section className="border-b border-foreground/10 bg-secondary/60">
-        <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
-            {isEn ? "Most viewed" : "Najczęściej sprawdzane"}
-          </p>
-
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-2 lg:flex-wrap lg:overflow-visible">
-            {popularFaqLinks.map((item) => (
-              <a
-                key={`${item.categoryId}-${item.question}`}
-                href={`#${item.categoryId}`}
-                className="min-h-11 shrink-0 rounded-full border border-foreground/15 bg-background px-4 py-2.5 text-sm font-semibold transition-all duration-200 hover:border-primary hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              >
-                {item.question}
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section
         id="faq"
         className="scroll-mt-20 bg-section-light px-4 py-16 md:px-6 md:py-24"
