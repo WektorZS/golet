@@ -426,26 +426,26 @@ export function ImageLightbox({
           />
 
           <button
-            type="button"
-            onClick={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
+  type="button"
+  onClick={(event) => {
+    event.preventDefault()
+    event.stopPropagation()
 
-              setIsOpen(false)
-            }}
-            className="absolute right-3 top-3 z-[70] flex size-11 items-center justify-center rounded-full bg-white text-black shadow-xl transition-transform duration-200 hover:scale-105 sm:right-5 sm:top-5 sm:size-12"
-            aria-label={
-              isEn
-                ? "Close photo"
-                : "Zamknij zdjęcie"
-            }
-          >
-            <X
-              className="size-5 sm:size-6"
-              strokeWidth={2.5}
-              aria-hidden="true"
-            />
-          </button>
+    setIsOpen(false)
+  }}
+  className="absolute right-4 top-4 z-[70] flex size-10 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md transition-[background-color,transform,border-color] duration-200 hover:scale-105 hover:border-white/25 hover:bg-black/75 sm:right-6 sm:top-6 sm:size-11"
+  aria-label={
+    isEn
+      ? "Close photo"
+      : "Zamknij zdjęcie"
+  }
+>
+  <X
+    className="size-5"
+    strokeWidth={2.2}
+    aria-hidden="true"
+  />
+</button>
 
           {hasMultipleImages && (
             <>
