@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Maximize2,
+  X,
 } from "lucide-react"
 
 import { localeFromPathname } from "@/lib/i18n"
@@ -34,8 +35,7 @@ type LightboxImage = {
 
 const LIGHTBOX_QUALITY = 90
 
-const LIGHTBOX_SIZES =
-  "(max-width: 640px) calc(100vw - 1rem), 1024px"
+const LIGHTBOX_SIZES = "100vw"
 
 const preloadCache = new Map<
   string,
@@ -79,6 +79,7 @@ function preloadLightboxImage(
     new window.Image()
 
   image.decoding = "async"
+
   image.sizes =
     props.sizes ??
     LIGHTBOX_SIZES
@@ -167,11 +168,6 @@ export function ImageLightbox({
     imageLoaded,
     setImageLoaded,
   ] = useState(false)
-
-  const contentRef =
-    useRef<HTMLDivElement>(
-      null,
-    )
 
   const triggerRef =
     useRef<HTMLButtonElement>(
@@ -333,13 +329,7 @@ export function ImageLightbox({
         event.preventDefault()
         event.stopPropagation()
 
-        setCurrentIndex(
-          (current) =>
-            current === 0
-              ? gallery.length -
-                1
-              : current - 1,
-        )
+        previousImage()
       }
 
       if (
@@ -349,13 +339,7 @@ export function ImageLightbox({
         event.preventDefault()
         event.stopPropagation()
 
-        setCurrentIndex(
-          (current) =>
-            current ===
-            gallery.length - 1
-              ? 0
-              : current + 1,
-        )
+        nextImage()
       }
     }
 
@@ -434,9 +418,7 @@ export function ImageLightbox({
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={(
-        open,
-      ) => {
+      onOpenChange={(open) => {
         setIsOpen(open)
 
         if (open) {
@@ -498,11 +480,8 @@ export function ImageLightbox({
       </DialogTrigger>
 
       <DialogContent
-        ref={
-          contentRef
-        }
-        className="top-[calc(50%+2.5rem)] flex h-[calc(100dvh-6rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col gap-0 overflow-hidden border-black/40 bg-black p-0 text-white shadow-2xl sm:w-[calc(100vw-2rem)] sm:max-w-6xl"
-        showCloseButton
+        className="inset-0 left-0 top-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 bg-black p-0 text-white shadow-none"
+        showCloseButton={false}
       >
         <DialogTitle className="sr-only">
           {isEn
@@ -517,7 +496,7 @@ export function ImageLightbox({
         </DialogDescription>
 
         <div
-          className="relative size-full min-h-0 overflow-hidden bg-black"
+          className="relative size-full overflow-hidden bg-black"
           onTouchStart={
             handleTouchStart
           }
@@ -554,53 +533,67 @@ export function ImageLightbox({
             </div>
           )}
 
-          <div className="absolute inset-0 z-10 p-2 sm:p-4">
-            <div className="relative size-full">
-              <Image
-                key={
-                  currentImage.src
-                }
-                src={
-                  currentImage.src
-                }
-                alt={
-                  currentImage.alt
-                }
-                fill
-                sizes={
-                  LIGHTBOX_SIZES
-                }
-                quality={
-                  LIGHTBOX_QUALITY
-                }
-                loading="eager"
-                onLoad={() =>
-                  setImageLoaded(
-                    true,
-                  )
-                }
-                className={`object-contain transition-opacity duration-200 ${
-                  imageLoaded
-                    ? "opacity-100"
-                    : "opacity-0"
-                }`}
-              />
-            </div>
+          <div className="absolute inset-0 z-10">
+            <Image
+              key={
+                currentImage.src
+              }
+              src={
+                currentImage.src
+              }
+              alt={
+                currentImage.alt
+              }
+              fill
+              sizes={
+                LIGHTBOX_SIZES
+              }
+              quality={
+                LIGHTBOX_QUALITY
+              }
+              loading="eager"
+              onLoad={() =>
+                setImageLoaded(
+                  true,
+                )
+              }
+              className={`object-contain transition-opacity duration-200 ${
+                imageLoaded
+                  ? "opacity-100"
+                  : "opacity-0"
+              }`}
+            />
           </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              setIsOpen(false)
+            }
+            className="absolute right-3 top-3 z-50 flex size-11 items-center justify-center rounded-full bg-black/70 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black sm:right-5 sm:top-5"
+            aria-label={
+              isEn
+                ? "Close photo"
+                : "Zamknij zdjęcie"
+            }
+          >
+            <X
+              className="size-5"
+              aria-hidden="true"
+            />
+          </button>
 
           {hasMultipleImages && (
             <>
               <button
                 type="button"
-                onClick={(
-                  event,
-                ) => {
+                onClick={(event) => {
                   event.preventDefault()
                   event.stopPropagation()
 
                   previousImage()
                 }}
-                className="absolute left-2 top-1/2 z-20 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:left-4 sm:size-11"
+                className="absolute left-2 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:left-5 sm:size-12"
                 aria-label={
                   isEn
                     ? "Previous photo"
@@ -612,15 +605,13 @@ export function ImageLightbox({
 
               <button
                 type="button"
-                onClick={(
-                  event,
-                ) => {
+                onClick={(event) => {
                   event.preventDefault()
                   event.stopPropagation()
 
                   nextImage()
                 }}
-                className="absolute right-2 top-1/2 z-20 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:right-4 sm:size-11"
+                className="absolute right-2 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:right-5 sm:size-12"
                 aria-label={
                   isEn
                     ? "Next photo"
@@ -630,7 +621,7 @@ export function ImageLightbox({
                 <ChevronRight className="size-5 sm:size-6" />
               </button>
 
-              <div className="absolute bottom-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-black/65 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md sm:bottom-4">
+              <div className="absolute bottom-3 left-1/2 z-30 -translate-x-1/2 rounded-full bg-black/65 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md sm:bottom-5">
                 {currentIndex +
                   1}{" "}
                 /{" "}
