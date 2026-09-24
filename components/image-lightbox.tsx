@@ -480,159 +480,130 @@ export function ImageLightbox({
       </DialogTrigger>
 
       <DialogContent
-        className="inset-0 left-0 top-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 bg-black p-0 text-white shadow-none"
-        showCloseButton={false}
-      >
-        <DialogTitle className="sr-only">
-          {isEn
-            ? "Photo preview"
-            : "Podgląd zdjęcia"}
-        </DialogTitle>
+  className="!fixed !inset-0 !left-0 !top-0 !z-[100] !m-0 !flex !h-dvh !w-screen !max-w-none !translate-x-0 !translate-y-0 !flex-col !gap-0 !overflow-hidden !rounded-none !border-0 !bg-black !p-0 !text-white !shadow-none sm:!max-w-none"
+  showCloseButton={false}
+>
+  <DialogTitle className="sr-only">
+    {isEn
+      ? "Photo preview"
+      : "Podgląd zdjęcia"}
+  </DialogTitle>
 
-        <DialogDescription className="sr-only">
-          {isEn
-            ? "Expanded photo. Use the arrows or swipe to move between photos."
-            : "Powiększone zdjęcie. Użyj strzałek, aby przechodzić między zdjęciami lub przesuń zdjęcie palcem."}
-        </DialogDescription>
+  <DialogDescription className="sr-only">
+    {isEn
+      ? "Expanded photo. Use the arrows or swipe to move between photos."
+      : "Powiększone zdjęcie. Użyj strzałek, aby przechodzić między zdjęciami lub przesuń zdjęcie palcem."}
+  </DialogDescription>
 
-        <div
-          className="relative size-full overflow-hidden bg-black"
-          onTouchStart={
-            handleTouchStart
-          }
-          onTouchEnd={
-            handleTouchEnd
+  <div
+    className="relative size-full min-h-0 overflow-hidden bg-black"
+    onTouchStart={handleTouchStart}
+    onTouchEnd={handleTouchEnd}
+  >
+    <div
+      key={`background-${currentImage.src}`}
+      className="absolute inset-0 overflow-hidden"
+      aria-hidden="true"
+    >
+      <Image
+        src={currentImage.src}
+        alt=""
+        fill
+        sizes={LIGHTBOX_SIZES}
+        quality={LIGHTBOX_QUALITY}
+        className="scale-110 object-cover blur-3xl"
+      />
+
+      <div className="absolute inset-0 bg-black/55" />
+    </div>
+
+    {!imageLoaded && (
+      <div className="absolute inset-0 z-10 flex items-center justify-center">
+        <span className="size-7 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
+      </div>
+    )}
+
+    <div className="absolute inset-0 z-10">
+      <Image
+        key={currentImage.src}
+        src={currentImage.src}
+        alt={currentImage.alt}
+        fill
+        sizes={LIGHTBOX_SIZES}
+        quality={LIGHTBOX_QUALITY}
+        loading="eager"
+        onLoad={() => setImageLoaded(true)}
+        className={`object-contain transition-opacity duration-200 ${
+          imageLoaded
+            ? "opacity-100"
+            : "opacity-0"
+        }`}
+      />
+    </div>
+
+    <button
+      type="button"
+      onClick={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        setIsOpen(false)
+      }}
+      className="absolute right-3 top-3 z-[120] flex size-11 items-center justify-center rounded-full bg-black/70 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black sm:right-5 sm:top-5"
+      aria-label={
+        isEn
+          ? "Close photo"
+          : "Zamknij zdjęcie"
+      }
+    >
+      <X
+        className="size-5"
+        aria-hidden="true"
+      />
+    </button>
+
+    {hasMultipleImages && (
+      <>
+        <button
+          type="button"
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            previousImage()
+          }}
+          className="absolute left-2 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:left-5 sm:size-12"
+          aria-label={
+            isEn
+              ? "Previous photo"
+              : "Poprzednie zdjęcie"
           }
         >
-          <div
-            key={`background-${currentImage.src}`}
-            className="absolute inset-0 overflow-hidden"
-            aria-hidden="true"
-          >
-            <Image
-              src={
-                currentImage.src
-              }
-              alt=""
-              fill
-              sizes={
-                LIGHTBOX_SIZES
-              }
-              quality={
-                LIGHTBOX_QUALITY
-              }
-              className="scale-110 object-cover blur-3xl"
-            />
+          <ChevronLeft className="size-5 sm:size-6" />
+        </button>
 
-            <div className="absolute inset-0 bg-black/55" />
-          </div>
+        <button
+          type="button"
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            nextImage()
+          }}
+          className="absolute right-2 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:right-5 sm:size-12"
+          aria-label={
+            isEn
+              ? "Next photo"
+              : "Następne zdjęcie"
+          }
+        >
+          <ChevronRight className="size-5 sm:size-6" />
+        </button>
 
-          {!imageLoaded && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center">
-              <span className="size-7 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
-            </div>
-          )}
-
-          <div className="absolute inset-0 z-10">
-            <Image
-              key={
-                currentImage.src
-              }
-              src={
-                currentImage.src
-              }
-              alt={
-                currentImage.alt
-              }
-              fill
-              sizes={
-                LIGHTBOX_SIZES
-              }
-              quality={
-                LIGHTBOX_QUALITY
-              }
-              loading="eager"
-              onLoad={() =>
-                setImageLoaded(
-                  true,
-                )
-              }
-              className={`object-contain transition-opacity duration-200 ${
-                imageLoaded
-                  ? "opacity-100"
-                  : "opacity-0"
-              }`}
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={() =>
-              setIsOpen(false)
-            }
-            className="absolute right-3 top-3 z-50 flex size-11 items-center justify-center rounded-full bg-black/70 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black sm:right-5 sm:top-5"
-            aria-label={
-              isEn
-                ? "Close photo"
-                : "Zamknij zdjęcie"
-            }
-          >
-            <X
-              className="size-5"
-              aria-hidden="true"
-            />
-          </button>
-
-          {hasMultipleImages && (
-            <>
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.preventDefault()
-                  event.stopPropagation()
-
-                  previousImage()
-                }}
-                className="absolute left-2 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:left-5 sm:size-12"
-                aria-label={
-                  isEn
-                    ? "Previous photo"
-                    : "Poprzednie zdjęcie"
-                }
-              >
-                <ChevronLeft className="size-5 sm:size-6" />
-              </button>
-
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.preventDefault()
-                  event.stopPropagation()
-
-                  nextImage()
-                }}
-                className="absolute right-2 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/85 sm:right-5 sm:size-12"
-                aria-label={
-                  isEn
-                    ? "Next photo"
-                    : "Następne zdjęcie"
-                }
-              >
-                <ChevronRight className="size-5 sm:size-6" />
-              </button>
-
-              <div className="absolute bottom-3 left-1/2 z-30 -translate-x-1/2 rounded-full bg-black/65 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md sm:bottom-5">
-                {currentIndex +
-                  1}{" "}
-                /{" "}
-                {
-                  gallery.length
-                }
-              </div>
-            </>
-          )}
+        <div className="absolute bottom-3 left-1/2 z-30 -translate-x-1/2 rounded-full bg-black/65 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md sm:bottom-5">
+          {currentIndex + 1} / {gallery.length}
         </div>
-      </DialogContent>
+      </>
+    )}
+  </div>
+</DialogContent>
     </Dialog>
   )
 }
