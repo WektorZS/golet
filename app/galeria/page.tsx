@@ -345,7 +345,7 @@ export default async function GalleryPage() {
           </div>
         </section>
 
-        <section className="overflow-hidden bg-section-light py-4 sm:py-0">
+        <section className="overflow-hidden bg-section-light pt-8 pb-4 sm:pt-12 sm:pb-0">
           {gallery.length ? (
             <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-0">
               <div className="overflow-hidden rounded-xl sm:rounded-none">
