@@ -497,9 +497,43 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
         {copy?.customEyebrow || "Twój wyjazd"}
       </p>
 
-      <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight md:text-6xl">
-        {localizedSetting(content, "customTripTitle", locale, copy?.customTitle || "Nie ma Twojego meczu w kalendarzu?")}
+      {(() => {
+  const title = localizedSetting(
+    content,
+    "customTripTitle",
+    locale,
+    copy?.customTitle ||
+      "Nie ma meczu na liście? Zorganizujemy go dla Ciebie",
+  )
+
+  const questionIndex = title.indexOf("?")
+
+  if (questionIndex === -1) {
+    return (
+      <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight md:text-5xl xl:text-6xl">
+        {title}
       </h2>
+    )
+  }
+
+  const firstLine = title.slice(0, questionIndex + 1)
+  const rest = title.slice(questionIndex + 1).trim()
+
+  return (
+    <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight md:text-5xl xl:text-6xl">
+      <span className="lg:whitespace-nowrap">
+        {firstLine}
+      </span>
+
+      {rest && (
+        <>
+          {" "}
+          <span>{rest}</span>
+        </>
+      )}
+    </h2>
+  )
+})()}
 
       <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
         {copy?.customIntro || "Masz wymarzony mecz, na który chcesz pojechać? Napisz nam jaki - przygotujemy wyjazd dopasowany do Ciebie."}
@@ -576,43 +610,9 @@ const facebookReviewsAverage = Number.isFinite(parsedFacebookReviewsAverage)
              {copy?.tailoredEyebrow || "Wyjazd szyty na miarę"}
           </p>
 
-          {(() => {
-  const title = localizedSetting(
-    content,
-    "customTripTitle",
-    locale,
-    copy?.customTitle ||
-      "Nie ma meczu na liście? Zorganizujemy go dla Ciebie",
-  )
-
-  const questionIndex = title.indexOf("?")
-
-  if (questionIndex === -1) {
-    return (
-      <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight md:text-5xl xl:text-6xl">
-        {title}
-      </h2>
-    )
-  }
-
-  const firstLine = title.slice(0, questionIndex + 1)
-  const rest = title.slice(questionIndex + 1).trim()
-
-  return (
-    <h2 className="mt-5 font-sans text-4xl font-black uppercase leading-[0.96] tracking-tight md:text-5xl xl:text-6xl">
-      <span className="lg:whitespace-nowrap">
-        {firstLine}
-      </span>
-
-      {rest && (
-        <>
-          {" "}
-          <span>{rest}</span>
-        </>
-      )}
-    </h2>
-  )
-})()}
+          <h2 className="mt-5 text-balance font-sans text-[38px] font-black uppercase leading-[0.94] tracking-tight text-white md:text-[46px]">
+            {copy?.tailoredTitle || "Powiedz nam, czego potrzebujesz."}
+          </h2>
 
           <p className="mt-6 max-w-md text-base leading-7 text-white md:text-lg">
             {copy?.tailoredIntro || "Nie musisz wybierać gotowego wyjazdu z kalendarza. Możemy zorganizować pojedynczy element albo całą podróż od biletu aż po lot i hotel."}
