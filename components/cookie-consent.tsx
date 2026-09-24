@@ -1,41 +1,68 @@
-
 "use client"
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react"
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react"
 import { Analytics } from "@vercel/analytics/next"
-import { Check, Cookie, ShieldCheck } from "lucide-react"
+import {
+  Check,
+  Cookie,
+  ShieldCheck,
+  X,
+} from "lucide-react"
+import { usePathname } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { getDictionary } from "@/lib/dictionaries"
 import { localeFromPathname } from "@/lib/i18n"
-import { usePathname } from "next/navigation"
 
 const COOKIE_NAME = "letsgol_analytics_consent"
 const COOKIE_MAX_AGE = 31536000
 const CONSENT_EVENT = "letsgol-consent-change"
 
 type Consent = "accepted" | "rejected" | null
+type SavedConsent = Exclude<Consent, null>
 
 function readConsent(): Consent {
   const value = document.cookie
     .split("; ")
-    .find((item) => item.startsWith(`${COOKIE_NAME}=`))
+    .find((item) =>
+      item.startsWith(`${COOKIE_NAME}=`),
+    )
     ?.split("=")[1]
 
-  return value === "accepted" || value === "rejected"
+  return value === "accepted" ||
+    value === "rejected"
     ? value
     : null
 }
 
-function saveConsent(value: Exclude<Consent, null>) {
+function saveConsent(value: SavedConsent) {
   document.cookie = `${COOKIE_NAME}=${value}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax; Secure`
-  window.dispatchEvent(new Event(CONSENT_EVENT))
+
+  window.dispatchEvent(
+    new Event(CONSENT_EVENT),
+  )
 }
 
-function subscribeConsent(onChange: () => void) {
-  window.addEventListener(CONSENT_EVENT, onChange)
-  return () => window.removeEventListener(CONSENT_EVENT, onChange)
+function subscribeConsent(
+  onChange: () => void,
+) {
+  window.addEventListener(
+    CONSENT_EVENT,
+    onChange,
+  )
+
+  return () => {
+    window.removeEventListener(
+      CONSENT_EVENT,
+      onChange,
+    )
+  }
 }
 
 function subscribeHydration() {
@@ -44,44 +71,133 @@ function subscribeHydration() {
 
 export function CookieConsent() {
   const pathname = usePathname()
-  const dictionary = getDictionary(localeFromPathname(pathname))
-  const consent = useSyncExternalStore(subscribeConsent, readConsent, () => null)
-  const ready = useSyncExternalStore(subscribeHydration, () => true, () => false)
-  const [editing, setEditing] = useState(false)
-  const [showFloatingButton, setShowFloatingButton] = useState(false)
-  const [floatingButtonReady, setFloatingButtonReady] = useState(false)
-  const consentDialogRef = useRef<HTMLDivElement>(null)
+  const locale = localeFromPathname(pathname)
+  const dictionary = getDictionary(locale)
+
+  const consent = useSyncExternalStore(
+    subscribeConsent,
+    readConsent,
+    () => null,
+  )
+
+  const ready = useSyncExternalStore(
+    subscribeHydration,
+    () => true,
+    () => false,
+  )
+
+  const [editing, setEditing] =
+    useState(false)
+
+  const [draftConsent, setDraftConsent] =
+    useState<SavedConsent>("rejected")
+
+  const [
+    showFloatingButton,
+    setShowFloatingButton,
+  ] = useState(false)
+
+  const [
+    floatingButtonReady,
+    setFloatingButtonReady,
+  ] = useState(false)
+
+  const consentDialogRef =
+    useRef<HTMLDivElement>(null)
+
+  const firstVisit = consent === null
+
+  const languageLabel =
+    locale === "en"
+      ? "Choose language"
+      : "Wybierz język"
+
+  const optionalInfo =
+    locale === "en"
+      ? "Analytics are optional. The website works normally without them."
+      : "Analityka jest opcjonalna. Strona działa normalnie również bez niej."
+
+  const saveLabel =
+    locale === "en"
+      ? "Save choice"
+      : "Zapisz wybór"
 
   useEffect(() => {
-    if (!ready || (consent !== null && !editing)) return
+    if (
+      !ready ||
+      (consent !== null && !editing)
+    ) {
+      return
+    }
 
-    const previousFocus = document.activeElement instanceof HTMLElement
-      ? document.activeElement
-      : null
-    const focusable = () => Array.from(
-      consentDialogRef.current?.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input:not(:disabled)') ?? []
-    ).filter((element) => element.getClientRects().length > 0)
+    const previousFocus =
+      document.activeElement instanceof
+      HTMLElement
+        ? document.activeElement
+        : null
 
-    const frame = requestAnimationFrame(() => focusable()[0]?.focus())
-    const trapFocus = (event: KeyboardEvent) => {
+    const focusable = () =>
+      Array.from(
+        consentDialogRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not(:disabled), input:not(:disabled)',
+        ) ?? [],
+      ).filter(
+        (element) =>
+          element.getClientRects().length > 0,
+      )
+
+    const frame = requestAnimationFrame(
+      () => {
+        focusable()[0]?.focus()
+      },
+    )
+
+    const trapFocus = (
+      event: KeyboardEvent,
+    ) => {
       if (event.key !== "Tab") return
+
       const items = focusable()
+
       if (!items.length) return
+
       const first = items[0]
       const last = items[items.length - 1]
-      if (event.shiftKey && (document.activeElement === first || !consentDialogRef.current?.contains(document.activeElement))) {
+
+      if (
+        event.shiftKey &&
+        (document.activeElement === first ||
+          !consentDialogRef.current?.contains(
+            document.activeElement,
+          ))
+      ) {
         event.preventDefault()
         last.focus()
-      } else if (!event.shiftKey && (document.activeElement === last || !consentDialogRef.current?.contains(document.activeElement))) {
+      } else if (
+        !event.shiftKey &&
+        (document.activeElement === last ||
+          !consentDialogRef.current?.contains(
+            document.activeElement,
+          ))
+      ) {
         event.preventDefault()
         first.focus()
       }
     }
 
-    document.addEventListener("keydown", trapFocus)
+    document.addEventListener(
+      "keydown",
+      trapFocus,
+    )
+
     return () => {
       cancelAnimationFrame(frame)
-      document.removeEventListener("keydown", trapFocus)
+
+      document.removeEventListener(
+        "keydown",
+        trapFocus,
+      )
+
       previousFocus?.focus()
     }
   }, [ready, consent, editing])
@@ -90,66 +206,119 @@ export function CookieConsent() {
     const updateVisibility = () => {
       const scrollY = window.scrollY
       const headerHeight = 80
-      const viewportHeight = window.innerHeight
-      const documentHeight = document.documentElement.scrollHeight
+      const viewportHeight =
+        window.innerHeight
 
-      const passedHeader = scrollY > headerHeight
+      const documentHeight =
+        document.documentElement.scrollHeight
+
+      const passedHeader =
+        scrollY > headerHeight
 
       const nearBottom =
-        scrollY + viewportHeight >= documentHeight - 350
+        scrollY + viewportHeight >=
+        documentHeight - 350
 
-      setShowFloatingButton(passedHeader && !nearBottom)
+      setShowFloatingButton(
+        passedHeader && !nearBottom,
+      )
     }
 
     updateVisibility()
 
-    const frame = requestAnimationFrame(() => {
-      setFloatingButtonReady(true)
-    })
+    const frame = requestAnimationFrame(
+      () => {
+        setFloatingButtonReady(true)
+      },
+    )
 
-    window.addEventListener("scroll", updateVisibility, {
-      passive: true,
-    })
+    window.addEventListener(
+      "scroll",
+      updateVisibility,
+      {
+        passive: true,
+      },
+    )
 
-    window.addEventListener("resize", updateVisibility, {
-      passive: true,
-    })
+    window.addEventListener(
+      "resize",
+      updateVisibility,
+      {
+        passive: true,
+      },
+    )
 
     return () => {
       cancelAnimationFrame(frame)
-      window.removeEventListener("scroll", updateVisibility)
-      window.removeEventListener("resize", updateVisibility)
+
+      window.removeEventListener(
+        "scroll",
+        updateVisibility,
+      )
+
+      window.removeEventListener(
+        "resize",
+        updateVisibility,
+      )
     }
   }, [])
 
   useEffect(() => {
     if (!ready) return
 
-    document.body.style.overflow = consent ? "" : "hidden"
+    document.body.style.overflow =
+      consent === null || editing
+        ? "hidden"
+        : ""
 
     return () => {
       document.body.style.overflow = ""
     }
-  }, [ready, consent])
+  }, [ready, consent, editing])
 
   useEffect(() => {
     if (!editing) return
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (
+      event: KeyboardEvent,
+    ) => {
       if (event.key === "Escape") {
         setEditing(false)
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown)
+    window.addEventListener(
+      "keydown",
+      handleKeyDown,
+    )
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown)
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown,
+      )
     }
   }, [editing])
 
-  function choose(value: Exclude<Consent, null>) {
+  function choose(
+    value: SavedConsent,
+  ) {
     saveConsent(value)
+    setEditing(false)
+  }
+
+  function openSettings() {
+    setDraftConsent(
+      consent === "accepted"
+        ? "accepted"
+        : "rejected",
+    )
+
+    setEditing(true)
+  }
+
+  function saveSettings() {
+    saveConsent(draftConsent)
     setEditing(false)
   }
 
@@ -157,345 +326,427 @@ export function CookieConsent() {
     return null
   }
 
-  const firstVisit = consent === null
-
   return (
     <>
-      {process.env.NODE_ENV === "production" &&
+      {process.env.NODE_ENV ===
+        "production" &&
       consent === "accepted" ? (
         <Analytics />
       ) : null}
 
-    
       {firstVisit ? (
         <div
           ref={consentDialogRef}
-          className="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-black/55 p-3 backdrop-blur-sm sm:p-4"
+          className="fixed inset-0 z-99999 flex items-end justify-center overflow-y-auto bg-black/60 backdrop-blur-sm sm:items-center sm:p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="cookie-consent-title"
         >
-          <section className="my-auto w-full max-w-xl overflow-hidden rounded-xl border border-white/10 bg-card text-card-foreground shadow-2xl">
-            <div className="p-4 sm:p-6 md:p-8">
-              <div className="flex flex-col gap-4 sm:gap-5">
-
-                {/* NAGŁÓWEK */}
-                <div className="flex items-center gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 sm:size-11">
-                    <Cookie
-                      className="size-5 text-black sm:size-6"
-                      aria-hidden="true"
-                    />
-                  </span>
-
-                  <div className="min-w-0">
-                    <h2
-                      id="cookie-consent-title"
-                      className="font-sans text-xl font-black uppercase leading-tight sm:text-2xl"
-                    >
-                      {dictionary.cookies.welcome}
-                    </h2>
-
-                    <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:text-xs">
-                      {dictionary.cookies.settingsTitle}
-                    </p>
-                  </div>
+          <section className="w-full max-w-lg overflow-hidden rounded-t-3xl bg-card text-card-foreground shadow-2xl ring-1 ring-black/10 sm:rounded-2xl">
+            <div className="p-5 sm:p-7">
+              <div className="flex items-start gap-4">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-black">
+                  <Cookie
+                    className="size-5"
+                    aria-hidden="true"
+                  />
                 </div>
 
-                
-                <div>
-  <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-    {localeFromPathname(pathname) === "en"
-      ? "Choose language"
-      : "Wybierz język"}
-  </p>
-
-  <LanguageSwitcher />
-</div>
-
-<p className="text-sm leading-relaxed text-muted-foreground">
-  {dictionary.cookies.choosePrompt}
-</p>
-
-              
-                <div className="grid gap-3">
-
-                 
-                  <button
-                    type="button"
-                    onClick={() => choose("rejected")}
-                    className="group w-full rounded-xl border border-border bg-background p-3 text-left transition-all duration-200 hover:border-primary hover:bg-primary/10 hover:shadow-md sm:p-4"
+                <div className="min-w-0">
+                  <h2
+                    id="cookie-consent-title"
+                    className="font-sans text-xl font-black uppercase leading-tight sm:text-2xl"
                   >
-                    <div className="flex items-center gap-3 sm:gap-4">
+                    {
+                      dictionary.cookies
+                        .welcome
+                    }
+                  </h2>
 
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black sm:size-10">
-                        <ShieldCheck
-                          className="size-5"
-                          aria-hidden="true"
-                        />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                          <p className="font-bold">
-                            {dictionary.cookies.necessary}
-                          </p>
-
-                          <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
-                            {dictionary.cookies.required}
-                          </span>
-                        </div>
-
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          {dictionary.cookies.necessaryDescription}
-                        </p>
-
-                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
-  {dictionary.cookies.choose}
-</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* ANALITYKA */}
-                  <button
-                    type="button"
-                    onClick={() => choose("accepted")}
-                    className="group w-full rounded-xl border border-border bg-background p-3 text-left transition-all duration-200 hover:border-primary hover:bg-primary/10 hover:shadow-md sm:p-4"
-                  >
-                    <div className="flex items-center gap-3 sm:gap-4">
-
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-all duration-200 group-hover:bg-primary group-hover:text-black sm:size-10">
-                        <Cookie
-                          className="size-5"
-                          aria-hidden="true"
-                        />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                          <p className="font-bold">
-                            {dictionary.cookies.analytics}
-                          </p>
-
-                          <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-[#705300] sm:text-xs">
-  {dictionary.cookies.optional}
-</span>
-                        </div>
-
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          {dictionary.cookies.analyticsDescription}
-                        </p>
-
-                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
-  {dictionary.cookies.choose}
-</p>
-                      </div>
-                    </div>
-                  </button>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    {
+                      dictionary.cookies
+                        .settingsTitle
+                    }
+                  </p>
                 </div>
+              </div>
 
-                
-                <p className="border-t border-border pt-3 text-center text-[11px] leading-relaxed text-muted-foreground sm:pt-4 sm:text-xs">
-                  {dictionary.cookies.changeAnytime}
+              <div className="mt-6 flex items-center justify-between gap-4 rounded-xl bg-muted/60 p-3">
+                <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  {languageLabel}
                 </p>
 
+                <LanguageSwitcher />
               </div>
+
+              <div className="mt-6">
+                <p className="text-[15px] font-medium leading-6 text-foreground">
+                  {
+                    dictionary.cookies
+                      .choosePrompt
+                  }
+                </p>
+
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  {optionalInfo}
+                </p>
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    choose("rejected")
+                  }
+                  className="group flex min-h-36 flex-col rounded-xl border border-border bg-background p-4 text-left transition-colors hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary group-hover:text-black">
+                      <ShieldCheck
+                        className="size-5"
+                        aria-hidden="true"
+                      />
+                    </div>
+
+                    <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      {
+                        dictionary.cookies
+                          .required
+                      }
+                    </span>
+                  </div>
+
+                  <div className="mt-4">
+                    <p className="font-sans text-base font-black">
+                      {
+                        dictionary.cookies
+                          .necessary
+                      }
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      {
+                        dictionary.cookies
+                          .necessaryDescription
+                      }
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    choose("accepted")
+                  }
+                  className="group flex min-h-36 flex-col rounded-xl border border-border bg-background p-4 text-left transition-colors hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary group-hover:text-black">
+                      <Cookie
+                        className="size-5"
+                        aria-hidden="true"
+                      />
+                    </div>
+
+                    <span className="rounded-full bg-primary/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
+                      {
+                        dictionary.cookies
+                          .optional
+                      }
+                    </span>
+                  </div>
+
+                  <div className="mt-4">
+                    <p className="font-sans text-base font-black">
+                      {
+                        dictionary.cookies
+                          .analytics
+                      }
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      {
+                        dictionary.cookies
+                          .analyticsDescription
+                      }
+                    </p>
+                  </div>
+                </button>
+              </div>
+
+              <p className="mt-5 border-t border-border pt-4 text-center text-[11px] leading-5 text-muted-foreground">
+                {
+                  dictionary.cookies
+                    .changeAnytime
+                }
+              </p>
             </div>
           </section>
         </div>
       ) : editing ? (
-
-        /* USTAWIENIA COOKIES */
         <div
           ref={consentDialogRef}
-          className="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-black/45 p-3 backdrop-blur-sm sm:p-4"
+          className="fixed inset-0 z-99999 flex items-end justify-center overflow-y-auto bg-black/55 backdrop-blur-sm sm:items-center sm:p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="cookie-settings-title"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
               setEditing(false)
             }
           }}
         >
-          <section className="my-auto w-full max-w-xl overflow-hidden rounded-xl border border-white/10 bg-card text-card-foreground shadow-2xl">
-            <div className="p-4 sm:p-6 md:p-8">
-              <div className="flex flex-col gap-4 sm:gap-5">
-
-                {/* NAGŁÓWEK */}
-                <div className="flex items-center gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 sm:size-11">
+          <section className="w-full max-w-lg overflow-hidden rounded-t-3xl bg-card text-card-foreground shadow-2xl ring-1 ring-black/10 sm:rounded-2xl">
+            <div className="p-5 sm:p-7">
+              <div className="flex items-start justify-between gap-5">
+                <div className="flex items-start gap-4">
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-black">
                     <Cookie
-                      className="size-5 text-black sm:size-6"
+                      className="size-5"
                       aria-hidden="true"
                     />
-                  </span>
+                  </div>
 
                   <div className="min-w-0">
                     <h2
                       id="cookie-settings-title"
                       className="font-sans text-xl font-black uppercase leading-tight sm:text-2xl"
                     >
-                      {dictionary.cookies.privacySettings}
+                      {
+                        dictionary.cookies
+                          .privacySettings
+                      }
                     </h2>
 
-                    <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:text-xs">
-                      {dictionary.cookies.manage}
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                      {
+                        dictionary.cookies
+                          .manage
+                      }
                     </p>
                   </div>
                 </div>
 
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {dictionary.cookies.chooseOption}
-                </p>
-
-                {/* OPCJE */}
-                <div className="grid gap-3">
-
-                  {/* NIEZBĘDNE */}
-                  <button
-                    type="button"
-                    onClick={() => choose("rejected")}
-                    aria-pressed={consent === "rejected"}
-                    className={`group w-full rounded-xl border p-3 text-left transition-all duration-200 sm:p-4 ${
-                      consent === "rejected"
-                        ? "border-primary bg-primary/10 shadow-sm"
-                        : "border-border bg-background hover:border-primary hover:bg-primary/10 hover:shadow-md"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 sm:gap-4">
-
-                      <div
-                        className={`flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors sm:size-10 ${
-                          consent === "rejected"
-                            ? "bg-primary text-black"
-                            : "bg-muted text-muted-foreground group-hover:bg-primary group-hover:text-black"
-                        }`}
-                      >
-                        <ShieldCheck
-                          className="size-5"
-                          aria-hidden="true"
-                        />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                          <p className="font-bold">
-                            {dictionary.cookies.necessary}
-                          </p>
-
-                          {consent === "rejected" ? (
-                            <span className="flex shrink-0 items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary sm:text-xs">
-                              <Check className="size-4" />
-                              {dictionary.cookies.selected}
-                            </span>
-                          ) : (
-                            <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
-                              {dictionary.cookies.required}
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          {dictionary.cookies.necessaryDescription}
-                        </p>
-
-                       <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
-  {dictionary.cookies.choose}
-</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* ANALITYKA */}
-                  <button
-                    type="button"
-                    onClick={() => choose("accepted")}
-                    aria-pressed={consent === "accepted"}
-                    className={`group w-full rounded-xl border p-3 text-left transition-all duration-200 sm:p-4 ${
-                      consent === "accepted"
-                        ? "border-primary bg-primary/10 shadow-sm"
-                        : "border-border bg-background hover:border-primary hover:bg-primary/10 hover:shadow-md"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 sm:gap-4">
-
-                      <div
-                        className={`flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors sm:size-10 ${
-                          consent === "accepted"
-                            ? "bg-primary text-black"
-                            : "bg-muted text-muted-foreground group-hover:bg-primary group-hover:text-black"
-                        }`}
-                      >
-                        <Cookie
-                          className="size-5"
-                          aria-hidden="true"
-                        />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                          <p className="font-bold">
-                            {dictionary.cookies.analytics}
-                          </p>
-
-                          {consent === "accepted" ? (
-                            <span className="flex shrink-0 items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary sm:text-xs">
-                              <Check className="size-4" />
-                              {dictionary.cookies.selected}
-                            </span>
-                          ) : (
-                            <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-[#705300] sm:text-xs">
-  {dictionary.cookies.optional}
-</span>
-                          )}
-                        </div>
-
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          {dictionary.cookies.analyticsDescription}
-                        </p>
-
-                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
-  {dictionary.cookies.choose}
-</p>
-                      </div>
-                    </div>
-                  </button>
-                </div>
-
-                {/* ZAMKNIJ */}
                 <button
                   type="button"
-                  onClick={() => setEditing(false)}
-                  className="mx-auto pt-1 text-sm font-medium text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                  onClick={() =>
+                    setEditing(false)
+                  }
+                  aria-label={
+                    locale === "en"
+                      ? "Close"
+                      : "Zamknij"
+                  }
+                  className="flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
-                  {dictionary.cookies.closeWithoutChanges}
+                  <X
+                    className="size-5"
+                    aria-hidden="true"
+                  />
+                </button>
+              </div>
+
+              <p className="mt-6 text-sm leading-6 text-muted-foreground">
+                {
+                  dictionary.cookies
+                    .chooseOption
+                }
+              </p>
+
+              <div className="mt-4 grid gap-3">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setDraftConsent(
+                      "rejected",
+                    )
+                  }
+                  aria-pressed={
+                    draftConsent ===
+                    "rejected"
+                  }
+                  className={`group flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                    draftConsent ===
+                    "rejected"
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-background hover:border-primary/60"
+                  }`}
+                >
+                  <div
+                    className={`flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                      draftConsent ===
+                      "rejected"
+                        ? "bg-primary text-black"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    <ShieldCheck
+                      className="size-5"
+                      aria-hidden="true"
+                    />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-bold text-foreground">
+                        {
+                          dictionary.cookies
+                            .necessary
+                        }
+                      </p>
+
+                      {draftConsent ===
+                      "rejected" ? (
+                        <span className="flex shrink-0 items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
+                          <Check className="size-3.5" />
+
+                          {
+                            dictionary.cookies
+                              .selected
+                          }
+                        </span>
+                      ) : (
+                        <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          {
+                            dictionary.cookies
+                              .required
+                          }
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      {
+                        dictionary.cookies
+                          .necessaryDescription
+                      }
+                    </p>
+                  </div>
                 </button>
 
+                <button
+                  type="button"
+                  onClick={() =>
+                    setDraftConsent(
+                      "accepted",
+                    )
+                  }
+                  aria-pressed={
+                    draftConsent ===
+                    "accepted"
+                  }
+                  className={`group flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                    draftConsent ===
+                    "accepted"
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-background hover:border-primary/60"
+                  }`}
+                >
+                  <div
+                    className={`flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                      draftConsent ===
+                      "accepted"
+                        ? "bg-primary text-black"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    <Cookie
+                      className="size-5"
+                      aria-hidden="true"
+                    />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-bold text-foreground">
+                        {
+                          dictionary.cookies
+                            .analytics
+                        }
+                      </p>
+
+                      {draftConsent ===
+                      "accepted" ? (
+                        <span className="flex shrink-0 items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
+                          <Check className="size-3.5" />
+
+                          {
+                            dictionary.cookies
+                              .selected
+                          }
+                        </span>
+                      ) : (
+                        <span className="shrink-0 rounded-full bg-primary/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
+                          {
+                            dictionary.cookies
+                              .optional
+                          }
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      {
+                        dictionary.cookies
+                          .analyticsDescription
+                      }
+                    </p>
+                  </div>
+                </button>
+              </div>
+
+              <div className="mt-6 border-t border-border pt-5">
+                <Button
+                  type="button"
+                  className="h-11 w-full font-bold"
+                  onClick={saveSettings}
+                >
+                  {saveLabel}
+                </Button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setEditing(false)
+                  }
+                  className="mx-auto mt-4 block text-sm font-medium text-muted-foreground underline decoration-muted-foreground/40 underline-offset-4 transition-colors hover:text-foreground"
+                >
+                  {
+                    dictionary.cookies
+                      .closeWithoutChanges
+                  }
+                </button>
               </div>
             </div>
           </section>
         </div>
       ) : (
-
-        /* PRZYCISK USTAWIEŃ */
         <Button
           type="button"
-          size="lg"
-          onClick={() => setEditing(true)}
-          aria-label={dictionary.cookies.settingsTitle}
-          title={dictionary.cookies.settingsTitle}
-          className={`fixed bottom-2 left-2 z-40 h-12 w-12 border border-[#f4b91e] bg-black text-black shadow-xl transition-[transform,opacity] duration-500 ease-out hover:scale-105 hover:bg-white md:bottom-3 md:left-3 ${
-            floatingButtonReady && showFloatingButton
+          size="icon-lg"
+          onClick={openSettings}
+          aria-label={
+            dictionary.cookies
+              .settingsTitle
+          }
+          title={
+            dictionary.cookies
+              .settingsTitle
+          }
+          className={`fixed bottom-2 left-2 z-40 size-12 rounded-xl border border-primary/60 bg-black text-primary shadow-xl transition-[transform,opacity,background-color] duration-500 ease-out hover:scale-105 hover:bg-foreground md:bottom-3 md:left-3 ${
+            floatingButtonReady &&
+            showFloatingButton
               ? "translate-y-0 opacity-100"
               : "pointer-events-none translate-y-10 opacity-0"
           }`}
         >
-          <Cookie className="!h-7 !w-7 text-[#f4b91e]" />
+          <Cookie className="size-6" />
         </Button>
       )}
     </>
   )
 }
-
