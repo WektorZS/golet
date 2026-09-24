@@ -1,4 +1,3 @@
-
 "use client"
 
 import Image from "next/image"
@@ -11,10 +10,21 @@ import { Button } from "@/components/ui/button"
 import { SocialLinks } from "@/components/social-links"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { getDictionary } from "@/lib/dictionaries"
-import { localeFromPathname, routeFor, type Locale } from "@/lib/i18n"
+import {
+  localeFromPathname,
+  routeFor,
+  type Locale,
+} from "@/lib/i18n"
 
-export function Brand({ priority = false, locale = "pl" }: { priority?: boolean; locale?: Locale }) {
+export function Brand({
+  priority = false,
+  locale = "pl",
+}: {
+  priority?: boolean
+  locale?: Locale
+}) {
   const dictionary = getDictionary(locale)
+
   return (
     <Link
       href={routeFor(locale, "/")}
@@ -46,14 +56,34 @@ export function SiteHeader() {
   const pathname = usePathname()
   const locale = localeFromPathname(pathname)
   const dictionary = getDictionary(locale)
+
   const links = [
-    [dictionary.navigation.trips, routeFor(locale, "/wyjazdy")],
-    [dictionary.navigation.customTrip, `${routeFor(locale, "/")}#twoj-wyjazd`],
-    [dictionary.navigation.gallery, routeFor(locale, "/galeria")],
-    [dictionary.navigation.about, routeFor(locale, "/o-nas")],
-    [dictionary.navigation.faq, routeFor(locale, "/faq")],
-    [dictionary.navigation.contact, routeFor(locale, "/kontakt")],
+    [
+      dictionary.navigation.trips,
+      routeFor(locale, "/wyjazdy"),
+    ],
+    [
+      dictionary.navigation.customTrip,
+      `${routeFor(locale, "/")}#twoj-wyjazd`,
+    ],
+    [
+      dictionary.navigation.gallery,
+      routeFor(locale, "/galeria"),
+    ],
+    [
+      dictionary.navigation.about,
+      routeFor(locale, "/o-nas"),
+    ],
+    [
+      dictionary.navigation.faq,
+      routeFor(locale, "/faq"),
+    ],
+    [
+      dictionary.navigation.contact,
+      routeFor(locale, "/kontakt"),
+    ],
   ] as const
+
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -64,7 +94,9 @@ export function SiteHeader() {
 
     handleScroll()
 
-    window.addEventListener("scroll", handleScroll, { passive: true })
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    })
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
@@ -87,24 +119,28 @@ export function SiteHeader() {
           : "bg-foreground/90 backdrop-blur-md"
       }`}
     >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 md:px-6">
-        {/* LOGO */}
-        <Brand priority locale={locale} />
+      <div className="relative mx-auto flex h-20 max-w-screen-2xl items-center px-4 md:px-6 lg:px-10 xl:px-12">
+        <div className="shrink-0">
+          <Brand priority locale={locale} />
+        </div>
 
         <nav
-          className="hidden items-center justify-center gap-7 lg:flex"
+          className="absolute left-1/2 hidden -translate-x-1/2 items-center justify-center gap-7 lg:flex"
           aria-label={dictionary.navigation.label}
         >
           {links.map(([label, href]) => {
             const route = href.split("#")[0] || "/"
-            const active = route !== "/" && pathname === route
+            const active =
+              route !== "/" && pathname === route
 
             return (
               <Link
                 key={href}
                 href={href}
-                aria-current={active ? "page" : undefined}
-                className={`relative py-2 font-mono text-[11px] font-bold uppercase tracking-[0.12em] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-primary after:transition-transform ${
+                aria-current={
+                  active ? "page" : undefined
+                }
+                className={`relative whitespace-nowrap py-2 font-mono text-[11px] font-bold uppercase tracking-[0.12em] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-primary after:transition-transform ${
                   active
                     ? "text-primary after:scale-x-100"
                     : "text-background/75 after:scale-x-0 hover:text-background hover:after:scale-x-100"
@@ -116,32 +152,39 @@ export function SiteHeader() {
           })}
         </nav>
 
-        {/* DESKTOP CTA */}
-        <div className="hidden items-center gap-3 text-background lg:flex">
+        <div className="ml-auto hidden items-center gap-3 text-background lg:flex">
           <LanguageSwitcher compact />
-        <Button
-          type="button"
-          onClick={() => {
-            window.dispatchEvent(
-              new Event("open-floating-contact")
-            )
-          }}
-          className="group h-11 items-center gap-3 rounded-lg border border-primary/60 bg-primary/10 px-5 font-mono text-[11px] font-bold uppercase tracking-wider text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-black"
-        >
-          <span>{dictionary.navigation.ask}</span>
 
-          <Plane className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
-        </Button>
+          <Button
+            type="button"
+            onClick={() => {
+              window.dispatchEvent(
+                new Event("open-floating-contact"),
+              )
+            }}
+            className="group h-11 items-center gap-3 rounded-lg border border-primary/60 bg-primary/10 px-5 font-mono text-[11px] font-bold uppercase tracking-wider text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-black"
+          >
+            <span>
+              {dictionary.navigation.ask}
+            </span>
+
+            <Plane className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-1" />
+          </Button>
         </div>
 
-        {/* MOBILE MENU BUTTON */}
         <Button
           variant="outline"
           size="icon-lg"
-          className="border-background/30 bg-transparent text-background lg:hidden"
-          aria-label={open ? dictionary.navigation.close : dictionary.navigation.open}
+          className="ml-auto border-background/30 bg-transparent text-background lg:hidden"
+          aria-label={
+            open
+              ? dictionary.navigation.close
+              : dictionary.navigation.open
+          }
           aria-expanded={open}
-          onClick={() => setOpen((value) => !value)}
+          onClick={() =>
+            setOpen((value) => !value)
+          }
         >
           {open ? <X /> : <Menu />}
         </Button>
@@ -150,36 +193,43 @@ export function SiteHeader() {
       {open ? (
         <nav
           className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 lg:hidden"
-          aria-label={dictionary.navigation.mobileLabel}
+          aria-label={
+            dictionary.navigation.mobileLabel
+          }
         >
-        {links.map(([label, href]) => {
-  const route = href.split("#")[0] || "/"
-  const active = route !== "/" && pathname === route
+          {links.map(([label, href]) => {
+            const route =
+              href.split("#")[0] || "/"
 
-  return (
-    <Link
-      key={href}
-      href={href}
-      onClick={() => setOpen(false)}
-      aria-current={active ? "page" : undefined}
-      className={`group rounded-md px-3 py-3 font-mono text-sm font-semibold uppercase tracking-wider transition-colors ${
-        active
-          ? "text-primary"
-          : "text-background hover:bg-background/10 hover:text-primary"
-      }`}
-    >
-      <span
-        className={`relative inline-block pb-1 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-primary after:transition-transform ${
-          active
-            ? "after:scale-x-100"
-            : "after:scale-x-0"
-        }`}
-      >
-        {label}
-      </span>
-    </Link>
-  )
-})}
+            const active =
+              route !== "/" && pathname === route
+
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setOpen(false)}
+                aria-current={
+                  active ? "page" : undefined
+                }
+                className={`group rounded-md px-3 py-3 font-mono text-sm font-semibold uppercase tracking-wider transition-colors ${
+                  active
+                    ? "text-primary"
+                    : "text-background hover:bg-background/10 hover:text-primary"
+                }`}
+              >
+                <span
+                  className={`relative inline-block pb-1 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-primary after:transition-transform ${
+                    active
+                      ? "after:scale-x-100"
+                      : "after:scale-x-0"
+                  }`}
+                >
+                  {label}
+                </span>
+              </Link>
+            )
+          })}
 
           <Button
             type="button"
@@ -188,11 +238,14 @@ export function SiteHeader() {
               setOpen(false)
 
               window.dispatchEvent(
-                new Event("open-floating-contact")
+                new Event(
+                  "open-floating-contact",
+                ),
               )
             }}
           >
             {dictionary.navigation.ask}
+
             <Plane data-icon="inline-end" />
           </Button>
 
@@ -202,6 +255,7 @@ export function SiteHeader() {
             </p>
 
             <SocialLinks showLabels />
+
             <div className="mt-4 text-background">
               <LanguageSwitcher compact />
             </div>
