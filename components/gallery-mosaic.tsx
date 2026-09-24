@@ -23,18 +23,18 @@ const DEFAULT_RATIO = 1.5
 
 function getMobileGroupClass(count: number) {
   if (count === 4) {
-    return "grid h-96 grid-cols-2 grid-rows-6 gap-0 sm:h-128"
+    return "grid h-96 grid-cols-2 grid-rows-6 gap-0.5 sm:h-128"
   }
 
   if (count === 3) {
-    return "grid h-80 grid-cols-2 grid-rows-4 gap-0 sm:h-96"
+    return "grid h-80 grid-cols-2 grid-rows-4 gap-0.5 sm:h-96"
   }
 
   if (count === 2) {
-    return "grid h-52 grid-cols-2 grid-rows-1 gap-0 sm:h-72"
+    return "grid h-52 grid-cols-2 grid-rows-1 gap-0.5 sm:h-72"
   }
 
-  return "grid h-56 grid-cols-1 grid-rows-1 gap-0 sm:h-80"
+  return "grid h-56 grid-cols-1 grid-rows-1 gap-0.5 sm:h-80"
 }
 
 function getMobileTileClass(
@@ -234,7 +234,7 @@ export function GalleryMosaic({
 
   return (
     <div className="mx-auto w-full px-4 sm:px-0 lg:max-w-5xl lg:px-6 xl:max-w-6xl">
-      <div className="overflow-hidden rounded-xl sm:rounded-none lg:rounded-xl">
+      <div className="flex flex-col gap-0.5 overflow-hidden rounded-xl bg-section-light p-0.5 sm:rounded-none lg:rounded-xl">
         {groups.map(
           (
             group,

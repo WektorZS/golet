@@ -392,8 +392,8 @@ export function ImageLightbox({
 
   <span className="whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-wider">
     {isEn
-      ? "Click to enlarge"
-      : "Kliknij, aby powiększyć"}
+      ? "Enlarge"
+      : "Powiększ"}
   </span>
 </span>
       </DialogTrigger>
