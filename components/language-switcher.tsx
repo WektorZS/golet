@@ -1,4 +1,4 @@
-```tsx
+
 "use client"
 
 import { useTransition } from "react"
@@ -99,4 +99,4 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
     </div>
   )
 }
-```
+
