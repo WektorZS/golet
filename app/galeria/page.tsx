@@ -1,8 +1,14 @@
 import type { Metadata } from "next"
 import Image from "next/image"
-import { ArrowUpRight, Images } from "lucide-react"
+import {
+  ArrowUpRight,
+  Images,
+} from "lucide-react"
 
-import { ImageLightbox } from "@/components/image-lightbox"
+import {
+  GalleryMosaic,
+  type GalleryMosaicItem,
+} from "@/components/gallery-mosaic"
 import { JsonLd } from "@/components/json-ld"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
@@ -29,20 +35,26 @@ const FACEBOOK_URL =
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
 
-  const { title, description } = getSeoCopy(
-    "gallery",
-    locale,
-  )
+  const { title, description } =
+    getSeoCopy(
+      "gallery",
+      locale,
+    )
 
-  const path = routeFor(locale, "/galeria")
+  const path =
+    routeFor(
+      locale,
+      "/galeria",
+    )
 
   return {
     title,
     description,
-    alternates: localizedAlternates(
-      "/galeria",
-      locale,
-    ),
+    alternates:
+      localizedAlternates(
+        "/galeria",
+        locale,
+      ),
     ...socialMetadata(
       title,
       description,
@@ -52,171 +64,53 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-function getMosaicGroupClass(count: number) {
-  if (count === 4) {
-    return "grid h-96 grid-cols-2 grid-rows-6 gap-0 sm:h-128 lg:h-96 lg:grid-cols-12 lg:grid-rows-4"
-  }
-
-  if (count === 3) {
-    return "grid h-80 grid-cols-2 grid-rows-4 gap-0 sm:h-96 lg:h-80 lg:grid-cols-12 lg:grid-rows-3"
-  }
-
-  if (count === 2) {
-    return "grid h-52 grid-cols-2 grid-rows-1 gap-0 sm:h-72 lg:h-56 lg:grid-cols-12"
-  }
-
-  return "grid h-56 grid-cols-1 grid-rows-1 gap-0 sm:h-80 lg:h-64 lg:grid-cols-12"
-}
-
-function getMosaicTileClass(
-  count: number,
-  index: number,
-  reverse: boolean,
-) {
-  if (count === 4) {
-    const mobile = [
-      "col-start-1 col-span-2 row-start-1 row-span-2",
-      "col-start-1 col-span-1 row-start-3 row-span-2",
-      "col-start-2 col-span-1 row-start-3 row-span-2",
-      "col-start-1 col-span-2 row-start-5 row-span-2",
-    ]
-
-    const desktopDefault = [
-      "lg:col-start-1 lg:col-span-3 lg:row-start-1 lg:row-span-4",
-      "lg:col-start-4 lg:col-span-4 lg:row-start-1 lg:row-span-2",
-      "lg:col-start-8 lg:col-span-5 lg:row-start-1 lg:row-span-2",
-      "lg:col-start-4 lg:col-span-9 lg:row-start-3 lg:row-span-2",
-    ]
-
-    const desktopReverse = [
-      "lg:col-start-10 lg:col-span-3 lg:row-start-1 lg:row-span-4",
-      "lg:col-start-1 lg:col-span-4 lg:row-start-1 lg:row-span-2",
-      "lg:col-start-5 lg:col-span-5 lg:row-start-1 lg:row-span-2",
-      "lg:col-start-1 lg:col-span-9 lg:row-start-3 lg:row-span-2",
-    ]
-
-    return `${mobile[index]} ${
-      reverse
-        ? desktopReverse[index]
-        : desktopDefault[index]
-    }`
-  }
-
-  if (count === 3) {
-    const mobile = [
-      "col-start-1 col-span-2 row-start-1 row-span-2",
-      "col-start-1 col-span-1 row-start-3 row-span-2",
-      "col-start-2 col-span-1 row-start-3 row-span-2",
-    ]
-
-    const desktopDefault = [
-      "lg:col-start-1 lg:col-span-5 lg:row-start-1 lg:row-span-3",
-      "lg:col-start-6 lg:col-span-7 lg:row-start-1 lg:row-span-1",
-      "lg:col-start-6 lg:col-span-7 lg:row-start-2 lg:row-span-2",
-    ]
-
-    const desktopReverse = [
-      "lg:col-start-8 lg:col-span-5 lg:row-start-1 lg:row-span-3",
-      "lg:col-start-1 lg:col-span-7 lg:row-start-1 lg:row-span-1",
-      "lg:col-start-1 lg:col-span-7 lg:row-start-2 lg:row-span-2",
-    ]
-
-    return `${mobile[index]} ${
-      reverse
-        ? desktopReverse[index]
-        : desktopDefault[index]
-    }`
-  }
-
-  if (count === 2) {
-    return index === 0
-      ? "col-start-1 col-span-1 row-start-1 lg:col-start-1 lg:col-span-6"
-      : "col-start-2 col-span-1 row-start-1 lg:col-start-7 lg:col-span-6"
-  }
-
-  return "col-start-1 col-span-1 row-start-1 lg:col-span-12"
-}
-
-function getMosaicSizes(
-  count: number,
-  index: number,
-) {
-  if (count === 4) {
-    const sizes = [
-      "(max-width: 1023px) 100vw, 25vw",
-      "(max-width: 1023px) 50vw, 33vw",
-      "(max-width: 1023px) 50vw, 42vw",
-      "(max-width: 1023px) 100vw, 75vw",
-    ]
-
-    return sizes[index]
-  }
-
-  if (count === 3) {
-    const sizes = [
-      "(max-width: 1023px) 100vw, 42vw",
-      "(max-width: 1023px) 50vw, 58vw",
-      "(max-width: 1023px) 50vw, 58vw",
-    ]
-
-    return sizes[index]
-  }
-
-  if (count === 2) {
-    return "50vw"
-  }
-
-  return "100vw"
-}
-
 export default async function GalleryPage() {
-  const locale = await getRequestLocale()
-  const isEn = locale === "en"
-  const path = routeFor(locale, "/galeria")
+  const locale =
+    await getRequestLocale()
 
-  const [gallery, content] = await Promise.all([
-    getPublishedGallery(locale),
-    getSiteContent(),
-  ])
+  const isEn =
+    locale === "en"
 
-  const lightboxImages = gallery.map((item) => ({
-    src: item.mediaId
-      ? `/api/media/${item.mediaId}`
-      : item.image,
-    alt:
-      item.alt ||
-      item.title ||
-      (isEn
-        ? "Photo from a Let's Gol trip"
-        : "Zdjęcie z wyjazdu Let's Gol"),
-  }))
+  const path =
+    routeFor(
+      locale,
+      "/galeria",
+    )
 
-  const galleryEntries = gallery.map(
-    (item, index) => ({
-      item,
-      index,
-    }),
-  )
+  const [gallery, content] =
+    await Promise.all([
+      getPublishedGallery(locale),
+      getSiteContent(),
+    ])
 
-  const galleryGroups = Array.from(
-    {
-      length: Math.ceil(
-        galleryEntries.length / 4,
-      ),
-    },
-    (_, index) =>
-      galleryEntries.slice(
-        index * 4,
-        index * 4 + 4,
-      ),
-  )
+  const galleryItems: GalleryMosaicItem[] =
+    gallery.map((item) => {
+      const src =
+        item.mediaId
+          ? `/api/media/${item.mediaId}`
+          : item.image
+
+      const alt =
+        item.alt ||
+        item.title ||
+        (isEn
+          ? "Photo from a Let's Gol trip"
+          : "Zdjęcie z wyjazdu Let's Gol")
+
+      return {
+        id: String(item.id),
+        src,
+        alt,
+      }
+    })
 
   return (
     <>
       <main className="min-h-screen bg-background text-foreground">
         <JsonLd
           data={{
-            "@context": "https://schema.org",
+            "@context":
+              "https://schema.org",
             "@graph": [
               breadcrumbSchema([
                 {
@@ -236,41 +130,51 @@ export default async function GalleryPage() {
                 },
               ]),
               {
-                "@type": "ImageGallery",
-                name: localizedSetting(
-                  content,
-                  "galleryTitle",
-                  locale,
-                  isEn
-                    ? "Football trip gallery"
-                    : "Galeria z wyjazdów",
-                ),
+                "@type":
+                  "ImageGallery",
+                name:
+                  localizedSetting(
+                    content,
+                    "galleryTitle",
+                    locale,
+                    isEn
+                      ? "Football trip gallery"
+                      : "Galeria z wyjazdów",
+                  ),
                 url: `https://letsgol.eu${path}`,
-                inLanguage: isEn
-                  ? "en-GB"
-                  : "pl-PL",
-                image: gallery.map(
-                  (item) => {
-                    const src =
-                      item.mediaId
-                        ? `/api/media/${item.mediaId}`
-                        : item.image
+                inLanguage:
+                  isEn
+                    ? "en-GB"
+                    : "pl-PL",
+                image:
+                  gallery.map(
+                    (item) => {
+                      const src =
+                        item.mediaId
+                          ? `/api/media/${item.mediaId}`
+                          : item.image
 
-                    return {
-                      "@type": "ImageObject",
-                      contentUrl: new URL(
-                        src,
-                        "https://letsgol.eu",
-                      ).toString(),
-                      caption: [
-                        item.title,
-                        item.city,
-                      ]
-                        .filter(Boolean)
-                        .join(" · "),
-                    }
-                  },
-                ),
+                      return {
+                        "@type":
+                          "ImageObject",
+                        contentUrl:
+                          new URL(
+                            src,
+                            "https://letsgol.eu",
+                          ).toString(),
+                        caption: [
+                          item.title,
+                          item.city,
+                        ]
+                          .filter(
+                            Boolean,
+                          )
+                          .join(
+                            " · ",
+                          ),
+                      }
+                    },
+                  ),
               },
             ],
           }}
@@ -284,8 +188,8 @@ export default async function GalleryPage() {
             alt=""
             fill
             priority
-            className="object-cover opacity-25"
             sizes="100vw"
+            className="object-cover opacity-25"
           />
 
           <div className="absolute inset-0 bg-linear-to-r from-foreground via-foreground/95 to-foreground/55" />
@@ -314,10 +218,12 @@ export default async function GalleryPage() {
                   "Stadiums, cities and match-day emotion from our football journeys. Explore photos from Let's Gol trips."
                 ) : (
                   <>
-                    Stadiony, miasta i emocje
-                    z naszych piłkarskich
-                    podróży. Zobacz zdjęcia
-                    z wyjazdów Let&apos;s Gol.
+                    Stadiony, miasta
+                    i emocje z naszych
+                    piłkarskich podróży.
+                    Zobacz zdjęcia
+                    z wyjazdów
+                    Let&apos;s Gol.
                   </>
                 )}
               </p>
@@ -345,84 +251,12 @@ export default async function GalleryPage() {
         </section>
 
         <section className="overflow-hidden bg-section-light pt-8 pb-4 sm:pt-12 sm:pb-0">
-          {gallery.length ? (
-            <div className="mx-auto w-full px-4 sm:px-0 lg:max-w-5xl xl:max-w-6xl">
-              <div className="overflow-hidden rounded-xl sm:rounded-none">
-                {galleryGroups.map(
-                  (group, groupIndex) => {
-                    const reverse =
-                      groupIndex % 2 === 1
-
-                    return (
-                      <div
-                        key={
-                          group[0]?.item.id ??
-                          groupIndex
-                        }
-                        className={getMosaicGroupClass(
-                          group.length,
-                        )}
-                      >
-                        {group.map(
-                          (
-                            { item, index },
-                            localIndex,
-                          ) => {
-                            const src =
-                              item.mediaId
-                                ? `/api/media/${item.mediaId}`
-                                : item.image
-
-                            const alt =
-                              item.alt ||
-                              item.title ||
-                              (isEn
-                                ? "Photo from a Let's Gol trip"
-                                : "Zdjęcie z wyjazdu Let's Gol")
-
-                            return (
-                              <figure
-                                key={item.id}
-                                className={`group relative isolate m-0 overflow-hidden bg-section-light ${getMosaicTileClass(
-                                  group.length,
-                                  localIndex,
-                                  reverse,
-                                )}`}
-                              >
-                                <ImageLightbox
-                                  src={src}
-                                  alt={alt}
-                                  images={
-                                    lightboxImages
-                                  }
-                                  initialIndex={
-                                    index
-                                  }
-                                  priority={
-                                    index < 4
-                                  }
-                                >
-                                  <Image
-                                    src={src}
-                                    alt={alt}
-                                    fill
-                                    sizes={getMosaicSizes(
-                                      group.length,
-                                      localIndex,
-                                    )}
-                                    className="cursor-zoom-in object-cover brightness-100 transition-[transform,filter] duration-700 ease-out lg:brightness-70 lg:group-hover:scale-105 lg:group-hover:brightness-100"
-                                  />
-                                </ImageLightbox>
-                              </figure>
-                            )
-                          },
-                        )}
-                      </div>
-                    )
-                  },
-                )}
-              </div>
-            </div>
+          {galleryItems.length ? (
+            <GalleryMosaic
+              items={
+                galleryItems
+              }
+            />
           ) : (
             <div className="bg-section-light px-4 py-24 text-center md:px-6">
               <Images
@@ -490,7 +324,9 @@ export default async function GalleryPage() {
         </section>
       </main>
 
-      <SiteFooter content={content} />
+      <SiteFooter
+        content={content}
+      />
     </>
   )
 }
