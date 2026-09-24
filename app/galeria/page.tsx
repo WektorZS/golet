@@ -54,18 +54,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 function getMosaicGroupClass(count: number) {
   if (count === 4) {
-    return "grid h-96 grid-cols-2 grid-rows-6 gap-0 sm:h-128 lg:h-160 lg:grid-cols-12 lg:grid-rows-6"
+    return "grid h-80 grid-cols-2 grid-rows-4 gap-0 sm:h-96 lg:h-96 lg:grid-cols-12 lg:grid-rows-4"
   }
 
   if (count === 3) {
-    return "grid h-80 grid-cols-2 grid-rows-4 gap-0 sm:h-96 lg:h-128 lg:grid-cols-12 lg:grid-rows-4"
+    return "grid h-64 grid-cols-2 grid-rows-3 gap-0 sm:h-72 lg:h-80 lg:grid-cols-12 lg:grid-rows-3"
   }
 
   if (count === 2) {
-    return "grid h-52 grid-cols-2 grid-rows-1 gap-0 sm:h-72 lg:h-96 lg:grid-cols-12"
+    return "grid h-44 grid-cols-2 gap-0 sm:h-52 lg:h-56 lg:grid-cols-12"
   }
 
-  return "grid h-56 grid-cols-1 grid-rows-1 gap-0 sm:h-80 lg:h-120 lg:grid-cols-12"
+  return "grid h-48 grid-cols-1 gap-0 sm:h-56 lg:h-64 lg:grid-cols-12"
 }
 
 function getMosaicTileClass(
@@ -75,24 +75,24 @@ function getMosaicTileClass(
 ) {
   if (count === 4) {
     const mobile = [
-      "col-start-1 col-span-2 row-start-1 row-span-2",
-      "col-start-1 col-span-1 row-start-3 row-span-2",
-      "col-start-2 col-span-1 row-start-3 row-span-2",
-      "col-start-1 col-span-2 row-start-5 row-span-2",
+      "col-start-1 col-span-1 row-start-1 row-span-2",
+      "col-start-2 col-span-1 row-start-1 row-span-1",
+      "col-start-2 col-span-1 row-start-2 row-span-1",
+      "col-start-1 col-span-2 row-start-3 row-span-2",
     ]
 
     const desktopDefault = [
-      "lg:col-start-1 lg:col-span-6 lg:row-start-1 lg:row-span-6",
-      "lg:col-start-7 lg:col-span-6 lg:row-start-1 lg:row-span-3",
-      "lg:col-start-7 lg:col-span-3 lg:row-start-4 lg:row-span-3",
-      "lg:col-start-10 lg:col-span-3 lg:row-start-4 lg:row-span-3",
+      "lg:col-start-1 lg:col-span-3 lg:row-start-1 lg:row-span-4",
+      "lg:col-start-4 lg:col-span-4 lg:row-start-1 lg:row-span-2",
+      "lg:col-start-8 lg:col-span-5 lg:row-start-1 lg:row-span-2",
+      "lg:col-start-4 lg:col-span-9 lg:row-start-3 lg:row-span-2",
     ]
 
     const desktopReverse = [
-      "lg:col-start-7 lg:col-span-6 lg:row-start-1 lg:row-span-6",
-      "lg:col-start-1 lg:col-span-6 lg:row-start-1 lg:row-span-3",
-      "lg:col-start-1 lg:col-span-3 lg:row-start-4 lg:row-span-3",
-      "lg:col-start-4 lg:col-span-3 lg:row-start-4 lg:row-span-3",
+      "lg:col-start-10 lg:col-span-3 lg:row-start-1 lg:row-span-4",
+      "lg:col-start-1 lg:col-span-4 lg:row-start-1 lg:row-span-2",
+      "lg:col-start-5 lg:col-span-5 lg:row-start-1 lg:row-span-2",
+      "lg:col-start-1 lg:col-span-9 lg:row-start-3 lg:row-span-2",
     ]
 
     return `${mobile[index]} ${
@@ -104,21 +104,21 @@ function getMosaicTileClass(
 
   if (count === 3) {
     const mobile = [
-      "col-start-1 col-span-2 row-start-1 row-span-2",
-      "col-start-1 col-span-1 row-start-3 row-span-2",
-      "col-start-2 col-span-1 row-start-3 row-span-2",
+      "col-start-1 col-span-2 row-start-1 row-span-1",
+      "col-start-1 col-span-1 row-start-2 row-span-2",
+      "col-start-2 col-span-1 row-start-2 row-span-2",
     ]
 
     const desktopDefault = [
-      "lg:col-start-1 lg:col-span-6 lg:row-start-1 lg:row-span-4",
-      "lg:col-start-7 lg:col-span-6 lg:row-start-1 lg:row-span-2",
-      "lg:col-start-7 lg:col-span-6 lg:row-start-3 lg:row-span-2",
+      "lg:col-start-1 lg:col-span-5 lg:row-start-1 lg:row-span-3",
+      "lg:col-start-6 lg:col-span-7 lg:row-start-1 lg:row-span-1",
+      "lg:col-start-6 lg:col-span-7 lg:row-start-2 lg:row-span-2",
     ]
 
     const desktopReverse = [
-      "lg:col-start-7 lg:col-span-6 lg:row-start-1 lg:row-span-4",
-      "lg:col-start-1 lg:col-span-6 lg:row-start-1 lg:row-span-2",
-      "lg:col-start-1 lg:col-span-6 lg:row-start-3 lg:row-span-2",
+      "lg:col-start-8 lg:col-span-5 lg:row-start-1 lg:row-span-3",
+      "lg:col-start-1 lg:col-span-7 lg:row-start-1 lg:row-span-1",
+      "lg:col-start-1 lg:col-span-7 lg:row-start-2 lg:row-span-2",
     ]
 
     return `${mobile[index]} ${
@@ -130,11 +130,11 @@ function getMosaicTileClass(
 
   if (count === 2) {
     return index === 0
-      ? "col-start-1 col-span-1 row-start-1 lg:col-start-1 lg:col-span-6"
-      : "col-start-2 col-span-1 row-start-1 lg:col-start-7 lg:col-span-6"
+      ? "col-start-1 col-span-1 lg:col-start-1 lg:col-span-6"
+      : "col-start-2 col-span-1 lg:col-start-7 lg:col-span-6"
   }
 
-  return "col-start-1 col-span-1 row-start-1 lg:col-span-12"
+  return "col-start-1 col-span-1 lg:col-span-12"
 }
 
 function getMosaicSizes(
@@ -143,10 +143,10 @@ function getMosaicSizes(
 ) {
   if (count === 4) {
     const sizes = [
-      "(max-width: 1023px) 100vw, 50vw",
-      "(max-width: 1023px) 50vw, 50vw",
       "(max-width: 1023px) 50vw, 25vw",
-      "(max-width: 1023px) 100vw, 25vw",
+      "(max-width: 1023px) 50vw, 33vw",
+      "(max-width: 1023px) 50vw, 42vw",
+      "(max-width: 1023px) 100vw, 75vw",
     ]
 
     return sizes[index]
@@ -154,9 +154,9 @@ function getMosaicSizes(
 
   if (count === 3) {
     const sizes = [
-      "(max-width: 1023px) 100vw, 50vw",
-      "(max-width: 1023px) 50vw, 50vw",
-      "(max-width: 1023px) 50vw, 50vw",
+      "(max-width: 1023px) 100vw, 42vw",
+      "(max-width: 1023px) 50vw, 58vw",
+      "(max-width: 1023px) 50vw, 58vw",
     ]
 
     return sizes[index]
@@ -317,8 +317,7 @@ export default async function GalleryPage() {
                     Stadiony, miasta i emocje
                     z naszych piłkarskich
                     podróży. Zobacz zdjęcia
-                    z wyjazdów Let&apos;s
-                    Gol.
+                    z wyjazdów Let&apos;s Gol.
                   </>
                 )}
               </p>
