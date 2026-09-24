@@ -217,7 +217,7 @@ useEffect(() => {
         {dictionary.floating.buttonContact}
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="border border-black/60 shadow-2xl ring-1 ring-black/10">
   <DialogHeader>
     <DialogTitle>
        {dictionary.floating.choiceTitle}
