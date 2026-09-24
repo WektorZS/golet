@@ -16,7 +16,7 @@ const slides = [
     desktopY: 50,
     desktopScale: 1,
   },
-   {
+    {
     src: "/images/san-siro.webp",
     mobileSrc: "/images/san-siro-mobile.webp",
 
@@ -40,6 +40,18 @@ const slides = [
     desktopX: 50,
     desktopY: 100,
     desktopScale: 1.0,
+  },
+     {
+    src: "/images/munich-hero.webp",
+    mobileSrc: "/images/munich-hero-mobile.webp",
+
+    mobileX: 55,
+    mobileY: 0,
+    mobileScale: 1.15,
+
+    desktopX: 50,
+    desktopY: 100,
+    desktopScale: 1,
   },
   {
     src: "/images/wembley-hero.webp",
