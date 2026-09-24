@@ -409,7 +409,7 @@ export default async function GalleryPage() {
                                     group.length,
                                     localIndex,
                                   )}
-                                  className="cursor-zoom-in object-cover brightness-70 transition-[transform,filter] duration-700 ease-out group-hover:scale-105 group-hover:brightness-100"
+                                  className="cursor-zoom-in object-cover brightness-100 transition-[transform,filter] duration-700 ease-out lg:brightness-70 lg:group-hover:scale-105 lg:group-hover:brightness-100"
                                 />
                               </ImageLightbox>
                             </figure>
