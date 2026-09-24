@@ -11,7 +11,11 @@ import {
   getPublishedGallery,
   getSiteContent,
 } from "@/lib/content"
-import { breadcrumbSchema, localizedAlternates, socialMetadata } from "@/lib/seo"
+import {
+  breadcrumbSchema,
+  localizedAlternates,
+  socialMetadata,
+} from "@/lib/seo"
 import { getRequestLocale } from "@/lib/i18n-request"
 import { localizedSetting } from "@/lib/i18n-content"
 import { routeFor } from "@/lib/i18n"
@@ -21,26 +25,151 @@ export const dynamic = "force-dynamic"
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
-  const { title, description } = getSeoCopy("gallery", locale)
+  const { title, description } = getSeoCopy(
+    "gallery",
+    locale,
+  )
+
   const path = routeFor(locale, "/galeria")
-  return { title, description, alternates: localizedAlternates("/galeria", locale), ...socialMetadata(title, description, path, locale) }
+
+  return {
+    title,
+    description,
+    alternates: localizedAlternates(
+      "/galeria",
+      locale,
+    ),
+    ...socialMetadata(
+      title,
+      description,
+      path,
+      locale,
+    ),
+  }
 }
 
-const galleryLayout = [
-  "col-span-2 sm:col-span-6 lg:col-span-12 aspect-[16/7]",
-  "col-span-1 sm:col-span-3 lg:col-span-4 aspect-[3/4]",
-  "col-span-1 sm:col-span-3 lg:col-span-4 aspect-[3/4]",
-  "col-span-2 sm:col-span-6 lg:col-span-4 aspect-[4/3]",
-  "col-span-1 sm:col-span-3 lg:col-span-5 aspect-[4/5]",
-  "col-span-1 sm:col-span-3 lg:col-span-7 aspect-[16/9]",
-  "col-span-2 sm:col-span-6 lg:col-span-7 aspect-[16/9]",
-  "col-span-1 sm:col-span-3 lg:col-span-5 aspect-[4/5]",
-] as const
+function getMosaicGroupClass(count: number) {
+  if (count === 4) {
+    return "grid h-128 grid-cols-2 grid-rows-6 gap-0 sm:h-144 lg:h-160 lg:grid-cols-12 lg:grid-rows-6"
+  }
+
+  if (count === 3) {
+    return "grid h-96 grid-cols-2 grid-rows-4 gap-0 sm:h-112 lg:h-128 lg:grid-cols-12 lg:grid-rows-4"
+  }
+
+  if (count === 2) {
+    return "grid h-64 grid-cols-2 grid-rows-1 gap-0 sm:h-80 lg:h-96 lg:grid-cols-12"
+  }
+
+  return "grid h-72 grid-cols-1 grid-rows-1 gap-0 sm:h-96 lg:h-120 lg:grid-cols-12"
+}
+
+function getMosaicTileClass(
+  count: number,
+  index: number,
+  reverse: boolean,
+) {
+  if (count === 4) {
+    const mobile = [
+      "col-start-1 col-span-2 row-start-1 row-span-2",
+      "col-start-1 col-span-1 row-start-3 row-span-2",
+      "col-start-2 col-span-1 row-start-3 row-span-2",
+      "col-start-1 col-span-2 row-start-5 row-span-2",
+    ]
+
+    const desktopDefault = [
+      "lg:col-start-1 lg:col-span-6 lg:row-start-1 lg:row-span-6",
+      "lg:col-start-7 lg:col-span-6 lg:row-start-1 lg:row-span-3",
+      "lg:col-start-7 lg:col-span-3 lg:row-start-4 lg:row-span-3",
+      "lg:col-start-10 lg:col-span-3 lg:row-start-4 lg:row-span-3",
+    ]
+
+    const desktopReverse = [
+      "lg:col-start-7 lg:col-span-6 lg:row-start-1 lg:row-span-6",
+      "lg:col-start-1 lg:col-span-6 lg:row-start-1 lg:row-span-3",
+      "lg:col-start-1 lg:col-span-3 lg:row-start-4 lg:row-span-3",
+      "lg:col-start-4 lg:col-span-3 lg:row-start-4 lg:row-span-3",
+    ]
+
+    return `${mobile[index]} ${
+      reverse
+        ? desktopReverse[index]
+        : desktopDefault[index]
+    }`
+  }
+
+  if (count === 3) {
+    const mobile = [
+      "col-start-1 col-span-2 row-start-1 row-span-2",
+      "col-start-1 col-span-1 row-start-3 row-span-2",
+      "col-start-2 col-span-1 row-start-3 row-span-2",
+    ]
+
+    const desktopDefault = [
+      "lg:col-start-1 lg:col-span-6 lg:row-start-1 lg:row-span-4",
+      "lg:col-start-7 lg:col-span-6 lg:row-start-1 lg:row-span-2",
+      "lg:col-start-7 lg:col-span-6 lg:row-start-3 lg:row-span-2",
+    ]
+
+    const desktopReverse = [
+      "lg:col-start-7 lg:col-span-6 lg:row-start-1 lg:row-span-4",
+      "lg:col-start-1 lg:col-span-6 lg:row-start-1 lg:row-span-2",
+      "lg:col-start-1 lg:col-span-6 lg:row-start-3 lg:row-span-2",
+    ]
+
+    return `${mobile[index]} ${
+      reverse
+        ? desktopReverse[index]
+        : desktopDefault[index]
+    }`
+  }
+
+  if (count === 2) {
+    return index === 0
+      ? "col-start-1 col-span-1 row-start-1 lg:col-start-1 lg:col-span-6"
+      : "col-start-2 col-span-1 row-start-1 lg:col-start-7 lg:col-span-6"
+  }
+
+  return "col-start-1 col-span-1 row-start-1 lg:col-span-12"
+}
+
+function getMosaicSizes(
+  count: number,
+  index: number,
+) {
+  if (count === 4) {
+    const sizes = [
+      "(max-width: 1023px) 100vw, 50vw",
+      "(max-width: 1023px) 50vw, 50vw",
+      "(max-width: 1023px) 50vw, 25vw",
+      "(max-width: 1023px) 100vw, 25vw",
+    ]
+
+    return sizes[index]
+  }
+
+  if (count === 3) {
+    const sizes = [
+      "(max-width: 1023px) 100vw, 50vw",
+      "(max-width: 1023px) 50vw, 50vw",
+      "(max-width: 1023px) 50vw, 50vw",
+    ]
+
+    return sizes[index]
+  }
+
+  if (count === 2) {
+    return "50vw"
+  }
+
+  return "100vw"
+}
 
 export default async function GalleryPage() {
   const locale = await getRequestLocale()
   const isEn = locale === "en"
   const path = routeFor(locale, "/galeria")
+
   const [gallery, content] = await Promise.all([
     getPublishedGallery(locale),
     getSiteContent(),
@@ -53,8 +182,30 @@ export default async function GalleryPage() {
     alt:
       item.alt ||
       item.title ||
-      (isEn ? "Photo from a Let's Gol trip" : "Zdjęcie z wyjazdu Let's Gol"),
+      (isEn
+        ? "Photo from a Let's Gol trip"
+        : "Zdjęcie z wyjazdu Let's Gol"),
   }))
+
+  const galleryEntries = gallery.map(
+    (item, index) => ({
+      item,
+      index,
+    }),
+  )
+
+  const galleryGroups = Array.from(
+    {
+      length: Math.ceil(
+        galleryEntries.length / 4,
+      ),
+    },
+    (_, index) =>
+      galleryEntries.slice(
+        index * 4,
+        index * 4 + 4,
+      ),
+  )
 
   return (
     <>
@@ -65,36 +216,58 @@ export default async function GalleryPage() {
             "@graph": [
               breadcrumbSchema([
                 {
-                  name: isEn ? "Home" : "Strona główna",
-                  path: routeFor(locale, "/"),
+                  name: isEn
+                    ? "Home"
+                    : "Strona główna",
+                  path: routeFor(
+                    locale,
+                    "/",
+                  ),
                 },
                 {
-                  name: isEn ? "Gallery" : "Galeria",
+                  name: isEn
+                    ? "Gallery"
+                    : "Galeria",
                   path,
                 },
               ]),
               {
                 "@type": "ImageGallery",
-                name:
-                  localizedSetting(content, "galleryTitle", locale, isEn ? "Football trip gallery" : "Galeria z wyjazdów"),
+                name: localizedSetting(
+                  content,
+                  "galleryTitle",
+                  locale,
+                  isEn
+                    ? "Football trip gallery"
+                    : "Galeria z wyjazdów",
+                ),
                 url: `https://letsgol.eu${path}`,
-                inLanguage: isEn ? "en-GB" : "pl-PL",
-                image: gallery.map((item) => {
-                  const src = item.mediaId
-                    ? `/api/media/${item.mediaId}`
-                    : item.image
+                inLanguage: isEn
+                  ? "en-GB"
+                  : "pl-PL",
+                image: gallery.map(
+                  (item) => {
+                    const src =
+                      item.mediaId
+                        ? `/api/media/${item.mediaId}`
+                        : item.image
 
-                  return {
-                    "@type": "ImageObject",
-                    contentUrl: new URL(
-                      src,
-                      "https://letsgol.eu"
-                    ).toString(),
-                    caption: [item.title, item.city]
-                      .filter(Boolean)
-                      .join(" · "),
-                  }
-                }),
+                    return {
+                      "@type":
+                        "ImageObject",
+                      contentUrl: new URL(
+                        src,
+                        "https://letsgol.eu",
+                      ).toString(),
+                      caption: [
+                        item.title,
+                        item.city,
+                      ]
+                        .filter(Boolean)
+                        .join(" · "),
+                    }
+                  },
+                ),
               },
             ],
           }}
@@ -117,15 +290,34 @@ export default async function GalleryPage() {
           <div className="relative mx-auto grid min-h-140 max-w-7xl items-center gap-12 px-4 py-16 md:px-6 lg:grid-cols-[1fr_0.5fr] lg:py-20">
             <div className="max-w-4xl">
               <p className="eyebrow eyebrow-on-dark">
-                {isEn ? "Gallery" : "Galeria"}
+                {isEn
+                  ? "Gallery"
+                  : "Galeria"}
               </p>
 
               <h1 className="mt-6 text-balance font-sans text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-[72px]">
-                {localizedSetting(content, "galleryTitle", locale, isEn ? "Football trip gallery" : "Galeria z wyjazdów")}
+                {localizedSetting(
+                  content,
+                  "galleryTitle",
+                  locale,
+                  isEn
+                    ? "Football trip gallery"
+                    : "Galeria z wyjazdów",
+                )}
               </h1>
 
               <p className="mt-6 max-w-2xl text-lg leading-8 text-background/70">
-                {isEn ? "Stadiums, cities and match-day emotion from our football journeys. Explore photos from Let's Gol trips." : <>Stadiony, miasta i emocje z naszych piłkarskich podróży. Zobacz zdjęcia z wyjazdów Let&apos;s Gol.</>}
+                {isEn ? (
+                  "Stadiums, cities and match-day emotion from our football journeys. Explore photos from Let's Gol trips."
+                ) : (
+                  <>
+                    Stadiony, miasta i emocje
+                    z naszych piłkarskich
+                    podróży. Zobacz zdjęcia
+                    z wyjazdów Let&apos;s
+                    Gol.
+                  </>
+                )}
               </p>
             </div>
 
@@ -136,81 +328,116 @@ export default async function GalleryPage() {
               />
 
               <p className="mt-4 font-sans text-2xl font-black uppercase">
-                {isEn ? "Memories from the stands" : "Wspomnienia z trybun"}
+                {isEn
+                  ? "Memories from the stands"
+                  : "Wspomnienia z trybun"}
               </p>
 
               <p className="mt-2 text-sm leading-6 text-background/60">
-                {isEn ? "Matches, stadiums and places we have experienced together with our travellers." : "Mecze, stadiony i miejsca, które odwiedziliśmy razem z uczestnikami naszych wyjazdów."}
+                {isEn
+                  ? "Matches, stadiums and places we have experienced together with our travellers."
+                  : "Mecze, stadiony i miejsca, które odwiedziliśmy razem z uczestnikami naszych wyjazdów."}
               </p>
             </div>
           </div>
         </section>
 
-        <section className="relative overflow-hidden bg-section-light px-4 py-16 md:px-6 md:py-24">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0"
-          >
-            <div className="absolute -right-40 top-20 size-105 rounded-full bg-primary/5 blur-[120px]" />
-            <div className="absolute -left-40 bottom-20 size-105 rounded-full bg-black/2.5 blur-[120px]" />
-          </div>
-
-          <div className="relative mx-auto max-w-7xl">
-            {gallery.length ? (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-6 lg:grid-cols-12 lg:gap-4">
-                {gallery.map((item, index) => {
-                  const src = item.mediaId
-                    ? `/api/media/${item.mediaId}`
-                    : item.image
-
-                  const layoutClass =
-                    galleryLayout[index % galleryLayout.length]
+        <section className="overflow-hidden bg-foreground">
+          {gallery.length ? (
+            <div className="w-full">
+              {galleryGroups.map(
+                (group, groupIndex) => {
+                  const reverse =
+                    groupIndex % 2 === 1
 
                   return (
-                    <figure
-                      key={item.id}
-                      className={`group relative overflow-hidden rounded-xl bg-muted ${layoutClass}`}
+                    <div
+                      key={
+                        group[0]?.item.id ??
+                        groupIndex
+                      }
+                      className={getMosaicGroupClass(
+                        group.length,
+                      )}
                     >
-                      <ImageLightbox
-                        src={src}
-                        alt={
-                          item.alt ||
-                          item.title ||
-                          (isEn ? "Photo from a Let's Gol trip" : "Zdjęcie z wyjazdu Let's Gol")
-                        }
-                        images={lightboxImages}
-                        initialIndex={index}
-                        priority={index < 3}
-                      >
-                        <Image
-                          src={src}
-                          alt={
+                      {group.map(
+                        (
+                          { item, index },
+                          localIndex,
+                        ) => {
+                          const src =
+                            item.mediaId
+                              ? `/api/media/${item.mediaId}`
+                              : item.image
+
+                          const alt =
                             item.alt ||
                             item.title ||
-                            (isEn ? "Photo from a Let's Gol trip" : "Zdjęcie z wyjazdu Let's Gol")
-                          }
-                          fill
-                          className="object-cover transition-[transform,filter] duration-700 ease-out group-hover:scale-105 group-hover:brightness-95"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        />
-                      </ImageLightbox>
-                    </figure>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="py-20 text-center">
-                <Images
-                  className="mx-auto size-8 text-muted-foreground/40"
-                  aria-hidden="true"
-                />
+                            (isEn
+                              ? "Photo from a Let's Gol trip"
+                              : "Zdjęcie z wyjazdu Let's Gol")
 
-                <p className="mt-4 text-muted-foreground">
-                  {isEn ? "More photos will be added soon." : "Galeria zostanie uzupełniona wkrótce."}
-                </p>
-              </div>
-            )}
-          </div>
+                          return (
+                            <figure
+                              key={item.id}
+                              className={`group relative isolate m-0 overflow-hidden bg-foreground ${getMosaicTileClass(
+                                group.length,
+                                localIndex,
+                                reverse,
+                              )}`}
+                            >
+                              <ImageLightbox
+                                src={src}
+                                alt={alt}
+                                images={
+                                  lightboxImages
+                                }
+                                initialIndex={
+                                  index
+                                }
+                                priority={
+                                  index < 4
+                                }
+                              >
+                                <Image
+                                  src={src}
+                                  alt={alt}
+                                  fill
+                                  sizes={getMosaicSizes(
+                                    group.length,
+                                    localIndex,
+                                  )}
+                                  className="cursor-zoom-in object-cover transition-[transform,filter] duration-700 ease-out group-hover:scale-105 group-hover:brightness-90"
+                                />
+                              </ImageLightbox>
+
+                              <div
+                                aria-hidden="true"
+                                className="pointer-events-none absolute inset-0 z-10 bg-black/0 transition-colors duration-500 group-hover:bg-black/10"
+                              />
+                            </figure>
+                          )
+                        },
+                      )}
+                    </div>
+                  )
+                },
+              )}
+            </div>
+          ) : (
+            <div className="bg-section-light px-4 py-24 text-center md:px-6">
+              <Images
+                className="mx-auto size-8 text-muted-foreground/40"
+                aria-hidden="true"
+              />
+
+              <p className="mt-4 text-muted-foreground">
+                {isEn
+                  ? "More photos will be added soon."
+                  : "Galeria zostanie uzupełniona wkrótce."}
+              </p>
+            </div>
+          )}
         </section>
       </main>
 
