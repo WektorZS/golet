@@ -493,7 +493,7 @@ export function ImageLightbox({
                 className="absolute left-2 top-1/2 z-30 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white shadow-xl transition-colors hover:bg-black sm:left-5 sm:size-12"
                 aria-label={
                   isEn
-                    ? "Previous photo"
+                    ? "Previous photox"
                     : "Poprzednie zdjęcie"
                 }
               >
