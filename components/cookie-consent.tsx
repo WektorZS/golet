@@ -335,156 +335,134 @@ export function CookieConsent() {
       ) : null}
 
       {firstVisit ? (
-        <div
-          ref={consentDialogRef}
-          className="fixed inset-0 z-99999 flex items-end justify-center overflow-y-auto bg-black/60 backdrop-blur-sm sm:items-center sm:p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="cookie-consent-title"
-        >
-          <section className="w-full max-w-lg overflow-hidden rounded-t-3xl bg-card text-card-foreground shadow-2xl ring-1 ring-black/10 sm:rounded-2xl">
-            <div className="p-5 sm:p-7">
-              <div className="flex items-start gap-4">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-black">
-                  <Cookie
-                    className="size-5"
-                    aria-hidden="true"
-                  />
-                </div>
+  <div
+    ref={consentDialogRef}
+    className="fixed inset-0 z-99999 flex items-end justify-center overflow-hidden bg-black/30 p-3 backdrop-blur-[2px] sm:items-center sm:bg-black/60 sm:p-4 sm:backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cookie-consent-title"
+  >
+    <section className="max-h-[78svh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/20 bg-card/95 text-card-foreground shadow-2xl backdrop-blur-xl sm:max-h-none sm:overflow-visible sm:bg-card">
+      <div className="p-4 sm:p-7">
+        <div className="flex items-start gap-3 sm:gap-4">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-black sm:size-11">
+            <Cookie
+              className="size-5"
+              aria-hidden="true"
+            />
+          </div>
 
-                <div className="min-w-0">
-                  <h2
-                    id="cookie-consent-title"
-                    className="font-sans text-xl font-black uppercase leading-tight sm:text-2xl"
-                  >
-                    {
-                      dictionary.cookies
-                        .welcome
-                    }
-                  </h2>
+          <div className="min-w-0">
+            <h2
+              id="cookie-consent-title"
+              className="font-sans text-lg font-black uppercase leading-tight sm:text-2xl"
+            >
+              {dictionary.cookies.welcome}
+            </h2>
 
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    {
-                      dictionary.cookies
-                        .settingsTitle
-                    }
-                  </p>
-                </div>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+              {dictionary.cookies.settingsTitle}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-muted/60 p-2.5 sm:mt-6 sm:p-3">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
+            {languageLabel}
+          </p>
+
+          <LanguageSwitcher />
+        </div>
+
+        <div className="mt-4 sm:mt-6">
+          <p className="text-sm font-medium leading-5 text-foreground sm:text-[15px] sm:leading-6">
+            {dictionary.cookies.choosePrompt}
+          </p>
+
+          <p className="mt-1.5 text-[11px] leading-4 text-muted-foreground sm:mt-2 sm:text-xs sm:leading-5">
+            {optionalInfo}
+          </p>
+        </div>
+
+        <div className="mt-4 grid gap-2.5 sm:mt-5 sm:grid-cols-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={() => choose("rejected")}
+            className="group flex items-center gap-3 rounded-xl border border-border bg-background/80 p-3 text-left transition-colors hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:min-h-36 sm:flex-col sm:items-stretch sm:p-4"
+          >
+            <div className="flex items-center justify-between gap-3 sm:items-start">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary group-hover:text-black sm:size-10">
+                <ShieldCheck
+                  className="size-5"
+                  aria-hidden="true"
+                />
               </div>
 
-              <div className="mt-6 flex items-center justify-between gap-4 rounded-xl bg-muted/60 p-3">
-                <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                  {languageLabel}
+              <span className="hidden rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:inline-flex">
+                {dictionary.cookies.required}
+              </span>
+            </div>
+
+            <div className="min-w-0 flex-1 sm:mt-4">
+              <div className="flex items-center gap-2">
+                <p className="font-sans text-sm font-black sm:text-base">
+                  {dictionary.cookies.necessary}
                 </p>
 
-                <LanguageSwitcher />
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground sm:hidden">
+                  {dictionary.cookies.required}
+                </span>
               </div>
 
-              <div className="mt-6">
-                <p className="text-[15px] font-medium leading-6 text-foreground">
-                  {
-                    dictionary.cookies
-                      .choosePrompt
-                  }
-                </p>
-
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  {optionalInfo}
-                </p>
-              </div>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    choose("rejected")
-                  }
-                  className="group flex min-h-36 flex-col rounded-xl border border-border bg-background p-4 text-left transition-colors hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary group-hover:text-black">
-                      <ShieldCheck
-                        className="size-5"
-                        aria-hidden="true"
-                      />
-                    </div>
-
-                    <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      {
-                        dictionary.cookies
-                          .required
-                      }
-                    </span>
-                  </div>
-
-                  <div className="mt-4">
-                    <p className="font-sans text-base font-black">
-                      {
-                        dictionary.cookies
-                          .necessary
-                      }
-                    </p>
-
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                      {
-                        dictionary.cookies
-                          .necessaryDescription
-                      }
-                    </p>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    choose("accepted")
-                  }
-                  className="group flex min-h-36 flex-col rounded-xl border border-border bg-background p-4 text-left transition-colors hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary group-hover:text-black">
-                      <Cookie
-                        className="size-5"
-                        aria-hidden="true"
-                      />
-                    </div>
-
-                    <span className="rounded-full bg-primary/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#705300]">
-                      {
-                        dictionary.cookies
-                          .optional
-                      }
-                    </span>
-                  </div>
-
-                  <div className="mt-4">
-                    <p className="font-sans text-base font-black">
-                      {
-                        dictionary.cookies
-                          .analytics
-                      }
-                    </p>
-
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                      {
-                        dictionary.cookies
-                          .analyticsDescription
-                      }
-                    </p>
-                  </div>
-                </button>
-              </div>
-
-              <p className="mt-5 border-t border-border pt-4 text-center text-[11px] leading-5 text-muted-foreground">
-                {
-                  dictionary.cookies
-                    .changeAnytime
-                }
+              <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground sm:mt-1 sm:text-xs sm:leading-5">
+                {dictionary.cookies.necessaryDescription}
               </p>
             </div>
-          </section>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => choose("accepted")}
+            className="group flex items-center gap-3 rounded-xl border border-border bg-background/80 p-3 text-left transition-colors hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:min-h-36 sm:flex-col sm:items-stretch sm:p-4"
+          >
+            <div className="flex items-center justify-between gap-3 sm:items-start">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary group-hover:text-black sm:size-10">
+                <Cookie
+                  className="size-5"
+                  aria-hidden="true"
+                />
+              </div>
+
+              <span className="hidden rounded-full bg-primary/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#705300] sm:inline-flex">
+                {dictionary.cookies.optional}
+              </span>
+            </div>
+
+            <div className="min-w-0 flex-1 sm:mt-4">
+              <div className="flex items-center gap-2">
+                <p className="font-sans text-sm font-black sm:text-base">
+                  {dictionary.cookies.analytics}
+                </p>
+
+                <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#705300] sm:hidden">
+                  {dictionary.cookies.optional}
+                </span>
+              </div>
+
+              <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground sm:mt-1 sm:text-xs sm:leading-5">
+                {dictionary.cookies.analyticsDescription}
+              </p>
+            </div>
+          </button>
         </div>
-      ) : editing ? (
+
+        <p className="mt-4 border-t border-border pt-3 text-center text-[10px] leading-4 text-muted-foreground sm:mt-5 sm:pt-4 sm:text-[11px] sm:leading-5">
+          {dictionary.cookies.changeAnytime}
+        </p>
+      </div>
+    </section>
+  </div>
+) : editing ? (
         <div
           ref={consentDialogRef}
           className="fixed inset-0 z-99999 flex items-end justify-center overflow-y-auto bg-black/55 backdrop-blur-sm sm:items-center sm:p-4"
