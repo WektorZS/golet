@@ -171,7 +171,7 @@ export default async function AboutPage() {
 
             <h2 className="mt-5 text-balance font-sans text-4xl font-black uppercase leading-[1.1] tracking-tight md:text-6xl md:leading-[1.1]">
               {t(
-                'Znamy się jak "łyse konie"',
+                'Znamy się jak „łyse konie”',
                 "We know each other inside out"
               )}
             </h2>
