@@ -19,32 +19,11 @@ import {
 export function Brand({
   priority = false,
   locale = "pl",
-  iconOnly = false,
 }: {
   priority?: boolean
   locale?: Locale
-  iconOnly?: boolean
 }) {
   const dictionary = getDictionary(locale)
-
-  if (iconOnly) {
-    return (
-      <Link
-        href={routeFor(locale, "/")}
-        className="flex shrink-0 items-center justify-center"
-        aria-label="Let's Gol"
-      >
-        <Image
-          src="/logo.webp"
-          alt="Let's Gol"
-          width={96}
-          height={96}
-          className="size-16 object-contain xl:size-20"
-          priority={priority}
-        />
-      </Link>
-    )
-  }
 
   return (
     <Link
@@ -63,9 +42,7 @@ export function Brand({
       </span>
 
       <span className="flex flex-col font-sans font-black uppercase leading-none tracking-tight">
-        <span className="text-xl">
-          Let&apos;s Gol
-        </span>
+        <span className="text-xl">Let&apos;s Gol</span>
 
         <span className="font-mono text-[10px] font-semibold tracking-[0.16em] text-primary">
           {dictionary.brandTagline}
@@ -142,22 +119,17 @@ export function SiteHeader() {
           : "bg-foreground/90 backdrop-blur-md"
       }`}
     >
-      <div className="mx-auto flex h-20 max-w-screen-2xl items-center px-4 md:px-6 xl:grid xl:h-24 xl:grid-cols-[1fr_auto_1fr] xl:px-10 2xl:px-12">
-        <div className="flex shrink-0 items-center xl:justify-start">
-          <Brand
-            priority
-            locale={locale}
-            iconOnly
-          />
+      <div className="relative mx-auto flex h-20 max-w-screen-2xl items-center px-4 md:px-6 lg:px-10 xl:px-12">
+        <div className="shrink-0">
+          <Brand priority locale={locale} />
         </div>
 
         <nav
-          className="hidden items-center justify-center gap-7 xl:flex 2xl:gap-8"
+          className="absolute left-1/2 hidden -translate-x-1/2 items-center justify-center gap-7 lg:flex"
           aria-label={dictionary.navigation.label}
         >
           {links.map(([label, href]) => {
             const route = href.split("#")[0] || "/"
-
             const active =
               route !== "/" && pathname === route
 
@@ -168,10 +140,10 @@ export function SiteHeader() {
                 aria-current={
                   active ? "page" : undefined
                 }
-                className={`relative whitespace-nowrap py-3 font-mono text-[11px] font-bold uppercase tracking-[0.14em] transition-colors duration-200 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-left after:bg-primary after:transition-transform after:duration-200 2xl:text-xs ${
+                className={`relative whitespace-nowrap py-2 font-mono text-[11px] font-bold uppercase tracking-[0.12em] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-primary after:transition-transform ${
                   active
                     ? "text-primary after:scale-x-100"
-                    : "text-background/70 after:scale-x-0 hover:text-background hover:after:scale-x-100"
+                    : "text-background/75 after:scale-x-0 hover:text-background hover:after:scale-x-100"
                 }`}
               >
                 {label}
@@ -180,7 +152,7 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="ml-auto hidden items-center justify-end gap-4 text-background xl:flex">
+        <div className="ml-auto hidden items-center gap-3 text-background lg:flex">
           <LanguageSwitcher compact />
 
           <Button
@@ -190,7 +162,7 @@ export function SiteHeader() {
                 new Event("open-floating-contact"),
               )
             }}
-            className="group h-12 items-center gap-3 rounded-lg border border-primary/60 bg-primary/10 px-6 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-black 2xl:text-xs"
+            className="group h-11 items-center gap-3 rounded-lg border border-primary/60 bg-primary/10 px-5 font-mono text-[11px] font-bold uppercase tracking-wider text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-black"
           >
             <span>
               {dictionary.navigation.ask}
@@ -200,33 +172,33 @@ export function SiteHeader() {
           </Button>
         </div>
 
-        <div className="ml-auto flex items-center gap-2 xl:hidden">
-          <div className="text-background">
-            <LanguageSwitcher compact />
-          </div>
+        <div className="ml-auto flex items-center gap-2 lg:hidden">
+  <div className="text-background">
+    <LanguageSwitcher compact />
+  </div>
 
-          <Button
-            variant="outline"
-            size="icon-lg"
-            className="border-background/30 bg-transparent text-background hover:bg-background/10 hover:text-background"
-            aria-label={
-              open
-                ? dictionary.navigation.close
-                : dictionary.navigation.open
-            }
-            aria-expanded={open}
-            onClick={() =>
-              setOpen((value) => !value)
-            }
-          >
-            {open ? <X /> : <Menu />}
-          </Button>
-        </div>
+  <Button
+    variant="outline"
+    size="icon-lg"
+    className="border-background/30 bg-transparent text-background"
+    aria-label={
+      open
+        ? dictionary.navigation.close
+        : dictionary.navigation.open
+    }
+    aria-expanded={open}
+    onClick={() =>
+      setOpen((value) => !value)
+    }
+  >
+    {open ? <X /> : <Menu />}
+  </Button>
+</div>
       </div>
 
       {open ? (
         <nav
-          className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 xl:hidden"
+          className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 lg:hidden"
           aria-label={
             dictionary.navigation.mobileLabel
           }
@@ -289,6 +261,7 @@ export function SiteHeader() {
             </p>
 
             <SocialLinks showLabels />
+            
           </div>
         </nav>
       ) : null}
