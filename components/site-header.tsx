@@ -23,33 +23,20 @@ export function Brand({
   priority?: boolean
   locale?: Locale
 }) {
-  const dictionary = getDictionary(locale)
-
   return (
     <Link
       href={routeFor(locale, "/")}
-      className="flex items-center gap-3 text-background xl:gap-4"
+      className="flex shrink-0 items-center justify-center"
+      aria-label="Let's Gol"
     >
-      <span className="flex size-16 shrink-0 items-center justify-center xl:size-20">
-        <Image
-          src="/logo.webp"
-          alt=""
-          width={96}
-          height={96}
-          className="size-16 object-contain xl:size-20"
-          priority={priority}
-        />
-      </span>
-
-      <span className="flex min-w-0 flex-col font-sans font-black uppercase leading-none tracking-tight">
-        <span className="whitespace-nowrap text-xl xl:text-2xl">
-          Let&apos;s Gol
-        </span>
-
-        <span className="mt-1 whitespace-nowrap font-mono text-[10px] font-semibold tracking-[0.16em] text-primary xl:text-[11px] xl:tracking-[0.18em]">
-          {dictionary.brandTagline}
-        </span>
-      </span>
+      <Image
+        src="/logo.webp"
+        alt="Let's Gol"
+        width={96}
+        height={96}
+        className="size-16 object-contain xl:size-20"
+        priority={priority}
+      />
     </Link>
   )
 }
@@ -122,12 +109,8 @@ export function SiteHeader() {
       }`}
     >
       <div className="relative mx-auto flex h-20 max-w-screen-2xl items-center px-4 md:px-6 xl:h-24 xl:px-8 2xl:px-12">
-        <div className="shrink-0">
-          <Brand priority locale={locale} />
-        </div>
-
         <nav
-          className="absolute left-1/2 hidden -translate-x-1/2 items-center justify-center gap-7 xl:flex 2xl:gap-8"
+          className="hidden items-center gap-6 xl:flex 2xl:gap-7"
           aria-label={dictionary.navigation.label}
         >
           {links.map(([label, href]) => {
@@ -151,6 +134,12 @@ export function SiteHeader() {
             )
           })}
         </nav>
+
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
+          <div className="pointer-events-auto">
+            <Brand priority locale={locale} />
+          </div>
+        </div>
 
         <div className="ml-auto hidden items-center gap-4 text-background xl:flex">
           <LanguageSwitcher compact />
@@ -187,7 +176,9 @@ export function SiteHeader() {
                 : dictionary.navigation.open
             }
             aria-expanded={open}
-            onClick={() => setOpen((value) => !value)}
+            onClick={() =>
+              setOpen((value) => !value)
+            }
           >
             {open ? <X /> : <Menu />}
           </Button>
