@@ -19,24 +19,58 @@ import {
 export function Brand({
   priority = false,
   locale = "pl",
+  iconOnly = false,
 }: {
   priority?: boolean
   locale?: Locale
+  iconOnly?: boolean
 }) {
+  const dictionary = getDictionary(locale)
+
+  if (iconOnly) {
+    return (
+      <Link
+        href={routeFor(locale, "/")}
+        className="flex shrink-0 items-center justify-center"
+        aria-label="Let's Gol"
+      >
+        <Image
+          src="/logo.webp"
+          alt="Let's Gol"
+          width={96}
+          height={96}
+          className="size-16 object-contain xl:size-20"
+          priority={priority}
+        />
+      </Link>
+    )
+  }
+
   return (
     <Link
       href={routeFor(locale, "/")}
-      className="flex shrink-0 items-center justify-center"
-      aria-label="Let's Gol"
+      className="flex items-center gap-3 text-background"
     >
-      <Image
-        src="/logo.webp"
-        alt="Let's Gol"
-        width={96}
-        height={96}
-        className="size-16 object-contain xl:size-20"
-        priority={priority}
-      />
+      <span className="flex size-16 shrink-0 items-center justify-center">
+        <Image
+          src="/logo.webp"
+          alt=""
+          width={84}
+          height={84}
+          className="size-16 object-contain"
+          priority={priority}
+        />
+      </span>
+
+      <span className="flex flex-col font-sans font-black uppercase leading-none tracking-tight">
+        <span className="text-xl">
+          Let&apos;s Gol
+        </span>
+
+        <span className="font-mono text-[10px] font-semibold tracking-[0.16em] text-primary">
+          {dictionary.brandTagline}
+        </span>
+      </span>
     </Link>
   )
 }
@@ -108,13 +142,22 @@ export function SiteHeader() {
           : "bg-foreground/90 backdrop-blur-md"
       }`}
     >
-      <div className="relative mx-auto flex h-20 max-w-screen-2xl items-center px-4 md:px-6 xl:h-24 xl:px-8 2xl:px-12">
+      <div className="mx-auto flex h-20 max-w-screen-2xl items-center px-4 md:px-6 xl:grid xl:h-24 xl:grid-cols-[1fr_auto_1fr] xl:px-10 2xl:px-12">
+        <div className="flex shrink-0 items-center xl:justify-start">
+          <Brand
+            priority
+            locale={locale}
+            iconOnly
+          />
+        </div>
+
         <nav
-          className="hidden items-center gap-6 xl:flex 2xl:gap-7"
+          className="hidden items-center justify-center gap-7 xl:flex 2xl:gap-8"
           aria-label={dictionary.navigation.label}
         >
           {links.map(([label, href]) => {
             const route = href.split("#")[0] || "/"
+
             const active =
               route !== "/" && pathname === route
 
@@ -122,11 +165,13 @@ export function SiteHeader() {
               <Link
                 key={href}
                 href={href}
-                aria-current={active ? "page" : undefined}
-                className={`relative whitespace-nowrap py-3 font-mono text-xs font-bold uppercase tracking-[0.13em] transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-left after:bg-primary after:transition-transform ${
+                aria-current={
+                  active ? "page" : undefined
+                }
+                className={`relative whitespace-nowrap py-3 font-mono text-[11px] font-bold uppercase tracking-[0.14em] transition-colors duration-200 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-left after:bg-primary after:transition-transform after:duration-200 2xl:text-xs ${
                   active
                     ? "text-primary after:scale-x-100"
-                    : "text-background/75 after:scale-x-0 hover:text-background hover:after:scale-x-100"
+                    : "text-background/70 after:scale-x-0 hover:text-background hover:after:scale-x-100"
                 }`}
               >
                 {label}
@@ -135,13 +180,7 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
-          <div className="pointer-events-auto">
-            <Brand priority locale={locale} />
-          </div>
-        </div>
-
-        <div className="ml-auto hidden items-center gap-4 text-background xl:flex">
+        <div className="ml-auto hidden items-center justify-end gap-4 text-background xl:flex">
           <LanguageSwitcher compact />
 
           <Button
@@ -151,13 +190,13 @@ export function SiteHeader() {
                 new Event("open-floating-contact"),
               )
             }}
-            className="group h-12 items-center gap-3 rounded-lg border border-primary/60 bg-primary/10 px-6 font-mono text-xs font-bold uppercase tracking-[0.08em] text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-black"
+            className="group h-12 items-center gap-3 rounded-lg border border-primary/60 bg-primary/10 px-6 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-black 2xl:text-xs"
           >
             <span>
               {dictionary.navigation.ask}
             </span>
 
-            <Plane className="size-[18px] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-1" />
+            <Plane className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-1" />
           </Button>
         </div>
 
@@ -169,7 +208,7 @@ export function SiteHeader() {
           <Button
             variant="outline"
             size="icon-lg"
-            className="border-background/30 bg-transparent text-background"
+            className="border-background/30 bg-transparent text-background hover:bg-background/10 hover:text-background"
             aria-label={
               open
                 ? dictionary.navigation.close
@@ -188,10 +227,14 @@ export function SiteHeader() {
       {open ? (
         <nav
           className="absolute inset-x-0 top-full flex h-[calc(100svh-5rem)] flex-col gap-1 overflow-y-auto border-t border-background/15 bg-foreground px-4 py-4 xl:hidden"
-          aria-label={dictionary.navigation.mobileLabel}
+          aria-label={
+            dictionary.navigation.mobileLabel
+          }
         >
           {links.map(([label, href]) => {
-            const route = href.split("#")[0] || "/"
+            const route =
+              href.split("#")[0] || "/"
+
             const active =
               route !== "/" && pathname === route
 
@@ -200,7 +243,9 @@ export function SiteHeader() {
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                aria-current={active ? "page" : undefined}
+                aria-current={
+                  active ? "page" : undefined
+                }
                 className={`group rounded-md px-3 py-3 font-mono text-sm font-semibold uppercase tracking-wider transition-colors ${
                   active
                     ? "text-primary"
@@ -227,7 +272,9 @@ export function SiteHeader() {
               setOpen(false)
 
               window.dispatchEvent(
-                new Event("open-floating-contact"),
+                new Event(
+                  "open-floating-contact",
+                ),
               )
             }}
           >
