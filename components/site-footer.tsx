@@ -135,7 +135,7 @@ export async function SiteFooter({
   aria-label="Let's Gol"
 >
   <Image
-    src="/images/logofooter.webp"
+    src="/logofooter.webp"
     alt="Let's Gol"
     width={130}
     height={142}
