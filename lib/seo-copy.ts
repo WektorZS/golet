@@ -3,27 +3,27 @@ import type { Locale } from "@/lib/i18n"
 export const seoCopy = {
   home: {
     pl: {
-      title: "Wyjazdy na mecze piłkarskie w Europie",
+      title: "Wyjazdy na mecze piłkarskie ze zwiedzaniem",
       description:
-        "Wyjazdy na mecze piłkarskie w Europie z biletem, lotem, hotelem i opieką koordynatora. Wybierz gotowy pakiet lub poproś o indywidualną ofertę.",
+        "Organizujemy wyjazdy na mecze w Europie: bilet, lot, hotel, zwiedzanie, transfery i opieka koordynatora. Wybierz gotowy pakiet lub poproś o własną ofertę.",
     },
     en: {
-      title: "Football Match Trips Across Europe",
+      title: "Football Match Trips with Sightseeing",
       description:
-        "Travel to football matches across Europe with match tickets, flights, hotels and coordinator support. Choose a ready-made package or request a custom trip.",
+        "We organise football match trips across Europe with tickets, flights, hotels, sightseeing, transfers and coordinator support. Choose a package or request a custom trip.",
     },
   },
 
   trips: {
     pl: {
-      title: "Aktualne wyjazdy na mecze piłkarskie",
+      title: "Wyjazdy na mecze - aktualne terminy i ceny",
       description:
-        "Sprawdź aktualne wyjazdy na mecze piłkarskie w Europie. Porównaj terminy, ceny i warianty z biletem, lotem, hotelem oraz opieką koordynatora.",
+        "Zobacz najbliższe wyjazdy na mecze piłkarskie. Porównaj terminy, ceny i pakiety oraz wybierz spotkanie, które pasuje do Twoich planów.",
     },
     en: {
-      title: "Current Football Match Trips",
+      title: "Football Match Trips - Dates and Prices",
       description:
-        "Explore current football match trips across Europe. Compare dates, prices and options with match tickets, flights, hotels and coordinator support.",
+        "Browse upcoming football match trips across Europe. Compare dates, prices and packages, then choose the fixture that best fits your plans.",
     },
   },
 
@@ -31,51 +31,51 @@ export const seoCopy = {
     pl: {
       title: "Galeria wyjazdów na mecze piłkarskie",
       description:
-        "Zobacz zdjęcia z wyjazdów na mecze piłkarskie organizowanych przez Let’s Gol. Stadiony, miasta, kibice i emocje z największych spotkań w Europie.",
+        "Zobacz zdjęcia ze stadionów, miast i wspólnych wyjazdów Let’s Gol. Poczuj atmosferę naszych piłkarskich podróży.",
     },
     en: {
       title: "Football Match Trip Gallery",
       description:
-        "See photos from Let’s Gol football trips across Europe. Discover stadiums, cities, supporters and unforgettable match-day moments.",
+        "See photos from Let’s Gol trips, stadiums and cities, and get a feel for the atmosphere of our football journeys.",
     },
   },
 
   about: {
     pl: {
-      title: "O nas – wyjazdy na mecze",
+      title: "Poznaj Let’s Gol - wyjazdy od kibiców dla kibiców",
       description:
-        "Poznaj Let’s Gol i ludzi stojących za naszymi wyjazdami na mecze. Zobacz, jak Łukasz i Mateusz łączą futbol, podróże i organizację wyjazdów.",
+        "Poznaj ludzi stojących za Let’s Gol i historię marki, która łączy piłkarskie emocje, podróże i kompleksową organizację wyjazdów.",
     },
     en: {
-      title: "About Let’s Gol",
+      title: "Meet Let’s Gol - Trips by Fans, for Fans",
       description:
-        "Meet the people behind Let’s Gol and learn how we combine football, travel planning and personal support to organise memorable match trips across Europe.",
+        "Meet the people behind Let’s Gol and discover the story of a brand built around football, travel and fully organised match trips.",
     },
   },
 
   faq: {
     pl: {
-      title: "FAQ o wyjazdach na mecze piłkarskie",
+      title: "Najczęstsze pytania - FAQ",
       description:
-        "Znajdź odpowiedzi na pytania o wyjazdy na mecze piłkarskie, bilety, loty, hotele, płatności, ubezpieczenie, dokumenty i organizację podróży.",
+        "Jak wygląda rezerwacja, kiedy otrzymasz bilet i co w przypadku zmiany terminu meczu? Zebraliśmy odpowiedzi na najczęstsze pytania.",
     },
     en: {
-      title: "Football Match Trip FAQ",
+      title: "Frequently Asked Questions - Let’s Gol",
       description:
-        "Find answers about football match trips, tickets, flights, hotels, payments, travel documents, insurance and how Let’s Gol organises each journey.",
+        "How does booking work, when will you receive your ticket, and what happens if the match date changes? Find answers to our most common questions.",
     },
   },
 
   contact: {
     pl: {
-      title: "Kontakt i wycena wyjazdu na mecz",
+      title: "Skontaktuj się z nami",
       description:
-        "Skontaktuj się z Let’s Gol w sprawie wyjazdu na mecz, dostępnych terminów, rezerwacji, oferty dla grupy lub indywidualnej wyceny wyjazdu.",
+        "Masz wybrany mecz lub potrzebujesz pomocy z ofertą? Skontaktuj się z Let’s Gol przez formularz, telefon, e-mail lub WhatsApp.",
     },
     en: {
-      title: "Contact Let’s Gol",
+      title: "Contact Us",
       description:
-        "Contact Let’s Gol about football match trips, available dates, bookings, group travel or a custom package built around your chosen match.",
+        "Already have a match in mind or need help choosing a trip? Contact Let’s Gol by phone, email, WhatsApp or through our online enquiry form.",
     },
   },
 
@@ -86,9 +86,9 @@ export const seoCopy = {
         "Sprawdź, jak Let’s Gol przetwarza dane osobowe, chroni prywatność użytkowników oraz wykorzystuje niezbędne i opcjonalne pliki cookies.",
     },
     en: {
-      title: "Privacy and Cookie Policy",
+      title: "Privacy Policy and Cookies",
       description:
-        "Learn how Let’s Gol processes personal data, protects visitor privacy and uses essential and optional cookies across the website.",
+        "Learn how Let’s Gol processes personal data, protects your privacy and uses essential and optional cookies across the website.",
     },
   },
 
@@ -99,9 +99,9 @@ export const seoCopy = {
         "Poznaj zasady rezerwacji, płatności i udziału w wyjazdach na mecze organizowanych przez Let’s Gol, w tym warunki biletów, transportu i noclegów.",
     },
     en: {
-      title: "Football Trip Terms and Conditions",
+      title: "Terms and Conditions for Football Match Trips",
       description:
-        "Read the booking, payment and participation terms for Let’s Gol football trips, including tickets, transport, accommodation and traveller responsibilities.",
+        "Read the booking, payment and participation terms for Let’s Gol trips, including match tickets, transport, accommodation and traveller responsibilities.",
     },
   },
 } as const
@@ -142,7 +142,7 @@ export function buildTripSeoDescription({
     ).format(price)
 
   if (locale === "en") {
-    return `Football trip to ${title} with Let’s Gol. Explore options with match tickets, flights, hotel and coordinator support. Prices from PLN ${formattedPrice} per person.`
+    return `Football trip to ${title} with Let’s Gol. Explore available options with match tickets, flights, hotel and coordinator support. Prices from PLN ${formattedPrice} per person.`
   }
 
   return `Wyjazd na mecz ${title} z Let’s Gol. Sprawdź dostępne warianty z biletem, lotem, hotelem i opieką koordynatora. Cena od ${formattedPrice} zł za osobę.`
