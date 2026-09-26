@@ -14,7 +14,6 @@ import {
   Users,
 } from "lucide-react"
 
-import { Brand } from "@/components/site-header"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { SocialLinks } from "@/components/social-links"
 import type { SiteContent } from "@/lib/content"
@@ -130,7 +129,20 @@ export async function SiteFooter({
       <div className="relative mx-auto max-w-screen-2xl px-4 md:px-6 lg:px-10 xl:px-12">
         <div className="grid gap-y-12 py-12 sm:grid-cols-2 lg:grid-cols-[1.12fr_0.8fr_1.05fr_1.05fr_1.3fr] lg:gap-0 lg:py-16">
           <div className="pr-0 sm:pr-8 lg:pr-10">
-            <Brand locale={locale} />
+           <Link
+  href={routeFor(locale, "/")}
+  className="inline-block"
+  aria-label="Let's Gol"
+>
+  <Image
+    src="/images/logofooter.webp"
+    alt="Let's Gol"
+    width={130}
+    height={142}
+    className="h-auto w-32.5 object-contain"
+    sizes="130px"
+  />
+</Link>
 
             <p className="mt-6 max-w-60 text-[15px] leading-6 text-background/70">
   {localizedSetting(
