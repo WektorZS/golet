@@ -19,7 +19,11 @@ import {
 } from "@/lib/site"
 import { getRequestLocale } from "@/lib/i18n-request"
 import { getSeoCopy } from "@/lib/seo-copy"
-import { brandedTitle } from "@/lib/seo"
+import {
+  BRAND_NAME,
+  SITE_NAME,
+  brandedTitle,
+} from "@/lib/seo"
 
 import "./globals.css"
 
@@ -41,12 +45,16 @@ const oswald = Oswald({
 
 const organizationSchema = {
   "@type": "TravelAgency",
+
   "@id": absoluteUrl(
     "/#organization"
   ),
 
-  name: "Let’s Gol",
-  alternateName: "Let's Gol",
+  name: SITE_NAME,
+
+  alternateName:
+    BRAND_NAME,
+
   legalName:
     "LB Coaching Łukasz Borger",
 
@@ -54,12 +62,15 @@ const organizationSchema = {
 
   logo: {
     "@type": "ImageObject",
+
     url: absoluteUrl(
       "/icon.svg"
     ),
+
     contentUrl: absoluteUrl(
       "/icon.svg"
     ),
+
     width: 916,
     height: 888,
   },
@@ -126,10 +137,10 @@ const websiteSchema = {
 
   url: absoluteUrl(),
 
-  name: "Let’s Gol",
+  name: SITE_NAME,
 
   alternateName:
-    "Let's Gol",
+    BRAND_NAME,
 
   publisher: {
     "@id": absoluteUrl(
@@ -156,6 +167,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: siteUrl,
 
+    applicationName:
+      SITE_NAME,
+
     title: {
       default:
         brandedTitle(
@@ -163,7 +177,7 @@ export async function generateMetadata(): Promise<Metadata> {
         ),
 
       template:
-        "%s | Let’s Gol",
+        `%s | ${BRAND_NAME}`,
     },
 
     description:

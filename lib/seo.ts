@@ -7,7 +7,10 @@ import {
   type Locale,
 } from "@/lib/i18n"
 
-export const SITE_NAME = "Let’s Gol"
+export const BRAND_NAME = "Let's Gol"
+
+export const SITE_NAME =
+  "Let's Gol Wyjazdy na mecze"
 
 export function brandedTitle(
   title: string
@@ -26,7 +29,7 @@ export function brandedTitle(
     return title
   }
 
-  return `${title} | ${SITE_NAME}`
+  return `${title} | ${BRAND_NAME}`
 }
 
 export function socialMetadata(
